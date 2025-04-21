@@ -1,0 +1,107 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+  "files": {
+    "maxSize": 1572864
+  },
+  // imports section
+  "organizeImports": {
+    "enabled": true,
+    "ignore": ["node_modules", ".next", "out"]
+  },
+  // formatter section
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80,
+    "attributePosition": "auto",
+    "ignore": ["node_modules", ".next", "out"]
+  },
+  // linter section
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noBannedTypes": "error",
+        "noUselessThisAlias": "error",
+        "noUselessTypeConstraint": "error",
+        "noStaticOnlyClass": "off",
+        "noForEach": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "noPrecisionLoss": "error",
+        "noUnusedVariables": "off",
+        "useArrayLiterals": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
+      "style": {
+        "noInferrableTypes": "off",
+        "noNamespace": "error",
+        "useAsConstAssertion": "error",
+        "useBlockStatements": "off",
+        "useConsistentArrayType": "warn",
+        "noNonNullAssertion": "off",
+        "useImportType": "warn"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off",
+        "noExplicitAny": "off",
+        "noExtraNonNullAssertion": "error",
+        "noMisleadingInstantiator": "error",
+        "noUnsafeDeclarationMerging": "error"
+      },
+      "nursery": {
+        "useSortedClasses": "error"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off",
+        "useKeyWithClickEvents": "off",
+        "useFocusableInteractive": "off",
+        "useSemanticElements": "off"
+      }
+    },
+    "ignore": ["node_modules", ".next", "out"]
+  },
+  // javascript section
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteStyle": "double",
+      "attributePosition": "auto"
+    }
+  },
+  // vcs section
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  // json section
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  // overrides section
+  "overrides": [
+    {
+      "include": ["*.json"],
+      "formatter": {
+        "indentWidth": 2
+      }
+    }
+  ]
+}

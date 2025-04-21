@@ -1,0 +1,42 @@
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { checkAuth } from "@/backend/middlewares/check-auth"
+import * as sessionQuery from "@/backend/queries/session"
+import * as accountQuery from "@/backend/queries/account"
+import { catchError } from "@/utils/catch-error"
+import { NextResponse } from "next/server"
+import { db } from "@/config/drizzle"
+
+import type { NextRequest } from "next/server"
+
+export async function signOutUser(
+  request: NextRequest,
+): Promise<NextResponse<unknown>> {
+  try {
+    const rateLimitCheck = await httpRequestLimit(request)
+    if (rateLimitCheck instanceof NextResponse) {
+      return rateLimitCheck
+    }
+
+    const currentSession = await checkAuth()
+    if (currentSession instanceof NextResponse) {
+      return currentSession
+    }
+
+    await db.transaction(async (_tx) => {
+      await Promise.all([
+        sessionQuery.deleteBySessionIdQuery.execute({
+          sessionId: currentSession.id,
+        }),
+        accountQuery.emptyAccountSessionQuery.execute({
+          userId: currentSession.userId,
+          updatedAt: new Date(),
+        }),
+      ])
+      currentSession.destroy()
+    })
+
+    return NextResponse.json("Signed out successfully", { status: 201 })
+  } catch (error) {
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "env": [
+        "NEXT_PUBLIC_APP_URL",
+        "TURSO_CONNECTION_URL",
+        "TURSO_AUTH_TOKEN",
+        "SECRET_KEY",
+        "REDIS_URL",
+        "EMAIL",
+        "PASS",
+        "NEXT_PUBLIC_LOGO_URL",
+        "TWO_FACTOR_SECRET"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env.production.local",
+        ".env.local",
+        ".env.production",
+        ".env"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "lint": {},
+    "dev": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env.development.local",
+        ".env.local",
+        ".env.development",
+        ".env"
+      ],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
