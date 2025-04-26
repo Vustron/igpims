@@ -1,3 +1,4 @@
+import { ContentLayout } from "@/features/layouts/content-layout"
 import QueryHydrator from "@/utils/query-hydrator"
 import UserClient from "@/features/user/client"
 
@@ -19,7 +20,9 @@ export default async function UserPage() {
   const userData = presentor(session)
   return (
     <QueryHydrator prefetchFns={[preFindUser]}>
-      <UserClient id={userData.userId} />
+      <ContentLayout title="Edit Profile">
+        <UserClient id={userData.userId} />
+      </ContentLayout>
     </QueryHydrator>
   )
 }

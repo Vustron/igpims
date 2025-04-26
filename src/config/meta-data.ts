@@ -12,13 +12,13 @@ export const siteConfig: SiteConfig = {
   meta: {
     metadataBase: new URL(getBaseUrl()),
     title: {
-      template: "%s | Nextjs Template",
-      default: "Nextjs Template",
+      template: "%s | IGPMIS",
+      default: "IGPMIS",
     },
-    applicationName: "Nextjs Template",
+    applicationName: "IGPMIS",
     description: "A template made by Vustron",
     openGraph: { images: ["/og"] },
-    icons: [{ rel: "icon", url: "/icons/icon.ico" }],
+    icons: [{ rel: "icon", url: "/images/logo.png" }],
   },
   viewport: {
     themeColor: [

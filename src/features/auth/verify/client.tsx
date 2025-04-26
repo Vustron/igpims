@@ -8,15 +8,16 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/cards"
+import { VerifyForm } from "@/features/auth/verify/verification-form"
 import { Loader2Icon, CircleX, ShieldCheck } from "lucide-react"
 import { DynamicButton } from "@/components/ui/buttons"
-import { VerifyForm } from "@/features/verify/form"
 import { Label } from "@/components/ui/labels"
 import Link from "next/link"
 
 import { useVerifyEmail } from "@/backend/actions/user/verify-email"
 import { useCallback, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import Image from "next/image"
 
 export const COOLDOWN_TIME = 3 * 60 * 1000
 
@@ -76,12 +77,21 @@ const VerifyClient = () => {
 
   return (
     <div className="grid w-full grow items-center px-4 sm:justify-center">
-      <Card className="w-full sm:w-96">
+      <Card className="w-full border-[2px] border-amber-300 bg-[#2B291A] sm:w-96">
         <CardHeader>
-          <CardTitle>
+          <div className="flex flex-col items-center justify-center">
+            <Image
+              src="/images/logo.png"
+              alt="DNSC Supreme Student Council Logo"
+              width={100}
+              height={100}
+              className="rounded-full"
+            />
+          </div>
+          <CardTitle className="text-center text-lg text-white">
             {token ? "Verifying Account" : "Send Verification Link"}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-center">
             {token
               ? "Please wait while we verify your account"
               : "Please check your email for a verification link."}

@@ -7,21 +7,21 @@ import { sendEmailSchema } from "@/schemas/user"
 import { catchError } from "@/utils/catch-error"
 import toast from "react-hot-toast"
 
-import { useSendVerifyLink } from "@/backend/actions/user/send-verify-link"
+import { useSendResetLink } from "@/backend/actions/user/send-reset-link"
 import { useForm } from "react-hook-form"
 
 import type { SendEmailPayload } from "@/schemas/user"
 import type { FieldConfig } from "@/interfaces/form"
 
-interface VerifyFormProps {
+interface ResetLinkFormProps {
   onSuccess?: () => void
   disabled?: boolean
 }
 
-export const VerifyForm = ({ onSuccess, disabled }: VerifyFormProps) => {
-  const sendVerifyLink = useSendVerifyLink()
+const SendResetLinkForm = ({ onSuccess, disabled }: ResetLinkFormProps) => {
+  const sendResetLink = useSendResetLink()
 
-  const verifyFields: FieldConfig<SendEmailPayload>[] = [
+  const resetFields: FieldConfig<SendEmailPayload>[] = [
     {
       name: "email",
       type: "email",
@@ -38,7 +38,7 @@ export const VerifyForm = ({ onSuccess, disabled }: VerifyFormProps) => {
   })
 
   const submitHandler = async (values: SendEmailPayload) => {
-    await toast.promise(sendVerifyLink.mutateAsync(values), {
+    await toast.promise(sendResetLink.mutateAsync(values), {
       loading: <span className="animate-pulse">Sending link...</span>,
       success: "Link sent, please check your email",
       error: (error: unknown) => catchError(error),
@@ -51,10 +51,15 @@ export const VerifyForm = ({ onSuccess, disabled }: VerifyFormProps) => {
     <DynamicForm
       form={form}
       onSubmit={submitHandler}
-      fields={verifyFields}
+      fields={resetFields}
       submitButtonTitle="Send link"
       disabled={disabled}
-      mutation={sendVerifyLink}
+      mutation={sendResetLink}
+      isResetPassword
+      submitButtonClassname="w-full bg-amber-300 text-black hover:bg-amber-400 focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-[#222216] disabled:cursor-not-allowed disabled:opacity-50"
+      isFloatingLabelInput={false}
     />
   )
 }
+
+export default SendResetLinkForm

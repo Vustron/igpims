@@ -49,6 +49,7 @@ export const SignInOTPEmailForm = () => {
       submitButtonTitle="Sign In"
       mutation={signInOTPEmail}
       isSignIn
+      submitButtonClassname="w-full bg-amber-300 text-black hover:bg-amber-400 focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-[#222216] disabled:cursor-not-allowed disabled:opacity-50"
     />
   )
 }

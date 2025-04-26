@@ -56,4 +56,5 @@ export interface DynamicFormProps<TFieldValues extends FieldValues> {
   isSignIn?: boolean
   isResetPassword?: boolean
   isOnEditAccount?: boolean
+  isFloatingLabelInput?: boolean
 }

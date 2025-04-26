@@ -38,6 +38,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
   isSignIn,
   isResetPassword,
   isOnEditAccount,
+  isFloatingLabelInput,
 }: DynamicFormProps<TFieldValues>) => {
   const [isPasswordStrong, setIsPasswordStrong] = useState(true)
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(
@@ -94,6 +95,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
                     disabled={disabled!}
                     isSignUp={isSignUp}
                     onPasswordStrengthChange={setIsPasswordStrong}
+                    isFloatingLabel={isFloatingLabelInput}
                   />
                 </FormControl>
                 <FormMessage />
@@ -177,7 +179,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
         )}
         {(isSignIn || isResetPassword) && (
           <div className="flex items-center justify-between">
-            <DynamicButton
+            {/* <DynamicButton
               variant="link"
               size="sm"
               asChild
@@ -188,14 +190,14 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
                   Don't have an account?
                 </span>
               </Link>
-            </DynamicButton>
+            </DynamicButton> */}
 
             <DynamicButton variant="link" size="sm" asChild>
               <Link
                 href={isResetPassword ? "/sign-in" : "/reset-password"}
                 onClick={resetOtpSignIn}
               >
-                <span className="text-muted-foreground text-sm">
+                <span className="text-sm text-white">
                   {isResetPassword
                     ? "Continue to sign in?"
                     : "Forgot password?"}

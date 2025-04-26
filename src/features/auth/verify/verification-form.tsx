@@ -2,26 +2,26 @@
 
 import { DynamicForm } from "@/components/ui/forms"
 
-import { sendEmailSchema } from "@/schemas/user"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { sendEmailSchema } from "@/schemas/user"
 import { catchError } from "@/utils/catch-error"
 import toast from "react-hot-toast"
 
-import { useSendResetLink } from "@/backend/actions/user/send-reset-link"
+import { useSendVerifyLink } from "@/backend/actions/user/send-verify-link"
 import { useForm } from "react-hook-form"
 
 import type { SendEmailPayload } from "@/schemas/user"
 import type { FieldConfig } from "@/interfaces/form"
 
-interface ResetLinkFormProps {
+interface VerifyFormProps {
   onSuccess?: () => void
   disabled?: boolean
 }
 
-const SendResetLinkForm = ({ onSuccess, disabled }: ResetLinkFormProps) => {
-  const sendResetLink = useSendResetLink()
+export const VerifyForm = ({ onSuccess, disabled }: VerifyFormProps) => {
+  const sendVerifyLink = useSendVerifyLink()
 
-  const resetFields: FieldConfig<SendEmailPayload>[] = [
+  const verifyFields: FieldConfig<SendEmailPayload>[] = [
     {
       name: "email",
       type: "email",
@@ -38,7 +38,7 @@ const SendResetLinkForm = ({ onSuccess, disabled }: ResetLinkFormProps) => {
   })
 
   const submitHandler = async (values: SendEmailPayload) => {
-    await toast.promise(sendResetLink.mutateAsync(values), {
+    await toast.promise(sendVerifyLink.mutateAsync(values), {
       loading: <span className="animate-pulse">Sending link...</span>,
       success: "Link sent, please check your email",
       error: (error: unknown) => catchError(error),
@@ -51,13 +51,11 @@ const SendResetLinkForm = ({ onSuccess, disabled }: ResetLinkFormProps) => {
     <DynamicForm
       form={form}
       onSubmit={submitHandler}
-      fields={resetFields}
+      fields={verifyFields}
       submitButtonTitle="Send link"
       disabled={disabled}
-      mutation={sendResetLink}
-      isResetPassword
+      mutation={sendVerifyLink}
+      submitButtonClassname="w-full bg-amber-300 text-black hover:bg-amber-400 focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-[#222216] disabled:cursor-not-allowed disabled:opacity-50"
     />
   )
 }
-
-export default SendResetLinkForm

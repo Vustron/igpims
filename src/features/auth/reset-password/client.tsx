@@ -5,15 +5,16 @@ import {
   CardTitle,
   CardHeader,
   CardContent,
-  CardDescription,
+  // CardDescription,
 } from "@/components/ui/cards"
-import SendResetLinkForm from "@/features/reset-password/send-reset-link-form"
-import ResetPasswordForm from "@/features/reset-password/reset-password-form"
+import SendResetLinkForm from "@/features/auth/reset-password/send-reset-link-form"
+import ResetPasswordForm from "@/features/auth/reset-password/reset-password-form"
 import { Label } from "@/components/ui/labels"
 import { Loader2Icon } from "lucide-react"
 
 import { useCallback, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import Image from "next/image"
 
 const COOLDOWN_TIME = 3 * 60 * 1000
 
@@ -64,18 +65,27 @@ const ResetPasswordClient = () => {
 
   return (
     <div className="grid w-full grow items-center px-4 sm:justify-center">
-      <Card className="w-full sm:w-96">
+      <Card className="w-full border-[2px] border-amber-300 bg-[#2B291A] sm:w-96">
         <CardHeader>
-          <CardTitle>
+          <div className="flex flex-col items-center justify-center">
+            <Image
+              src="/images/logo.png"
+              alt="DNSC Supreme Student Council Logo"
+              width={100}
+              height={100}
+              className="rounded-full"
+            />
+          </div>
+          <CardTitle className="text-center text-lg text-white">
             {token && email
               ? "Resetting Your Password"
               : "Send Reset Password Link"}
           </CardTitle>
-          <CardDescription>
+          {/* <CardDescription className="text-center">
             {token && email
               ? "Please wait while we reset the password of your account"
               : "Please check your email for a reset password link."}
-          </CardDescription>
+          </CardDescription> */}
         </CardHeader>
         <CardContent>
           {token && email ? (

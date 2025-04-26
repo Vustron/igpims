@@ -1,11 +1,7 @@
 "use client"
 
 import { Input } from "@/components/ui/inputs/input"
-import { EyeIcon, EyeOffIcon } from "lucide-react"
-import { Button } from "@/components/ui/buttons"
 import { Label } from "@/components/ui/labels"
-
-import { useState } from "react"
 
 import { cn } from "@/utils/cn"
 import * as React from "react"
@@ -23,58 +19,22 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
     { className, placeholder, type, isPassword, disabled, hasErrors, ...props },
     ref,
   ) => {
-    // init state
-    const [showPassword, setShowPassword] = useState<boolean>(false)
-
     return (
-      <div>
-        <Input
-          type={isPassword ? (showPassword ? "text" : "password") : type}
-          placeholder={placeholder}
-          disabled={disabled}
-          className={cn(
-            "peer",
-            hasErrors
-              ? "focus-visible:outline-hidden focus-visible:ring-0 focus-visible:ring-offset-0"
-              : "",
-            className,
-            isPassword ? "hide-password-toggle pr-10" : "",
-          )}
-          ref={ref}
-          {...props}
-        />
-
-        {isPassword && (
-          <div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-              onClick={() => setShowPassword((prev) => !prev)}
-              disabled={disabled}
-            >
-              {showPassword && !disabled ? (
-                <EyeIcon className="size-4" aria-hidden="true" />
-              ) : (
-                <EyeOffIcon className="size-4" aria-hidden="true" />
-              )}
-              <span className="sr-only">
-                {showPassword ? "Hide password" : "Show password"}
-              </span>
-            </Button>
-
-            <style>{`
-              .hide-password-toggle::-ms-reveal,
-              .hide-password-toggle::-ms-clear {
-                visibility: hidden;
-                pointer-events: none;
-                display: none;
-              }
-            `}</style>
-          </div>
+      <Input
+        type={type}
+        placeholder={placeholder}
+        disabled={disabled}
+        isPassword={isPassword}
+        className={cn(
+          "peer",
+          hasErrors
+            ? "focus-visible:outline-hidden focus-visible:ring-0 focus-visible:ring-offset-0"
+            : "",
+          className,
         )}
-      </div>
+        ref={ref}
+        {...props}
+      />
     )
   },
 )
