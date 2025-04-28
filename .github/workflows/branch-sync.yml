@@ -3,6 +3,7 @@ on:
   push:
     branches-ignore:
       - main
+      - vustron
 
 jobs:
   branch-sync:
@@ -12,6 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
 
       - name: Set up git
         run: |
