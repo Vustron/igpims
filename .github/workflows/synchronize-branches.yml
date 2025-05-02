@@ -14,7 +14,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_PAT }}
 
       - name: Set up git
         run: |
@@ -28,7 +27,7 @@ jobs:
         run: |
           git branch -r | grep -v '\->' | while read remote; do
             branch="${remote#origin/}"
-            if [ "$branch" != "main" ] && [ "$branch" != "HEAD" ] && [ "$branch" != "vustron" ]; then
+            if [ "$branch" != "main" ] && [ "$branch" != "HEAD" ]; then
               git checkout "$branch"
               git merge origin/main --no-edit || true
               git push origin "$branch"
