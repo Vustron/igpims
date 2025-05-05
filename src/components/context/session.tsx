@@ -8,7 +8,7 @@ import type { Session } from "@/schemas/drizzle-schema"
 
 const SessionContext = createContext<Session | null>(null)
 
-const SessionProvider = ({
+export const SessionProvider = ({
   children,
   value,
 }: React.PropsWithChildren<{ value: Session }>) => {
@@ -16,8 +16,6 @@ const SessionProvider = ({
     <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
   )
 }
-
-export default SessionProvider
 
 export const useSession = () => {
   const context = useContext(SessionContext)

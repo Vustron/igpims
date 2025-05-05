@@ -1,4 +1,4 @@
-import SignUpClient from "@/features/sign-up/client"
+import SignUpClient from "@/features/auth/sign-up/client"
 
 import type { Metadata } from "next"
 
@@ -8,8 +8,13 @@ export const metadata: Metadata = {
 
 export default async function SignUpPage() {
   return (
-    <div className="m-auto flex size-full flex-col items-center justify-center space-y-12">
-      <SignUpClient />
+    <div className="relative grid h-screen w-full grid-cols-1 lg:grid-cols-2">
+      <div className="hidden lg:block">
+        <div className="size-full" />
+      </div>
+      <div className="flex flex-col items-center justify-center">
+        <SignUpClient />
+      </div>
     </div>
   )
 }

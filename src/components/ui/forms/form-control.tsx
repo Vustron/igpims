@@ -1,4 +1,5 @@
 import {
+  Input,
   Switch,
   InputOTP,
   FileUpload,
@@ -7,7 +8,7 @@ import {
   FloatingLabelInput,
   FloatingLabelTextArea,
 } from "@/components/ui/inputs"
-import { PasswordStrengthMeter } from "@/components/ui/forms"
+import { FormLabel, PasswordStrengthMeter } from "@/components/ui/forms"
 import { FloatingSelect } from "@/components/ui/selects"
 
 import { cn } from "@/utils/cn"
@@ -24,6 +25,7 @@ interface FormControlRendererProps<TFieldValues extends FieldValues> {
   mutation: Mutation
   disabled: boolean
   isSignUp?: boolean
+  isFloatingLabel?: boolean
   onPasswordStrengthChange?: (isStrong: boolean) => void
 }
 
@@ -34,6 +36,7 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
   mutation,
   disabled,
   isSignUp,
+  isFloatingLabel = true,
   onPasswordStrengthChange,
 }: FormControlRendererProps<TFieldValues>) => {
   const isOtpSignIn = useOtpStore((state) => state.isOtpSignIn)
@@ -152,22 +155,52 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
         <>
           {!isOtpSignIn && (
             <>
-              <FloatingLabelInput
-                {...formField}
-                id={field.name}
-                type={field.type}
-                label={field.label}
-                placeholder={isOtpSignIn ? field.placeholder : null}
-                disabled={mutation?.isPending}
-                hasErrors={!!form.formState.errors[field.name]}
-                className={cn(
-                  form.formState.errors[field.name]
-                    ? "border-red-600 focus:ring-0"
-                    : "space-y-10",
-                  field.className,
-                )}
-                isPassword={field.type === "password"}
-              />
+              {isFloatingLabel ? (
+                <FloatingLabelInput
+                  {...formField}
+                  id={field.name}
+                  type={field.type}
+                  label={field.label}
+                  placeholder={isOtpSignIn ? field.placeholder : null}
+                  disabled={mutation?.isPending}
+                  hasErrors={!!form.formState.errors[field.name]}
+                  className={cn(
+                    "w-full",
+                    form.formState.errors[field.name]
+                      ? "border-red-600 focus:ring-0"
+                      : "space-y-10",
+                    field.className,
+                  )}
+                  isPassword={field.type === "password"}
+                />
+              ) : (
+                <div className="space-y-2">
+                  {field.label && (
+                    <FormLabel
+                      htmlFor={field.name}
+                      className="font-medium text-sm text-white"
+                    >
+                      {field.label}
+                    </FormLabel>
+                  )}
+                  <Input
+                    {...formField}
+                    id={field.name}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    disabled={mutation?.isPending || disabled}
+                    className={cn(
+                      "w-full",
+                      form.formState.errors[field.name]
+                        ? "border-red-600 focus:ring-0"
+                        : "",
+                      field.className,
+                    )}
+                    aria-invalid={!!form.formState.errors[field.name]}
+                    isPassword={field.type === "password"}
+                  />
+                </div>
+              )}
 
               {((isSignUp && field.type === "password") ||
                 (field.type === "password" &&
