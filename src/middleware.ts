@@ -5,7 +5,12 @@ import { unsealData } from "iron-session"
 import type { SessionType } from "@/config/session"
 import type { NextRequest } from "next/server"
 
-export const protectedRoutes: string[] = ["/", "/user"]
+export const protectedRoutes: string[] = [
+  "/",
+  "/user",
+  "/locker-rental",
+  "/locker",
+]
 export const authRoutes: string[] = [
   "/sign-in",
   "/sign-up",
