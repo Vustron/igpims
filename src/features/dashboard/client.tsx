@@ -5,7 +5,7 @@ import { DashboardCard } from "@/features/dashboard/dashboard-card"
 import { SalesOverview } from "@/features/dashboard/sales-overview"
 import { IgpActivity } from "@/features/dashboard/igp-activity"
 import { IgpStatus } from "@/features/dashboard/igp-status"
-import { IgpChart } from "@/features/dashboard/igp-chart"
+import { IgpPerformance } from "@/features/dashboard/igp-performance"
 import { GiDroplets } from "react-icons/gi"
 import { GiClothes } from "react-icons/gi"
 import { GiLockers } from "react-icons/gi"
@@ -48,13 +48,15 @@ export const DashboardClient = () => {
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-5">
         <div className="md:col-span-3">
-          <IgpChart />
+          <IgpPerformance />
         </div>
         <div className="md:col-span-2">
-          <div className="mb-5">
+          <div className="mb-2">
             <IgpStatus />
           </div>
-          <IgpActivity />
+          <div className="mb-2">
+            <IgpActivity />
+          </div>
         </div>
       </div>
 

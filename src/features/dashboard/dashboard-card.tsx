@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
-import { getPercentageChangeColor } from "@/utils/get-percentage-color"
+import { TrendingDown, TrendingUp } from "lucide-react"
+import { Card } from "@/components/ui/cards"
 
 interface DashboardCardItemProps {
   id: string
@@ -21,36 +21,52 @@ export const DashboardCard = ({ items }: DashboardCardProps) => {
       {items.map((item) => (
         <Card
           key={item.id}
-          className="w-full bg-card text-card-foreground shadow-sm"
+          className="col-span-full p-3 sm:col-span-2 sm:p-4 md:p-6 lg:col-span-1"
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4 pb-2">
-            <CardTitle className="font-medium text-muted-foreground text-sm">
-              {item.title}
-            </CardTitle>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="mb-1 font-medium text-gray-500 text-xs sm:text-sm">
+                {item.title}
+              </p>
+              <h2 className="font-bold text-base sm:text-lg md:text-xl">
+                {item.amount}
+              </h2>
+            </div>
             {item.icon && (
-              <span className="text-muted-foreground">{item.icon}</span>
-            )}
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="font-bold text-2xl">{item.amount}</div>
-
-            {item.metric && (
-              <div className="mt-1 text-muted-foreground text-sm">
-                {item.metric}
+              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900">
+                {item.icon}
               </div>
             )}
+          </div>
 
-            <div className="mt-3 flex items-center gap-1 text-xs">
-              <span className={getPercentageChangeColor(item.percentageChange)}>
+          <div className="mt-3 sm:mt-4 md:mt-6">
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`flex items-center gap-1 text-2xs sm:text-xs ${
+                  item.percentageChange.startsWith("+") ||
+                  item.percentageChange.startsWith("0")
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              >
+                {item.percentageChange.startsWith("+") ||
+                item.percentageChange.startsWith("0") ? (
+                  <TrendingUp className="size-3 sm:size-4" />
+                ) : (
+                  <TrendingDown className="size-3 sm:size-4" />
+                )}
                 {item.percentageChange}
               </span>
-              {item.trendDescription && (
-                <span className="text-muted-foreground">
-                  {item.trendDescription}
-                </span>
-              )}
+              <span className="text-2xs text-gray-500 sm:text-xs">
+                {item.trendDescription || "vs previous period"}
+              </span>
             </div>
-          </CardContent>
+            {item.metric && (
+              <p className="mt-1 text-2xs text-gray-400 sm:text-xs">
+                {item.metric}
+              </p>
+            )}
+          </div>
         </Card>
       ))}
     </>
