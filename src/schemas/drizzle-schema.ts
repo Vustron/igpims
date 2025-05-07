@@ -25,14 +25,14 @@ export const user = sqliteTable(
     email: text("email").notNull().unique(),
     emailVerified: integer("emailVerified", { mode: "boolean" }).notNull(),
     sessionExpired: integer("sessionExpired", { mode: "boolean" }).notNull(),
-    role: text("role", { enum: [ "admin", "user" ] })
+    role: text("role", { enum: ["admin", "user"] })
       .notNull()
       .default("user"),
     image: text("image"),
     createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
     updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
   },
-  (t) => [ index("user_role_idx").on(t.id) ],
+  (t) => [index("user_role_idx").on(t.id)],
 )
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -66,8 +66,8 @@ export const session = sqliteTable(
 
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
-    fields: [ session.userId ],
-    references: [ user.id ],
+    fields: [session.userId],
+    references: [user.id],
   }),
 }))
 
@@ -92,8 +92,8 @@ export const account = sqliteTable("account", {
 
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
-    fields: [ account.userId ],
-    references: [ user.id ],
+    fields: [account.userId],
+    references: [user.id],
   }),
 }))
 
@@ -109,7 +109,7 @@ export const rateLimit = sqliteTable(
     createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
     updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
   },
-  (t) => [ uniqueIndex("rate_limit_ip_address_idx").on(t.ipAddress) ],
+  (t) => [uniqueIndex("rate_limit_ip_address_idx").on(t.ipAddress)],
 )
 
 export const verificationToken = sqliteTable("verification_token", {
@@ -130,8 +130,8 @@ export const verificationTokenRelations = relations(
   verificationToken,
   ({ one }) => ({
     user: one(user, {
-      fields: [ verificationToken.userId ],
-      references: [ user.id ],
+      fields: [verificationToken.userId],
+      references: [user.id],
     }),
   }),
 )
@@ -152,8 +152,8 @@ export const resetToken = sqliteTable("reset_token", {
 
 export const resetTokenRelations = relations(resetToken, ({ one }) => ({
   user: one(user, {
-    fields: [ resetToken.userId ],
-    references: [ user.id ],
+    fields: [resetToken.userId],
+    references: [user.id],
   }),
 }))
 
@@ -171,8 +171,8 @@ export const otpToken = sqliteTable("otp_token", {
 
 export const otpTokenRelations = relations(otpToken, ({ one }) => ({
   user: one(user, {
-    fields: [ otpToken.userId ],
-    references: [ user.id ],
+    fields: [otpToken.userId],
+    references: [user.id],
   }),
 }))
 
@@ -184,16 +184,16 @@ export const locker = sqliteTable(
       .$defaultFn(() => nanoid()),
     lockerType: text("locker_type").notNull(),
     lockerNumber: text("locker_number").notNull(),
-    isAvailable: integer("is_available", { mode: "boolean" }).notNull().default(true),
+    isAvailable: integer("is_available", { mode: "boolean" })
+      .notNull()
+      .default(true),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
   },
   (t) => [
-    uniqueIndex("locker_type_number_idx").on(t.lockerType, t.lockerNumber)
-
-  ]
+    uniqueIndex("locker_type_number_idx").on(t.lockerType, t.lockerNumber),
+  ],
 )
-
 
 export const lockerRental = sqliteTable(
   "locker_rental",
@@ -218,28 +218,28 @@ export const lockerRental = sqliteTable(
     index("locker_rental_locker_id_idx").on(t.lockerId),
     index("locker_rental_renter_id_idx").on(t.renterId),
     index("locker_rental_renter_name_idx").on(t.renterName),
-  ]
+  ],
 )
 
 export const lockerRelations = relations(locker, ({ many }) => ({
-  rentals: many(lockerRental)
+  rentals: many(lockerRental),
 }))
 
 export const lockerRentalRelations = relations(lockerRental, ({ one }) => ({
   locker: one(locker, {
-    fields: [ lockerRental.lockerId ],
-    references: [ locker.locker_id ]
+    fields: [lockerRental.lockerId],
+    references: [locker.locker_id],
   }),
   renter: one(user, {
-    fields: [ lockerRental.renterId ],
-    references: [ user.id ]
+    fields: [lockerRental.renterId],
+    references: [user.id],
   }),
 }))
 
 export type Account = InferSelectModel<typeof account>
 export type User = InferSelectModel<typeof user>
 export type Session = InferSelectModel<typeof session>
-export type UserRoleType = (typeof UserRole)[ keyof typeof UserRole ]
+export type UserRoleType = (typeof UserRole)[keyof typeof UserRole]
 export type RateLimit = InferSelectModel<typeof rateLimit>
 export type OtpToken = InferSelectModel<typeof otpToken>
 export type Locker = InferSelectModel<typeof locker>
