@@ -56,7 +56,7 @@ export const LockerCard: React.FC<LockerCardProps> = ({
         className={!isDisabled ? "cursor-pointer" : "cursor-not-allowed"}
       >
         <Card
-          className={`relative flex h-64 w-44 flex-col items-center justify-start overflow-hidden bg-gradient-to-br p-4 transition-all duration-300 sm:h-72 sm:w-48 sm:p-5 md:h-80 md:w-56 md:p-6 ${getStatusColor(locker.status)}`}
+          className={`relative flex h-75 w-35 flex-col items-center justify-start overflow-hidden bg-gradient-to-br p-4 transition-all duration-300 sm:h-75 sm:w-48 sm:p-5 md:h-75 md:w-45 md:p-6 ${getStatusColor(locker.status)}`}
         >
           <LockerStatusIndicator status={locker.status} />
 

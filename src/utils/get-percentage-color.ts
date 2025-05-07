@@ -6,17 +6,6 @@ export const getPercentageChangeColor = (percentageChange: string) => {
     : "text-red-600 dark:text-red-400"
 }
 
-export function getStatusColor(status: string): string {
-  switch (status) {
-    case "active":
-      return "from-emerald-500 to-emerald-600"
-    case "under_maintenance":
-      return "from-red-500 to-red-600"
-    default:
-      return "from-slate-400 to-slate-500"
-  }
-}
-
 export function getStatusIndicator(status: string): string {
   switch (status) {
     case "active":
@@ -36,5 +25,31 @@ export function getStatusText(status: string): string {
       return "Maintenance"
     default:
       return "In use"
+  }
+}
+
+export const getStatusLabel = (status: string): string => {
+  switch (status) {
+    case "active":
+      return "Available"
+    case "inactive":
+      return "In Use"
+    case "under_maintenance":
+      return "Maintenance"
+    default:
+      return "All"
+  }
+}
+
+export const getStatusColor = (status: string): string => {
+  switch (status) {
+    case "active":
+      return "bg-emerald-500 hover:bg-emerald-600"
+    case "inactive":
+      return "bg-yellow-500 hover:bg-yellow-600"
+    case "under_maintenance":
+      return "bg-red-500 hover:bg-red-600"
+    default:
+      return "bg-blue-500 hover:bg-blue-600"
   }
 }
