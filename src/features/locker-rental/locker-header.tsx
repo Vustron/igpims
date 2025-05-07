@@ -1,5 +1,7 @@
 "use client"
 
+import { Badge } from "@/components/ui/badges"
+
 import { getStatusText } from "@/utils/get-percentage-color"
 import { motion } from "framer-motion"
 
@@ -16,16 +18,19 @@ export const LockerHeader: React.FC<LockerHeaderProps> = ({
 }) => {
   return (
     <motion.div
-      className="mb-4 text-center sm:mb-5 md:mb-6"
-      animate={{ y: isSelected ? -5 : 0 }}
+      className="relative z-10 mb-1.5 text-center sm:mb-2 md:mb-3"
+      animate={{ y: isSelected ? -3 : 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="font-bold text-lg text-white drop-shadow-md sm:text-xl md:text-2xl">
+      <div className="font-bold text-sm text-white drop-shadow-md sm:text-base md:text-lg">
         {name}
       </div>
-      <div className="mt-1 text-[10px] text-white/80 uppercase tracking-wide sm:text-xs">
+      <Badge
+        className="mt-0.5 bg-white/20 text-[8px] text-white uppercase tracking-wide sm:text-[9px]"
+        variant="secondary"
+      >
         {getStatusText(status)}
-      </div>
+      </Badge>
     </motion.div>
   )
 }

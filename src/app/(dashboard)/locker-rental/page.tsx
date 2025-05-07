@@ -1,4 +1,4 @@
-import { LockerRentalClient } from "@/features/locker-rental/client"
+import { LockerRentalTabs } from "@/features/locker-rental/locker-tabs"
 import { ContentLayout } from "@/features/layouts/content-layout"
 
 import type { Metadata } from "next"
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   return (
     <ContentLayout title="Locker Rental">
-      <LockerRentalClient />
+      <LockerRentalTabs />
     </ContentLayout>
   )
 }

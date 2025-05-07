@@ -11,28 +11,28 @@ export const MaintenanceTape: React.FC<MaintenanceTapeProps> = ({ index }) => {
   return (
     <>
       <motion.div
-        className="absolute top-0 left-0 flex h-6 w-[200%] origin-bottom-left rotate-45 items-center justify-center bg-yellow-300 shadow-md sm:h-7 md:h-8"
+        className="-top-1 absolute left-0 flex h-4 w-[200%] origin-bottom-left rotate-45 items-center justify-center bg-yellow-300 shadow-md sm:h-5"
         initial={{ x: -100 }}
-        animate={{ x: -20 }}
+        animate={{ x: -15 }}
         transition={{ duration: 0.5, delay: index * 0.15 + 0.3 }}
       >
-        <div className="flex items-center gap-1 font-bold text-[10px] text-red-600 tracking-wider sm:gap-1.5 sm:text-xs">
-          <WrenchIcon size={10} className="sm:size-3 md:size-4" />
-          <span className="hidden sm:inline">UNDER</span> MAINTENANCE
-          <WrenchIcon size={10} className="sm:size-3 md:size-4" />
+        <div className="flex items-center gap-0.5 font-bold text-[7px] text-red-600 tracking-wider sm:text-[8px]">
+          <WrenchIcon size={6} className="sm:size-2" />
+          MAINTENANCE
+          <WrenchIcon size={6} className="sm:size-2" />
         </div>
       </motion.div>
 
       <motion.div
-        className="absolute right-0 bottom-0 flex h-6 w-[200%] origin-top-right rotate-45 items-center justify-center bg-yellow-300 shadow-md sm:h-7 md:h-8"
+        className="absolute right-0 bottom-0 flex h-4 w-[200%] origin-top-right rotate-45 items-center justify-center bg-yellow-300 shadow-md sm:h-5"
         initial={{ x: 100 }}
-        animate={{ x: 20 }}
+        animate={{ x: 15 }}
         transition={{ duration: 0.5, delay: index * 0.15 + 0.3 }}
       >
-        <div className="flex items-center gap-1 font-bold text-[10px] text-red-600 tracking-wider sm:gap-1.5 sm:text-xs">
-          <WrenchIcon size={10} className="sm:size-3 md:size-4" />
-          <span className="hidden sm:inline">UNDER</span> MAINTENANCE
-          <WrenchIcon size={10} className="sm:size-3 md:size-4" />
+        <div className="flex items-center gap-0.5 font-bold text-[7px] text-red-600 tracking-wider sm:text-[8px]">
+          <WrenchIcon size={6} className="sm:size-2" />
+          MAINTENANCE
+          <WrenchIcon size={6} className="sm:size-2" />
         </div>
       </motion.div>
     </>

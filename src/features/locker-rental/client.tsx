@@ -1,89 +1,19 @@
 "use client"
 
 import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectContent,
-  SelectTrigger,
-} from "@/components/ui/selects"
-import { getStatusColor, getStatusLabel } from "@/utils/get-percentage-color"
+  LockerFilter,
+  getGridLayoutClass,
+} from "@/features/locker-rental/locker-filter"
 import { LockerCard } from "@/features/locker-rental/locker-card"
-import { Search, PlusCircleIcon } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
-import { Input } from "@/components/ui/inputs"
 
 import { useEffect, useState } from "react"
 
 import { motion } from "framer-motion"
 
-import type { Locker } from "@/interfaces/locker"
+import { lockerList, type Locker } from "@/interfaces/locker"
 
-export const lockerList: Locker[] = [
-  {
-    id: 1,
-    name: "SM - 01",
-    status: "active",
-    location: "Academic Building - 1st Floor (Left)",
-  },
-  {
-    id: 2,
-    name: "SM - 02",
-    status: "inactive",
-    location: "Academic Building - 1st Floor (Left)",
-  },
-  {
-    id: 3,
-    name: "SM - 03",
-    status: "under_maintenance",
-    location: "Academic Building - 1st Floor (Left)",
-  },
-  {
-    id: 4,
-    name: "SM - 04",
-    status: "active",
-    location: "Academic Building - 1st Floor (Right)",
-  },
-  {
-    id: 5,
-    name: "SM - 05",
-    status: "active",
-    location: "IC - 1st Floor (Right)",
-  },
-  {
-    id: 6,
-    name: "SM - 06",
-    status: "active",
-    location: "Academic Building - 2nd Floor (Left)",
-  },
-  {
-    id: 7,
-    name: "SM - 07",
-    status: "active",
-    location: "Academic Building - 2nd Floor (Left)",
-  },
-  {
-    id: 8,
-    name: "SM - 08",
-    status: "active",
-    location: "Academic Building - 2nd Floor (Right)",
-  },
-  {
-    id: 9,
-    name: "SM - 09",
-    status: "active",
-    location: "Academic Building - 2nd Floor (Right)",
-  },
-  {
-    id: 10,
-    name: "SM - 10",
-    status: "active",
-    location: "Academic Building - 2nd Floor (Right)",
-  },
-]
-
-export const LockerRentalClient = () => {
+export const LockerRentalClient = ({ isSidebarOpen = false }) => {
   const [data, setData] = useState<Locker[]>(lockerList)
   const [filteredData, setFilteredData] = useState<Locker[]>(lockerList)
   const [selectedLocker, setSelectedLocker] = useState<number | null>(null)
@@ -150,146 +80,28 @@ export const LockerRentalClient = () => {
     setData(lockerList)
   }, [])
 
+  const containerPadding = isSidebarOpen
+    ? "p-2 sm:p-2 md:p-3 lg:p-4"
+    : "p-2 sm:p-3 md:p-4 lg:p-6"
+
   return (
-    <div className="flex min-h-screen w-full flex-col p-2 sm:p-3 md:p-4 lg:p-6">
+    <div className={`flex min-h-screen w-full flex-col ${containerPadding}`}>
       {/* Filters Section */}
-      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center md:mb-4">
-        <div className="relative flex-1">
-          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search lockers..."
-            className="h-9 pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="mt-2 flex flex-col gap-2 sm:mt-0 sm:flex-row sm:gap-2">
-          <div className="flex items-center gap-1">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-9 w-full sm:w-[140px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  <p className="text-xs">All Statuses</p>
-                </SelectItem>
-                <SelectItem value="active">
-                  <p className="text-xs">Available</p>
-                </SelectItem>
-                <SelectItem value="inactive">
-                  <p className="text-xs">In Use</p>
-                </SelectItem>
-                <SelectItem value="under_maintenance">
-                  <p className="text-xs">Maintenance</p>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Select value={locationFilter} onValueChange={setLocationFilter}>
-              <SelectTrigger className="h-9 sm:w-[140px]">
-                <SelectValue placeholder="Filter by location" />
-              </SelectTrigger>
-              <SelectContent className="w-[180px]">
-                <SelectItem value="all">
-                  <p className="text-xs">All Locations</p>
-                </SelectItem>
-                {uniqueLocations.map((location) => (
-                  <SelectItem key={location} value={location}>
-                    <p className="text-xs">{location}</p>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-center">
-          <Button>
-            <span className="text-xs">Add Locker</span>
-            <PlusCircleIcon className="ml-2 size-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Filter Badges */}
-      <div className="mb-3 flex flex-col gap-2 md:mb-4">
-        {/* Status Badges */}
-        <div className="flex flex-wrap gap-1">
-          <p className="mr-1 flex items-center font-medium text-muted-foreground text-xs">
-            Status:
-          </p>
-          {["all", "active", "inactive", "under_maintenance"].map((status) => (
-            <Button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              variant={statusFilter === status ? "default" : "outline"}
-              size="sm"
-              className={`flex items-center text-xs sm:text-sm ${
-                statusFilter === status ? getStatusColor(status) : ""
-              }`}
-            >
-              {getStatusLabel(status)}
-              <Badge
-                variant="secondary"
-                className="ml-1 bg-white/20 text-xs hover:bg-white/30"
-              >
-                {statusCounts[status as keyof typeof statusCounts]}
-              </Badge>
-            </Button>
-          ))}
-        </div>
-
-        {/* Location Badges */}
-        <div className="flex flex-wrap gap-2">
-          <p className="mr-1 flex items-center font-medium text-muted-foreground text-xs">
-            Location:
-          </p>
-          <Button
-            onClick={() => setLocationFilter("all")}
-            variant={locationFilter === "all" ? "default" : "outline"}
-            size="sm"
-            className={`flex items-center text-xs sm:text-sm ${
-              locationFilter === "all" ? "bg-blue-500 hover:bg-blue-600" : ""
-            }`}
-          >
-            All Locations
-            <Badge
-              variant="secondary"
-              className="ml-2 bg-white/20 hover:bg-white/30"
-            >
-              {locationCounts.all}
-            </Badge>
-          </Button>
-
-          {uniqueLocations.map((location) => (
-            <Button
-              key={location}
-              onClick={() => setLocationFilter(location)}
-              variant={locationFilter === location ? "default" : "outline"}
-              size="sm"
-              className={`flex items-center text-xs sm:text-sm ${
-                locationFilter === location
-                  ? "bg-purple-500 hover:bg-purple-600"
-                  : ""
-              }`}
-            >
-              {location}
-              <Badge
-                variant="secondary"
-                className="ml-2 bg-white/20 hover:bg-white/30"
-              >
-                {locationCounts[location as keyof typeof locationCounts]}
-              </Badge>
-            </Button>
-          ))}
-        </div>
-      </div>
+      <LockerFilter
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        locationFilter={locationFilter}
+        setLocationFilter={setLocationFilter}
+        uniqueLocations={uniqueLocations}
+        statusCounts={statusCounts}
+        locationCounts={locationCounts}
+        isSidebarOpen={isSidebarOpen}
+      />
 
       {/* Results */}
-      <div className="mb-4">
+      <div className="mb-3">
         <p className="text-muted-foreground text-xs sm:text-sm">
           Showing {filteredData.length} of {data.length} lockers
         </p>
@@ -298,7 +110,7 @@ export const LockerRentalClient = () => {
       {/* Locker Grid */}
       {filteredData.length > 0 ? (
         <motion.div
-          className="grid grid-cols-1 xs:grid-cols-2 xxs:grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          className={getGridLayoutClass(isSidebarOpen, filteredData.length)}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -314,6 +126,7 @@ export const LockerRentalClient = () => {
                   selectedLocker === locker.id ? null : locker.id,
                 )
               }
+              compact={isSidebarOpen}
             />
           ))}
         </motion.div>

@@ -9,7 +9,7 @@ interface LockerControlsProps {
 
 export const LockerControls: React.FC<LockerControlsProps> = ({ status }) => {
   return (
-    <div className="absolute right-0 bottom-0 left-0 mt-6 flex items-center justify-between bg-black/10 p-3 backdrop-blur-sm sm:p-3 md:p-4">
+    <div className="absolute right-0 bottom-0 left-0 flex items-center justify-between bg-black/15 p-1.5 backdrop-blur-sm sm:p-2 md:p-2.5">
       <motion.div
         whileHover={
           status !== "under_maintenance" ? { scale: 1.2, rotate: 15 } : {}
@@ -17,10 +17,10 @@ export const LockerControls: React.FC<LockerControlsProps> = ({ status }) => {
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
       >
         {status === "inactive" && (
-          <AlertTriangleIcon className="size-4 text-amber-300 sm:size-5 md:size-5" />
+          <AlertTriangleIcon className="size-2.5 text-amber-300 sm:size-3 md:size-3.5" />
         )}
         {status === "active" && (
-          <KeyIcon className="size-4 text-amber-300 sm:size-5 md:size-5" />
+          <KeyIcon className="size-2.5 text-amber-300 sm:size-3 md:size-3.5" />
         )}
         {status === "under_maintenance" && (
           <motion.div
@@ -30,13 +30,13 @@ export const LockerControls: React.FC<LockerControlsProps> = ({ status }) => {
               duration: 5,
             }}
           >
-            <WrenchIcon className="size-4 text-yellow-300 sm:size-5 md:size-5" />
+            <WrenchIcon className="size-2.5 text-yellow-300 sm:size-3 md:size-3.5" />
           </motion.div>
         )}
       </motion.div>
 
       <motion.button
-        className={`rounded-full px-2 py-0.5 font-medium text-[10px] sm:px-2.5 sm:py-0.5 sm:text-xs md:px-3 md:py-1 ${
+        className={`rounded-full px-1.5 py-0.5 font-medium text-[7px] sm:text-[8px] md:text-[9px] ${
           status === "active"
             ? "bg-white/20 text-white hover:bg-white/30"
             : status === "under_maintenance"
@@ -51,7 +51,7 @@ export const LockerControls: React.FC<LockerControlsProps> = ({ status }) => {
           ? "Rent"
           : status === "under_maintenance"
             ? "Unavailable"
-            : "Occupied"}
+            : "Used"}
       </motion.button>
     </div>
   )

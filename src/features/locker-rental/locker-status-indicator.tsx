@@ -12,7 +12,7 @@ export const LockerStatusIndicator: React.FC<LockerStatusIndicatorProps> = ({
 }) => {
   return (
     <motion.div
-      className={`absolute top-4 right-4 size-2 rounded-full sm:size-2.5 md:size-3 ${getStatusIndicator(status)}`}
+      className={`absolute top-1.5 right-1.5 size-1.5 rounded-full sm:size-2 md:size-2.5 ${getStatusIndicator(status)}`}
       animate={{
         scale:
           status === "active"

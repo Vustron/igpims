@@ -14,9 +14,7 @@ export const LockerDoor: React.FC<LockerDoorProps> = ({
 }) => {
   return (
     <motion.div
-      className={`relative flex h-24 w-full items-center justify-center rounded-md border border-white/20 bg-white/10 shadow-inner backdrop-blur-sm sm:h-28 md:h-32 ${
-        status === "under_maintenance" ? "opacity-60" : ""
-      }`}
+      className={`relative flex w-full items-center justify-center rounded-md border border-white/20 bg-white/10 shadow-inner backdrop-blur-sm ${status === "under_maintenance" ? "opacity-60" : ""}h-16 sm:h-18 md:h-20`}
       animate={{
         rotateY: isSelected ? 30 : 0,
       }}
@@ -24,9 +22,9 @@ export const LockerDoor: React.FC<LockerDoorProps> = ({
     >
       {/* Door handle */}
       <motion.div
-        className="absolute right-3 size-4 rounded-l-full bg-gray-800/70 sm:size-5 md:size-6"
+        className="absolute right-2 size-2.5 rounded-l-full bg-gray-800/70 sm:size-3 md:size-3.5"
         animate={{
-          x: isSelected ? 3 : 0,
+          x: isSelected ? 2 : 0,
           scale: isSelected ? 1.1 : 1,
         }}
         transition={{ duration: 0.3 }}
@@ -53,11 +51,11 @@ export const LockerDoor: React.FC<LockerDoorProps> = ({
         }}
       >
         {status === "active" ? (
-          <UnlockIcon className="size-5 text-white/90 sm:size-6 md:size-7" />
+          <UnlockIcon className="size-3.5 text-white/90 sm:size-4 md:size-5" />
         ) : status === "under_maintenance" ? (
-          <WrenchIcon className="size-5 text-white/90 sm:size-6 md:size-7" />
+          <WrenchIcon className="size-3.5 text-white/90 sm:size-4 md:size-5" />
         ) : (
-          <LockIcon className="size-5 text-white/90 sm:size-6 md:size-7" />
+          <LockIcon className="size-3.5 text-white/90 sm:size-4 md:size-5" />
         )}
       </motion.div>
     </motion.div>
