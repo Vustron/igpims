@@ -163,9 +163,6 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
                     <Badge className="ml-2 bg-emerald-500 text-[8px]">
                       Active
                     </Badge>
-                    <span className="ml-auto text-muted-foreground text-xs">
-                      Study Room
-                    </span>
                   </Button>
                 </li>
                 <li>
@@ -179,9 +176,6 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
                     <Badge className="ml-2 bg-slate-500 text-[8px]">
                       Inactive
                     </Badge>
-                    <span className="ml-auto text-muted-foreground text-xs">
-                      Study Room
-                    </span>
                   </Button>
                 </li>
                 <li>
@@ -195,9 +189,6 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
                     <Badge className="ml-2 bg-emerald-500 text-[8px]">
                       Active
                     </Badge>
-                    <span className="ml-auto text-muted-foreground text-xs">
-                      Library
-                    </span>
                   </Button>
                 </li>
               </ul>
