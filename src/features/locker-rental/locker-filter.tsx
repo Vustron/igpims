@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badges"
 import { Input } from "@/components/ui/inputs"
 
 import { getStatusColor, getStatusLabel } from "@/utils/get-percentage-color"
+import { useDialog } from "@/hooks/use-dialog"
 
 interface LockerFilterProps {
   searchTerm: string
@@ -48,6 +49,7 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
 }) => {
   const showFilters =
     searchTerm || statusFilter !== "all" || locationFilter !== "all"
+  const { onOpen } = useDialog()
 
   const resetFilters = () => {
     setSearchTerm("")
@@ -120,6 +122,7 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
               variant="outline"
               size="sm"
               className="h-10 gap-1.5 whitespace-nowrap px-3"
+              onClick={() => onOpen("createLocker")}
             >
               <PlusCircleIcon className="size-4" />
               <span className="text-xs">Add Locker</span>

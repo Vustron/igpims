@@ -1,11 +1,9 @@
 "use client"
 
 import { RevenueAnalytics } from "@/features/dashboard/revenue-analytics"
+import { IgpPerformance } from "@/features/dashboard/igp-performance"
 import { DashboardCard } from "@/features/dashboard/dashboard-card"
 import { SalesOverview } from "@/features/dashboard/sales-overview"
-import { IgpActivity } from "@/features/dashboard/igp-activity"
-import { IgpStatus } from "@/features/dashboard/igp-status"
-import { IgpPerformance } from "@/features/dashboard/igp-performance"
 import { GiDroplets } from "react-icons/gi"
 import { GiClothes } from "react-icons/gi"
 import { GiLockers } from "react-icons/gi"
@@ -32,7 +30,7 @@ export const DashboardClient = () => {
     },
     {
       id: "3",
-      title: "Merchandise",
+      title: "Other IGPs",
       amount: "₱5,300",
       metric: "3 Total Items",
       percentageChange: "+4.5%",
@@ -52,20 +50,11 @@ export const DashboardClient = () => {
         </div>
         <div className="md:col-span-2">
           <div className="mb-2">
-            <IgpStatus />
+            <RevenueAnalytics />
           </div>
           <div className="mb-2">
-            <IgpActivity />
+            <SalesOverview />
           </div>
-        </div>
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-5">
-        <div className="md:col-span-2">
-          <SalesOverview />
-        </div>
-        <div className="md:col-span-3">
-          <RevenueAnalytics />
         </div>
       </div>
     </div>

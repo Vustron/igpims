@@ -21,7 +21,7 @@ export const DashboardCard = ({ items }: DashboardCardProps) => {
       {items.map((item) => (
         <Card
           key={item.id}
-          className="col-span-full p-3 sm:col-span-2 sm:p-4 md:p-6 lg:col-span-1"
+          className="col-span-full border-2 border-black bg-[#FFF8D5] p-3 sm:col-span-2 sm:p-4 md:p-6 lg:col-span-1"
         >
           <div className="flex items-center justify-between">
             <div>

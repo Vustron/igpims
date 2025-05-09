@@ -17,6 +17,7 @@ import { useOtpStore } from "@/hooks/use-otp-store"
 
 import type { FieldValues, UseFormReturn } from "react-hook-form"
 import type { FieldConfig, Mutation } from "@/interfaces/form"
+import AmountInput from "../inputs/amount-input"
 
 interface FormControlRendererProps<TFieldValues extends FieldValues> {
   field: FieldConfig<TFieldValues>
@@ -213,6 +214,18 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
             </>
           )}
         </>
+      )
+
+    case "currency":
+      return (
+        <AmountInput
+          value={formField.value}
+          onChange={(value: any) => {
+            const numValue = value === "" ? 0 : Number.parseFloat(value)
+            formField.onChange(numValue)
+          }}
+          disabled={mutation?.isPending || disabled}
+        />
       )
 
     default:

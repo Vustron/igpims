@@ -1,6 +1,10 @@
 import { create } from "zustand"
 
-export type DialogType = "confirm" | "needVerifyUser" | "sessionExpired"
+export type DialogType =
+  | "confirm"
+  | "needVerifyUser"
+  | "sessionExpired"
+  | "createLocker"
 
 interface ConfirmDialogData {
   title?: string

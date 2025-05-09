@@ -482,9 +482,7 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
             <DropdownMenuContent align="end" className="w-[180px]">
               <DropdownMenuLabel className="text-xs">Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(rental.transactionId)
-                }
+                onClick={() => navigator.clipboard.writeText(rental.id)}
                 className="text-xs"
               >
                 <ClipboardCopy className="mr-2 h-3.5 w-3.5" />

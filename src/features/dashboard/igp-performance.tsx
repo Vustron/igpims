@@ -1,85 +1,150 @@
 "use client"
 
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 import {
-  AreaChart,
-  Area,
+  Bar,
+  Cell,
   XAxis,
   YAxis,
-  CartesianGrid,
+  Text,
   Tooltip,
+  BarChart,
+  CartesianGrid,
   ResponsiveContainer,
 } from "recharts"
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 import { Card } from "@/components/ui/cards"
+import { useMemo } from "react"
+
+const CustomXAxisTick = ({ x, y, payload }: any) => {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <Text
+        x={0}
+        y={0}
+        dy={10}
+        textAnchor="middle"
+        fill="#666"
+        fontSize={12}
+        width={200}
+      >
+        {payload.value}
+      </Text>
+    </g>
+  )
+}
 
 export const IgpPerformance = () => {
   const data = [
-    { name: "Week 1", value: 7 },
-    { name: "Week 2", value: 12 },
-    { name: "Week 3", value: 18 },
-    { name: "Week 4", value: 25 },
+    { name: "Kalibulong Tshirts", value: 200 },
+    { name: "Button Pins", value: 800 },
+    { name: "Water Vendo", value: 1200 },
+    { name: "Locker", value: 400 },
   ]
+
+  const { yAxisDomain, yAxisTicks } = useMemo(() => {
+    const maxValue = Math.max(...data.map((item) => item.value))
+    const upperLimit = Math.ceil(maxValue / 200) * 200
+
+    let tickSpacing: any
+    if (upperLimit <= 200) tickSpacing = 20
+    else if (upperLimit <= 500) tickSpacing = 50
+    else if (upperLimit <= 1000) tickSpacing = 100
+    else if (upperLimit <= 5000) tickSpacing = 200
+    else if (upperLimit <= 10000) tickSpacing = 1000
+    else tickSpacing = 2000
+
+    const ticks = []
+    for (let i = 0; i <= upperLimit; i += tickSpacing) {
+      ticks.push(i)
+    }
+
+    if (!ticks.includes(upperLimit)) {
+      ticks.push(upperLimit)
+    }
+
+    return {
+      yAxisDomain: [0, upperLimit],
+      yAxisTicks: ticks,
+    }
+  }, [data])
+
+  const getBarColors = () => {
+    const baseColor = "#76E4F7"
+    const highlightColor = "#0BC5EA"
+
+    return data.map((_, index) => {
+      const maxValueIndex = data.findIndex(
+        (item) => item.value === Math.max(...data.map((d) => d.value)),
+      )
+      return index === maxValueIndex ? highlightColor : baseColor
+    })
+  }
 
   const chartConfig = {
     performance: {
-      label: "Performance",
+      label: "Revenue",
       color: "#76E4F7",
     },
   }
 
   return (
-    <Card className="col-span-full h-full w-full p-3 sm:p-4 md:p-6 lg:col-span-2">
-      <h3 className="mb-2 font-semibold text-sm sm:mb-4 sm:text-base md:mb-6 md:text-lg">
-        IGP Performance
-      </h3>
-      <div className="h-[180px] w-full sm:h-[200px] md:h-[240px]">
-        <ChartContainer config={chartConfig} className="mt-15 h-full w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={data}
-              margin={{
-                top: 0,
-                right: 10,
-                left: 0,
-                bottom: 0,
-              }}
-            >
-              <defs>
-                <linearGradient
-                  id="colorPerformance"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor="#76E4F7" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#76E4F7" stopOpacity={0.1} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-              <XAxis
-                dataKey="name"
-                tick={{ fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip content={<ChartTooltipContent />} />
-              <Area
-                type="monotone"
-                dataKey="value"
-                stroke="#76E4F7"
-                fillOpacity={1}
-                fill="url(#colorPerformance)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </div>
+    <Card className="col-span-full h-full w-full border-black bg-[#FFF8D5] p-6">
+      <h3 className="mb-6 font-semibold text-lg">IGP Performance</h3>
+      <ChartContainer config={chartConfig} className="h-full w-full">
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart
+            data={data}
+            margin={{
+              top: 20,
+              right: 20,
+              left: 20,
+              bottom: 30,
+            }}
+            barSize={100}
+            barGap={8}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              opacity={0.15}
+              vertical={false}
+            />
+            <XAxis
+              dataKey="name"
+              tick={<CustomXAxisTick />}
+              axisLine={false}
+              tickLine={false}
+              padding={{ left: 20, right: 20 }}
+              height={40}
+              interval={0}
+            />
+            <YAxis
+              tick={{ fontSize: 12 }}
+              axisLine={false}
+              tickLine={false}
+              domain={yAxisDomain}
+              ticks={yAxisTicks}
+              tickFormatter={(value) => `₱${value.toLocaleString()}`}
+            />
+            <Tooltip
+              cursor={{ fill: "rgba(118, 228, 247, 0.1)" }}
+              content={<ChartTooltipContent />}
+              formatter={(value) => [
+                `₱${Number(value).toLocaleString()}`,
+                " Revenue",
+              ]}
+            />
+            <Bar dataKey="value" name="Revenue" radius={[8, 8, 0, 0]}>
+              {data.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={getBarColors()[index]}
+                  filter="drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.1))"
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartContainer>
     </Card>
   )
 }

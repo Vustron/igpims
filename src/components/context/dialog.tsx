@@ -3,6 +3,7 @@
 import {
   ConfirmDialog,
   VerifyUserDialog,
+  CreateLockerDialog,
   SessionExpiredDialog,
 } from "@/components/ui/dialogs"
 
@@ -16,6 +17,7 @@ export const DialogProvider = () => {
       <ConfirmDialog />
       <VerifyUserDialog />
       <SessionExpiredDialog />
+      <CreateLockerDialog />
     </>
   )
 }

@@ -21,58 +21,70 @@ export const SalesOverview = () => {
   const formatCurrency = (value: number) => `₱${value.toLocaleString()}`
 
   return (
-    <Card className="h-full w-full p-3 sm:p-4 md:p-6">
-      <h3 className="mb-2 font-semibold text-sm sm:mb-4 sm:text-base md:mb-6 md:text-lg">
+    <Card className="h-full w-full border-black bg-[#FFF8D5] p-3 sm:p-4 md:p-6">
+      <h3 className="mb-3 font-semibold text-sm sm:mb-4 sm:text-base md:mb-6 md:text-lg">
         Sales Overview
       </h3>
 
-      <div className="h-[180px] w-full sm:h-[200px] md:h-[240px]">
-        <ChartContainer config={chartConfig} className="h-full w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius="50%"
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip content={<ChartTooltipContent />} />
-            </PieChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </div>
+      <div className="flex flex-col sm:flex-row sm:items-center">
+        {/* Pie Chart - Left side */}
+        <div className="h-[180px] w-full sm:w-1/2 md:h-[220px]">
+          <ChartContainer config={chartConfig} className="h-full w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius="70%"
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip content={<ChartTooltipContent />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
 
-      <div className="mt-2 grid grid-cols-1 gap-2 sm:mt-3 sm:grid-cols-3 sm:gap-3 md:mt-4 md:gap-4">
-        {data.map((entry, index) => {
-          const percentage = ((entry.value / total) * 100).toFixed(1)
-          return (
-            <div
-              key={index}
-              className="flex items-center gap-2 rounded-md border border-border/50 p-2 sm:border-0 sm:p-0"
-            >
-              <div
-                className="h-3 w-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
-              <div className="text-xs">
-                <div className="truncate font-medium">{entry.name}</div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">{percentage}%</span>
-                  <span className="ml-1 font-semibold">
-                    {formatCurrency(entry.value)}
-                  </span>
+        {/* Legend - Right side */}
+        <div className="mt-4 w-full sm:mt-0 sm:w-1/2">
+          <div className="flex flex-col space-y-3">
+            {data.map((entry, index) => {
+              const percentage = ((entry.value / total) * 100).toFixed(1)
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 rounded-md border border-border/50 p-2.5 sm:p-2"
+                >
+                  <div
+                    className="h-4 w-4 rounded-full sm:h-3 sm:w-3"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <div className="flex-grow text-xs sm:text-sm">
+                    <div className="truncate font-medium">{entry.name}</div>
+                    <div className="mt-1 flex items-center justify-between">
+                      <span className="text-gray-500">{percentage}%</span>
+                      <span className="font-semibold">
+                        {formatCurrency(entry.value)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )
+            })}
+          </div>
+          <div className="mt-3 border-border/50 border-t pt-2 font-medium text-sm">
+            <div className="flex justify-between">
+              <span>Total</span>
+              <span>{formatCurrency(total)}</span>
             </div>
-          )
-        })}
+          </div>
+        </div>
       </div>
     </Card>
   )

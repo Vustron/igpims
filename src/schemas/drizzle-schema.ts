@@ -5,7 +5,7 @@ import {
   sqliteTable,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core"
-import { relations } from "drizzle-orm"
+import { relations, sql } from "drizzle-orm"
 import { nanoid } from "nanoid"
 
 import type { InferSelectModel } from "drizzle-orm"
@@ -21,16 +21,20 @@ export const user = sqliteTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
-    name: text("name").notNull(),
-    email: text("email").notNull().unique(),
+    name: text("name", { length: 255 }).notNull(),
+    email: text("email", { length: 100 }).notNull().unique(),
     emailVerified: integer("emailVerified", { mode: "boolean" }).notNull(),
     sessionExpired: integer("sessionExpired", { mode: "boolean" }).notNull(),
     role: text("role", { enum: ["admin", "user"] })
       .notNull()
       .default("user"),
     image: text("image"),
-    createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-    updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [index("user_role_idx").on(t.id)],
 )
@@ -51,11 +55,15 @@ export const session = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     expiresAt: integer("expiresAt", { mode: "timestamp" }).notNull(),
-    token: text("token").notNull().unique(),
-    ipAddress: text("ipAddress"),
-    userAgent: text("userAgent"),
-    createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-    updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+    token: text("token", { length: 255 }).notNull().unique(),
+    ipAddress: text("ipAddress", { length: 255 }),
+    userAgent: text("userAgent", { length: 255 }),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("session_user_id_idx").on(t.userId),
@@ -75,19 +83,23 @@ export const account = sqliteTable("account", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => nanoid()),
-  accountId: text("accountId").notNull(),
+  accountId: text("accountId", { length: 255 }).notNull(),
   userId: text("userId")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  providerType: text("providerType").notNull(),
-  accessToken: text("accessToken"),
+  providerType: text("providerType", { length: 50 }).notNull(),
+  accessToken: text("accessToken", { length: 255 }),
   accessTokenExpiresAt: integer("accessTokenExpiresAt", { mode: "timestamp" }),
-  password: text("password"),
-  salt: text("salt"),
+  password: text("password", { length: 255 }),
+  salt: text("salt", { length: 255 }),
   otpSignIn: integer("otpSignIn", { mode: "boolean" }).notNull(),
-  twoFactorSecret: text("twoFactorSecret"),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+  twoFactorSecret: text("twoFactorSecret", { length: 10 }),
+  createdAt: integer("createdAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updatedAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 })
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -103,11 +115,15 @@ export const rateLimit = sqliteTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
-    ipAddress: text("ipAddress").notNull(),
+    ipAddress: text("ipAddress", { length: 255 }).notNull(),
     attempts: integer("attempts").notNull().default(0),
     resetAt: integer("resetAt", { mode: "timestamp" }).notNull(),
-    createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-    updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [uniqueIndex("rate_limit_ip_address_idx").on(t.ipAddress)],
 )
@@ -119,11 +135,15 @@ export const verificationToken = sqliteTable("verification_token", {
   userId: text("userId")
     .notNull()
     .references(() => user.id),
-  token: text("token").notNull().unique(),
-  email: text("email").notNull(),
+  token: text("token", { length: 20 }).notNull().unique(),
+  email: text("email", { length: 100 }).notNull(),
   expires: integer("expires", { mode: "timestamp" }).notNull(),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updatedAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 })
 
 export const verificationTokenRelations = relations(
@@ -143,11 +163,15 @@ export const resetToken = sqliteTable("reset_token", {
   userId: text("userId")
     .notNull()
     .references(() => user.id),
-  token: text("token").notNull().unique(),
-  email: text("email").notNull(),
+  token: text("token", { length: 20 }).notNull().unique(),
+  email: text("email", { length: 100 }).notNull(),
   expires: integer("expires", { mode: "timestamp" }).notNull(),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer("updatedAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 })
 
 export const resetTokenRelations = relations(resetToken, ({ one }) => ({
@@ -164,9 +188,11 @@ export const otpToken = sqliteTable("otp_token", {
   userId: text("userId")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  email: text("email").notNull(),
-  otp: text("otp").notNull(),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  email: text("email", { length: 100 }).notNull(),
+  otp: text("otp", { length: 10 }).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 })
 
 export const otpTokenRelations = relations(otpToken, ({ one }) => ({
@@ -179,45 +205,70 @@ export const otpTokenRelations = relations(otpToken, ({ one }) => ({
 export const locker = sqliteTable(
   "locker",
   {
-    locker_id: text("locker_id")
+    id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
-    lockerType: text("locker_type").notNull(),
-    lockerNumber: text("locker_number").notNull(),
-    isAvailable: integer("is_available", { mode: "boolean" })
+    lockerStatus: text("lockerStatus", { length: 20 })
       .notNull()
-      .default(true),
-    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+      .default("available")
+      .$type<
+        "available" | "occupied" | "reserved" | "maintenance" | "out-of-service"
+      >(),
+    lockerType: text("lockerType", { length: 255 }).notNull(),
+    lockerName: text("lockerName", { length: 255 }).notNull(),
+    lockerLocation: text("lockerType", { length: 255 }).notNull(),
+    lockerRentalPrice: integer("lockerRentalPrice").default(0).notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
-    uniqueIndex("locker_type_number_idx").on(t.lockerType, t.lockerNumber),
+    uniqueIndex("locker_id_idx").on(t.id),
+    index("locker_type_idx").on(t.lockerType),
+    index("locker_status_idx").on(t.lockerStatus),
+    index("locker_location_idx").on(t.lockerLocation),
+    index("locker_rental_price_idx").on(t.lockerRentalPrice),
   ],
 )
 
 export const lockerRental = sqliteTable(
   "locker_rental",
   {
-    transactionId: text("transaction_id").primaryKey(),
-    lockerId: text("locker_id")
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    lockerId: text("lockerId")
       .notNull()
-      .references(() => locker.locker_id),
+      .references(() => locker.id, { onDelete: "restrict" }),
     renterId: text("renterId")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    renterName: text("renter_name").notNull(),
-    courseAndSet: text("course_and_set").notNull(),
-    rentalStatus: text("rental_status").notNull(),
-    paymentStatus: text("payment_status").notNull(),
-    dateRented: integer("date_rented", { mode: "timestamp" }).notNull(),
-    dateDue: integer("date_due", { mode: "timestamp" }).notNull(),
-    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+    renterName: text("renterName", { length: 100 }).notNull(),
+    courseAndSet: text("courseAndSet", { length: 100 }).notNull(),
+    rentalStatus: text("rentalStatus", { length: 100 }).notNull(),
+    paymentStatus: text("paymentStatus", { length: 100 }).notNull(),
+    dateRented: integer("dateRented", { mode: "timestamp" }).notNull(),
+    dateDue: integer("dateDue", { mode: "timestamp" }).notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
+    uniqueIndex("locker_rental_id_idx").on(t.id),
     index("locker_rental_locker_id_idx").on(t.lockerId),
     index("locker_rental_renter_id_idx").on(t.renterId),
     index("locker_rental_renter_name_idx").on(t.renterName),
+    index("locker_rental_course_idx").on(t.courseAndSet),
+    index("locker_rental_rental_status_idx").on(t.rentalStatus),
+    index("locker_rental_payment_status_idx").on(t.paymentStatus),
+    index("locker_rental_date_rented_idx").on(t.dateRented),
+    index("locker_rental_date_due_idx").on(t.dateDue),
   ],
 )
 
@@ -228,7 +279,7 @@ export const lockerRelations = relations(locker, ({ many }) => ({
 export const lockerRentalRelations = relations(lockerRental, ({ one }) => ({
   locker: one(locker, {
     fields: [lockerRental.lockerId],
-    references: [locker.locker_id],
+    references: [locker.id],
   }),
   renter: one(user, {
     fields: [lockerRental.renterId],

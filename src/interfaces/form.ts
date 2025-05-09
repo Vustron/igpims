@@ -25,6 +25,7 @@ export interface FieldConfig<TFieldValues> {
     | "textarea"
     | "file"
     | "switch"
+    | "currency"
   label: string
   placeholder: string
   className?: string
