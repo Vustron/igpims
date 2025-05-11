@@ -6,13 +6,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/ui/separators/tabs"
-import {
-  Menu,
-  ListChecks,
-  ClipboardList,
-  CalendarCheck,
-  ChevronsUpDown,
-} from "lucide-react"
+
 import {
   Sheet,
   SheetTitle,
@@ -20,7 +14,6 @@ import {
   SheetTrigger,
   SheetDescription,
 } from "@/components/ui/sheets"
-
 import {
   Drawer,
   DrawerTitle,
@@ -32,6 +25,7 @@ import {
 import VisuallyHiddenComponent from "@/components/ui/separators/visually-hidden"
 import { LockerRentalListClient } from "@/features/locker-rental-list/client"
 import { LockerRentalClient } from "@/features/locker-rental/client"
+import { Menu, ClipboardList, ChevronsUpDown } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 import { PiLockers } from "react-icons/pi"
 
@@ -65,18 +59,6 @@ export const LockerRentalTabs = () => {
       label: "Locker Rental List",
       shortLabel: "Rental List",
       icon: <ClipboardList className="size-4" />,
-    },
-    {
-      id: "locker_inspection",
-      label: "Locker Inspection Schedule",
-      shortLabel: "Inspection",
-      icon: <CalendarCheck className="size-4" />,
-    },
-    {
-      id: "violator_list",
-      label: "Violator List",
-      shortLabel: "Violators",
-      icon: <ListChecks className="size-4" />,
     },
   ]
 
@@ -248,32 +230,6 @@ export const LockerRentalTabs = () => {
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
         <LockerRentalListClient />
-      </TabsContent>
-
-      <TabsContent
-        value="locker_inspection"
-        className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
-      >
-        <div className="rounded-lg border p-8 text-center">
-          <h2 className="mb-2 font-semibold text-2xl">
-            Locker Inspection Schedule
-          </h2>
-          <p className="text-muted-foreground">
-            This feature is under development. Coming soon!
-          </p>
-        </div>
-      </TabsContent>
-
-      <TabsContent
-        value="violator_list"
-        className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
-      >
-        <div className="rounded-lg border p-8 text-center">
-          <h2 className="mb-2 font-semibold text-2xl">Violator List</h2>
-          <p className="text-muted-foreground">
-            This feature is under development. Coming soon!
-          </p>
-        </div>
       </TabsContent>
     </Tabs>
   )

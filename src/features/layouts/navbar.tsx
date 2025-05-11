@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, UserButton } from "@/components/ui/buttons"
+import { Button, ChangeThemeButton, UserButton } from "@/components/ui/buttons"
 import { SheetMenu } from "@/components/ui/sidebar"
 import { BellDot } from "lucide-react"
 
@@ -30,6 +30,9 @@ export const Navbar = ({ title }: NavbarProps) => {
         </div>
 
         <div className="mr-5 flex items-center gap-5">
+          <NavbarItem>
+            <ChangeThemeButton />
+          </NavbarItem>
           <NavbarItem>
             <Button
               variant="ghost"
