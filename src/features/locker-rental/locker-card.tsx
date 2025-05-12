@@ -1,4 +1,5 @@
 "use client"
+
 import { LockerStatusIndicator } from "@/features/locker-rental/locker-status-indicator"
 import { MaintenanceTape } from "@/features/locker-rental/maintainance-tape"
 import { LockerControls } from "@/features/locker-rental/locker-controls"
@@ -9,9 +10,12 @@ import { Card } from "@/components/ui/cards"
 import { getStatusColor } from "@/utils/get-percentage-color"
 import { motion, AnimatePresence } from "framer-motion"
 
+import { useRouter } from "next-nprogress-bar"
+
 import type { Locker } from "@/interfaces/locker"
 
 interface LockerCardProps {
+  id: string
   locker: Locker
   index: number
   isSelected: boolean
@@ -20,6 +24,7 @@ interface LockerCardProps {
 }
 
 export const LockerCard: React.FC<LockerCardProps> = ({
+  id,
   locker,
   index,
   isSelected,
@@ -27,6 +32,7 @@ export const LockerCard: React.FC<LockerCardProps> = ({
   compact = false,
 }) => {
   const isDisabled = locker.status === "under_maintenance"
+  const router = useRouter()
 
   return (
     <AnimatePresence>
@@ -35,7 +41,10 @@ export const LockerCard: React.FC<LockerCardProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: index * 0.05 }}
         className={`relative ${compact ? "max-w-[100px]" : "max-w-[115px]"}`}
-        onClick={() => !isDisabled && onSelect()}
+        onClick={() => {
+          router.push(`/locker-rental/${id}`)
+          onSelect()
+        }}
       >
         <Card
           className={`relative flex flex-col items-center justify-start overflow-hidden bg-gradient-to-br transition-all duration-300 ${

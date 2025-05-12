@@ -8,13 +8,14 @@ import {
   FormMessage,
   FormControlRenderer,
 } from "@/components/ui/forms"
+import { Loader2Icon, ChevronDown, ChevronUp } from "lucide-react"
 import { DynamicButton } from "@/components/ui/buttons"
 import { Switch } from "@/components/ui/inputs"
-import { Loader2Icon } from "lucide-react"
 import Image from "next/image"
 
 import { useGenerate2FA } from "@/backend/actions/user/generate-2fa"
 import { useOtpStore } from "@/hooks/use-otp-store"
+import { useRouter } from "next-nprogress-bar"
 import { useEffect, useState } from "react"
 
 import { motion, AnimatePresence } from "framer-motion"
@@ -28,6 +29,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
   form,
   onSubmit,
   fields,
+  sections,
   submitButtonTitle,
   mutation,
   className,
@@ -39,14 +41,31 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
   isResetPassword,
   isOnEditAccount,
   isFloatingLabelInput,
+  addCancelButton,
+  twoColumnLayout = false,
 }: DynamicFormProps<TFieldValues>) => {
   const [isPasswordStrong, setIsPasswordStrong] = useState(true)
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(
     form.getValues("otpSignIn" as Path<TFieldValues>) || false,
   )
   const [qrCode, setQrCode] = useState<string>()
+  const [expandedSections, setExpandedSections] = useState<
+    Record<string, boolean>
+  >({})
+
+  useEffect(() => {
+    if (sections) {
+      const initialState: Record<string, boolean> = {}
+      sections.forEach((section) => {
+        initialState[section.id] = section.defaultExpanded ?? true
+      })
+      setExpandedSections(initialState)
+    }
+  }, [sections])
+
   const generate2FA = useGenerate2FA()
   const resetOtpSignIn = useOtpStore((state) => state.resetOtpSignIn)
+  const router = useRouter()
 
   useEffect(() => {
     if (isTwoFactorEnabled) {
@@ -73,19 +92,152 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
     await onSubmit(values)
   }
 
-  return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className={cn("w-full space-y-5", className)}
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
+    }))
+  }
+
+  const renderFormFields = () => {
+    if (sections && sections.length > 0) {
+      return (
+        <>
+          {sections.map((section) => (
+            <div
+              key={section.id}
+              className={cn(
+                "rounded-lg border border-border",
+                section.className,
+              )}
+            >
+              <div
+                className={cn(
+                  "flex cursor-pointer items-center justify-between px-4 py-3",
+                  section.titleClassName,
+                )}
+                onClick={() => toggleSection(section.id)}
+              >
+                <div>
+                  <h3 className="font-medium text-lg">{section.title}</h3>
+                  {section.description && (
+                    <p className="text-muted-foreground text-sm">
+                      {section.description}
+                    </p>
+                  )}
+                </div>
+                <div className="text-muted-foreground">
+                  {expandedSections[section.id] ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                </div>
+              </div>
+
+              <AnimatePresence>
+                {expandedSections[section.id] && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className={cn("px-4 pb-4", section.contentClassName)}
+                  >
+                    <div
+                      className={cn(
+                        "grid gap-5",
+                        twoColumnLayout && "grid-cols-1 md:grid-cols-2",
+                      )}
+                    >
+                      {fields
+                        .filter((field) => field.section === section.id)
+                        .map((field) => (
+                          <FormField
+                            key={field.name.toString()}
+                            name={field.name}
+                            control={form.control}
+                            render={({ field: formField }) => (
+                              <FormItem className="flex-1">
+                                <FormControl>
+                                  <FormControlRenderer
+                                    field={field}
+                                    formField={formField}
+                                    form={form}
+                                    mutation={mutation!}
+                                    disabled={disabled!}
+                                    isSignUp={isSignUp}
+                                    onPasswordStrengthChange={
+                                      setIsPasswordStrong
+                                    }
+                                    isFloatingLabel={isFloatingLabelInput}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+
+          {/* Render fields without a section */}
+          <div
+            className={cn(
+              "grid gap-5",
+              twoColumnLayout && "grid-cols-1 md:grid-cols-2",
+            )}
+          >
+            {fields
+              .filter((field) => !field.section)
+              .map((field) => (
+                <FormField
+                  key={field.name.toString()}
+                  name={field.name}
+                  control={form.control}
+                  render={({ field: formField }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <FormControlRenderer
+                          field={field}
+                          formField={formField}
+                          form={form}
+                          mutation={mutation!}
+                          disabled={disabled!}
+                          isSignUp={isSignUp}
+                          onPasswordStrengthChange={setIsPasswordStrong}
+                          isFloatingLabel={isFloatingLabelInput}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+          </div>
+        </>
+      )
+    }
+
+    // If no sections are provided, render all fields in a traditional layout
+    return (
+      <div
+        className={cn(
+          "grid gap-5",
+          twoColumnLayout && "grid-cols-1 md:grid-cols-2",
+        )}
       >
         {fields.map((field) => (
           <FormField
-            key={field.name}
+            key={field.name.toString()}
             name={field.name}
             control={form.control}
             render={({ field: formField }) => (
-              <FormItem>
+              <FormItem className="flex-1">
                 <FormControl>
                   <FormControlRenderer
                     field={field}
@@ -103,6 +255,18 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
             )}
           />
         ))}
+      </div>
+    )
+  }
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className={cn("w-full space-y-6", className)}
+      >
+        {renderFormFields()}
+
         {isOnEditAccount && (
           <>
             <motion.div
@@ -177,21 +341,9 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
             </AnimatePresence>
           </>
         )}
+
         {(isSignIn || isResetPassword) && (
           <div className="flex items-center justify-between">
-            {/* <DynamicButton
-              variant="link"
-              size="sm"
-              asChild
-              onClick={resetOtpSignIn}
-            >
-              <Link href="/sign-up">
-                <span className="text-muted-foreground text-sm">
-                  Don't have an account?
-                </span>
-              </Link>
-            </DynamicButton> */}
-
             <DynamicButton variant="link" size="sm" asChild>
               <Link
                 href={isResetPassword ? "/sign-in" : "/reset-password"}
@@ -206,16 +358,38 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
             </DynamicButton>
           </div>
         )}
-        <DynamicButton
-          type="submit"
-          title={submitButtonTitle}
-          disabled={mutation?.isPending || disabled}
-          buttonClassName={cn(
-            "w-full focus:outline-hidden focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-600",
-            submitButtonClassname,
+
+        <div
+          className={cn(
+            addCancelButton
+              ? "flex flex-col items-center gap-3 sm:flex-row"
+              : "flex justify-end",
           )}
-          titleClassName={submitButtonTitleClassname}
-        />
+        >
+          {addCancelButton && (
+            <DynamicButton
+              type="button"
+              title="Cancel"
+              disabled={mutation?.isPending || disabled}
+              buttonClassName={cn(
+                "w-full !bg-red-500 !hover:bg-red-600 text-white focus:outline-none focus:ring-2 focus:ring-red-600 dark:focus:ring-red-400",
+                submitButtonClassname,
+              )}
+              titleClassName={submitButtonTitleClassname}
+              onClick={() => router.back()}
+            />
+          )}
+          <DynamicButton
+            type="submit"
+            title={submitButtonTitle}
+            disabled={mutation?.isPending || disabled}
+            buttonClassName={cn(
+              "w-full focus:outline-hidden focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-600",
+              submitButtonClassname,
+            )}
+            titleClassName={submitButtonTitleClassname}
+          />
+        </div>
       </form>
     </Form>
   )

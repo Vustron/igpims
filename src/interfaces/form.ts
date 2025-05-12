@@ -12,6 +12,17 @@ export interface SelectOption {
   label: string
 }
 
+/* FormSection Type */
+export interface FormSection {
+  id: string
+  title: string
+  description?: string
+  defaultExpanded?: boolean
+  className?: string
+  titleClassName?: string
+  contentClassName?: string
+}
+
 /* FieldConfig Type */
 export interface FieldConfig<TFieldValues> {
   name: Path<TFieldValues>
@@ -26,6 +37,8 @@ export interface FieldConfig<TFieldValues> {
     | "file"
     | "switch"
     | "currency"
+    | "date"
+    | "dateRange"
   label: string
   placeholder: string
   className?: string
@@ -33,6 +46,11 @@ export interface FieldConfig<TFieldValues> {
   description?: string
   hidden?: boolean
   required?: boolean
+  section?: string
+  minDate?: Date | string
+  maxDate?: Date | string
+  disabledDates?: Date[]
+  span?: 1 | 2
 }
 
 /* Mutation Type */
@@ -45,6 +63,7 @@ export interface DynamicFormProps<TFieldValues extends FieldValues> {
   form: UseFormReturn<TFieldValues>
   onSubmit: SubmitHandler<TFieldValues>
   fields: FieldConfig<TFieldValues>[]
+  sections?: FormSection[]
   submitButtonTitle: string
   resetButtonTitle?: string
   mutation?: Mutation
@@ -58,4 +77,6 @@ export interface DynamicFormProps<TFieldValues extends FieldValues> {
   isResetPassword?: boolean
   isOnEditAccount?: boolean
   isFloatingLabelInput?: boolean
+  addCancelButton?: boolean
+  twoColumnLayout?: boolean
 }

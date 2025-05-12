@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/buttons"
 
 import { useEffect, useState } from "react"
 
+import { lockerList } from "@/interfaces/locker"
 import { motion } from "framer-motion"
 
-import { lockerList, type Locker } from "@/interfaces/locker"
+import type { Locker } from "@/interfaces/locker"
 
 export const LockerRentalClient = ({ isSidebarOpen = false }) => {
   const [data, setData] = useState<Locker[]>(lockerList)
@@ -127,6 +128,7 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
                 )
               }
               compact={isSidebarOpen}
+              id={locker.id.toString()}
             />
           ))}
         </motion.div>
