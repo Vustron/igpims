@@ -17,9 +17,10 @@ import {
 import { DynamicForm } from "@/components/ui/forms"
 import { Button } from "@/components/ui/buttons"
 import { Switch } from "@/components/ui/inputs"
-import { Printer } from "lucide-react"
+import { Mail, Printer } from "lucide-react"
 import Image from "next/image"
 
+import { useDialog } from "@/hooks/use-dialog"
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 
@@ -55,6 +56,7 @@ type RenterInfoForm = z.infer<typeof renterInfoSchema>
 export const RenterInfo = ({ id }: { id: string }) => {
   const [documentType, setDocumentType] = useState<string>("agreement")
   const [isViolation, setIsViolation] = useState(false)
+  const { onOpen } = useDialog()
 
   const form = useForm<RenterInfoForm>({
     resolver: zodResolver(renterInfoSchema),
@@ -261,14 +263,6 @@ export const RenterInfo = ({ id }: { id: string }) => {
     console.log("Form submitted with data:", data)
   }
 
-  const handlePrint = () => {
-    if (documentType === "agreement") {
-      console.log("Printing rental agreement form")
-    } else if (documentType === "receipt") {
-      console.log("Printing receipt")
-    }
-  }
-
   return (
     <Card className="w-full max-w-5xl p-4">
       <CardHeader className="flex flex-col items-center justify-center">
@@ -309,11 +303,21 @@ export const RenterInfo = ({ id }: { id: string }) => {
             <Button
               variant="outline"
               className="flex min-w-[100px] items-center gap-2"
-              onClick={handlePrint}
+              onClick={() => onOpen("printRentalAgreementReceipt")}
             >
               <Printer className="h-4 w-4" />
               Print
             </Button>
+            {isViolation && (
+              <Button
+                variant="outline"
+                className="flex min-w-[100px] items-center gap-2"
+                onClick={() => onOpen("printRentalAgreementReceipt")}
+              >
+                <Mail className="h-4 w-4" />
+                Send to Email
+              </Button>
+            )}
           </div>
         </div>
       </CardHeader>

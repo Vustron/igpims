@@ -5,6 +5,7 @@ import {
   VerifyUserDialog,
   CreateLockerDialog,
   SessionExpiredDialog,
+  RentalAgreementReceiptDialog,
 } from "@/components/ui/dialogs"
 
 import useMounted from "@/hooks/use-mounted"
@@ -18,6 +19,7 @@ export const DialogProvider = () => {
       <VerifyUserDialog />
       <SessionExpiredDialog />
       <CreateLockerDialog />
+      <RentalAgreementReceiptDialog />
     </>
   )
 }
