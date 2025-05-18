@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  Zap,
   Power,
   Settings,
   Activity,
@@ -28,12 +27,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdowns"
-import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/buttons"
 import { Badge } from "@/components/ui/badges"
 
 import { motion } from "framer-motion"
-import { cn } from "@/utils/cn"
 
 import { useState } from "react"
 
@@ -41,11 +38,8 @@ interface WaterVendoCardProps {
   id: string
   location: string
   gallonsUsed: number
-  gallonsTotal: number
   vendoStatus: "online" | "offline" | "maintenance"
   refillStatus: "full" | "low" | "critical" | "empty"
-  lastRefilled?: Date
-  powerUsage?: number
 }
 
 export const exampleWaterVendos: WaterVendoCardProps[] = [
@@ -53,61 +47,43 @@ export const exampleWaterVendos: WaterVendoCardProps[] = [
     id: "WV-2023-001",
     location: "AB Building, 2nd Floor",
     gallonsUsed: 75,
-    gallonsTotal: 100,
     vendoStatus: "online",
     refillStatus: "low",
-    lastRefilled: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    powerUsage: 0.75,
   },
   {
     id: "WV-2023-002",
     location: "College of Engineering, Ground Floor",
     gallonsUsed: 30,
-    gallonsTotal: 100,
     vendoStatus: "online",
     refillStatus: "full",
-    lastRefilled: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    powerUsage: 0.82,
   },
   {
     id: "WV-2023-003",
     location: "Main Canteen, Entrance",
     gallonsUsed: 95,
-    gallonsTotal: 100,
     vendoStatus: "online",
     refillStatus: "critical",
-    lastRefilled: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-    powerUsage: 0.91,
   },
   {
     id: "WV-2023-004",
     location: "Library Building, 1st Floor",
     gallonsUsed: 100,
-    gallonsTotal: 100,
     vendoStatus: "offline",
     refillStatus: "empty",
-    lastRefilled: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-    powerUsage: 0.0,
   },
   {
     id: "WV-2023-005",
     location: "College of Science, 3rd Floor",
     gallonsUsed: 45,
-    gallonsTotal: 100,
     vendoStatus: "maintenance",
     refillStatus: "low",
-    lastRefilled: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    powerUsage: 0.35,
   },
   {
     id: "WV-2023-006",
     location: "Student Center, Near Entrance",
     gallonsUsed: 10,
-    gallonsTotal: 100,
     vendoStatus: "online",
     refillStatus: "full",
-    lastRefilled: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-    powerUsage: 0.68,
   },
 ]
 
@@ -115,11 +91,8 @@ export const WaterVendoCard = ({
   id,
   location,
   gallonsUsed,
-  gallonsTotal,
   vendoStatus,
   refillStatus,
-  lastRefilled,
-  powerUsage,
 }: Partial<WaterVendoCardProps>) => {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -159,58 +132,41 @@ export const WaterVendoCard = ({
           color: "text-emerald-500 bg-emerald-50",
           text: "Full",
           progressColor: "bg-emerald-500",
+          level: 90,
         }
       case "low":
         return {
           color: "text-amber-500 bg-amber-50",
           text: "Low",
           progressColor: "bg-amber-500",
+          level: 40,
         }
       case "critical":
         return {
           color: "text-red-500 bg-red-50",
           text: "Critical",
           progressColor: "bg-red-500",
+          level: 15,
         }
       case "empty":
         return {
           color: "text-slate-500 bg-slate-50",
           text: "Empty",
           progressColor: "bg-slate-500",
+          level: 0,
         }
       default:
         return {
           color: "text-slate-500 bg-slate-50",
           text: "Unknown",
           progressColor: "bg-slate-500",
+          level: 50,
         }
     }
   }
 
-  const waterLevel = Math.round(
-    ((gallonsUsed ?? 0) / (gallonsTotal ?? 1)) * 100,
-  )
   const vendoStatusDetails = getVendoStatusDetails()
   const refillStatusDetails = getRefillStatusDetails()
-
-  // Format last refilled date to "3 days ago" format
-  const formatRelativeTime = (date: Date) => {
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffMinutes = Math.floor(diffMs / (1000 * 60))
-
-    if (diffDays > 0) {
-      return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`
-    }
-
-    if (diffHours > 0) {
-      return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`
-    }
-
-    return `${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`
-  }
 
   return (
     <motion.div
@@ -279,44 +235,11 @@ export const WaterVendoCard = ({
 
         <CardContent className="pb-0">
           <div className="flex flex-col space-y-4">
-            {/* Water level indicator */}
-            <div>
-              <div className="mb-1 flex items-center justify-between">
-                <span className="font-medium text-xs">Water Level</span>
-                <span className="text-muted-foreground text-xs">
-                  {waterLevel}%
-                </span>
-              </div>
-              <Progress
-                value={waterLevel}
-                max={100}
-                className={cn(`h-2 ${refillStatusDetails.progressColor}`)}
-              />
-            </div>
-
-            {/* Usage info and last refilled */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-xs">Used</span>
-                <span className="mt-1 font-semibold text-sm">
-                  {gallonsUsed} / {gallonsTotal} gal
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-muted-foreground text-xs">
-                  Last Refilled
-                </span>
-                <span className="mt-1 font-semibold text-sm">
-                  {formatRelativeTime(lastRefilled ?? new Date())}
-                </span>
-              </div>
-            </div>
-
-            {/* Power usage */}
-            <div className="flex items-center">
-              <Zap className="mr-1 h-4 w-4 text-amber-500" />
-              <span className="text-xs">
-                Power usage: <strong>{powerUsage} kWh</strong>
+            {/* Usage info */}
+            <div className="flex flex-col">
+              <span className="text-muted-foreground text-xs">Used</span>
+              <span className="mt-1 font-semibold text-sm">
+                {gallonsUsed} gallons
               </span>
             </div>
           </div>

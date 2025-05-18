@@ -6,6 +6,7 @@ export type DialogType =
   | "sessionExpired"
   | "createLocker"
   | "printRentalAgreementReceipt"
+  | "createWaterVendo"
 
 interface ConfirmDialogData {
   title?: string

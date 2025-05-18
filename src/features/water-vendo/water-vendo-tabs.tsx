@@ -33,15 +33,18 @@ import {
 import VisuallyHiddenComponent from "@/components/ui/separators/visually-hidden"
 import { Menu, Filter, Search, Plus, X, ChevronsUpDown } from "lucide-react"
 import { WaterSupply } from "@/features/water-vendo/water-supply-list"
+import { WaterFunds } from "@/features/water-vendo/water-funds"
 import { GiWaterGallon, GiWaterSplash } from "react-icons/gi"
 import { Separator } from "@/components/ui/separators"
 import { Checkbox } from "@/components/ui/checkboxes"
+import { FaMoneyBill1Wave } from "react-icons/fa6"
 import { Button } from "@/components/ui/buttons"
 import { Label } from "@/components/ui/labels"
 import { Input } from "@/components/ui/inputs"
 import { Badge } from "@/components/ui/badges"
 
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { useDialog } from "@/hooks/use-dialog"
 import { useState, useEffect } from "react"
 
 import { motion } from "framer-motion"
@@ -88,6 +91,7 @@ export const WaterVendoTabs = () => {
     },
     lastRefilled: null,
   })
+  const { onOpen } = useDialog()
 
   const isMobile = useMediaQuery("(max-width: 768px)")
   const isSmallScreen = useMediaQuery("(max-width: 640px)")
@@ -104,6 +108,12 @@ export const WaterVendoTabs = () => {
       label: "Water Supply",
       shortLabel: "Water Supply",
       icon: <GiWaterSplash className="size-4" />,
+    },
+    {
+      id: "water_funds",
+      label: "Fund Colection",
+      shortLabel: "Water Funds",
+      icon: <FaMoneyBill1Wave className="size-4" />,
     },
   ]
 
@@ -194,19 +204,6 @@ export const WaterVendoTabs = () => {
         !refillFiltersActive || filters.refill[vendo.refillStatus]
 
       if (!matchesRefill) return false
-
-      // Last refilled filter
-      if (filters.lastRefilled && vendo.lastRefilled) {
-        const now = new Date()
-        const refillDate = new Date(vendo.lastRefilled)
-        const diffDays = Math.floor(
-          (now.getTime() - refillDate.getTime()) / (1000 * 60 * 60 * 24),
-        )
-
-        if (filters.lastRefilled === "today" && diffDays > 0) return false
-        if (filters.lastRefilled === "week" && diffDays > 7) return false
-        if (filters.lastRefilled === "month" && diffDays > 30) return false
-      }
 
       return true
     })
@@ -640,7 +637,11 @@ export const WaterVendoTabs = () => {
               </PopoverContent>
             </Popover>
 
-            <Button size="sm" className="h-9">
+            <Button
+              size="sm"
+              className="h-9"
+              onClick={() => onOpen("createWaterVendo")}
+            >
               <Plus className="mr-2 h-3.5 w-3.5" />
               Add Vendo
             </Button>
@@ -792,11 +793,8 @@ export const WaterVendoTabs = () => {
                   id={vendo.id}
                   location={vendo.location}
                   gallonsUsed={vendo.gallonsUsed}
-                  gallonsTotal={vendo.gallonsTotal}
                   vendoStatus={vendo.vendoStatus}
                   refillStatus={vendo.refillStatus}
-                  lastRefilled={vendo.lastRefilled}
-                  powerUsage={vendo.powerUsage}
                 />
               </motion.div>
             ))
@@ -809,6 +807,13 @@ export const WaterVendoTabs = () => {
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
         <WaterSupply />
+      </TabsContent>
+
+      <TabsContent
+        value="water_funds"
+        className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
+      >
+        <WaterFunds />
       </TabsContent>
     </Tabs>
   )
