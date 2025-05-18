@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  IdCell,
   AmountCell,
   SelectCell,
   DateDueCell,
@@ -10,7 +11,6 @@ import {
   CourseAndSetCell,
   RentalStatusCell,
   PaymentStatusCell,
-  TransactionIdCell,
 } from "@/features/locker-rental-list/table-cells"
 import { columnHeaders } from "@/features/locker-rental-list/column-helper"
 import { ActionMenu } from "@/features/locker-rental-list/action-menu"
@@ -32,7 +32,7 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
     header: "ID",
     cell: ({ row }) => {
       const transactionId = row.getValue("transactionId") as string
-      return <TransactionIdCell value={transactionId} />
+      return <IdCell value={transactionId} />
     },
     size: 90,
   },

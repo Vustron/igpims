@@ -14,6 +14,7 @@ import {
   SelectContent,
   SelectTrigger,
 } from "@/components/ui/selects"
+import { ViolationList } from "@/features/locker/violation-list"
 import { DynamicForm } from "@/components/ui/forms"
 import { Button } from "@/components/ui/buttons"
 import { Switch } from "@/components/ui/inputs"
@@ -40,14 +41,11 @@ const renterInfoSchema = z.object({
   semester_academic_year: z.string(),
   dateRented: z.date().optional(),
   dateDue: z.date().optional(),
-
-  // Fields that change based on isViolation
   lockerRentalPrice: z.number().min(0).optional(),
   lockerRentalPayment: z.number().min(0).optional(),
   violationType: z.string().optional(),
   violationPrice: z.number().min(0).optional(),
   violationPayment: z.number().min(0).optional(),
-
   paymentStatus: z.string(),
 })
 
@@ -56,6 +54,7 @@ type RenterInfoForm = z.infer<typeof renterInfoSchema>
 export const RenterInfo = ({ id }: { id: string }) => {
   const [documentType, setDocumentType] = useState<string>("agreement")
   const [isViolation, setIsViolation] = useState(false)
+  const [showViolationList, setShowViolationList] = useState(false)
   const { onOpen } = useDialog()
 
   const form = useForm<RenterInfoForm>({
@@ -79,6 +78,12 @@ export const RenterInfo = ({ id }: { id: string }) => {
       paymentStatus: "unpaid",
     },
   })
+
+  useEffect(() => {
+    if (!isViolation) {
+      setShowViolationList(false)
+    }
+  }, [isViolation])
 
   useEffect(() => {
     if (isViolation) {
@@ -279,12 +284,24 @@ export const RenterInfo = ({ id }: { id: string }) => {
         </CardDescription>
 
         <div className="mt-4 flex w-full flex-col gap-4 sm:flex-row sm:justify-between">
-          {/* Violation Switch */}
+          {/* Mode Switch - Rental/Violation */}
           <div className="flex items-center gap-2">
             <span className="font-medium text-sm">Locker Rental</span>
             <Switch checked={isViolation} onCheckedChange={setIsViolation} />
             <span className="font-medium text-sm">Locker Violation</span>
           </div>
+
+          {/* Show Violation List Switch - Only visible when in violation mode */}
+          {isViolation && (
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-sm">Record Violation</span>
+              <Switch
+                checked={showViolationList}
+                onCheckedChange={setShowViolationList}
+              />
+              <span className="font-medium text-sm">View Violations</span>
+            </div>
+          )}
 
           {/* Print Controls */}
           <div className="flex flex-row gap-3">
@@ -312,7 +329,7 @@ export const RenterInfo = ({ id }: { id: string }) => {
               <Button
                 variant="outline"
                 className="flex min-w-[100px] items-center gap-2"
-                onClick={() => onOpen("printRentalAgreementReceipt")}
+                onClick={() => onOpen("confirm")}
               >
                 <Mail className="h-4 w-4" />
                 Send to Email
@@ -322,23 +339,27 @@ export const RenterInfo = ({ id }: { id: string }) => {
         </div>
       </CardHeader>
       <CardContent>
-        <DynamicForm
-          form={form}
-          fields={renterInfoFields}
-          sections={formSections}
-          onSubmit={handleSubmit}
-          submitButtonTitle={
-            isViolation ? "Record Violation" : "Save Information"
-          }
-          className="w-auto"
-          addCancelButton
-          twoColumnLayout={true}
-          submitButtonClassname={
-            isViolation
-              ? "bg-amber-600 hover:bg-amber-700"
-              : "bg-primary hover:bg-primary/90"
-          }
-        />
+        {isViolation && showViolationList ? (
+          ViolationList()
+        ) : (
+          <DynamicForm
+            form={form}
+            fields={renterInfoFields}
+            sections={formSections}
+            onSubmit={handleSubmit}
+            submitButtonTitle={
+              isViolation ? "Record Violation" : "Save Information"
+            }
+            className="w-auto"
+            addCancelButton
+            twoColumnLayout={true}
+            submitButtonClassname={
+              isViolation
+                ? "bg-amber-600 hover:bg-amber-700"
+                : "bg-primary hover:bg-primary/90"
+            }
+          />
+        )}
       </CardContent>
     </Card>
   )

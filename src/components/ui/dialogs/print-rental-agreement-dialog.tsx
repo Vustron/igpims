@@ -1,23 +1,26 @@
 "use client"
 
-import React from "react"
 import {
   Dialog,
-  DialogContent,
+  DialogTitle,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogContent,
 } from "@/components/ui/dialogs"
 import {
   Drawer,
-  DrawerContent,
+  DrawerTitle,
   DrawerFooter,
   DrawerHeader,
-  DrawerTitle,
+  DrawerContent,
 } from "@/components/ui/drawers"
 import { Button } from "@/components/ui/buttons"
-import { useDialog } from "@/hooks/use-dialog"
+import { Printer } from "lucide-react"
+
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { useDialog } from "@/hooks/use-dialog"
+
+import toast from "react-hot-toast"
 
 export const RentalAgreementReceiptDialog = () => {
   const { isOpen, onClose, type } = useDialog()
@@ -128,14 +131,46 @@ export const RentalAgreementReceiptDialog = () => {
     </div>
   )
 
+  const handlePrint = () => {
+    onClose()
+
+    toast.promise(
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(true)
+        }, 2000)
+      }),
+      {
+        loading: (
+          <span className="flex items-center gap-2">
+            <Printer className="h-4 w-4 animate-pulse" />
+            Printing receipt...
+          </span>
+        ),
+        success: (
+          <span className="flex items-center gap-2">
+            <Printer className="h-4 w-4 text-green-500" />
+            Receipt printed successfully
+          </span>
+        ),
+        error: (
+          <span className="flex items-center gap-2">
+            <Printer className="h-4 w-4 text-red-500" />
+            Failed to print receipt
+          </span>
+        ),
+      },
+    )
+  }
+
   const renderFooter = () => (
     <div className="flex w-full gap-2">
-      <Button className="w-full bg-blue-500 text-white hover:bg-blue-600">
+      <Button className="w-full text-white" onClick={handlePrint}>
         PRINT
       </Button>
       <Button
         variant="outline"
-        className="w-full bg-green-500 text-white hover:bg-green-600"
+        className="w-full bg-red-500 text-white hover:bg-red-600"
         onClick={onClose}
       >
         RETURN

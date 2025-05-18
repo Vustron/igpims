@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Locker Rental",
 }
 
-export default async function DashboardPage() {
+export default async function LockerRentalPage() {
   return (
     <ContentLayout title="Locker Rental">
       <LockerRentalTabs />

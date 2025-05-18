@@ -13,6 +13,7 @@ export const LockerRentalListClient = () => {
           columns={lockerRentalListColumns}
           data={lockerRentalListExample}
           placeholder="Search..."
+          isLockerRental
         />
       </CardContent>
     </Card>

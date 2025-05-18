@@ -52,6 +52,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   placeholder: string
   disabled?: boolean
+  isLockerRental?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -59,6 +60,7 @@ export function DataTable<TData, TValue>({
   data,
   placeholder,
   disabled,
+  isLockerRental,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -249,12 +251,14 @@ export function DataTable<TData, TValue>({
             />
 
             {/* Advanced filter component */}
-            <AdvancedFilter
-              advancedFilters={advancedFilters}
-              setAdvancedFilters={setAdvancedFilters}
-              statusOptions={statusOptions}
-              onClearAllFilters={clearFilters}
-            />
+            {isLockerRental && (
+              <AdvancedFilter
+                advancedFilters={advancedFilters}
+                setAdvancedFilters={setAdvancedFilters}
+                statusOptions={statusOptions}
+                onClearAllFilters={clearFilters}
+              />
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

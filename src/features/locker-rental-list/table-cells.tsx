@@ -61,7 +61,7 @@ export const SelectCell = ({
   )
 }
 
-export const TransactionIdCell = ({ value }: { value: string }) => {
+export const IdCell = ({ value }: { value: string }) => {
   return (
     <TooltipProvider>
       <Tooltip>
