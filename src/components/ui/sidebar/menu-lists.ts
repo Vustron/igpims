@@ -3,11 +3,13 @@ import { FaMoneyBillTransfer } from "react-icons/fa6"
 import { IoBarChartSharp } from "react-icons/io5"
 import { IoWaterOutline } from "react-icons/io5"
 import { RiFileList3Fill } from "react-icons/ri"
+import { GiClothes } from "react-icons/gi"
 import { PiLockers } from "react-icons/pi"
 import { BiTask } from "react-icons/bi"
 
 import type { IconType } from "react-icons/lib"
 import type { LucideIcon } from "lucide-react"
+
 
 type Submenu = {
   href: string
@@ -57,6 +59,13 @@ export function getMenuList(pathname: string): Group[] {
           label: "Water Vendo",
           active: pathname.includes("/water-vendo"),
           icon: IoWaterOutline,
+          submenus: [],
+        },
+        {
+          href: "/other-igps",
+          label: "Other Igps",
+          active: pathname.includes("/other-igps"),
+          icon: GiClothes,
           submenus: [],
         },
       ],

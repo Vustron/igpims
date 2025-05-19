@@ -96,8 +96,8 @@ const ResetPasswordClient = () => {
             <>
               {cooldownTime > 0 && (
                 <div className="mb-4 flex flex-col items-center justify-center space-y-2 rounded-lg bg-muted/50 p-4">
-                  <Loader2Icon className="size-6 animate-spin text-muted-foreground" />
-                  <Label className="text-center text-muted-foreground text-sm">
+                  <Loader2Icon className="size-6 animate-spin text-white" />
+                  <Label className="text-center text-sm text-white">
                     Please wait {cooldownTime} seconds before requesting another
                     link
                   </Label>

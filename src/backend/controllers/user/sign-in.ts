@@ -47,8 +47,8 @@ export async function signInUser(
 
       if (result.length > 0) {
         existingUser = {
-          user: result[0]!.user as User,
-          accounts: [result[0]!.accounts as Account],
+          user: result[0]?.user as User,
+          accounts: [result[0]?.accounts as Account],
         }
       }
     })
@@ -103,7 +103,7 @@ export async function signInUser(
       await Promise.all([
         sessionQuery.insertSessionQuery.execute({
           id: sessionId,
-          userId: existingUser!.user.id,
+          userId: existingUser?.user.id,
           token: sessionToken,
           expiresAt: new Date(expiresAt),
           createdAt: new Date(timestamp),
@@ -112,7 +112,7 @@ export async function signInUser(
           userAgent: request.headers.get("user-agent") ?? "",
         }),
         accountQuery.updateAccountSessionQuery.execute({
-          userId: existingUser!.user.id,
+          userId: existingUser?.user.id,
           accessToken: sessionToken,
           accessTokenExpiresAt: new Date(expiresAt),
           updatedAt: new Date(timestamp),
@@ -122,7 +122,7 @@ export async function signInUser(
       const currentSession = await getSession()
       Object.assign(currentSession, {
         id: sessionId,
-        userId: existingUser!.user.id,
+        userId: existingUser?.user.id,
         token: sessionToken,
         expiresAt: new Date(expiresAt),
         createdAt: new Date(timestamp),
