@@ -1,19 +1,14 @@
 "use client"
 
 import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdowns"
-import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectContent,
-  SelectTrigger,
-} from "@/components/ui/selects"
-import { ChevronDown, ChevronUp, Plus, Printer, Edit } from "lucide-react"
+  weekSummaries,
+  waterVendoEntries,
+  waterVendoEntryColumn,
+} from "@/features/water-vendo/water-vendo-entry-column"
+import { WaterFundsSummaryCards } from "@/features/water-vendo/water-funds-summary-card"
+import { WaterFundsControls } from "@/features/water-vendo/water-funds-control"
+import { Calendar, ChevronDown, ChevronUp, Edit } from "lucide-react"
+import { Separator } from "@/components/ui/separators"
 import { DataTable } from "@/components/ui/tables"
 import { Button } from "@/components/ui/buttons"
 
@@ -22,9 +17,7 @@ import { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { z } from "zod"
 
-import type { ColumnDef } from "@tanstack/react-table"
-
-const WaterVendoEntrySchema = z.object({
+export const WaterVendoEntrySchema = z.object({
   id: z.string(),
   location: z.string(),
   gallonsUsed: z.number(),
@@ -32,121 +25,40 @@ const WaterVendoEntrySchema = z.object({
   revenue: z.number(),
   profit: z.number(),
   week: z.string(),
+  date: z.date().optional(),
 })
 
-const WeekSummarySchema = z.object({
+export const WeekSummarySchema = z.object({
   id: z.string(),
   week: z.string(),
   totalRevenue: z.number(),
   totalExpenses: z.number(),
   totalProfit: z.number(),
   expanded: z.boolean().default(false),
+  dateRange: z.string().optional(),
 })
 
-type WaterVendoEntry = z.infer<typeof WaterVendoEntrySchema>
-type WeekSummary = z.infer<typeof WeekSummarySchema>
-
-const weekSummaries: WeekSummary[] = [
-  {
-    id: "week-3",
-    week: "3rd WEEK OF APRIL 2025",
-    totalRevenue: 756.0,
-    totalExpenses: 456.0,
-    totalProfit: 300.0,
-    expanded: true,
-  },
-  {
-    id: "week-2",
-    week: "2nd WEEK OF APRIL 2025",
-    totalRevenue: 756.0,
-    totalExpenses: 456.0,
-    totalProfit: 300.0,
-    expanded: false,
-  },
-]
-
-const waterVendoEntries: WaterVendoEntry[] = [
-  {
-    id: "entry-1",
-    location: "LIBRARY",
-    gallonsUsed: 3,
-    expenses: 76.0,
-    revenue: 126.0,
-    profit: 50.0,
-    week: "3rd WEEK OF APRIL 2025",
-  },
-  {
-    id: "entry-2",
-    location: "ACADEMIC BUILDING",
-    gallonsUsed: 3,
-    expenses: 76.0,
-    revenue: 126.0,
-    profit: 50.0,
-    week: "3rd WEEK OF APRIL 2025",
-  },
-  {
-    id: "entry-3",
-    location: "MPEC",
-    gallonsUsed: 3,
-    expenses: 76.0,
-    revenue: 126.0,
-    profit: 50.0,
-    week: "3rd WEEK OF APRIL 2025",
-  },
-  {
-    id: "entry-4",
-    location: "NTED",
-    gallonsUsed: 3,
-    expenses: 76.0,
-    revenue: 126.0,
-    profit: 50.0,
-    week: "3rd WEEK OF APRIL 2025",
-  },
-  {
-    id: "entry-5",
-    location: "OLD ITED",
-    gallonsUsed: 3,
-    expenses: 76.0,
-    revenue: 126.0,
-    profit: 50.0,
-    week: "3rd WEEK OF APRIL 2025",
-  },
-  {
-    id: "entry-6",
-    location: "IADS",
-    gallonsUsed: 3,
-    expenses: 76.0,
-    revenue: 126.0,
-    profit: 50.0,
-    week: "3rd WEEK OF APRIL 2025",
-  },
-  // Entries for week 2
-  {
-    id: "entry-7",
-    location: "LIBRARY",
-    gallonsUsed: 3,
-    expenses: 76.0,
-    revenue: 126.0,
-    profit: 50.0,
-    week: "2nd WEEK OF APRIL 2025",
-  },
-  {
-    id: "entry-8",
-    location: "ACADEMIC BUILDING",
-    gallonsUsed: 3,
-    expenses: 76.0,
-    revenue: 126.0,
-    profit: 50.0,
-    week: "2nd WEEK OF APRIL 2025",
-  },
-]
+export type WaterVendoEntry = z.infer<typeof WaterVendoEntrySchema>
+export type WeekSummary = z.infer<typeof WeekSummarySchema>
 
 export const WaterFunds = () => {
   const [weekData, setWeekData] = useState<WeekSummary[]>(weekSummaries)
   const [entries] = useState<WaterVendoEntry[]>(waterVendoEntries)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [compareWithPrevious] = useState(false)
+  const [timeRange, setTimeRange] = useState("ALL")
 
   const totalProfit = useMemo(() => {
     return weekData.reduce((sum, week) => sum + week.totalProfit, 0)
+  }, [weekData])
+
+  const totalRevenue = useMemo(() => {
+    return weekData.reduce((sum, week) => sum + week.totalRevenue, 0)
+  }, [weekData])
+
+  const totalExpenses = useMemo(() => {
+    return weekData.reduce((sum, week) => sum + week.totalExpenses, 0)
   }, [weekData])
 
   const toggleWeekExpanded = (weekId: string) => {
@@ -157,201 +69,168 @@ export const WaterFunds = () => {
     )
   }
 
-  const detailColumns: ColumnDef<WaterVendoEntry>[] = [
-    {
-      accessorKey: "location",
-      header: "WATER VENDO",
-      cell: ({ row }) => (
-        <div className="font-medium text-xs">{row.getValue("location")}</div>
-      ),
-    },
-    {
-      accessorKey: "gallonsUsed",
-      header: "GALLON USED",
-      cell: ({ row }) => (
-        <div className="text-center text-xs">{row.getValue("gallonsUsed")}</div>
-      ),
-    },
-    {
-      accessorKey: "expenses",
-      header: "EXPENSES",
-      cell: ({ row }) => (
-        <div className="text-xs">
-          ₱ {row.getValue<number>("expenses").toFixed(2)}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "revenue",
-      header: "REVENUE",
-      cell: ({ row }) => (
-        <div className="text-xs">
-          ₱ {row.getValue<number>("revenue").toFixed(2)}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "profit",
-      header: "PROFIT",
-      cell: ({ row }) => (
-        <div className="font-medium text-xs">
-          ₱ {row.getValue<number>("profit").toFixed(2)}
-        </div>
-      ),
-    },
-    {
-      id: "actions",
-      header: "ACTION",
-      cell: () => (
-        <div className="flex justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-full">
-                Action <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ),
-    },
-  ]
+  const handlePrint = () => {
+    console.log("Printing report...")
+    window.print()
+  }
+
+  const handleAddCollection = () => {
+    console.log("Adding new collection...")
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  }
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <span className="font-medium text-sm">Sort by</span>
-          <Select defaultValue="ALL">
-            <SelectTrigger className="h-9 w-[140px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">ALL</SelectItem>
-              <SelectItem value="WEEK">Week</SelectItem>
-              <SelectItem value="MONTH">Month</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+    <div className="mx-auto max-w-[1200px] space-y-6">
+      {/* Summary cards */}
+      <WaterFundsSummaryCards
+        totalRevenue={totalRevenue}
+        totalExpenses={totalExpenses}
+        totalProfit={totalProfit}
+        asOfDate="April 21, 2025"
+        compareWithPrevious={compareWithPrevious}
+      />
 
-        <div className="flex items-center space-x-2">
-          <div className="text-sm">
-            <div className="font-medium">
-              Total Profit: ₱{totalProfit.toFixed(2)}
-            </div>
-            <div className="text-muted-foreground text-xs">
-              As of April 21, 2025
-            </div>
-          </div>
+      {/* Controls */}
+      <WaterFundsControls
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        isSheetOpen={isSheetOpen}
+        setIsSheetOpen={setIsSheetOpen}
+        timeRange={timeRange}
+        setTimeRange={setTimeRange}
+        onPrint={handlePrint}
+        onAddCollection={handleAddCollection}
+      />
 
-          <Button variant="outline" size="icon">
-            <Printer className="h-4 w-4" />
-          </Button>
+      <Separator className="my-6" />
 
-          <Button variant="default" size="sm" className="flex items-center">
-            <Plus className="mr-1 h-4 w-4" />
-            ADD FUND COLLECTION
-          </Button>
-        </div>
-      </div>
-
-      <div className="space-y-4">
+      {/* Collapsible sections */}
+      <motion.div
+        className="space-y-4"
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: {},
+          show: {
+            transition: {
+              staggerChildren: 0.1,
+            },
+          },
+        }}
+      >
         {weekData.map((week) => (
-          <div key={week.id} className="overflow-hidden rounded-sm border">
+          <motion.div
+            key={week.id}
+            variants={itemVariants}
+            layout
+            className="overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md"
+          >
             <div
-              className="flex cursor-pointer justify-between bg-yellow-200 p-2"
+              className="flex cursor-pointer items-center justify-between bg-gradient-to-r from-yellow-50 to-yellow-100/50 p-4"
               onClick={() => toggleWeekExpanded(week.id)}
             >
-              <div className="font-medium text-sm">{week.week}</div>
-              <div className="flex items-center space-x-8">
-                <div className="text-sm">
-                  <span className="font-medium">Total Revenue</span>
-                  <span className="ml-2">₱{week.totalRevenue.toFixed(2)}</span>
+              <div>
+                <span className="font-medium text-sm">{week.week}</span>
+                <div className="flex items-center text-muted-foreground text-xs">
+                  <Calendar className="mr-1 h-3.5 w-3.5 text-muted-foreground" />
+                  {week.dateRange}
                 </div>
-                <div className="text-sm">
-                  <span className="font-medium">Total Expenses</span>
-                  <span className="ml-2">₱{week.totalExpenses.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center gap-4 md:gap-8">
+                <div className="hidden md:block">
+                  <div className="flex flex-col text-right">
+                    <span className="text-muted-foreground text-xs">
+                      Revenue
+                    </span>
+                    <span className="font-medium text-sm">
+                      ₱
+                      {week.totalRevenue.toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-sm">
-                  <span className="font-medium">Total Profit</span>
-                  <span className="ml-2">₱{week.totalProfit.toFixed(2)}</span>
+                <div className="hidden md:block">
+                  <div className="flex flex-col text-right">
+                    <span className="text-muted-foreground text-xs">
+                      Expenses
+                    </span>
+                    <span className="font-medium text-sm">
+                      ₱
+                      {week.totalExpenses.toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
+                <div>
+                  <div className="flex flex-col text-right">
+                    <span className="text-muted-foreground text-xs">
+                      Profit
+                    </span>
+                    <span className="font-medium text-green-600 text-sm">
+                      ₱
+                      {week.totalProfit.toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full"
+                  >
                     <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit</span>
                   </Button>
-                  {week.expanded ? (
-                    <ChevronUp className="h-5 w-5" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5" />
-                  )}
+                  <div className="flex h-8 w-8 items-center justify-center">
+                    {week.expanded ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {week.expanded && (
-              <AnimatePresence>
+            <AnimatePresence>
+              {week.expanded && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <DataTable
-                    columns={detailColumns}
-                    data={entries.filter((entry) => entry.week === week.week)}
-                    placeholder="Search water vendo entries..."
-                  />
+                  <div className="overflow-hidden p-5 print:overflow-visible">
+                    <DataTable
+                      columns={waterVendoEntryColumn}
+                      data={entries.filter(
+                        (entry) =>
+                          entry.week === week.week &&
+                          (searchTerm === "" ||
+                            entry.location
+                              .toLowerCase()
+                              .includes(searchTerm.toLowerCase())),
+                      )}
+                      placeholder="No entries found"
+                    />
+                  </div>
                 </motion.div>
-              </AnimatePresence>
-            )}
-          </div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         ))}
-      </div>
-
-      <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <span className="font-medium text-sm">Show</span>
-          <Select defaultValue="7">
-            <SelectTrigger className="h-8 w-[80px]">
-              <SelectValue placeholder="Show" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="5">5</SelectItem>
-              <SelectItem value="7">7</SelectItem>
-              <SelectItem value="10">10</SelectItem>
-            </SelectContent>
-          </Select>
-          <span className="text-sm">Entries</span>
-        </div>
-
-        <div className="flex items-center space-x-1">
-          <Button variant="outline" size="sm" className="h-8 px-2">
-            Prev
-          </Button>
-          <Button
-            variant="default"
-            size="sm"
-            className="h-8 w-8 bg-yellow-600 p-0"
-          >
-            1
-          </Button>
-          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-            2
-          </Button>
-          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-            3
-          </Button>
-          <Button variant="outline" size="sm" className="h-8 px-2">
-            Next
-          </Button>
-        </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

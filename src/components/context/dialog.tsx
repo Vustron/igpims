@@ -5,6 +5,7 @@ import {
   VerifyUserDialog,
   CreateLockerDialog,
   SessionExpiredDialog,
+  CreateWaterFundDialog,
   CreateWaterVendoDialog,
   RentalAgreementReceiptDialog,
 } from "@/components/ui/dialogs"
@@ -22,6 +23,7 @@ export const DialogProvider = () => {
       <CreateLockerDialog />
       <RentalAgreementReceiptDialog />
       <CreateWaterVendoDialog />
+      <CreateWaterFundDialog />
     </>
   )
 }

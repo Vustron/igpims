@@ -344,7 +344,7 @@ export function DataTable<TData, TValue>({
       ) : (
         <>
           <ScrollArea className="h-[calc(80vh-100px)] rounded-md border md:h-[calc(80vh-100px)]">
-            <ScrollBar orientation="horizontal" />
+            <ScrollBar orientation="horizontal" className="z-10" />
             <Table className="relative">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (

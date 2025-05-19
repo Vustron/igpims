@@ -285,9 +285,9 @@ export const WaterVendoTabs = () => {
                 <VisuallyHiddenComponent>
                   <DrawerHeader className="text-center">
                     <DrawerTitle>
-                      <h3 className="mb-2 font-medium text-muted-foreground text-sm">
+                      <span className="mb-2 font-medium text-muted-foreground text-sm">
                         Navigation
-                      </h3>
+                      </span>
                     </DrawerTitle>
                     <DrawerDescription className="text-muted-foreground">
                       Select a tab to navigate
