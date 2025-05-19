@@ -10,7 +10,6 @@ import { BiTask } from "react-icons/bi"
 import type { IconType } from "react-icons/lib"
 import type { LucideIcon } from "lucide-react"
 
-
 type Submenu = {
   href: string
   label: string
