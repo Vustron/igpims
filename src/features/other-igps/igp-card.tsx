@@ -15,6 +15,8 @@ import {
   CreditCard,
   CheckCircle,
   ChevronRight,
+  AlertTriangle,
+  Wrench,
 } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/cards"
 import { Button } from "@/components/ui/buttons"
@@ -31,6 +33,7 @@ import {
   GiBookshelf,
   GiPaintBrush,
   GiMicroscope,
+  GiShirtButton,
   GiSewingNeedle,
   GiMusicalNotes,
   GiVendingMachine,
@@ -50,7 +53,7 @@ export interface IgpCardProps {
   id: string
   name: string
   description: string
-  type: "temporary" | "permanent"
+  type: "temporary" | "permanent" | "maintenance"
   iconType?:
     | "store"
     | "card"
@@ -79,9 +82,11 @@ export interface IgpCardProps {
     | "art"
     | "rental"
     | "newspaper"
+    | "pin"
   totalSold: number
   revenue: number
   href?: string
+  maintenanceDate?: Date
 }
 
 export function IgpCard({
@@ -92,6 +97,7 @@ export function IgpCard({
   iconType = "store",
   totalSold,
   revenue,
+  maintenanceDate,
   // href = `/igps/${id}`,
 }: IgpCardProps) {
   const icons = {
@@ -122,6 +128,7 @@ export function IgpCard({
     art: GiPaintBrush,
     rental: Car,
     newspaper: LuNewspaper,
+    pin: GiShirtButton,
   }
 
   const Icon = icons[iconType]
@@ -134,32 +141,80 @@ export function IgpCard({
     }).format(amount)
   }
 
+  const getStatusStyles = () => {
+    switch (type) {
+      case "permanent":
+        return {
+          iconBg: "bg-emerald-100",
+          iconColor: "text-emerald-700",
+          badgeBorder: "border-emerald-200",
+          badgeBg: "bg-emerald-50",
+          badgeText: "text-emerald-700",
+          statusIcon: CheckCircle,
+          statusText: "Permanent",
+          cardBorder: "border-slate-200",
+        }
+      case "maintenance":
+        return {
+          iconBg: "bg-red-100",
+          iconColor: "text-red-700",
+          badgeBorder: "border-red-200",
+          badgeBg: "bg-red-50",
+          badgeText: "text-red-700",
+          statusIcon: Wrench,
+          statusText: "Maintenance",
+          cardBorder: "border-red-200",
+          cardOverlay: true,
+        }
+      default:
+        return {
+          iconBg: "bg-amber-100",
+          iconColor: "text-amber-700",
+          badgeBorder: "border-amber-200",
+          badgeBg: "bg-amber-50",
+          badgeText: "text-amber-700",
+          statusIcon: Clock,
+          statusText: "Temporary",
+          cardBorder: "border-slate-200",
+        }
+    }
+  }
+
+  const statusStyles = getStatusStyles()
+  const StatusIcon = statusStyles.statusIcon
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       whileHover={{ y: -5 }}
-      className="h-full"
+      className="relative h-full"
     >
-      <Card className="flex h-full flex-col overflow-hidden border-slate-200 transition-all hover:border-slate-300 hover:shadow-md">
-        <CardContent className="flex flex-col gap-4 p-5">
+      <Card
+        className={cn(
+          "flex h-full flex-col overflow-hidden transition-all hover:shadow-md",
+          statusStyles.cardBorder,
+          type === "maintenance"
+            ? "hover:border-red-300"
+            : "hover:border-slate-300",
+        )}
+      >
+        {type === "maintenance" && (
+          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-blue-red/5 to-blue-red/10" />
+        )}
+
+        <CardContent className="relative flex flex-col gap-4 p-5">
+          {type === "maintenance" && (
+            <Badge className="absolute top-0 right-0 mt-2 mr-2 bg-red-600 py-0.5 text-[10px]">
+              Under Maintenance
+            </Badge>
+          )}
+
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div
-                className={cn(
-                  "rounded-md p-2",
-                  type === "permanent" ? "bg-emerald-100" : "bg-amber-100",
-                )}
-              >
-                <Icon
-                  className={cn(
-                    "h-5 w-5",
-                    type === "permanent"
-                      ? "text-emerald-700"
-                      : "text-amber-700",
-                  )}
-                />
+              <div className={cn("rounded-md p-2", statusStyles.iconBg)}>
+                <Icon className={cn("h-5 w-5", statusStyles.iconColor)} />
               </div>
               <div>
                 <h3 className="font-medium text-slate-900 text-sm">{name}</h3>
@@ -168,9 +223,9 @@ export function IgpCard({
                     variant="outline"
                     className={cn(
                       "px-1.5 py-0 font-medium text-[10px]",
-                      type === "permanent"
-                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                        : "border-amber-200 bg-amber-50 text-amber-700",
+                      statusStyles.badgeBorder,
+                      statusStyles.badgeBg,
+                      statusStyles.badgeText,
                     )}
                   >
                     <motion.span
@@ -179,14 +234,16 @@ export function IgpCard({
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
                     >
-                      {type === "permanent" ? (
-                        <CheckCircle className="h-2.5 w-2.5" />
-                      ) : (
-                        <Clock className="h-2.5 w-2.5" />
-                      )}
-                      {type === "permanent" ? "Permanent" : "Temporary"}
+                      <StatusIcon className="h-2.5 w-2.5" />
+                      {statusStyles.statusText}
                     </motion.span>
                   </Badge>
+
+                  {type === "maintenance" && maintenanceDate && (
+                    <span className="ml-1.5 text-[10px] text-red-600">
+                      Until {maintenanceDate.toLocaleDateString()}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -194,40 +251,108 @@ export function IgpCard({
 
           <p className="line-clamp-2 text-slate-600 text-xs">{description}</p>
 
-          <div className="mt-auto grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <p className="text-slate-500 text-xs">Total Sold</p>
-              <div className="flex items-center gap-1.5">
-                <Package className="h-3.5 w-3.5 text-slate-400" />
-                <p className="font-semibold text-sm">
-                  {totalSold.toLocaleString()}
-                </p>
+          {type === "maintenance" ? (
+            <div className="flex items-center gap-2 rounded-md border border-red-100 bg-red-50 px-3 py-2">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <p className="text-red-700 text-xs">
+                This IGP is currently unavailable due to maintenance work.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-auto grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-slate-500 text-xs">Total Sold</p>
+                <div className="flex items-center gap-1.5">
+                  <Package className="h-3.5 w-3.5 text-slate-400" />
+                  <p className="font-semibold text-sm">
+                    {totalSold.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-slate-500 text-xs">Revenue</p>
+                <div className="flex items-center gap-1.5">
+                  <BarChart2 className="h-3.5 w-3.5 text-slate-400" />
+                  <p className="font-semibold text-sm">
+                    {formatCurrency(revenue)}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-slate-500 text-xs">Revenue</p>
-              <div className="flex items-center gap-1.5">
-                <BarChart2 className="h-3.5 w-3.5 text-slate-400" />
-                <p className="font-semibold text-sm">
-                  {formatCurrency(revenue)}
-                </p>
-              </div>
-            </div>
-          </div>
+          )}
         </CardContent>
 
-        <CardFooter className="border-t bg-slate-50 p-4">
+        <CardFooter
+          className={cn(
+            "border-t p-4",
+            type === "maintenance" ? "bg-red-50" : "bg-slate-50",
+          )}
+        >
           {/* <Link href={href} className="w-full"> */}
           <Button
             variant="outline"
-            className="w-full border-slate-300 bg-white hover:bg-slate-100"
+            className={cn(
+              "w-full bg-white",
+              type === "maintenance"
+                ? "border-red-300 hover:bg-red-50"
+                : "border-slate-300 hover:bg-slate-100",
+            )}
           >
-            <span className="mr-1">View Details</span>
+            <span className="mr-1">
+              {type === "maintenance"
+                ? "View Maintenance Details"
+                : "View Details"}
+            </span>
             <ChevronRight className="h-3.5 w-3.5" />
           </Button>
           {/* </Link> */}
         </CardFooter>
       </Card>
     </motion.div>
+  )
+}
+
+// Example usage with maintenance status
+export function IgpCardDemo() {
+  const demoIgps: IgpCardProps[] = [
+    {
+      id: "igp-1",
+      name: "University Merch Store",
+      description:
+        "Official university merchandise including shirts, caps, and accessories for students and alumni.",
+      type: "permanent",
+      iconType: "shirt",
+      totalSold: 2456,
+      revenue: 345750.5,
+    },
+    {
+      id: "igp-2",
+      name: "Water Vending Station #3",
+      description:
+        "Self-service water refilling station located at the Student Union building. Currently under maintenance.",
+      type: "maintenance",
+      iconType: "vendo",
+      totalSold: 8342,
+      revenue: 125680.75,
+      maintenanceDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14), // 14 days from now
+    },
+    {
+      id: "igp-3",
+      name: "Annual Research Symposium",
+      description:
+        "Yearly event showcasing student and faculty research with fees for participation and attendance.",
+      type: "temporary",
+      iconType: "research",
+      totalSold: 156,
+      revenue: 78450.0,
+    },
+  ]
+
+  return (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {demoIgps.map((igp) => (
+        <IgpCard key={igp.id} {...igp} />
+      ))}
+    </div>
   )
 }
