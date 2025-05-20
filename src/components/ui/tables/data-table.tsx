@@ -40,6 +40,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import { deepSearch } from "@/utils/deep-search"
 
+import { useDialog } from "@/hooks/use-dialog"
+
 import type {
   ColumnDef,
   SortingState,
@@ -47,6 +49,7 @@ import type {
   ColumnFiltersState,
 } from "@tanstack/react-table"
 import type { FilterState } from "@/components/ui/tables/advance-filter"
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -67,6 +70,7 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [filterValue, setFilterValue] = useState<string>("")
+  const { onOpen } = useDialog()
 
   // Advanced filters state
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
@@ -272,6 +276,7 @@ export function DataTable<TData, TValue>({
                 size="sm"
                 variant="outline"
                 className="font-normal text-xs shadow-xs"
+                onClick={() => onOpen("printRentalAgreementReceipt")}
               >
                 <PrinterIcon className="mr-2 h-4 w-4" />
                 Print

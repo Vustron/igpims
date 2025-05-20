@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  CreateIgpDialog,
   ConfirmDialog,
   VerifyUserDialog,
   CreateLockerDialog,
@@ -24,6 +25,7 @@ export const DialogProvider = () => {
       <RentalAgreementReceiptDialog />
       <CreateWaterVendoDialog />
       <CreateWaterFundDialog />
+      <CreateIgpDialog />
     </>
   )
 }

@@ -8,6 +8,7 @@ export type DialogType =
   | "printRentalAgreementReceipt"
   | "createWaterVendo"
   | "createWaterFund"
+  | "createIgp"
 
 interface ConfirmDialogData {
   title?: string

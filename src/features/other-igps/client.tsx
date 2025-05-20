@@ -1,28 +1,31 @@
 "use client"
 
-import { useState } from "react"
-import { IgpCard } from "@/features/other-igps/igp-card"
-import { Input } from "@/components/ui/inputs"
-import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
-import { Separator } from "@/components/ui/separators"
 import {
   DropdownMenu,
+  DropdownMenuLabel,
   DropdownMenuContent,
-  DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuLabel,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdowns"
 import {
   X,
   Search,
   Filter,
-  SlidersHorizontal,
   ArrowUpDown,
   PlusCircleIcon,
+  SlidersHorizontal,
 } from "lucide-react"
+import { IgpCard } from "@/features/other-igps/igp-card"
+import { Separator } from "@/components/ui/separators"
+import { Button } from "@/components/ui/buttons"
+import { Badge } from "@/components/ui/badges"
+import { Input } from "@/components/ui/inputs"
+
 import { motion, AnimatePresence } from "framer-motion"
+
+import { useDialog } from "@/hooks/use-dialog"
+import { useState } from "react"
 
 import type { IgpCardProps } from "@/features/other-igps/igp-card"
 
@@ -40,6 +43,7 @@ export const OtherIgpsClient = () => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [sortOption, setSortOption] = useState<SortOption>("name-asc")
   const [selectedIconTypes, setSelectedIconTypes] = useState<string[]>([])
+  const { onOpen } = useDialog()
 
   const demoIgps: IgpCardProps[] = [
     {
@@ -407,6 +411,7 @@ export const OtherIgpsClient = () => {
             variant="outline"
             size="sm"
             className={`flex items-center gap-1 ${sortOption !== "name-asc" ? "border-primary/30 bg-primary/10 text-primary" : ""}`}
+            onClick={() => onOpen("createIgp")}
           >
             <PlusCircleIcon className="h-3.5 w-3.5" />
             <span>Add Igp</span>
