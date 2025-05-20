@@ -1,15 +1,24 @@
 "use client"
 
+import {
+  Tabs,
+  TabsList,
+  TabsContent,
+  TabsTrigger,
+} from "@/components/ui/separators/tabs"
+import { LockerInspectionSchedule } from "@/features/locker-rental/locker-inspection-schedule"
 import { LockerRentalListClient } from "@/features/locker-rental-list/client"
 import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
 import { LockerRentalClient } from "@/features/locker-rental/client"
-import { Tabs, TabsContent } from "@/components/ui/separators/tabs"
-import { ClipboardList } from "lucide-react"
-
+import { ViolationList } from "@/features/locker/violation-list"
+import { ClipboardList, FileX } from "lucide-react"
+import { GiMagnifyingGlass } from "react-icons/gi"
 import { PiLockers } from "react-icons/pi"
 
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useState, useEffect } from "react"
+
+import { cn } from "@/utils/cn"
 
 interface TabItem {
   id: string
@@ -37,6 +46,18 @@ export const LockerRentalTabs = () => {
       shortLabel: "Rental List",
       icon: <ClipboardList className="size-4" />,
     },
+    {
+      id: "locker_inspection_schedule",
+      label: "Locker Inspection Schedule",
+      shortLabel: "Locker Inspection",
+      icon: <GiMagnifyingGlass className="size-4" />,
+    },
+    {
+      id: "violator_list",
+      label: "Violator List",
+      shortLabel: "Violator List",
+      icon: <FileX className="size-4" />,
+    },
   ]
 
   useEffect(() => {
@@ -50,6 +71,30 @@ export const LockerRentalTabs = () => {
       className="w-full"
       onValueChange={(value) => setActiveTab(value)}
     >
+      {/* Desktop and Tablet Navigation */}
+      <div className="hidden flex-wrap items-center justify-between border-b md:flex">
+        <TabsList className="h-10 bg-transparent">
+          {tabs.map((tab) => (
+            <TabsTrigger
+              key={tab.id}
+              value={tab.id}
+              className={cn(
+                "border-transparent border-b-2 data-[state=active]:bg-background data-[state=active]:shadow-none",
+                "h-10 rounded-none px-4 data-[state=active]:border-primary",
+                "transition-all duration-200",
+              )}
+            >
+              <span
+                className={`flex items-center gap-1.5 ${activeTab === tab.id ? "font-medium text-primary" : "text-muted-foreground"}`}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+
       {/* Mobile Navigation */}
       <MobileTabNav
         tabs={tabs}
@@ -74,6 +119,19 @@ export const LockerRentalTabs = () => {
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
         <LockerRentalListClient />
+      </TabsContent>
+
+      <TabsContent
+        value="locker_inspection_schedule"
+        className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
+      >
+        <LockerInspectionSchedule />
+      </TabsContent>
+      <TabsContent
+        value="violator_list"
+        className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
+      >
+        <ViolationList />
       </TabsContent>
     </Tabs>
   )

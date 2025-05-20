@@ -7,7 +7,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/separators/tabs"
 import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
-import { IgpSupply } from "@/features/other-igps/igp-supply"
+import { IgpManagement } from "@/features/other-igps/igp-management"
 import { Boxes, Store } from "lucide-react"
 
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -24,7 +24,6 @@ interface IgpTabsProps {
   igpTabIcon?: React.ReactNode
   activeTab?: string
   setActiveTab?: (tab: string) => void
-  igpManagementContent?: React.ReactNode
 }
 
 export const IgpTabs = ({
@@ -34,7 +33,6 @@ export const IgpTabs = ({
   igpTabIcon = <Store className="size-4" />,
   activeTab: externalActiveTab,
   setActiveTab: externalSetActiveTab,
-  igpManagementContent,
 }: IgpTabsProps) => {
   const [internalActiveTab, setInternalActiveTab] = useState(igpTab)
   const [openMobileSheet, setOpenMobileSheet] = useState(false)
@@ -111,14 +109,14 @@ export const IgpTabs = ({
         value={igpTab}
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        {igpManagementContent}
+        <IgpManagement />
       </TabsContent>
 
       <TabsContent
         value="supply"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <IgpSupply />
+        igp supply
       </TabsContent>
     </Tabs>
   )

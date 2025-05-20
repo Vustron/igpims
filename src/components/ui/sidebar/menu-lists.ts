@@ -1,11 +1,10 @@
-import { LayoutGrid, Settings2Icon, User } from "lucide-react"
 import { FaMoneyBillTransfer } from "react-icons/fa6"
 import { IoBarChartSharp } from "react-icons/io5"
 import { IoWaterOutline } from "react-icons/io5"
 import { RiFileList3Fill } from "react-icons/ri"
+import { LayoutGrid, User } from "lucide-react"
 import { GiClothes } from "react-icons/gi"
 import { PiLockers } from "react-icons/pi"
-import { BiTask } from "react-icons/bi"
 
 import type { IconType } from "react-icons/lib"
 import type { LucideIcon } from "lucide-react"
@@ -62,7 +61,7 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/other-igps",
-          label: "Other Igps",
+          label: "Other IGPs",
           active: pathname.includes("/other-igps"),
           icon: GiClothes,
           submenus: [],
@@ -72,13 +71,6 @@ export function getMenuList(pathname: string): Group[] {
     {
       groupLabel: "Operation Management",
       menus: [
-        {
-          href: "/locker-inspection",
-          label: "Locker Inspection",
-          active: pathname.includes("/locker-inspection"),
-          icon: BiTask,
-          submenus: [],
-        },
         {
           href: "/fund-request",
           label: "Fund Request",
@@ -115,13 +107,6 @@ export function getMenuList(pathname: string): Group[] {
           label: "User",
           active: pathname.includes("/user"),
           icon: User,
-          submenus: [],
-        },
-        {
-          href: "/settings",
-          label: "IGP Settings",
-          active: pathname.includes("/settings"),
-          icon: Settings2Icon,
           submenus: [],
         },
       ],

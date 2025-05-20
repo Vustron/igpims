@@ -2,10 +2,8 @@
 
 import { IgpFilters } from "@/features/other-igps/igp-filters"
 import { IgpCard } from "@/features/other-igps/igp-card"
-import { IgpTabs } from "@/features/other-igps/igp-tabs"
 import { Separator } from "@/components/ui/separators"
 import { Button } from "@/components/ui/buttons"
-import { Store } from "lucide-react"
 
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -19,7 +17,6 @@ export const OtherIgpsClient = () => {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [sortOption, setSortOption] = useState<SortOption>("name-asc")
   const [selectedIconTypes, setSelectedIconTypes] = useState<string[]>([])
-  const [activeTab, setActiveTab] = useState("igp_management")
 
   const demoIgps: IgpCardProps[] = [
     {
@@ -151,8 +148,7 @@ export const OtherIgpsClient = () => {
     selectedIconTypes.length > 0 ||
     sortOption !== "name-asc"
 
-  // IGP Management tab content
-  const renderIgpManagementContent = () => (
+  return (
     <div className="space-y-6">
       {/* Filters component */}
       <IgpFilters
@@ -227,17 +223,5 @@ export const OtherIgpsClient = () => {
         </AnimatePresence>
       </motion.div>
     </div>
-  )
-
-  return (
-    <IgpTabs
-      igpTab="igp_management"
-      igpTabLabel="IGP Management"
-      igpTabShortLabel="IGP"
-      igpTabIcon={<Store className="size-4" />}
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
-      igpManagementContent={renderIgpManagementContent()}
-    />
   )
 }

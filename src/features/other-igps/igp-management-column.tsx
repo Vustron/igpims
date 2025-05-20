@@ -37,7 +37,7 @@ import { z } from "zod"
 
 import type { ColumnDef } from "@tanstack/react-table"
 
-export const IgpSupplySchema = z.object({
+export const IgpManagementSchema = z.object({
   id: z.string(),
   purchaser: z.object({
     name: z.string(),
@@ -52,9 +52,9 @@ export const IgpSupplySchema = z.object({
   itemName: z.string().optional(),
 })
 
-export type Supply = z.infer<typeof IgpSupplySchema>
+export type Igp = z.infer<typeof IgpManagementSchema>
 
-export const exampleSupplyData: Supply[] = [
+export const exampleIgpManagementData: Igp[] = [
   {
     id: "txn-2024-001",
     purchaser: {
@@ -64,7 +64,7 @@ export const exampleSupplyData: Supply[] = [
     },
     batch: "Batch 2023-A",
     quantity: 2,
-    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 3, // 3 days ago
+    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 3,
     status: "received",
     itemName: "DNSC T-Shirt",
     price: 350,
@@ -78,7 +78,7 @@ export const exampleSupplyData: Supply[] = [
     },
     batch: "Batch 2023-B",
     quantity: 1,
-    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 1, // 1 day ago
+    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 1,
     status: "pending",
     itemName: "ID Lace",
     price: 150,
@@ -92,7 +92,7 @@ export const exampleSupplyData: Supply[] = [
     },
     batch: "Batch 2023-A",
     quantity: 3,
-    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 5, // 5 days ago
+    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 5,
     status: "received",
     itemName: "Eco Bag",
     price: 200,
@@ -106,7 +106,7 @@ export const exampleSupplyData: Supply[] = [
     },
     batch: "Batch 2023-C",
     quantity: 5,
-    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
+    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 2,
     status: "pending",
     itemName: "Button Pin Set",
     price: 75,
@@ -120,7 +120,7 @@ export const exampleSupplyData: Supply[] = [
     },
     batch: "Batch 2023-B",
     quantity: 2,
-    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 7, // 7 days ago
+    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 7,
     status: "received",
     itemName: "University Calendar",
     price: 120,
@@ -134,14 +134,13 @@ export const exampleSupplyData: Supply[] = [
     },
     batch: "Batch 2023-C",
     quantity: 1,
-    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 4, // 4 days ago
+    dateBought: Date.now() - 1000 * 60 * 60 * 24 * 4,
     status: "received",
     itemName: "College Jacket",
     price: 850,
   },
 ]
 
-// Column header with icon and text
 const ColumnHeader = ({
   icon,
   text,
@@ -155,7 +154,6 @@ const ColumnHeader = ({
   </div>
 )
 
-// Select cell for checkbox selection
 const SelectCell = ({ row, table = undefined }: { row?: any; table?: any }) => {
   if (table) {
     return (
@@ -185,7 +183,6 @@ const SelectCell = ({ row, table = undefined }: { row?: any; table?: any }) => {
   )
 }
 
-// Transaction ID cell
 const TransactionIdCell = ({ value }: { value: string }) => {
   return (
     <TooltipProvider>
@@ -212,7 +209,6 @@ const TransactionIdCell = ({ value }: { value: string }) => {
   )
 }
 
-// Purchaser info cell
 const PurchaserCell = ({
   value,
 }: {
@@ -247,7 +243,6 @@ const PurchaserCell = ({
   )
 }
 
-// Batch cell
 const BatchCell = ({ value }: { value: string }) => {
   return (
     <TooltipProvider>
@@ -268,7 +263,6 @@ const BatchCell = ({ value }: { value: string }) => {
   )
 }
 
-// Quantity cell
 const QuantityCell = ({ value, price }: { value: number; price?: number }) => {
   const formatted = new Intl.NumberFormat("en-PH").format(value)
   const totalPrice = price ? value * price : undefined
@@ -304,7 +298,6 @@ const QuantityCell = ({ value, price }: { value: number; price?: number }) => {
   )
 }
 
-// Date cell with tooltip
 const DateCell = ({ value }: { value: number }) => {
   const date = new Date(value)
   const formattedDate = new Intl.DateTimeFormat("en-US", {
@@ -361,7 +354,7 @@ const StatusCell = ({ value }: { value: "received" | "pending" }) => {
   )
 }
 
-const SupplyActions = ({ supply }: { supply: Supply }) => {
+const SupplyActions = ({ supply }: { supply: Igp }) => {
   const handleView = () => {
     console.log("View supply transaction:", supply.id)
   }
@@ -433,8 +426,7 @@ const SupplyActions = ({ supply }: { supply: Supply }) => {
   )
 }
 
-// Column definitions for the supply table
-export const supplyColumns: ColumnDef<Supply>[] = [
+export const igpManagementColumn: ColumnDef<Igp>[] = [
   {
     id: "select",
     header: ({ table }) => <SelectCell table={table} />,

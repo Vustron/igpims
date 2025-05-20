@@ -21,7 +21,7 @@ import {
   DrawerContent,
   DrawerDescription,
 } from "@/components/ui/drawers"
-import { LockerInspectionSchedule } from "@/features/locker-inspection/locker-inspection-schedule"
+import { LockerInspectionSchedule } from "@/features/locker-rental/locker-inspection-schedule"
 import VisuallyHiddenComponent from "@/components/ui/separators/visually-hidden"
 import { Menu, ClipboardList, ChevronsUpDown, InspectIcon } from "lucide-react"
 import { ViolationList } from "@/features/locker/violation-list"

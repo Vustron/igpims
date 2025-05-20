@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badges"
 
 import { motion } from "framer-motion"
 import { cn } from "@/utils/cn"
-// import Link from "next/link"
+import Link from "next/link"
 
 import {
   GiCupcake,
@@ -98,7 +98,7 @@ export function IgpCard({
   totalSold,
   revenue,
   maintenanceDate,
-  // href = `/igps/${id}`,
+  href = `/other-igps/${name}`,
 }: IgpCardProps) {
   const icons = {
     store: Store,
@@ -205,12 +205,6 @@ export function IgpCard({
         )}
 
         <CardContent className="relative flex flex-col gap-4 p-5">
-          {type === "maintenance" && (
-            <Badge className="absolute top-0 right-0 mt-2 mr-2 bg-red-600 py-0.5 text-[10px]">
-              Under Maintenance
-            </Badge>
-          )}
-
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className={cn("rounded-md p-2", statusStyles.iconBg)}>
@@ -288,71 +282,26 @@ export function IgpCard({
             type === "maintenance" ? "bg-red-50" : "bg-slate-50",
           )}
         >
-          {/* <Link href={href} className="w-full"> */}
-          <Button
-            variant="outline"
-            className={cn(
-              "w-full bg-white",
-              type === "maintenance"
-                ? "border-red-300 hover:bg-red-50"
-                : "border-slate-300 hover:bg-slate-100",
-            )}
-          >
-            <span className="mr-1">
-              {type === "maintenance"
-                ? "View Maintenance Details"
-                : "View Details"}
-            </span>
-            <ChevronRight className="h-3.5 w-3.5" />
-          </Button>
-          {/* </Link> */}
+          <Link href={href} className="w-full">
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full bg-white",
+                type === "maintenance"
+                  ? "border-red-300 hover:bg-red-50"
+                  : "border-slate-300 hover:bg-slate-100",
+              )}
+            >
+              <span className="mr-1">
+                {type === "maintenance"
+                  ? "View Maintenance Details"
+                  : "View Details"}
+              </span>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Button>
+          </Link>
         </CardFooter>
       </Card>
     </motion.div>
-  )
-}
-
-// Example usage with maintenance status
-export function IgpCardDemo() {
-  const demoIgps: IgpCardProps[] = [
-    {
-      id: "igp-1",
-      name: "University Merch Store",
-      description:
-        "Official university merchandise including shirts, caps, and accessories for students and alumni.",
-      type: "permanent",
-      iconType: "shirt",
-      totalSold: 2456,
-      revenue: 345750.5,
-    },
-    {
-      id: "igp-2",
-      name: "Water Vending Station #3",
-      description:
-        "Self-service water refilling station located at the Student Union building. Currently under maintenance.",
-      type: "maintenance",
-      iconType: "vendo",
-      totalSold: 8342,
-      revenue: 125680.75,
-      maintenanceDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14), // 14 days from now
-    },
-    {
-      id: "igp-3",
-      name: "Annual Research Symposium",
-      description:
-        "Yearly event showcasing student and faculty research with fees for participation and attendance.",
-      type: "temporary",
-      iconType: "research",
-      totalSold: 156,
-      revenue: 78450.0,
-    },
-  ]
-
-  return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {demoIgps.map((igp) => (
-        <IgpCard key={igp.id} {...igp} />
-      ))}
-    </div>
   )
 }

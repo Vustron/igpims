@@ -5,14 +5,13 @@ import {
   waterVendoEntries,
   waterVendoEntryColumn,
 } from "@/features/water-vendo/water-vendo-entry-column"
-import { WaterFundsSummaryCards } from "@/features/water-vendo/water-funds-summary-card"
 import { WaterFundsControls } from "@/features/water-vendo/water-funds-control"
 import { Calendar, ChevronDown, ChevronUp, Edit } from "lucide-react"
 import { Separator } from "@/components/ui/separators"
 import { DataTable } from "@/components/ui/tables"
 import { Button } from "@/components/ui/buttons"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 
 import { motion, AnimatePresence } from "framer-motion"
 import { z } from "zod"
@@ -46,20 +45,7 @@ export const WaterFunds = () => {
   const [entries] = useState<WaterVendoEntry[]>(waterVendoEntries)
   const [searchTerm, setSearchTerm] = useState("")
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [compareWithPrevious] = useState(false)
   const [timeRange, setTimeRange] = useState("ALL")
-
-  const totalProfit = useMemo(() => {
-    return weekData.reduce((sum, week) => sum + week.totalProfit, 0)
-  }, [weekData])
-
-  const totalRevenue = useMemo(() => {
-    return weekData.reduce((sum, week) => sum + week.totalRevenue, 0)
-  }, [weekData])
-
-  const totalExpenses = useMemo(() => {
-    return weekData.reduce((sum, week) => sum + week.totalExpenses, 0)
-  }, [weekData])
 
   const toggleWeekExpanded = (weekId: string) => {
     setWeekData((prev) =>
@@ -85,15 +71,6 @@ export const WaterFunds = () => {
 
   return (
     <div className="mx-auto max-w-[1200px] space-y-6">
-      {/* Summary cards */}
-      <WaterFundsSummaryCards
-        totalRevenue={totalRevenue}
-        totalExpenses={totalExpenses}
-        totalProfit={totalProfit}
-        asOfDate="April 21, 2025"
-        compareWithPrevious={compareWithPrevious}
-      />
-
       {/* Controls */}
       <WaterFundsControls
         searchTerm={searchTerm}

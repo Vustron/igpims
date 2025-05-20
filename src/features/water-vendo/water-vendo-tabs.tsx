@@ -109,12 +109,6 @@ export const WaterVendoTabs = () => {
   const filteredVendos = filterVendos()
 
   const totalVendos = exampleWaterVendos.length
-  const onlineVendos = exampleWaterVendos.filter(
-    (v) => v.vendoStatus === "online",
-  ).length
-  const criticalVendos = exampleWaterVendos.filter(
-    (v) => v.refillStatus === "critical" || v.refillStatus === "empty",
-  ).length
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -201,47 +195,6 @@ export const WaterVendoTabs = () => {
               Add Vendo
             </Button>
           </div>
-        </div>
-
-        {/* Summary cards */}
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="rounded-lg bg-blue-50 p-4 shadow-sm"
-          >
-            <h3 className="font-medium text-blue-800 text-sm">Total Vendos</h3>
-            <p className="mt-2 font-bold text-2xl text-blue-900">
-              {totalVendos}
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="rounded-lg bg-green-50 p-4 shadow-sm"
-          >
-            <h3 className="font-medium text-green-800 text-sm">
-              Online Vendos
-            </h3>
-            <p className="mt-2 font-bold text-2xl text-green-900">
-              {onlineVendos}
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-            className="rounded-lg bg-red-50 p-4 shadow-sm"
-          >
-            <h3 className="font-medium text-red-800 text-sm">
-              Critical Refill
-            </h3>
-            <p className="mt-2 font-bold text-2xl text-red-900">
-              {criticalVendos}
-            </p>
-          </motion.div>
         </div>
 
         {/* Water vendo cards */}

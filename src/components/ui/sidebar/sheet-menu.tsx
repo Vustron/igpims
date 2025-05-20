@@ -7,8 +7,8 @@ import {
   SheetDescription,
 } from "@/components/ui/sheets"
 import VisuallyHiddenComponent from "@/components/ui/separators/visually-hidden"
-import { Button } from "@/components/ui/buttons"
 import { Menu } from "@/components/ui/sidebar/menu"
+import { Button } from "@/components/ui/buttons"
 import { MenuIcon } from "lucide-react"
 
 import Image from "next/image"
@@ -49,7 +49,7 @@ export const SheetMenu = () => {
                 }
               />
               <span className="font-semibold text-base transition-opacity duration-300">
-                IGPIMS
+                IGPMIS
               </span>
             </Link>
           </Button>

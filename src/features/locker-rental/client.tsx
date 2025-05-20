@@ -87,7 +87,6 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
 
   return (
     <div className={`flex min-h-screen w-full flex-col ${containerPadding}`}>
-      {/* Filters Section */}
       <LockerFilter
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
