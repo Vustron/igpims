@@ -30,9 +30,11 @@ export const Navbar = ({ title }: NavbarProps) => {
         </div>
 
         <div className="mr-5 flex items-center gap-5">
-          <NavbarItem>
-            <ChangeThemeButton />
-          </NavbarItem>
+          {process.env.NODE_ENV === "development" && (
+            <NavbarItem>
+              <ChangeThemeButton />
+            </NavbarItem>
+          )}
           <NavbarItem>
             <Button
               variant="ghost"

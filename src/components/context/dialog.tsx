@@ -1,13 +1,14 @@
 "use client"
 
 import {
-  CreateIgpDialog,
   ConfirmDialog,
+  CreateIgpDialog,
   VerifyUserDialog,
   CreateLockerDialog,
   SessionExpiredDialog,
   CreateWaterFundDialog,
   CreateWaterVendoDialog,
+  CreateFundRequestDialog,
   RentalAgreementReceiptDialog,
 } from "@/components/ui/dialogs"
 
@@ -26,6 +27,7 @@ export const DialogProvider = () => {
       <CreateWaterVendoDialog />
       <CreateWaterFundDialog />
       <CreateIgpDialog />
+      <CreateFundRequestDialog />
     </>
   )
 }

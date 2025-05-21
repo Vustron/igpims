@@ -9,6 +9,7 @@ export type DialogType =
   | "createWaterVendo"
   | "createWaterFund"
   | "createIgp"
+  | "createFundRequest"
 
 interface ConfirmDialogData {
   title?: string
