@@ -12,7 +12,7 @@ interface SpecificIgpProps {
 }
 
 export const SpecificIgp = ({
-  igpTab,
+  // igpTab,
   igpTabLabel,
   igpTabShortLabel,
 }: SpecificIgpProps) => {
@@ -20,7 +20,7 @@ export const SpecificIgp = ({
 
   return (
     <IgpTabs
-      igpTab={igpTab}
+      igpTab="igp_management"
       igpTabLabel={igpTabLabel}
       igpTabShortLabel={igpTabShortLabel}
       igpTabIcon={<Store className="size-4" />}

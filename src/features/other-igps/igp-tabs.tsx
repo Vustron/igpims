@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/separators/tabs"
 import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
 import { IgpManagement } from "@/features/other-igps/igp-management"
+import { IgpSupply } from "@/features/other-igps/igp-supply"
 import { Boxes, Store } from "lucide-react"
 
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -116,7 +117,7 @@ export const IgpTabs = ({
         value="supply"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        igp supply
+        <IgpSupply />
       </TabsContent>
     </Tabs>
   )

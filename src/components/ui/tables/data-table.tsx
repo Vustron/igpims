@@ -15,6 +15,7 @@ import {
   TableHeader,
 } from "@/components/ui/tables"
 import {
+  Mail,
   History,
   Settings2,
   ChevronLeft,
@@ -56,6 +57,7 @@ interface DataTableProps<TData, TValue> {
   placeholder: string
   disabled?: boolean
   isLockerRental?: boolean
+  isIgp?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -64,6 +66,7 @@ export function DataTable<TData, TValue>({
   placeholder,
   disabled,
   isLockerRental,
+  isIgp,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -266,28 +269,51 @@ export function DataTable<TData, TValue>({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Button
-                size="sm"
-                variant="outline"
-                className="font-normal text-xs shadow-xs"
-                onClick={() => onOpen("printRentalAgreementReceipt")}
-              >
-                <PrinterIcon className="mr-2 h-4 w-4" />
-                Print
-              </Button>
-            </motion.div>
-            <AnimatePresence>
+            {isIgp && (
               <motion.div
+                key="email-button"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2 }}
+              >
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="font-normal text-xs shadow-xs"
+                  onClick={() => onOpen("confirm")}
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  Send email
+                </Button>
+              </motion.div>
+            )}
+
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key="print-button"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2, delay: 0.05 }}
+              >
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="font-normal text-xs shadow-xs"
+                  onClick={() => onOpen("printRentalAgreementReceipt")}
+                >
+                  <PrinterIcon className="mr-2 h-4 w-4" />
+                  Print
+                </Button>
+              </motion.div>
+
+              <motion.div
+                key="view-button"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
               >
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -324,6 +350,7 @@ export function DataTable<TData, TValue>({
             {/* Active filters counter */}
             {activeFilterCount > 0 && (
               <motion.div
+                key="filter-badge"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}

@@ -123,6 +123,7 @@ export const IgpManagement = () => {
         columns={igpManagementColumn}
         data={filteredData}
         placeholder="Search transactions..."
+        isIgp
       />
     </div>
   )
