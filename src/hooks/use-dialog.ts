@@ -10,6 +10,7 @@ export type DialogType =
   | "createWaterFund"
   | "createIgp"
   | "createFundRequest"
+  | "createProjectRequest"
 
 interface ConfirmDialogData {
   title?: string

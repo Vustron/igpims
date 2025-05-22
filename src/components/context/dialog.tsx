@@ -9,6 +9,7 @@ import {
   CreateWaterFundDialog,
   CreateWaterVendoDialog,
   CreateFundRequestDialog,
+  CreateProjectRequestDialog,
   RentalAgreementReceiptDialog,
 } from "@/components/ui/dialogs"
 
@@ -28,6 +29,7 @@ export const DialogProvider = () => {
       <CreateWaterFundDialog />
       <CreateIgpDialog />
       <CreateFundRequestDialog />
+      <CreateProjectRequestDialog />
     </>
   )
 }
