@@ -37,6 +37,7 @@ interface FormControlRendererProps<TFieldValues extends FieldValues> {
   isSignUp?: boolean
   isFloatingLabel?: boolean
   onPasswordStrengthChange?: (isStrong: boolean) => void
+  isOnAuth?: boolean
 }
 
 export const FormControlRenderer = <TFieldValues extends FieldValues>({

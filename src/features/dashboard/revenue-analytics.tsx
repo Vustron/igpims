@@ -116,7 +116,7 @@ export const RevenueAnalytics = () => {
   }
 
   return (
-    <Card className="col-span-full h-full w-full border-black bg-[#FFF8D5] p-4 md:p-6 lg:col-span-3">
+    <Card className="col-span-full h-full w-full bg-background p-4 md:p-6 lg:col-span-3">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="font-semibold text-base md:text-lg">

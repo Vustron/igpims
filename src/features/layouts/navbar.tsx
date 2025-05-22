@@ -2,7 +2,13 @@
 
 import { Button, ChangeThemeButton, UserButton } from "@/components/ui/buttons"
 import { SheetMenu } from "@/components/ui/sidebar"
+import { Badge } from "@/components/ui/badges"
 import { BellDot } from "lucide-react"
+
+import { useNotificationStore } from "@/features/notification/notification-store"
+import { useRouter } from "next-nprogress-bar"
+
+import { cn } from "@/utils/cn"
 
 import type React from "react"
 
@@ -19,6 +25,9 @@ const NavbarItem: React.FC<NavbarItemProps> = ({ children }) => (
 )
 
 export const Navbar = ({ title }: NavbarProps) => {
+  const router = useRouter()
+  const unreadCount = useNotificationStore((state) => state.unreadCount)
+
   return (
     <header className="sticky top-0 z-20 w-full bg-[#3D3A24] shadow-sm backdrop-blur-sm">
       <nav className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -36,13 +45,28 @@ export const Navbar = ({ title }: NavbarProps) => {
             </NavbarItem>
           )}
           <NavbarItem>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white transition-colors hover:text-black"
-            >
-              <BellDot className="size-5" />
-            </Button>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white transition-colors hover:text-black"
+                onClick={() => router.push("/notification")}
+              >
+                <BellDot className="size-5" />
+              </Button>
+
+              {unreadCount > 0 && (
+                <Badge
+                  variant="info"
+                  className={cn(
+                    "-right-1 -top-1 absolute flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 font-medium text-white text-xs",
+                    unreadCount > 99 ? "px-1.5" : "",
+                  )}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </Badge>
+              )}
+            </div>
           </NavbarItem>
           <NavbarItem>
             <UserButton />

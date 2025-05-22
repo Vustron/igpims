@@ -21,7 +21,7 @@ export const SalesOverview = () => {
   const formatCurrency = (value: number) => `₱${value.toLocaleString()}`
 
   return (
-    <Card className="h-full w-full border-black bg-[#FFF8D5] p-3 sm:p-4 md:p-6">
+    <Card className="h-full w-full bg-background p-3 sm:p-4 md:p-6">
       <h3 className="mb-3 font-semibold text-sm sm:mb-4 sm:text-base md:mb-6 md:text-lg">
         Sales Overview
       </h3>

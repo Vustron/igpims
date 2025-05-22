@@ -88,7 +88,7 @@ export const IgpPerformance = () => {
   }
 
   return (
-    <Card className="col-span-full h-full w-full border-black bg-[#FFF8D5] p-6">
+    <Card className="col-span-full h-full w-full bg-background p-6">
       <h3 className="mb-6 font-semibold text-lg">IGP Performance</h3>
       <ChartContainer config={chartConfig} className="h-full w-full">
         <ResponsiveContainer width="100%" height={350}>

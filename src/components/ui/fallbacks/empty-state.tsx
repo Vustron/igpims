@@ -6,7 +6,7 @@ import { cn } from "@/utils/cn"
 import type { LucideIcon } from "lucide-react"
 
 interface EmptyStateProps {
-  icon: LucideIcon
+  icon: LucideIcon | React.FC<React.SVGProps<SVGSVGElement>>
   title: string
   description: string
   action?: {

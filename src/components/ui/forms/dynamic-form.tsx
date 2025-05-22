@@ -349,7 +349,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
                 href={isResetPassword ? "/sign-in" : "/reset-password"}
                 onClick={resetOtpSignIn}
               >
-                <span className="text-sm text-white">
+                <span className="text-sm text-white hover:text-amber-300">
                   {isResetPassword
                     ? "Continue to sign in?"
                     : "Forgot password?"}
