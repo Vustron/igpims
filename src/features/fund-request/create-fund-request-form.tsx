@@ -32,6 +32,7 @@ export const fundRequestSchema = z.object({
         message: "Date of need must be today or in the future",
       },
     ),
+  requestStatus: z.enum(["pending", "approved", "rejected"]).optional(),
 })
 
 export type FundRequest = z.infer<typeof fundRequestSchema>
@@ -56,6 +57,7 @@ export const CreateFundRequestForm = ({
       amount: 0,
       dateOfRequest: new Date(),
       dateOfNeed: new Date(),
+      requestStatus: "pending",
     },
   })
 
@@ -128,6 +130,7 @@ export const CreateFundRequestForm = ({
         amount: 0,
         dateOfRequest: new Date(),
         dateOfNeed: new Date(),
+        requestStatus: "pending",
       })
 
       console.log(formattedData)
