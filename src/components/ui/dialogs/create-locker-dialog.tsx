@@ -38,7 +38,7 @@ export const CreateLockerDialog = () => {
               Fill in the details below to create a new locker.
             </DialogDescription>
           </DialogHeader>
-          <CreateLockerForm />
+          <CreateLockerForm onSuccess={handleClose} onError={handleClose} />
         </DialogContent>
       </Dialog>
     )

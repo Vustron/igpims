@@ -20,7 +20,7 @@ interface ResetPasswordFormProps {
   email: string
 }
 
-const ResetPasswordForm = ({
+export const ResetPasswordForm = ({
   onSuccess,
   disabled,
   token,
@@ -70,5 +70,3 @@ const ResetPasswordForm = ({
     />
   )
 }
-
-export default ResetPasswordForm

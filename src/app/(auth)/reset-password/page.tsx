@@ -1,4 +1,4 @@
-import ResetPasswordClient from "@/features/auth/reset-password/client"
+import { ResetPasswordClient } from "@/features/auth/reset-password/client"
 
 import type { Metadata } from "next"
 

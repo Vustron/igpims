@@ -18,7 +18,10 @@ interface ResetLinkFormProps {
   disabled?: boolean
 }
 
-const SendResetLinkForm = ({ onSuccess, disabled }: ResetLinkFormProps) => {
+export const SendResetLinkForm = ({
+  onSuccess,
+  disabled,
+}: ResetLinkFormProps) => {
   const sendResetLink = useSendResetLink()
 
   const resetFields: FieldConfig<SendEmailPayload>[] = [
@@ -62,5 +65,3 @@ const SendResetLinkForm = ({ onSuccess, disabled }: ResetLinkFormProps) => {
     />
   )
 }
-
-export default SendResetLinkForm

@@ -6,80 +6,107 @@ import {
 } from "@/features/locker-rental/locker-filter"
 import { LockerCard } from "@/features/locker-rental/locker-card"
 import { Button } from "@/components/ui/buttons"
-
-import { useEffect, useState } from "react"
-
-import { lockerList } from "@/interfaces/locker"
+import { useFindManyLockers } from "@/backend/actions/locker/find-many"
+import { useState } from "react"
 import { motion } from "framer-motion"
 
-import type { Locker } from "@/interfaces/locker"
-
 export const LockerRentalClient = ({ isSidebarOpen = false }) => {
-  const [data, setData] = useState<Locker[]>(lockerList)
-  const [filteredData, setFilteredData] = useState<Locker[]>(lockerList)
-  const [selectedLocker, setSelectedLocker] = useState<number | null>(null)
+  const [selectedLocker, setSelectedLocker] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [locationFilter, setLocationFilter] = useState<string>("all")
+  const [page, setPage] = useState(1)
+  const [limit] = useState(12)
 
-  const uniqueLocations = Array.from(
-    new Set(
-      lockerList.map((locker) => {
-        const mainLocation =
-          locker.location.split("-")[0]?.trim() || locker.location.trim()
-        return mainLocation
-      }),
-    ),
-  )
-
-  const locationCounts = {
-    all: lockerList.length,
-    ...Object.fromEntries(
-      uniqueLocations.map((location) => [
-        location,
-        lockerList.filter((l) => l.location.includes(location)).length,
-      ]),
-    ),
+  // Convert UI status to API status
+  const getApiStatus = (uiStatus: string) => {
+    switch (uiStatus) {
+      case "active":
+        return "available"
+      case "inactive":
+        return "occupied"
+      case "under_maintenance":
+        return "maintenance"
+      default:
+        return undefined
+    }
   }
 
-  const statusCounts = {
-    all: lockerList.length,
-    active: lockerList.filter((l) => l.status === "active").length,
-    inactive: lockerList.filter((l) => l.status === "inactive").length,
-    under_maintenance: lockerList.filter(
-      (l) => l.status === "under_maintenance",
-    ).length,
+  // Use the hook with filters
+  const {
+    data: lockersResponse,
+    isLoading,
+    error,
+  } = useFindManyLockers({
+    page,
+    limit,
+    status: statusFilter !== "all" ? getApiStatus(statusFilter) : undefined,
+    location: locationFilter !== "all" ? locationFilter : undefined,
+    search: searchTerm || undefined,
+  })
+
+  // Get unique locations from fetched data
+  const uniqueLocations = lockersResponse?.data
+    ? Array.from(
+        new Set(
+          lockersResponse.data.map((locker) => {
+            const mainLocation = locker.lockerLocation
+              ? locker.lockerLocation.split("-")[0]?.trim() ||
+                locker.lockerLocation.trim()
+              : "Unknown"
+            return mainLocation
+          }),
+        ),
+      )
+    : []
+
+  // Calculate counts for filters
+  const locationCounts = lockersResponse?.data
+    ? {
+        all: lockersResponse.data.length,
+        ...Object.fromEntries(
+          uniqueLocations.map((location) => [
+            location,
+            lockersResponse.data.filter((l) =>
+              l.lockerLocation ? l.lockerLocation.includes(location) : false,
+            ).length,
+          ]),
+        ),
+      }
+    : { all: 0 }
+
+  // Map API status to UI status
+  const getUiStatus = (apiStatus: string | undefined) => {
+    if (!apiStatus) return "active"
+
+    switch (apiStatus) {
+      case "available":
+        return "active"
+      case "occupied":
+      case "reserved":
+        return "inactive"
+      case "maintenance":
+      case "out-of-service":
+        return "under_maintenance"
+      default:
+        return "inactive"
+    }
   }
 
-  useEffect(() => {
-    let result = [...data]
-
-    if (statusFilter !== "all") {
-      result = result.filter((locker) => locker.status === statusFilter)
-    }
-
-    if (locationFilter !== "all") {
-      result = result.filter((locker) =>
-        locker.location.includes(locationFilter),
-      )
-    }
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      result = result.filter(
-        (locker) =>
-          locker.name.toLowerCase().includes(term) ||
-          locker.id.toString().includes(term) ||
-          locker.location.toLowerCase().includes(term),
-      )
-    }
-
-    setFilteredData(result)
-  }, [data, searchTerm, statusFilter, locationFilter])
-
-  useEffect(() => {
-    setData(lockerList)
-  }, [])
+  const statusCounts = lockersResponse?.data
+    ? {
+        all: lockersResponse.data.length,
+        active: lockersResponse.data.filter(
+          (l) => getUiStatus(l.lockerStatus) === "active",
+        ).length,
+        inactive: lockersResponse.data.filter(
+          (l) => getUiStatus(l.lockerStatus) === "inactive",
+        ).length,
+        under_maintenance: lockersResponse.data.filter(
+          (l) => getUiStatus(l.lockerStatus) === "under_maintenance",
+        ).length,
+      }
+    : { all: 0, active: 0, inactive: 0, under_maintenance: 0 }
 
   const containerPadding = isSidebarOpen
     ? "p-2 sm:p-2 md:p-3 lg:p-4"
@@ -103,54 +130,120 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
       {/* Results */}
       <div className="mb-3">
         <p className="text-muted-foreground text-xs sm:text-sm">
-          Showing {filteredData.length} of {data.length} lockers
+          {isLoading
+            ? "Loading lockers..."
+            : lockersResponse
+              ? `Showing ${lockersResponse.data.length} of ${lockersResponse.meta.totalItems} lockers`
+              : "No lockers available"}
         </p>
       </div>
 
-      {/* Locker Grid */}
-      {filteredData.length > 0 ? (
-        <motion.div
-          className={getGridLayoutClass(isSidebarOpen, filteredData.length)}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          {filteredData.map((locker, index) => (
-            <LockerCard
-              key={locker.id}
-              locker={locker}
-              index={index}
-              isSelected={selectedLocker === locker.id}
-              onSelect={() =>
-                setSelectedLocker(
-                  selectedLocker === locker.id ? null : locker.id,
-                )
-              }
-              compact={isSidebarOpen}
-              id={locker.id.toString()}
-            />
-          ))}
-        </motion.div>
-      ) : (
-        <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-dashed p-3 sm:p-4">
-          <p className="mb-2 text-center font-medium text-lg sm:text-xl">
-            No lockers found
-          </p>
-          <p className="text-center text-muted-foreground text-xs sm:text-sm">
-            Try changing your search or filter criteria
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex h-48 flex-col items-center justify-center">
+          <p className="text-center font-medium text-lg">Loading lockers...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-4">
+          <p className="text-center font-medium text-red-600">
+            Error loading lockers
           </p>
           <Button
             className="mt-4"
             variant="outline"
-            onClick={() => {
-              setSearchTerm("")
-              setStatusFilter("all")
-              setLocationFilter("all")
-            }}
+            onClick={() => window.location.reload()}
           >
-            Reset filters
+            Retry
           </Button>
         </div>
+      )}
+
+      {/* Locker Grid */}
+      {!isLoading && !error && lockersResponse?.data && (
+        <>
+          {lockersResponse.data.length > 0 ? (
+            <motion.div
+              className={getGridLayoutClass(
+                isSidebarOpen,
+                lockersResponse.data.length,
+              )}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              {lockersResponse.data.map((locker, index) => (
+                <LockerCard
+                  key={`locker-${locker.id}-${index}`}
+                  locker={{
+                    id: Number(locker.id),
+                    name: locker.lockerName,
+                    location: locker.lockerLocation,
+                    status: getUiStatus(locker.lockerStatus),
+                  }}
+                  index={index}
+                  isSelected={selectedLocker === locker.id}
+                  onSelect={() =>
+                    setSelectedLocker(
+                      selectedLocker === locker.id ? null : locker.id,
+                    )
+                  }
+                  compact={isSidebarOpen}
+                  id={locker.id}
+                />
+              ))}
+            </motion.div>
+          ) : (
+            <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-dashed p-3 sm:p-4">
+              <p className="mb-2 text-center font-medium text-lg sm:text-xl">
+                No lockers found
+              </p>
+              <p className="text-center text-muted-foreground text-xs sm:text-sm">
+                Try changing your search or filter criteria
+              </p>
+              <Button
+                className="mt-4"
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm("")
+                  setStatusFilter("all")
+                  setLocationFilter("all")
+                  setPage(1)
+                }}
+              >
+                Reset filters
+              </Button>
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {lockersResponse.meta.totalPages > 1 && (
+            <div className="mt-6 flex justify-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!lockersResponse.meta.hasPrevPage}
+                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              >
+                Previous
+              </Button>
+              <div className="flex items-center px-2">
+                Page {lockersResponse.meta.page} of{" "}
+                {lockersResponse.meta.totalPages}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!lockersResponse.meta.hasNextPage}
+                onClick={() => setPage((prev) => prev + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

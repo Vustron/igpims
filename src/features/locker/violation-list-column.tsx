@@ -14,8 +14,8 @@ import {
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
+  TooltipProvider,
 } from "@/components/ui/tooltips"
 import {
   DropdownMenu,
@@ -145,7 +145,6 @@ export const exampleViolations: Violation[] = [
   },
 ]
 
-// Column header component with icon
 const ColumnHeader = ({
   icon,
   text,
@@ -156,7 +155,6 @@ const ColumnHeader = ({
   </div>
 )
 
-// Select cell component
 const SelectCell = ({ row, table = undefined }: { row?: any; table?: any }) => {
   if (table) {
     return (
@@ -186,7 +184,6 @@ const SelectCell = ({ row, table = undefined }: { row?: any; table?: any }) => {
   )
 }
 
-// Enhanced violation cell component
 const ViolationCell = ({ value }: { value: string }) => {
   const getBadgeColor = (violationType: string) => {
     switch (violationType.toLowerCase()) {
@@ -229,7 +226,6 @@ const ViolationCell = ({ value }: { value: string }) => {
   )
 }
 
-// Actions dropdown menu component
 const ViolationActions = ({ violation }: { violation: Violation }) => {
   const handleView = () => {
     console.log("View violation:", violation.id)
@@ -289,7 +285,6 @@ const ViolationActions = ({ violation }: { violation: Violation }) => {
   )
 }
 
-// Improved date cell with formatting and tooltip
 const DateCell = ({ value }: { value: number }) => {
   const date = new Date(value)
   const formattedDate = new Intl.DateTimeFormat("en-US", {
@@ -351,7 +346,6 @@ const IdCell = ({ value }: { value: string }) => {
   )
 }
 
-// Enhanced student name cell
 const RenterNameCell = ({ value }: { value: string }) => {
   return (
     <TooltipProvider>
@@ -374,7 +368,6 @@ const RenterNameCell = ({ value }: { value: string }) => {
   )
 }
 
-// Enhanced amount cell
 const AmountCell = ({ value }: { value: number }) => {
   const formatted = new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -400,7 +393,6 @@ const AmountCell = ({ value }: { value: number }) => {
   )
 }
 
-// Improved payment status cell
 const PaymentStatusCell = ({ value }: { value: string }) => {
   const getStatusStyles = (status: string) => {
     switch (status) {
@@ -435,7 +427,6 @@ const PaymentStatusCell = ({ value }: { value: string }) => {
   )
 }
 
-// Improved column definitions with proper headers
 export const violationListColumns: ColumnDef<Violation>[] = [
   {
     id: "select",

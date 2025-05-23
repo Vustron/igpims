@@ -25,7 +25,7 @@ interface UserClientProps {
   id: string
 }
 
-const UserClient = ({ id }: UserClientProps) => {
+export const UserClient = ({ id }: UserClientProps) => {
   const { data: user, isLoading } = useFindAccountById(id)
   const deleteUser = useDeleteUserById(id)
   const confirm = useConfirm()
@@ -90,5 +90,3 @@ const UserClient = ({ id }: UserClientProps) => {
     </main>
   )
 }
-
-export default UserClient

@@ -3,8 +3,8 @@
 import { TimelineStatusBadge } from "@/features/fund-request/timeline-status"
 import { timelineSteps } from "@/features/fund-request/timeline-sample-data"
 import { Card, CardContent, CardHeader } from "@/components/ui/cards"
-import { Timeline } from "@/features/fund-request/timeline"
 import { ChevronDown, ChevronUp, XCircle } from "lucide-react"
+import { Timeline } from "@/features/fund-request/timeline"
 import { Button } from "@/components/ui/buttons"
 
 import { useState } from "react"

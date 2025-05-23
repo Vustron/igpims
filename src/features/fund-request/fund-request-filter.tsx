@@ -12,8 +12,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popovers"
-import { Calendar } from "@/components/ui/calendars"
 import { Search, CalendarIcon, X } from "lucide-react"
+import { Calendar } from "@/components/ui/calendars"
 import { Button } from "@/components/ui/buttons"
 import { Input } from "@/components/ui/inputs"
 import { Badge } from "@/components/ui/badges"

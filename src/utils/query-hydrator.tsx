@@ -29,7 +29,7 @@ async function prefetchQueries(
   return queryClient
 }
 
-const QueryHydrator = async ({
+export const QueryHydrator = async ({
   children,
   prefetchFns = [],
 }: QueryHydratorProps) => {
@@ -42,5 +42,3 @@ const QueryHydrator = async ({
     </HydrationBoundary>
   )
 }
-
-export default QueryHydrator

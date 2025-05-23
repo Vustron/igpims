@@ -8,10 +8,11 @@ import { lockerSchema } from "@/schemas/locker"
 import toast from "react-hot-toast"
 
 import { useForm } from "react-hook-form"
-import { useState } from "react"
 
 import type { FieldConfig } from "@/interfaces/form"
 import type { Locker } from "@/schemas/locker"
+
+import { useCreateLocker } from "@/backend/actions/locker/create-locker"
 
 interface CreateLockerFormProps {
   onSuccess?: () => void
@@ -22,7 +23,7 @@ export const CreateLockerForm = ({
   onSuccess,
   onError,
 }: CreateLockerFormProps) => {
-  const [, setIsSubmitting] = useState(false)
+  const createLocker = useCreateLocker()
 
   const form = useForm<Locker>({
     resolver: zodResolver(lockerSchema),
@@ -90,34 +91,18 @@ export const CreateLockerForm = ({
     },
   ]
 
-  const onSubmit = async (data: Locker) => {
-    try {
-      setIsSubmitting(true)
+  const onSubmit = async (values: Locker) => {
+    await toast.promise(createLocker.mutateAsync(values), {
+      loading: <span className="animate-pulse">Creating locker...</span>,
+      success: "Successfully created a locker",
+      error: (error: unknown) => catchError(error),
+    })
+    form.reset()
 
-      toast.success("Locker created successfully!")
-
-      const formattedData = {
-        ...data,
-        lockerRentalPrice: Number(data.lockerRentalPrice),
-      }
-
-      form.reset({
-        lockerStatus: "available",
-        lockerType: "small",
-        lockerName: "",
-        lockerLocation: "",
-        lockerRentalPrice: 0,
-      })
-
-      console.log(formattedData)
-
-      if (onSuccess) onSuccess()
-    } catch (error) {
-      const errorMessage = catchError(error)
-      toast.error(errorMessage || "Failed to create locker")
-      if (onError) onError()
-    } finally {
-      setIsSubmitting(false)
+    if (createLocker.isSuccess) {
+      onSuccess?.()
+    } else {
+      onError?.()
     }
   }
 

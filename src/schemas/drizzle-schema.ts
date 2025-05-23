@@ -226,7 +226,6 @@ export const locker = sqliteTable(
       .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
-    uniqueIndex("locker_id_idx").on(t.id),
     index("locker_type_idx").on(t.lockerType),
     index("locker_status_idx").on(t.lockerStatus),
     index("locker_location_idx").on(t.lockerLocation),

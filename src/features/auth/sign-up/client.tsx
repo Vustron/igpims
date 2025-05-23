@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardFooter,
   CardContent,
-  // CardDescription,
 } from "@/components/ui/cards"
 import { DynamicButton } from "@/components/ui/buttons"
 import SignUpForm from "@/features/auth/sign-up/sign-up-form"

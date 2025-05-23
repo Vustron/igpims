@@ -1,6 +1,6 @@
 import { ContentLayout } from "@/features/layouts/content-layout"
-import QueryHydrator from "@/utils/query-hydrator"
-import UserClient from "@/features/user/client"
+import { QueryHydrator } from "@/utils/query-hydrator"
+import { UserClient } from "@/features/user/client"
 
 import { preFindUserById } from "@/backend/actions/user/find-by-id"
 import { presentor } from "@/utils/presentor"

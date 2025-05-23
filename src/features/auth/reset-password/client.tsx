@@ -1,14 +1,8 @@
 "use client"
 
-import {
-  Card,
-  CardTitle,
-  CardHeader,
-  CardContent,
-  // CardDescription,
-} from "@/components/ui/cards"
-import SendResetLinkForm from "@/features/auth/reset-password/send-reset-link-form"
-import ResetPasswordForm from "@/features/auth/reset-password/reset-password-form"
+import { Card, CardTitle, CardHeader, CardContent } from "@/components/ui/cards"
+import { SendResetLinkForm } from "@/features/auth/reset-password/send-reset-link-form"
+import { ResetPasswordForm } from "@/features/auth/reset-password/reset-password-form"
 import { Label } from "@/components/ui/labels"
 import { Loader2Icon } from "lucide-react"
 
@@ -18,7 +12,7 @@ import Image from "next/image"
 
 const COOLDOWN_TIME = 3 * 60 * 1000
 
-const ResetPasswordClient = () => {
+export const ResetPasswordClient = () => {
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
   const email = searchParams.get("email")
@@ -114,5 +108,3 @@ const ResetPasswordClient = () => {
     </div>
   )
 }
-
-export default ResetPasswordClient
