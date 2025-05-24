@@ -1,4 +1,6 @@
+import { findRentByLockerId } from "@/backend/controllers/locker-rental/find-rent-by-locker-id"
 import { findManyLockers } from "@/backend/controllers/locker/find-many"
+import { findLockerById } from "@/backend/controllers/locker/find-by-id"
 import { generate2fa } from "@/backend/controllers/user/generate-2fa"
 import { findUserById } from "@/backend/controllers/user/find-by-id"
 import { findManyUser } from "@/backend/controllers/user/find-many"
@@ -10,5 +12,10 @@ export const getRoutes: Route[] = [
   { path: "/api/v1/auth/find-many", handler: findManyUser },
   { path: "/api/v1/auth/generate-2fa", handler: generate2fa },
   { path: "/api/v1/lockers/find-many", handler: findManyLockers },
+  { path: "/api/v1/lockers/find-by-id", handler: findLockerById },
+  {
+    path: "/api/v1/locker-rentals/find-by-locker-id",
+    handler: findRentByLockerId,
+  },
   // Add more GET routes here
 ]

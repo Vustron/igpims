@@ -36,20 +36,20 @@ export const LockerRentalTabs = () => {
   const tabs: TabItem[] = [
     {
       id: "locker_rental_management",
-      label: "Locker Rental Management",
-      shortLabel: "Rental Management",
+      label: "Lockers",
+      shortLabel: "Rental Lockers",
       icon: <PiLockers className="size-4" />,
     },
     {
       id: "locker_rental_list",
-      label: "Locker Rental List",
+      label: "Rental List",
       shortLabel: "Rental List",
       icon: <ClipboardList className="size-4" />,
     },
     {
       id: "locker_inspection_schedule",
-      label: "Locker Inspection Schedule",
-      shortLabel: "Locker Inspection",
+      label: "Inspection Schedules",
+      shortLabel: "Inspection Schedules",
       icon: <GiMagnifyingGlass className="size-4" />,
     },
     {

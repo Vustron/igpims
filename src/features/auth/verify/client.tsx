@@ -77,7 +77,7 @@ const VerifyClient = () => {
 
   return (
     <div className="grid w-full grow items-center px-4 sm:justify-center">
-      <Card className="w-full border-[2px] border-amber-300 bg-[#2B291A] sm:w-96">
+      <Card className="w-full bg-background shadow-xl sm:w-96">
         <CardHeader>
           <div className="flex flex-col items-center justify-center">
             <Image
@@ -86,9 +86,10 @@ const VerifyClient = () => {
               width={100}
               height={100}
               className="rounded-full"
+              priority
             />
           </div>
-          <CardTitle className="text-center text-lg text-white">
+          <CardTitle className="text-center text-lg">
             {token ? "Verifying Account" : "Send Verification Link"}
           </CardTitle>
           <CardDescription className="text-center">

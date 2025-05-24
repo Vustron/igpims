@@ -4,7 +4,7 @@ import { lockerSchema } from "@/schemas/locker"
 import { sanitizer } from "@/utils/sanitizer"
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next-nprogress-bar"
+// import { useRouter } from "next-nprogress-bar"
 
 import type { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
 import type { Locker as LockerType } from "@/schemas/locker"
@@ -16,7 +16,7 @@ export async function createLocker(payload: LockerType): Promise<Locker> {
 
 export const useCreateLocker = () => {
   const queryClient = useQueryClient()
-  const router = useRouter()
+  // const router = useRouter()
 
   return useMutation({
     mutationKey: ["create-locker"],
@@ -33,7 +33,7 @@ export const useCreateLocker = () => {
       queryClient.setQueriesData<PaginatedLockersResponse>(
         { queryKey: ["lockers"] },
         (oldData) => {
-          if (!oldData) return undefined
+          if (!oldData || !oldData.meta) return undefined
 
           // For the first page, add the new locker to the start of the list
           if (oldData.meta.page === 1) {
@@ -67,10 +67,13 @@ export const useCreateLocker = () => {
       queryClient.setQueriesData(
         { queryKey: ["lockers-infinite"] },
         (oldData: any) => {
-          if (!oldData) return undefined
+          if (!oldData || !oldData.pages) return undefined
 
           const pages = oldData.pages || []
           if (pages.length === 0) return oldData
+
+          // Check if first page exists and has meta
+          if (!pages[0] || !pages[0].meta) return oldData
 
           // Add to first page of infinite query
           const newPages = [...pages]
@@ -96,7 +99,6 @@ export const useCreateLocker = () => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["lockers"] })
       queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] })
-      router.refresh()
     },
     onError: (error) => catchError(error),
   })

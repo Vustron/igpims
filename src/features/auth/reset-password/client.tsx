@@ -59,7 +59,7 @@ export const ResetPasswordClient = () => {
 
   return (
     <div className="grid w-full grow items-center px-4 sm:justify-center">
-      <Card className="w-full border-[2px] border-amber-300 bg-[#2B291A] sm:w-96">
+      <Card className="w-full bg-background shadow-xl sm:w-96">
         <CardHeader>
           <div className="flex flex-col items-center justify-center">
             <Image
@@ -68,9 +68,10 @@ export const ResetPasswordClient = () => {
               width={100}
               height={100}
               className="rounded-full"
+              priority
             />
           </div>
-          <CardTitle className="text-center text-lg text-white">
+          <CardTitle className="text-center text-lg">
             {token && email
               ? "Resetting Your Password"
               : "Send Reset Password Link"}
@@ -90,8 +91,8 @@ export const ResetPasswordClient = () => {
             <>
               {cooldownTime > 0 && (
                 <div className="mb-4 flex flex-col items-center justify-center space-y-2 rounded-lg bg-muted/50 p-4">
-                  <Loader2Icon className="size-6 animate-spin text-white" />
-                  <Label className="text-center text-sm text-white">
+                  <Loader2Icon className="size-6 animate-spin" />
+                  <Label className="text-center text-sm">
                     Please wait {cooldownTime} seconds before requesting another
                     link
                   </Label>

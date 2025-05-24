@@ -88,6 +88,7 @@ export const CreateLockerForm = ({
       label: "Rental Price",
       placeholder: "Enter price in PHP",
       description: "Monthly rental price for the locker",
+      required: true,
     },
   ]
 
@@ -111,6 +112,7 @@ export const CreateLockerForm = ({
       form={form}
       onSubmit={onSubmit}
       fields={createLockerFields}
+      mutation={createLocker}
       submitButtonTitle="Create Locker"
     />
   )

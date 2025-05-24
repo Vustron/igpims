@@ -4,6 +4,7 @@ import {
   integer,
   sqliteTable,
   uniqueIndex,
+  sqliteView,
 } from "drizzle-orm/sqlite-core"
 import { relations, sql } from "drizzle-orm"
 import { nanoid } from "nanoid"
@@ -43,6 +44,12 @@ export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   lockerRentals: many(lockerRental),
+  requestedFunds: many(fundRequest, { relationName: "requestedFunds" }),
+  approvedFunds: many(fundRequest, { relationName: "approvedFunds" }),
+  submittedProjects: many(projectRequest, {
+    relationName: "submittedProjects",
+  }),
+  approvedProjects: many(projectRequest, { relationName: "approvedProjects" }),
 }))
 
 export const session = sqliteTable(
@@ -259,7 +266,6 @@ export const lockerRental = sqliteTable(
       .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
-    uniqueIndex("locker_rental_id_idx").on(t.id),
     index("locker_rental_locker_id_idx").on(t.lockerId),
     index("locker_rental_renter_id_idx").on(t.renterId),
     index("locker_rental_renter_name_idx").on(t.renterName),
@@ -286,6 +292,327 @@ export const lockerRentalRelations = relations(lockerRental, ({ one }) => ({
   }),
 }))
 
+export const waterVendo = sqliteTable(
+  "water_vendo",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    waterVendoLocation: text("waterVendoLocation", { length: 255 }).notNull(),
+    gallonsUsed: integer("gallonsUsed").default(0).notNull(),
+    vendoStatus: text("vendoStatus", { length: 20 })
+      .notNull()
+      .default("operational")
+      .$type<"operational" | "maintenance" | "out-of-service" | "offline">(),
+    waterRefillStatus: text("waterRefillStatus", { length: 20 })
+      .notNull()
+      .default("full")
+      .$type<"full" | "medium" | "low" | "empty">(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (_t) => [
+    // index("water_vendo_location_idx").on(t.waterVendoLocation),
+    // index("water_vendo_status_idx").on(t.vendoStatus),
+    // index("water_refill_status_idx").on(t.waterRefillStatus),
+  ],
+)
+
+export const waterSupply = sqliteTable(
+  "water_supply",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    waterVendoId: text("waterVendoId")
+      .notNull()
+      .references(() => waterVendo.id, { onDelete: "cascade" }),
+    supplyDate: integer("supplyDate", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    suppliedGallons: integer("suppliedGallons").notNull(),
+    expenses: integer("expenses").notNull(),
+    usedGallons: integer("usedGallons").default(0).notNull(),
+    remainingGallons: integer("remainingGallons").notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (_t) => [],
+)
+
+export const waterFunds = sqliteView("water_funds", {
+  id: text("id"),
+  waterVendoId: text("waterVendoId"),
+  waterVendoLocation: text("waterVendoLocation"),
+  gallonsUsed: integer("gallonsUsed"),
+  expenses: integer("expenses"),
+  revenue: integer("revenue"),
+  profit: integer("profit"),
+  createdAt: integer("createdAt", { mode: "timestamp" }),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }),
+}).as(sql`
+  SELECT
+    hex(randomblob(4)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(6)) as id,
+    wv.id as waterVendoId,
+    wv.waterVendoLocation,
+    wv.gallonsUsed,
+    COALESCE(SUM(ws.expenses), 0) as expenses,
+    (wv.gallonsUsed * 10) as revenue,
+    ((wv.gallonsUsed * 10) - COALESCE(SUM(ws.expenses), 0)) as profit,
+    wv.createdAt,
+    wv.updatedAt
+  FROM
+    water_vendo wv
+  LEFT JOIN
+    water_supply ws ON wv.id = ws.waterVendoId
+  GROUP BY
+    wv.id
+`)
+
+export const igp = sqliteTable(
+  "igp",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    igpName: text("igpName", { length: 255 }).notNull(),
+    semesterAndAcademicYear: text("semesterAndAcademicYear", {
+      length: 100,
+    }).notNull(),
+    typeOfTransaction: text("typeOfTransaction", { length: 100 }).notNull(),
+    igpStartDate: integer("igpStartDate", { mode: "timestamp" }).notNull(),
+    igpEndDate: integer("igpEndDate", { mode: "timestamp" }),
+    itemsToSell: text("itemsToSell", { length: 1000 }),
+    assignedOfficers: text("assignedOfficers", { length: 1000 }),
+    costPerItem: integer("costPerItem").notNull(),
+    igpType: text("igpType", { length: 20 })
+      .notNull()
+      .default("goods")
+      .$type<"goods" | "services" | "rentals" | "events" | "other">(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    index("igp_name_idx").on(t.igpName),
+    index("igp_semester_year_idx").on(t.semesterAndAcademicYear),
+    index("igp_type_idx").on(t.igpType),
+    index("igp_start_date_idx").on(t.igpStartDate),
+  ],
+)
+
+export const igpRelations = relations(igp, ({ many }) => ({
+  transactions: many(igpTransactions),
+  supplies: many(igpSupply),
+}))
+
+export const waterVendoRelations = relations(waterVendo, ({ many }) => ({
+  supplies: many(waterSupply),
+}))
+
+export const waterSupplyRelations = relations(waterSupply, ({ one }) => ({
+  vendo: one(waterVendo, {
+    fields: [waterSupply.waterVendoId],
+    references: [waterVendo.id],
+  }),
+}))
+
+export const igpTransactions = sqliteTable(
+  "igp_transactions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    igpId: text("igpId")
+      .notNull()
+      .references(() => igp.id, { onDelete: "cascade" }),
+    purchaserName: text("purchaserName", { length: 255 }).notNull(),
+    courseAndSet: text("courseAndSet", { length: 100 }).notNull(),
+    batch: integer("batch").notNull(),
+    quantity: integer("quantity").notNull(),
+    dateBought: integer("dateBought", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    itemReceived: text("itemReceived", { length: 20 })
+      .notNull()
+      .default("pending")
+      .$type<"pending" | "received" | "cancelled">(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    index("igp_transactions_igp_id_idx").on(t.igpId),
+    index("igp_transactions_purchaser_idx").on(t.purchaserName),
+    index("igp_transactions_date_bought_idx").on(t.dateBought),
+    index("igp_transactions_item_received_idx").on(t.itemReceived),
+  ],
+)
+
+export const igpTransactionsRelations = relations(
+  igpTransactions,
+  ({ one }) => ({
+    igp: one(igp, {
+      fields: [igpTransactions.igpId],
+      references: [igp.id],
+    }),
+  }),
+)
+
+export const igpSupply = sqliteTable(
+  "igp_supply",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    igpId: text("igpId")
+      .notNull()
+      .references(() => igp.id, { onDelete: "cascade" }),
+    supplyDate: integer("supplyDate", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    quantitySold: integer("quantitySold").notNull().default(0),
+    unitPrice: integer("unitPrice").notNull(),
+    totalRevenue: integer("totalRevenue").notNull().default(0),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    index("igp_supply_igp_id_idx").on(t.igpId),
+    index("igp_supply_date_idx").on(t.supplyDate),
+  ],
+)
+
+export const igpSupplyRelations = relations(igpSupply, ({ one }) => ({
+  igp: one(igp, {
+    fields: [igpSupply.igpId],
+    references: [igp.id],
+  }),
+}))
+
+export const fundRequest = sqliteTable(
+  "fund_request",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    purpose: text("purpose", { length: 1000 }).notNull(),
+    amount: integer("amount").notNull(),
+    utilizedFunds: integer("utilizedFunds").default(0).notNull(),
+    allocatedFunds: integer("allocatedFunds").default(0).notNull(),
+    status: text("status", { length: 20 })
+      .notNull()
+      .default("pending")
+      .$type<"pending" | "approved" | "denied" | "completed" | "cancelled">(),
+    requestedBy: text("requestedBy").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    approvedBy: text("approvedBy").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    index("fund_request_status_idx").on(t.status),
+    index("fund_request_requested_by_idx").on(t.requestedBy),
+    index("fund_request_approved_by_idx").on(t.approvedBy),
+    index("fund_request_created_at_idx").on(t.createdAt),
+  ],
+)
+
+export const fundRequestRelations = relations(fundRequest, ({ one }) => ({
+  requester: one(user, {
+    fields: [fundRequest.requestedBy],
+    references: [user.id],
+    relationName: "requestedFunds",
+  }),
+  approver: one(user, {
+    fields: [fundRequest.approvedBy],
+    references: [user.id],
+    relationName: "approvedFunds",
+  }),
+}))
+
+export const projectRequest = sqliteTable(
+  "project_request",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    projectLead: text("projectLead", { length: 255 }).notNull(),
+    projectTitle: text("projectTitle", { length: 500 }).notNull(),
+    dateSubmitted: integer("dateSubmitted", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    status: text("status", { length: 20 })
+      .notNull()
+      .default("pending")
+      .$type<
+        | "pending"
+        | "approved"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+        | "rejected"
+      >(),
+    description: text("description", { length: 2000 }),
+    submittedBy: text("submittedBy").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    approvedBy: text("approvedBy").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    index("project_request_status_idx").on(t.status),
+    index("project_request_lead_idx").on(t.projectLead),
+    index("project_request_date_idx").on(t.dateSubmitted),
+    index("project_request_submitted_by_idx").on(t.submittedBy),
+  ],
+)
+
+export const projectRequestRelations = relations(projectRequest, ({ one }) => ({
+  submitter: one(user, {
+    fields: [projectRequest.submittedBy],
+    references: [user.id],
+    relationName: "submittedProjects",
+  }),
+  approver: one(user, {
+    fields: [projectRequest.approvedBy],
+    references: [user.id],
+    relationName: "approvedProjects",
+  }),
+}))
+
 export type Account = InferSelectModel<typeof account>
 export type User = InferSelectModel<typeof user>
 export type Session = InferSelectModel<typeof session>
@@ -294,3 +621,10 @@ export type RateLimit = InferSelectModel<typeof rateLimit>
 export type OtpToken = InferSelectModel<typeof otpToken>
 export type Locker = InferSelectModel<typeof locker>
 export type LockerRental = InferSelectModel<typeof lockerRental>
+export type WaterVendo = InferSelectModel<typeof waterVendo>
+export type WaterSupply = InferSelectModel<typeof waterSupply>
+export type Igp = InferSelectModel<typeof igp>
+export type IgpSupply = InferSelectModel<typeof igpSupply>
+export type IgpTransaction = InferSelectModel<typeof igpTransactions>
+export type FundRequest = InferSelectModel<typeof fundRequest>
+export type ProjectRequest = InferSelectModel<typeof projectRequest>

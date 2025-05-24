@@ -1,5 +1,8 @@
+import { preFindRentByLockerId } from "@/backend/actions/locker-rental/find-rent-by-locker-id"
+import { preFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { ContentLayout } from "@/features/layouts/content-layout"
 import { LockerClient } from "@/features/locker/client"
+import { QueryHydrator } from "@/utils/query-hydrator"
 
 import type { Metadata } from "next"
 
@@ -12,11 +15,17 @@ interface PageProps {
 }
 
 export default async function LockerIdPage({ params }: PageProps) {
-  const [resolvedParams] = await Promise.all([params])
+  const [resolvedParams, preFindLocker, preFindLockerRent] = await Promise.all([
+    params,
+    preFindLockerById((await params).id),
+    preFindRentByLockerId((await params).id),
+  ])
   const { id } = resolvedParams
   return (
     <ContentLayout title="Locker">
-      <LockerClient id={id} />
+      <QueryHydrator prefetchFns={[preFindLocker, preFindLockerRent]}>
+        <LockerClient id={id} />
+      </QueryHydrator>
     </ContentLayout>
   )
 }

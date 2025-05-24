@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.124",
+  "version": "1.0.125",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -17,6 +17,7 @@
     "db-migrate": "bunx drizzle-kit generate",
     "db-push": "bunx drizzle-kit push",
     "db-studio": "bunx drizzle-kit studio --port 6969 --verbose",
+    "db-generate-erd": "drizzle-erd --in ./src/schemas/drizzle-schema.ts --out erd.svg",
     "outdated-packages": "bun outdated",
     "update-packages": "bun update --latest",
     "seed-admin": "bun run ./src/scripts/seed-admin.ts"
@@ -44,8 +45,8 @@
     "@radix-ui/react-visually-hidden": "1.2.3",
     "@react-email/components": "0.0.41",
     "@t3-oss/env-nextjs": "0.13.4",
-    "@tanstack/react-query": "5.76.1",
-    "@tanstack/react-query-devtools": "5.76.1",
+    "@tanstack/react-query": "5.76.2",
+    "@tanstack/react-query-devtools": "5.76.2",
     "@tanstack/react-table": "8.21.3",
     "async-ratelimiter": "1.5.2",
     "bcrypt-ts": "7.0.0",
@@ -54,9 +55,10 @@
     "cmdk": "1.1.1",
     "date-fns": "4.1.0",
     "dotenv": "16.5.0",
+    "drizzle-erd": "^0.0.1-alpha.11",
     "drizzle-orm": "0.43.1",
-    "drizzle-zod": "0.8.1",
-    "framer-motion": "12.12.1",
+    "drizzle-zod": "0.8.2",
+    "framer-motion": "12.12.2",
     "input-otp": "1.4.2",
     "ioredis": "5.6.1",
     "iron-session": "8.0.4",
@@ -84,7 +86,7 @@
     "tailwind-merge": "3.3.0",
     "tailwindcss-animate": "1.0.7",
     "vaul": "1.1.2",
-    "zod": "3.25.20",
+    "zod": "3.25.28",
     "zustand": "5.0.5"
   },
   "devDependencies": {

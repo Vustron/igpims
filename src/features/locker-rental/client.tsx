@@ -6,8 +6,10 @@ import {
 } from "@/features/locker-rental/locker-filter"
 import { LockerCard } from "@/features/locker-rental/locker-card"
 import { Button } from "@/components/ui/buttons"
+
 import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { useState } from "react"
+
 import { motion } from "framer-motion"
 
 export const LockerRentalClient = ({ isSidebarOpen = false }) => {
@@ -18,7 +20,6 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
   const [page, setPage] = useState(1)
   const [limit] = useState(12)
 
-  // Convert UI status to API status
   const getApiStatus = (uiStatus: string) => {
     switch (uiStatus) {
       case "active":
@@ -32,7 +33,6 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
     }
   }
 
-  // Use the hook with filters
   const {
     data: lockersResponse,
     isLoading,
@@ -45,7 +45,6 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
     search: searchTerm || undefined,
   })
 
-  // Get unique locations from fetched data
   const uniqueLocations = lockersResponse?.data
     ? Array.from(
         new Set(
@@ -60,7 +59,6 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
       )
     : []
 
-  // Calculate counts for filters
   const locationCounts = lockersResponse?.data
     ? {
         all: lockersResponse.data.length,
@@ -75,7 +73,6 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
       }
     : { all: 0 }
 
-  // Map API status to UI status
   const getUiStatus = (apiStatus: string | undefined) => {
     if (!apiStatus) return "active"
 
@@ -125,18 +122,8 @@ export const LockerRentalClient = ({ isSidebarOpen = false }) => {
         statusCounts={statusCounts}
         locationCounts={locationCounts}
         isSidebarOpen={isSidebarOpen}
+        lockersResponse={lockersResponse}
       />
-
-      {/* Results */}
-      <div className="mb-3">
-        <p className="text-muted-foreground text-xs sm:text-sm">
-          {isLoading
-            ? "Loading lockers..."
-            : lockersResponse
-              ? `Showing ${lockersResponse.data.length} of ${lockersResponse.meta.totalItems} lockers`
-              : "No lockers available"}
-        </p>
-      </div>
 
       {/* Loading State */}
       {isLoading && (

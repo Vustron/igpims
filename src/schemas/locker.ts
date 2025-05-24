@@ -28,7 +28,7 @@ export const lockerSchema = z.object({
     .max(50, "Characters should not exceed 50"),
   lockerRentalPrice: z
     .number()
-    .min(0, "Rental price must be a positive number")
+    .min(1, "Rental price must be a positive number")
     .max(1000, "Rental price must be less than 1000")
     .optional(),
 })

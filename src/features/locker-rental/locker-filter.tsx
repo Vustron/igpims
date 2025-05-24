@@ -34,6 +34,12 @@ interface LockerFilterProps {
   statusCounts: Record<string, number>
   locationCounts: Record<string, number>
   isSidebarOpen: boolean
+  lockersResponse?: {
+    data: any[]
+    meta: {
+      totalItems: number
+    }
+  }
 }
 
 export const LockerFilter: React.FC<LockerFilterProps> = ({
@@ -46,6 +52,7 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
   uniqueLocations,
   statusCounts,
   isSidebarOpen,
+  lockersResponse,
 }) => {
   const showFilters =
     searchTerm || statusFilter !== "all" || locationFilter !== "all"
@@ -502,10 +509,8 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
           <p className="text-muted-foreground text-xs">
             Showing{" "}
             <span className="font-medium text-foreground">
-              {Object.values(statusCounts).reduce(
-                (sum, count) => sum + count,
-                0,
-              )}
+              {lockersResponse?.data.length || 0} of{" "}
+              {lockersResponse?.meta.totalItems || 0}
             </span>{" "}
             lockers
           </p>

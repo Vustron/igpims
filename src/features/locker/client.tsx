@@ -1,6 +1,6 @@
 "use client"
 
-import { RenterInfo } from "@/features/locker/renter-info"
+import { LockerInfo } from "@/features/locker/locker-info"
 
 interface LockerClientProps {
   id: string
@@ -9,7 +9,7 @@ interface LockerClientProps {
 export const LockerClient = ({ id }: LockerClientProps) => {
   return (
     <div className="container">
-      <RenterInfo id={id} />
+      <LockerInfo id={id} />
     </div>
   )
 }

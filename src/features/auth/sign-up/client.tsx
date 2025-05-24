@@ -16,7 +16,7 @@ import Image from "next/image"
 const SignUpClient = () => {
   return (
     <div className="grid w-full grow items-center px-4 sm:justify-center">
-      <Card className="w-full border-[2px] border-amber-300 bg-[#2B291A] sm:w-96">
+      <Card className="w-full bg-background shadow-xl sm:w-96">
         <CardHeader>
           <div className="flex flex-col items-center justify-center">
             <Image
@@ -25,9 +25,10 @@ const SignUpClient = () => {
               width={100}
               height={100}
               className="rounded-full"
+              priority
             />
           </div>
-          <CardTitle className="text-center text-lg text-white">
+          <CardTitle className="text-center text-lg">
             Please sign-up to continue
           </CardTitle>
           {/* <CardDescription className="text-center">
@@ -43,7 +44,7 @@ const SignUpClient = () => {
           <div className="grid w-full gap-y-4">
             <DynamicButton variant="link" size="sm" asChild>
               <Link href="/sign-in">
-                <span className="text-muted-foreground text-sm">
+                <span className="text-sm hover:text-amber-300">
                   Already have an account? Sign in
                 </span>
               </Link>
