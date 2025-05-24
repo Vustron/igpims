@@ -43,7 +43,6 @@ export const user = sqliteTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
-  lockerRentals: many(lockerRental),
   requestedFunds: many(fundRequest, { relationName: "requestedFunds" }),
   approvedFunds: many(fundRequest, { relationName: "approvedFunds" }),
   submittedProjects: many(projectRequest, {
@@ -249,9 +248,7 @@ export const lockerRental = sqliteTable(
     lockerId: text("lockerId")
       .notNull()
       .references(() => locker.id, { onDelete: "restrict" }),
-    renterId: text("renterId")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
+    renterId: text("renterId").notNull(),
     renterName: text("renterName", { length: 100 }).notNull(),
     courseAndSet: text("courseAndSet", { length: 100 }).notNull(),
     rentalStatus: text("rentalStatus", { length: 100 }).notNull(),
@@ -265,16 +262,7 @@ export const lockerRental = sqliteTable(
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
   },
-  (t) => [
-    index("locker_rental_locker_id_idx").on(t.lockerId),
-    index("locker_rental_renter_id_idx").on(t.renterId),
-    index("locker_rental_renter_name_idx").on(t.renterName),
-    index("locker_rental_course_idx").on(t.courseAndSet),
-    index("locker_rental_rental_status_idx").on(t.rentalStatus),
-    index("locker_rental_payment_status_idx").on(t.paymentStatus),
-    index("locker_rental_date_rented_idx").on(t.dateRented),
-    index("locker_rental_date_due_idx").on(t.dateDue),
-  ],
+  (_t) => [],
 )
 
 export const lockerRelations = relations(locker, ({ many }) => ({

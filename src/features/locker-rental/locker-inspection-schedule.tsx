@@ -6,10 +6,12 @@ import { DataTable } from "@/components/ui/tables"
 
 export const LockerInspectionSchedule = () => {
   return (
-    <DataTable
-      columns={violationListColumns}
-      data={exampleLockerViolations}
-      placeholder="Search..."
-    />
+    <div className="mt-2">
+      <DataTable
+        columns={violationListColumns}
+        data={exampleLockerViolations}
+        placeholder="Search..."
+      />
+    </div>
   )
 }

@@ -53,7 +53,7 @@ export const CreateLockerDialog = () => {
             Fill in the details below to create a new locker.
           </DrawerDescription>
         </DrawerHeader>
-        <CreateLockerForm />
+        <CreateLockerForm onSuccess={handleClose} onError={handleClose} />
       </DrawerContent>
     </Drawer>
   )

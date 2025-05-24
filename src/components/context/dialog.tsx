@@ -7,6 +7,7 @@ import {
   CreateLockerDialog,
   SessionExpiredDialog,
   CreateWaterFundDialog,
+  CreateLockerRentDialog,
   CreateWaterVendoDialog,
   CreateFundRequestDialog,
   CreateProjectRequestDialog,
@@ -30,6 +31,7 @@ export const DialogProvider = () => {
       <CreateIgpDialog />
       <CreateFundRequestDialog />
       <CreateProjectRequestDialog />
+      <CreateLockerRentDialog />
     </>
   )
 }

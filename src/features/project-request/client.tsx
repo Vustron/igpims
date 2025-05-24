@@ -3,14 +3,10 @@
 import { sampleProjectRequests } from "@/features/project-request/timeline-sample-data"
 import { ProjectRequestFilter } from "@/features/project-request/project-request-filter"
 import { ProjectRequestCard } from "@/features/project-request/project-request-card"
-import { Button } from "@/components/ui/buttons"
-import { Plus } from "lucide-react"
 
-import { useDialog } from "@/hooks/use-dialog"
 import { useState, useMemo } from "react"
 
 export const ProjectRequestClient = () => {
-  const { onOpen } = useDialog()
   const [filters, setFilters] = useState({
     search: "",
     status: "all",
@@ -57,18 +53,8 @@ export const ProjectRequestClient = () => {
 
   return (
     <div className="space-y-4">
-      <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
-        <Button
-          className="gap-2 shadow-sm transition-all hover:shadow"
-          onClick={() => onOpen("createProjectRequest")}
-        >
-          <Plus className="size-4" />
-          <span className="whitespace-nowrap">New Project Request</span>
-        </Button>
-      </div>
-
       {/* Fund Request Filter */}
-      <div className="mb-6">
+      <div className="mt-2 mb-6">
         <ProjectRequestFilter
           onFilterChange={(newFilters) => setFilters(newFilters)}
         />

@@ -68,7 +68,7 @@ export const LockerRentalTabs = () => {
     <Tabs
       defaultValue="locker_rental_management"
       value={activeTab}
-      className="w-full"
+      className="mt-1 w-full"
       onValueChange={(value) => setActiveTab(value)}
     >
       {/* Desktop and Tablet Navigation */}

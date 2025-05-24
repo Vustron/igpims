@@ -1,33 +1,22 @@
 "use client"
 
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdowns"
-import {
   Table,
   TableRow,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
+  StaticFilter,
+  DynamicSearchHeader,
+  DynamicFiltersPanel,
+  DynamicResultsSummary,
+  DynamicPaginationControls,
 } from "@/components/ui/tables"
-import {
-  Mail,
-  History,
-  Settings2,
-  ChevronLeft,
-  ChevronRight,
-  PrinterIcon,
-} from "lucide-react"
-import { AdvancedFilter } from "@/components/ui/tables/advance-filter"
+import { History } from "lucide-react"
 import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
-import { FloatingLabelInput } from "@/components/ui/inputs"
-import { EmptyState } from "@/components/ui/fallbacks"
-import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
+import { EmptyState, Skeleton } from "@/components/ui/fallbacks"
+import { TableActions } from "./table-actions"
 
 import { useReactTable } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
@@ -41,15 +30,12 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import { deepSearch } from "@/utils/deep-search"
 
-import { useDialog } from "@/hooks/use-dialog"
-
 import type {
   ColumnDef,
   SortingState,
   VisibilityState,
   ColumnFiltersState,
 } from "@tanstack/react-table"
-import type { FilterState } from "@/components/ui/tables/advance-filter"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -58,6 +44,33 @@ interface DataTableProps<TData, TValue> {
   disabled?: boolean
   isLockerRental?: boolean
   isIgp?: boolean
+  isLoading?: boolean
+  isDynamic?: boolean
+  onRefetch?: () => void
+  isFetching?: boolean
+  // Dynamic props
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  showFilters?: boolean
+  onToggleFilters?: () => void
+  activeFiltersCount?: number
+  filters?: any
+  onUpdateFilters?: (filters: any) => void
+  onResetFilters?: () => void
+  onClose?: () => void
+  totalItems?: number
+  currentDataLength?: number
+  currentPage?: number
+  totalPages?: number
+  limit?: number
+  onPageSizeChange?: (limit: number) => void
+  hasNextPage?: boolean
+  hasPrevPage?: boolean
+  onGoToFirstPage?: () => void
+  onGoToPreviousPage?: () => void
+  onGoToNextPage?: () => void
+  onGoToLastPage?: () => void
+  onGoToPage?: (page: number) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -67,138 +80,46 @@ export function DataTable<TData, TValue>({
   disabled,
   isLockerRental,
   isIgp,
+  isLoading,
+  isDynamic,
+  onRefetch,
+  isFetching,
+  // Dynamic props
+  searchValue = "",
+  onSearchChange,
+  showFilters = false,
+  onToggleFilters,
+  activeFiltersCount = 0,
+  filters,
+  onUpdateFilters,
+  onResetFilters,
+  onClose,
+  totalItems = 0,
+  currentDataLength = 0,
+  currentPage = 1,
+  totalPages = 1,
+  limit = 10,
+  onPageSizeChange,
+  hasNextPage = false,
+  hasPrevPage = false,
+  onGoToFirstPage,
+  onGoToPreviousPage,
+  onGoToNextPage,
+  onGoToLastPage,
+  onGoToPage,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [filterValue, setFilterValue] = useState<string>("")
-  const { onOpen } = useDialog()
 
-  // Advanced filters state
-  const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
-    renterName: "",
-    courseAndSet: "",
-    rentalStatus: [],
-    paymentStatus: [],
-    dateRented: { start: null, end: null },
-    dateDue: { start: null, end: null },
-    createdAt: { start: null, end: null },
-    updatedAt: { start: null, end: null },
-  })
-
-  // Track if any advanced filters are active
-  const activeFilterCount = useMemo(() => {
-    let count = 0
-    if (advancedFilters.renterName) count++
-    if (advancedFilters.courseAndSet) count++
-    if (advancedFilters.rentalStatus.length > 0) count++
-    if (advancedFilters.paymentStatus.length > 0) count++
-    if (advancedFilters.dateRented.start || advancedFilters.dateRented.end)
-      count++
-    if (advancedFilters.dateDue.start || advancedFilters.dateDue.end) count++
-    if (advancedFilters.createdAt.start || advancedFilters.createdAt.end)
-      count++
-    if (advancedFilters.updatedAt.start || advancedFilters.updatedAt.end)
-      count++
-    return count
-  }, [advancedFilters])
-
-  // Apply advanced filters to data
   const filteredData = useMemo(() => {
-    // First apply text search filter
-    let filtered = data.filter((item) => deepSearch(item, filterValue))
-
-    // Then apply advanced filters
-    filtered = filtered.filter((item: any) => {
-      // Renter name filter
-      if (
-        advancedFilters.renterName &&
-        !item.renterName
-          ?.toLowerCase()
-          .includes(advancedFilters.renterName.toLowerCase())
-      ) {
-        return false
-      }
-
-      // Course and set filter
-      if (
-        advancedFilters.courseAndSet &&
-        !item.courseAndSet
-          ?.toLowerCase()
-          .includes(advancedFilters.courseAndSet.toLowerCase())
-      ) {
-        return false
-      }
-
-      // Rental status filter
-      if (
-        advancedFilters.rentalStatus.length > 0 &&
-        !advancedFilters.rentalStatus.includes(item.rentalStatus)
-      ) {
-        return false
-      }
-
-      // Payment status filter
-      if (
-        advancedFilters.paymentStatus.length > 0 &&
-        !advancedFilters.paymentStatus.includes(item.paymentStatus)
-      ) {
-        return false
-      }
-
-      // Date filters
-      const checkDateRange = (
-        date: number | undefined,
-        range: { start: Date | null; end: Date | null },
-      ) => {
-        if (!date) return true
-        const itemDate = new Date(date)
-
-        if (range.start && itemDate < range.start) {
-          return false
-        }
-
-        if (range.end) {
-          // Set to end of day for the end date
-          const endDate = new Date(range.end)
-          endDate.setHours(23, 59, 59, 999)
-          if (itemDate > endDate) {
-            return false
-          }
-        }
-
-        return true
-      }
-
-      if (!checkDateRange(item.dateRented, advancedFilters.dateRented))
-        return false
-      if (!checkDateRange(item.dateDue, advancedFilters.dateDue)) return false
-      if (!checkDateRange(item.createdAt, advancedFilters.createdAt))
-        return false
-      if (!checkDateRange(item.updatedAt, advancedFilters.updatedAt))
-        return false
-
-      return true
-    })
-
-    return filtered
-  }, [data, filterValue, advancedFilters])
-
-  // Function to clear all filters
-  const clearFilters = () => {
-    setAdvancedFilters({
-      renterName: "",
-      courseAndSet: "",
-      rentalStatus: [],
-      paymentStatus: [],
-      dateRented: { start: null, end: null },
-      dateDue: { start: null, end: null },
-      createdAt: { start: null, end: null },
-      updatedAt: { start: null, end: null },
-    })
-    setFilterValue("")
-  }
+    if (isDynamic) {
+      return data
+    }
+    return data.filter((item) => deepSearch(item, filterValue))
+  }, [data, filterValue, isDynamic])
 
   const table = useReactTable({
     data: filteredData,
@@ -223,158 +144,61 @@ export function DataTable<TData, TValue>({
     [table.getRowModel().rows],
   )
 
-  // Get available status options from data
-  const statusOptions = useMemo(() => {
-    const rentalStatuses = new Set<string>()
-    const paymentStatuses = new Set<string>()
+  if (isDynamic) {
+    return (
+      <div className="space-y-4">
+        {/* Dynamic Search Header */}
+        {onSearchChange && onToggleFilters && (
+          <DynamicSearchHeader
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+            onToggleFilters={onToggleFilters}
+            activeFiltersCount={activeFiltersCount}
+            onRefetch={onRefetch!}
+            isFetching={isFetching!}
+            isIgp={isIgp}
+            isLockerRental={isLockerRental}
+            table={table}
+          />
+        )}
 
-    data.forEach((item: any) => {
-      if (item.rentalStatus) rentalStatuses.add(item.rentalStatus)
-      if (item.paymentStatus) paymentStatuses.add(item.paymentStatus)
-    })
-
-    return {
-      rental: Array.from(rentalStatuses),
-      payment: Array.from(paymentStatuses),
-    }
-  }, [data])
-
-  return (
-    <div>
-      {/* filter */}
-      <ScrollArea>
-        <ScrollBar orientation="horizontal" className="z-10" />
-        <div className="flex flex-col justify-between gap-4 p-2 sm:flex-row">
-          <div className="flex flex-1 flex-wrap gap-2">
-            <FloatingLabelInput
-              id="filter-input"
-              type="text"
-              label={`${placeholder}`}
-              placeholder={placeholder}
-              disabled={disabled}
-              value={filterValue}
-              onChange={(e) => setFilterValue(e.target.value)}
-              className="w-full p-5 shadow-xs sm:w-64"
+        {/* Dynamic Filters Panel */}
+        {showFilters &&
+          filters &&
+          onUpdateFilters &&
+          onResetFilters &&
+          onClose && (
+            <DynamicFiltersPanel
+              filters={filters}
+              activeFiltersCount={activeFiltersCount}
+              onUpdateFilters={onUpdateFilters}
+              onResetFilters={onResetFilters}
+              onClose={onClose}
             />
+          )}
 
-            {/* Advanced filter component */}
-            {isLockerRental && (
-              <AdvancedFilter
-                advancedFilters={advancedFilters}
-                setAdvancedFilters={setAdvancedFilters}
-                statusOptions={statusOptions}
-                onClearAllFilters={clearFilters}
-              />
-            )}
-          </div>
+        {/* Dynamic Results Summary */}
+        {onPageSizeChange && (
+          <DynamicResultsSummary
+            totalItems={totalItems}
+            currentDataLength={currentDataLength}
+            activeFiltersCount={activeFiltersCount}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            limit={limit}
+            onPageSizeChange={onPageSizeChange}
+          />
+        )}
 
-          <div className="flex flex-wrap items-center gap-2">
-            {isIgp && (
-              <motion.div
-                key="email-button"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="font-normal text-xs shadow-xs"
-                  onClick={() => onOpen("confirm")}
-                >
-                  <Mail className="mr-2 h-4 w-4" />
-                  Send email
-                </Button>
-              </motion.div>
-            )}
-
-            <AnimatePresence mode="popLayout">
-              <motion.div
-                key="print-button"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2, delay: 0.05 }}
-              >
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="font-normal text-xs shadow-xs"
-                  onClick={() => onOpen("printRentalAgreementReceipt")}
-                >
-                  <PrinterIcon className="mr-2 h-4 w-4" />
-                  Print
-                </Button>
-              </motion.div>
-
-              <motion.div
-                key="view-button"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2, delay: 0.1 }}
-              >
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="font-normal text-xs shadow-xs"
-                    >
-                      <Settings2 className="mr-2 h-4 w-4" />
-                      View
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {table
-                      .getAllColumns()
-                      .filter((column) => column.getCanHide())
-                      .map((column) => (
-                        <DropdownMenuCheckboxItem
-                          key={column.id}
-                          className="capitalize"
-                          checked={column.getIsVisible()}
-                          onCheckedChange={(value) =>
-                            column.toggleVisibility(!!value)
-                          }
-                        >
-                          {column.id}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Active filters counter */}
-            {activeFilterCount > 0 && (
-              <motion.div
-                key="filter-badge"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Badge variant="outline" className="ml-2">
-                  {activeFilterCount}{" "}
-                  {activeFilterCount === 1 ? "filter" : "filters"} active
-                </Badge>
-              </motion.div>
-            )}
-          </div>
-        </div>
-      </ScrollArea>
-
-      {data.length === 0 ? (
-        <EmptyState
-          icon={History}
-          title="No history records found"
-          description="There are no history records tracked in the system yet."
-          action={undefined}
-        />
-      ) : (
-        <>
+        {/* Data Table */}
+        {data.length === 0 ? (
+          <EmptyState
+            icon={History}
+            title="No records found"
+            description="There are no records to display at the moment."
+            action={undefined}
+          />
+        ) : (
           <ScrollArea className="h-[calc(80vh-100px)] rounded-md border md:h-[calc(80vh-100px)]">
             <ScrollBar orientation="horizontal" className="z-10" />
             <Table className="relative">
@@ -396,7 +220,18 @@ export function DataTable<TData, TValue>({
               </TableHeader>
               <AnimatePresence mode="wait">
                 <TableBody>
-                  {memoizedRows.length > 0 ? (
+                  {isLoading ? (
+                    // Loading skeleton rows
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={`skeleton-${index}`}>
+                        {columns.map((_, colIndex) => (
+                          <TableCell key={`skeleton-cell-${colIndex}`}>
+                            <Skeleton className="h-4 w-full" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : memoizedRows.length > 0 ? (
                     memoizedRows.map((row) => (
                       <motion.tr
                         key={row.id}
@@ -432,33 +267,128 @@ export function DataTable<TData, TValue>({
               </AnimatePresence>
             </Table>
           </ScrollArea>
+        )}
 
-          <div className="flex items-center justify-end space-x-2 py-4 max-sm:flex-col max-sm:justify-center">
-            <div className="flex-1 text-muted-foreground text-sm">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div>
+        {/* Dynamic Pagination */}
+        {onGoToPage &&
+          onGoToFirstPage &&
+          onGoToPreviousPage &&
+          onGoToNextPage &&
+          onGoToLastPage && (
+            <DynamicPaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              hasNextPage={hasNextPage}
+              hasPrevPage={hasPrevPage}
+              isFetching={isFetching!}
+              onGoToFirstPage={onGoToFirstPage}
+              onGoToPreviousPage={onGoToPreviousPage}
+              onGoToNextPage={onGoToNextPage}
+              onGoToLastPage={onGoToLastPage}
+              onGoToPage={onGoToPage}
+            />
+          )}
+      </div>
+    )
+  }
 
-            <div className="flex flex-row items-center justify-between gap-2 text-center max-sm:mt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {}}
-                disabled={true}
-              >
-                <ChevronLeft className="size-6" />
-              </Button>
+  return (
+    <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <StaticFilter
+          placeholder={placeholder}
+          disabled={disabled}
+          filterValue={filterValue}
+          onFilterChange={setFilterValue}
+          table={table}
+        />
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {}}
-                disabled={true}
-              >
-                <ChevronRight className="size-6" />
-              </Button>
-            </div>
-          </div>
+        <TableActions
+          isIgp={isIgp}
+          isLockerRental={isLockerRental}
+          onRefetch={onRefetch!}
+          isFetching={isFetching!}
+          table={table}
+        />
+      </div>
+
+      {data.length === 0 ? (
+        <EmptyState
+          icon={History}
+          title="No history records found"
+          description="There are no history records tracked in the system yet."
+          action={undefined}
+        />
+      ) : (
+        <>
+          <ScrollArea className="h-[calc(80vh-100px)] rounded-md border md:h-[calc(80vh-100px)]">
+            <ScrollBar orientation="horizontal" className="z-10" />
+            <Table className="relative">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <AnimatePresence mode="wait">
+                <TableBody>
+                  {isLoading ? (
+                    // Loading skeleton rows
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={`skeleton-${index}`}>
+                        {columns.map((_, colIndex) => (
+                          <TableCell key={`skeleton-cell-${colIndex}`}>
+                            <Skeleton className="h-4 w-full" />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : memoizedRows.length > 0 ? (
+                    memoizedRows.map((row) => (
+                      <motion.tr
+                        key={row.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className={
+                          row.getIsSelected() ? "bg-muted/50" : undefined
+                        }
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </TableCell>
+                        ))}
+                      </motion.tr>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results match your search.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </AnimatePresence>
+            </Table>
+          </ScrollArea>
         </>
       )}
     </div>

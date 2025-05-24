@@ -26,16 +26,13 @@ export const useCreateLocker = () => {
     },
 
     onSuccess: async (newLocker: Locker) => {
-      // Cancel any ongoing queries for lockers
       await queryClient.cancelQueries({ queryKey: ["lockers"] })
 
-      // Update paginated data in cache
       queryClient.setQueriesData<PaginatedLockersResponse>(
         { queryKey: ["lockers"] },
         (oldData) => {
           if (!oldData || !oldData.meta) return undefined
 
-          // For the first page, add the new locker to the start of the list
           if (oldData.meta.page === 1) {
             return {
               ...oldData,
@@ -50,7 +47,6 @@ export const useCreateLocker = () => {
             }
           }
 
-          // For other pages, just update the metadata
           return {
             ...oldData,
             meta: {
@@ -72,10 +68,8 @@ export const useCreateLocker = () => {
           const pages = oldData.pages || []
           if (pages.length === 0) return oldData
 
-          // Check if first page exists and has meta
           if (!pages[0] || !pages[0].meta) return oldData
 
-          // Add to first page of infinite query
           const newPages = [...pages]
           newPages[0] = {
             ...newPages[0],
@@ -97,8 +91,8 @@ export const useCreateLocker = () => {
       )
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["lockers"] })
-      queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] })
+      // queryClient.invalidateQueries({ queryKey: [ "lockers" ] })
+      // queryClient.invalidateQueries({ queryKey: [ "lockers-infinite" ] })
     },
     onError: (error) => catchError(error),
   })

@@ -17,11 +17,13 @@ import { Search, CalendarIcon, X } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 import { Input } from "@/components/ui/inputs"
 import { Badge } from "@/components/ui/badges"
+import { Plus } from "lucide-react"
+
+import { useDialog } from "@/hooks/use-dialog"
+import { useState } from "react"
 
 import { format } from "date-fns"
 import { cn } from "@/utils/cn"
-
-import { useState } from "react"
 
 import type { FundRequest } from "@/features/fund-request/timeline-sample-data"
 
@@ -43,6 +45,7 @@ export const ProjectRequestFilter = ({
     to: Date | undefined
   }>({ from: undefined, to: undefined })
   const [activeFilters, setActiveFilters] = useState<string[]>([])
+  const { onOpen } = useDialog()
 
   const statusOptions: { value: StatusOption; label: string }[] = [
     { value: "all", label: "All Statuses" },
@@ -227,6 +230,14 @@ export const ProjectRequestFilter = ({
             />
           </PopoverContent>
         </Popover>
+
+        <Button
+          className="gap-2 shadow-sm transition-all hover:shadow"
+          onClick={() => onOpen("createProjectRequest")}
+        >
+          <Plus className="size-4" />
+          <span className="whitespace-nowrap">New Project Request</span>
+        </Button>
       </div>
 
       {/* Active filters */}

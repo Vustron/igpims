@@ -9,10 +9,12 @@ import { DataTable } from "@/components/ui/tables"
 
 export const ViolationList = () => {
   return (
-    <DataTable
-      columns={violationListColumns}
-      data={exampleViolations}
-      placeholder="Search..."
-    />
+    <div className="mt-2">
+      <DataTable
+        columns={violationListColumns}
+        data={exampleViolations}
+        placeholder="Search..."
+      />
+    </div>
   )
 }

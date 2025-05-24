@@ -12,7 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popovers"
-import { Search, CalendarIcon, X } from "lucide-react"
+import { Search, CalendarIcon, X, Plus } from "lucide-react"
 import { Calendar } from "@/components/ui/calendars"
 import { Button } from "@/components/ui/buttons"
 import { Input } from "@/components/ui/inputs"
@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badges"
 import { format } from "date-fns"
 import { cn } from "@/utils/cn"
 
+import { useDialog } from "@/hooks/use-dialog"
 import { useState } from "react"
 
 import type { FundRequest } from "@/features/fund-request/timeline-sample-data"
@@ -43,6 +44,7 @@ export const FundRequestFilter = ({
     to: Date | undefined
   }>({ from: undefined, to: undefined })
   const [activeFilters, setActiveFilters] = useState<string[]>([])
+  const { onOpen } = useDialog()
 
   const statusOptions: { value: StatusOption; label: string }[] = [
     { value: "all", label: "All Statuses" },
@@ -159,7 +161,7 @@ export const FundRequestFilter = ({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="mt-2">
       <div className="flex flex-col gap-3 sm:flex-row">
         {/* Search */}
         <div className="relative flex-grow">
@@ -227,6 +229,14 @@ export const FundRequestFilter = ({
             />
           </PopoverContent>
         </Popover>
+
+        <Button
+          className="gap-2 shadow-sm transition-all hover:shadow"
+          onClick={() => onOpen("createFundRequest")}
+        >
+          <Plus className="size-4" />
+          <span className="whitespace-nowrap">New Fund Request</span>
+        </Button>
       </div>
 
       {/* Active filters */}

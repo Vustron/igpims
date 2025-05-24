@@ -1,9 +1,10 @@
-import { preFindRentByLockerId } from "@/backend/actions/locker-rental/find-rent-by-locker-id"
+import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
 import { preFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { ContentLayout } from "@/features/layouts/content-layout"
 import { LockerClient } from "@/features/locker/client"
 import { QueryHydrator } from "@/utils/query-hydrator"
 
+import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -15,15 +16,20 @@ interface PageProps {
 }
 
 export default async function LockerIdPage({ params }: PageProps) {
-  const [resolvedParams, preFindLocker, preFindLockerRent] = await Promise.all([
+  const [resolvedParams, preFindLocker] = await Promise.all([
     params,
     preFindLockerById((await params).id),
-    preFindRentByLockerId((await params).id),
   ])
   const { id } = resolvedParams
+  const lockerItems: BreadcrumbItemProps[] = [
+    { label: "Dashboard", href: "/" },
+    { label: "Locker Rental", href: "/locker-rental" },
+    { label: "Locker" },
+  ]
   return (
     <ContentLayout title="Locker">
-      <QueryHydrator prefetchFns={[preFindLocker, preFindLockerRent]}>
+      <DynamicBreadcrumb items={lockerItems} />
+      <QueryHydrator prefetchFns={[preFindLocker]}>
         <LockerClient id={id} />
       </QueryHydrator>
     </ContentLayout>

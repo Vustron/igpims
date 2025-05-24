@@ -1,3 +1,5 @@
 export * from "./skeleton"
 export * from "./fallback-boundary"
 export * from "./empty-state"
+export * from "./table-loader"
+export * from "./table-error"

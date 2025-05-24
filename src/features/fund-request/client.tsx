@@ -2,16 +2,12 @@
 
 import { FundRequestFilter } from "@/features/fund-request/fund-request-filter"
 import { FundRequestCard } from "@/features/fund-request/fund-request-card"
-import { Button } from "@/components/ui/buttons"
-import { Plus } from "lucide-react"
 
 import { sampleFundRequests } from "@/features/fund-request/timeline-sample-data"
 
-import { useDialog } from "@/hooks/use-dialog"
 import { useState, useMemo } from "react"
 
 export const FundRequestClient = () => {
-  const { onOpen } = useDialog()
   const [filters, setFilters] = useState({
     search: "",
     status: "all",
@@ -58,16 +54,6 @@ export const FundRequestClient = () => {
 
   return (
     <div className="space-y-4">
-      <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
-        <Button
-          className="gap-2 shadow-sm transition-all hover:shadow"
-          onClick={() => onOpen("createFundRequest")}
-        >
-          <Plus className="size-4" />
-          <span className="whitespace-nowrap">New Fund Request</span>
-        </Button>
-      </div>
-
       {/* Fund Request Filter */}
       <div className="mb-6">
         <FundRequestFilter

@@ -149,7 +149,7 @@ export const OtherIgpsClient = () => {
     sortOption !== "name-asc"
 
   return (
-    <div className="space-y-6">
+    <div className="mt-2 space-y-6">
       {/* Filters component */}
       <IgpFilters
         searchTerm={searchTerm}

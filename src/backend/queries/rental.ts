@@ -26,20 +26,22 @@ const createRentalQuery = db
   .values({
     id: sql.placeholder("id"),
     lockerId: sql`${sql.placeholder("lockerId")}`,
-    renterId: sql`${sql.placeholder("studentId")}`,
-    renterName: sql`${sql.placeholder("studentName")}`,
+    renterId: sql`${sql.placeholder("renterId")}`,
+    renterName: sql`${sql.placeholder("renterName")}`,
     courseAndSet: sql`${sql.placeholder("courseAndSet")}`,
     rentalStatus: sql`${sql.placeholder("rentalStatus")}`,
     paymentStatus: sql`${sql.placeholder("paymentStatus")}`,
     dateRented: sql`${sql.placeholder("dateRented")}`,
     dateDue: sql`${sql.placeholder("dateDue")}`,
+    createdAt: sql`CURRENT_TIMESTAMP`,
+    updatedAt: sql`CURRENT_TIMESTAMP`,
   })
   .prepare()
 
 const updateRentalQuery = db
   .update(lockerRental)
   .set({
-    renterId: sql`${sql.placeholder("studentId")}`,
+    renterId: sql`${sql.placeholder("renterId")}`,
     renterName: sql`${sql.placeholder("studentName")}`,
     courseAndSet: sql`${sql.placeholder("courseAndSet")}`,
     dateRented: sql`${sql.placeholder("dateRented")}`,
@@ -55,6 +57,19 @@ const deleteRentalQuery = db
   .where(sql`${lockerRental.id} = ${sql.placeholder("id")}`)
   .prepare()
 
+const findManyRentalsQuery = db
+  .select()
+  .from(lockerRental)
+  .orderBy(sql`${lockerRental.createdAt} DESC`)
+  .limit(sql.placeholder("limit"))
+  .offset(sql.placeholder("offset"))
+  .prepare()
+
+const countRentalsQuery = db
+  .select({ count: sql<number>`count(*)` })
+  .from(lockerRental)
+  .prepare()
+
 export {
   getRentalByIdQuery,
   getRentalByLockerIdQuery,
@@ -62,4 +77,6 @@ export {
   createRentalQuery,
   updateRentalQuery,
   deleteRentalQuery,
+  findManyRentalsQuery,
+  countRentalsQuery,
 }

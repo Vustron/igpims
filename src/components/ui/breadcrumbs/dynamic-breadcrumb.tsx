@@ -18,7 +18,7 @@ interface DynamicBreadcrumbProps {
   items: BreadcrumbItemProps[]
 }
 
-const DynamicBreadcrumb = ({ items }: DynamicBreadcrumbProps) => {
+export const DynamicBreadcrumb = ({ items }: DynamicBreadcrumbProps) => {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -40,5 +40,3 @@ const DynamicBreadcrumb = ({ items }: DynamicBreadcrumbProps) => {
     </Breadcrumb>
   )
 }
-
-export default DynamicBreadcrumb

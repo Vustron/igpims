@@ -2,21 +2,20 @@
 
 import {
   Card,
-  CardHeader,
   CardTitle,
+  CardHeader,
   CardContent,
   CardDescription,
 } from "@/components/ui/cards"
-import { Loader2, ArrowLeft, Trash2 } from "lucide-react"
 import { DynamicForm } from "@/components/ui/forms"
 import { Button } from "@/components/ui/buttons"
+import { Loader2, Trash2 } from "lucide-react"
 import { PiLockers } from "react-icons/pi"
 
 import { useDeleteLockerById } from "@/backend/actions/locker/delete-by-id"
 import { useUpdateLocker } from "@/backend/actions/locker/update-locker"
 import { useFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { useConfirm } from "@/hooks/use-confirm"
-import { useRouter } from "next-nprogress-bar"
 import { useForm } from "react-hook-form"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -28,7 +27,6 @@ import type { FieldConfig } from "@/interfaces/form"
 import type { Locker } from "@/schemas/locker"
 
 export const LockerInfo = ({ id }: { id: string }) => {
-  const router = useRouter()
   const { data: locker, error: lockerError } = useFindLockerById(id)
   const updateLocker = useUpdateLocker(id)
   const deleteLocker = useDeleteLockerById(id)
@@ -119,7 +117,6 @@ export const LockerInfo = ({ id }: { id: string }) => {
     }
   }
 
-  const goBack = () => router.back()
   const isLoading = !locker && !lockerError
 
   if (isLoading) {
@@ -155,13 +152,22 @@ export const LockerInfo = ({ id }: { id: string }) => {
   }
 
   return (
-    <Card className="mx-auto w-full max-w-4xl">
+    <Card className="mx-auto mt-5 w-full max-w-4xl">
       <CardHeader className="border-b bg-muted/40 pb-8">
         <div className="mb-4 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={goBack} className="mr-2">
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            Back
-          </Button>
+          <div className="flex flex-col items-center gap-4 sm:flex-row">
+            <div className="flex items-center gap-4">
+              <div className="rounded-full bg-primary/10 p-3">
+                <PiLockers className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl">Locker Information</CardTitle>
+                <CardDescription>
+                  ID: {id} {locker?.lockerName && `• ${locker.lockerName}`}
+                </CardDescription>
+              </div>
+            </div>
+          </div>
           <Button
             variant="destructive"
             size="sm"
@@ -170,21 +176,8 @@ export const LockerInfo = ({ id }: { id: string }) => {
             className="gap-1.5"
           >
             <Trash2 className="h-4 w-4" />
-            {deleteLocker.isPending ? "Deleting..." : "Delete Locker"}
+            {deleteLocker.isPending ? "Deleting..." : "Delete"}
           </Button>
-        </div>
-        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="flex items-center gap-4">
-            <div className="rounded-full bg-primary/10 p-3">
-              <PiLockers className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-2xl">Locker Information</CardTitle>
-              <CardDescription>
-                ID: {id} {locker?.lockerName && `• ${locker.lockerName}`}
-              </CardDescription>
-            </div>
-          </div>
         </div>
       </CardHeader>
 

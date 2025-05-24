@@ -2,8 +2,6 @@
 
 import {
   IdCell,
-  AmountCell,
-  SelectCell,
   DateDueCell,
   LockerIdCell,
   RenterNameCell,
@@ -20,18 +18,10 @@ import type { ColumnDef } from "@tanstack/react-table"
 
 export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   {
-    id: "select",
-    header: ({ table }) => <SelectCell table={table} />,
-    cell: ({ row }) => <SelectCell row={row} />,
-    enableSorting: false,
-    enableHiding: false,
-    size: 40,
-  },
-  {
-    accessorKey: "transactionId",
-    header: "ID",
+    accessorKey: "id",
+    header: () => <div className="ml-2">Transaction Id</div>,
     cell: ({ row }) => {
-      const transactionId = row.getValue("transactionId") as string
+      const transactionId = row.getValue("id") as string
       return <IdCell value={transactionId} />
     },
     size: 90,
@@ -103,15 +93,6 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
     },
     sortingFn: "datetime",
     size: 100,
-  },
-  {
-    accessorKey: "amount",
-    header: columnHeaders.amount,
-    cell: ({ row }) => {
-      const amount = row.getValue("amount") as number
-      return <AmountCell value={amount} />
-    },
-    size: 80,
   },
   {
     id: "actions",

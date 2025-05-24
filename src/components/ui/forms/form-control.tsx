@@ -175,7 +175,7 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
                   formField.value ? new Date(formField.value) : undefined
                 }
                 onSelect={(date) => {
-                  formField.onChange(date)
+                  formField.onChange(date || undefined)
                 }}
                 disabled={(date) => {
                   if (field.minDate && date < new Date(field.minDate))

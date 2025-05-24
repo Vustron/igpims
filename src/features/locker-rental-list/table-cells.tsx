@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/buttons"
 import { Badge } from "@/components/ui/badges"
 
 import {
-  formatDate,
   getRemainingDays,
   getRentalStatusStyle,
   getPaymentStatusStyle,
@@ -25,6 +24,7 @@ import {
   getStatusDescription,
   getPaymentDescription,
 } from "@/features/locker-rental-list/rental-status-indicators"
+import { format } from "date-fns"
 
 export const SelectCell = ({
   row,
@@ -66,7 +66,7 @@ export const IdCell = ({ value }: { value: string }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="max-w-[80px] truncate font-medium font-mono text-xs md:text-sm">
+          <div className="ml-2 max-w-[80px] truncate font-medium font-mono text-xs md:text-sm">
             {value.substring(0, 8)}
           </div>
         </TooltipTrigger>
@@ -208,14 +208,16 @@ export const PaymentStatusCell = ({ value }: { value: string }) => {
   )
 }
 
-export const DateRentedCell = ({ value }: { value: number }) => {
-  const timestamp = value
-  const date = new Date(timestamp)
-  const formattedDate = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date)
+export const DateRentedCell = ({ value }: { value: string | number }) => {
+  const date = typeof value === "string" ? new Date(value) : new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return (
+      <div className="whitespace-nowrap text-red-500 text-xs">Invalid Date</div>
+    )
+  }
+
+  const formattedDate = format(date, "MMM dd, yyyy")
 
   return (
     <TooltipProvider>
@@ -226,7 +228,7 @@ export const DateRentedCell = ({ value }: { value: number }) => {
         <TooltipContent side="top">
           <div className="flex items-center">
             <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-            {formatDate(timestamp)}
+            {format(date, "PPP")}
           </div>
         </TooltipContent>
       </Tooltip>
@@ -234,16 +236,18 @@ export const DateRentedCell = ({ value }: { value: number }) => {
   )
 }
 
-export const DateDueCell = ({ value }: { value: number }) => {
-  const timestamp = value
-  const daysRemaining = getRemainingDays(timestamp)
+export const DateDueCell = ({ value }: { value: string | number }) => {
+  const date = typeof value === "string" ? new Date(value) : new Date(value)
 
-  const date = new Date(timestamp)
-  const formattedDate = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date)
+  if (Number.isNaN(date.getTime())) {
+    return (
+      <div className="whitespace-nowrap text-red-500 text-xs">Invalid Date</div>
+    )
+  }
+
+  const timestamp = date.getTime()
+  const daysRemaining = getRemainingDays(timestamp)
+  const formattedDate = format(date, "MMM dd, yyyy")
 
   return (
     <TooltipProvider>
@@ -272,7 +276,7 @@ export const DateDueCell = ({ value }: { value: number }) => {
           <div className="space-y-1">
             <div className="flex items-center">
               <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-              {formatDate(timestamp)}
+              {format(date, "PPP")}
             </div>
             <div
               className={`text-xs ${
