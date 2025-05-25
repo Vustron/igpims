@@ -1,6 +1,7 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import * as lockerQuery from "@/backend/queries/locker"
+import * as rentalQuery from "@/backend/queries/rental"
 import { catchError } from "@/utils/catch-error"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
@@ -31,7 +32,7 @@ export async function deleteLockerById(
       )
     }
 
-    let exists = false
+    let deletedLocker = null
 
     await db.transaction(async (_tx) => {
       const findResult = await lockerQuery.getLockerByIdQuery.execute({
@@ -42,20 +43,33 @@ export async function deleteLockerById(
         throw new Error("Locker not found")
       }
 
-      exists = true
+      deletedLocker = findResult[0]
+
+      const rentalsResult = await rentalQuery.getRentalsByLockerIdQuery.execute(
+        {
+          lockerId: lockerId,
+        },
+      )
+
+      if (rentalsResult && rentalsResult.length > 0) {
+        for (const rental of rentalsResult) {
+          await rentalQuery.deleteRentalQuery.execute({ id: rental.id })
+        }
+      }
 
       await lockerQuery.deleteLockerQuery.execute({ id: lockerId })
     })
 
-    if (!exists) {
+    if (!deletedLocker) {
       return NextResponse.json({ error: "Locker not found" }, { status: 404 })
     }
 
     return NextResponse.json(
-      { message: "Locker deleted successfully" },
-      { status: 201 },
+      "Locker and associated rentals deleted successfully",
+      { status: 200 },
     )
   } catch (error) {
+    console.error("Delete locker error:", error)
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

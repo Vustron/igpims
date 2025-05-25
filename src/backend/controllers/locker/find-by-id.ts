@@ -1,6 +1,8 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import * as lockerQuery from "@/backend/queries/locker"
+import * as rentalQuery from "@/backend/queries/rental"
+import { toTimestamp } from "@/utils/date-convert"
 import { catchError } from "@/utils/catch-error"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
@@ -31,18 +33,48 @@ export async function findLockerById(
       )
     }
 
-    const locker = await db.transaction(async (_tx) => {
-      const result = await lockerQuery.getLockerByIdQuery.execute({
+    const lockerWithRental = await db.transaction(async (_tx) => {
+      const lockerResult = await lockerQuery.getLockerByIdQuery.execute({
         id,
       })
-      return result[0]
+      const locker = lockerResult[0]
+
+      if (!locker) {
+        return null
+      }
+
+      const rentalResult = await rentalQuery.getRentalsByLockerIdQuery.execute({
+        lockerId: id,
+      })
+
+      const rentalHistory = rentalResult.map((rental) => ({
+        ...rental,
+        dateRented: toTimestamp(rental.dateRented),
+        dateDue: toTimestamp(rental.dateDue),
+        createdAt: toTimestamp(rental.createdAt),
+        updatedAt: toTimestamp(rental.updatedAt),
+      }))
+
+      const currentRental = rentalHistory[0] || null
+
+      const lockerWithTimestamps = {
+        ...locker,
+        createdAt: toTimestamp(locker.createdAt),
+        updatedAt: toTimestamp(locker.updatedAt),
+      }
+
+      return {
+        ...lockerWithTimestamps,
+        rental: currentRental,
+        rentalHistory: rentalHistory,
+      }
     })
 
-    if (!locker) {
+    if (!lockerWithRental) {
       return NextResponse.json({ error: "Locker not found" }, { status: 404 })
     }
 
-    return NextResponse.json(locker, { status: 200 })
+    return NextResponse.json(lockerWithRental, { status: 200 })
   } catch (error) {
     return NextResponse.json(
       { error: catchError(error) || "Failed to find locker" },

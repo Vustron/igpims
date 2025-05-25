@@ -1,15 +1,17 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import * as lockerQuery from "@/backend/queries/locker"
+import * as rentalQuery from "@/backend/queries/rental"
+import { lockerConfigSchema } from "@/schemas/locker"
+import { toTimestamp } from "@/utils/date-convert"
 import { requestJson } from "@/utils/request-json"
 import { locker } from "@/schemas/drizzle-schema"
 import { catchError } from "@/utils/catch-error"
-import { lockerSchema } from "@/schemas/locker"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 import { eq, sql } from "drizzle-orm"
 
-import type { Locker } from "@/schemas/locker"
+import type { LockerConfig } from "@/schemas/locker"
 import type { NextRequest } from "next/server"
 
 export async function updateLocker(
@@ -47,8 +49,8 @@ export async function updateLocker(
       return NextResponse.json({ error: "Locker not found" }, { status: 404 })
     }
 
-    const data = await requestJson<Locker>(request)
-    const validationResult = await lockerSchema.safeParseAsync(data)
+    const data = await requestJson<LockerConfig>(request)
+    const validationResult = await lockerConfigSchema.safeParseAsync(data)
 
     if (!validationResult.success) {
       return NextResponse.json(
@@ -76,40 +78,132 @@ export async function updateLocker(
       }
     }
 
-    const updatedLocker = await db.transaction(async (_tx) => {
-      const result = await db
+    let finalLockerStatus = existingLocker.lockerStatus
+
+    await db.transaction(async (_tx) => {
+      const updateValues: any = {
+        updatedAt: sql`CURRENT_TIMESTAMP`,
+      }
+
+      if (
+        validationResult.data.lockerStatus !== undefined &&
+        validationResult.data.lockerStatus !== existingLocker.lockerStatus
+      ) {
+        updateValues.lockerStatus = validationResult.data.lockerStatus
+        finalLockerStatus = validationResult.data.lockerStatus
+      }
+
+      if (
+        validationResult.data.lockerType !== undefined &&
+        validationResult.data.lockerType !== existingLocker.lockerType
+      ) {
+        updateValues.lockerType = validationResult.data.lockerType
+      }
+
+      if (
+        validationResult.data.lockerName !== undefined &&
+        validationResult.data.lockerName !== existingLocker.lockerName
+      ) {
+        updateValues.lockerName = validationResult.data.lockerName
+      }
+
+      if (
+        validationResult.data.lockerLocation !== undefined &&
+        validationResult.data.lockerLocation !== existingLocker.lockerLocation
+      ) {
+        updateValues.lockerLocation = validationResult.data.lockerLocation
+      }
+
+      if (
+        validationResult.data.lockerRentalPrice !== undefined &&
+        validationResult.data.lockerRentalPrice !==
+          existingLocker.lockerRentalPrice
+      ) {
+        updateValues.lockerRentalPrice = validationResult.data.lockerRentalPrice
+      }
+
+      await db
         .update(locker)
-        .set({
-          lockerStatus:
-            validationResult.data.lockerStatus || existingLocker.lockerStatus,
-          lockerType:
-            validationResult.data.lockerType || existingLocker.lockerType,
-          lockerName:
-            validationResult.data.lockerName || existingLocker.lockerName,
-          lockerLocation:
-            validationResult.data.lockerLocation ||
-            existingLocker.lockerLocation,
-          lockerRentalPrice:
-            validationResult.data.lockerRentalPrice ??
-            existingLocker.lockerRentalPrice,
-          updatedAt: sql`CURRENT_TIMESTAMP`,
-        })
+        .set(updateValues)
         .where(eq(locker.id, id))
-        .returning()
         .execute()
 
-      return result[0]
+      if (validationResult.data.rentalId) {
+        const existingRentalResult =
+          await rentalQuery.getRentalByIdQuery.execute({
+            id: validationResult.data.rentalId,
+          })
+        const existingRental = existingRentalResult[0]
+
+        if (existingRental) {
+          await rentalQuery.updateRentalQuery.execute({
+            id: validationResult.data.rentalId,
+            renterId: validationResult.data.renterId || existingRental.renterId,
+            renterName:
+              validationResult.data.renterName || existingRental.renterName,
+            renterEmail:
+              validationResult.data.renterEmail || existingRental.renterEmail,
+            courseAndSet:
+              validationResult.data.courseAndSet || existingRental.courseAndSet,
+            rentalStatus:
+              validationResult.data.rentalStatus || existingRental.rentalStatus,
+            paymentStatus:
+              validationResult.data.paymentStatus ||
+              existingRental.paymentStatus,
+            dateRented: validationResult.data.dateRented
+              ? toTimestamp(validationResult.data.dateRented)
+              : existingRental.dateRented,
+            dateDue: validationResult.data.dateDue
+              ? toTimestamp(validationResult.data.dateDue)
+              : existingRental.dateDue,
+          })
+
+          if (validationResult.data.rentalStatus) {
+            let newLockerStatus = finalLockerStatus
+
+            if (validationResult.data.rentalStatus === "active") {
+              newLockerStatus = "occupied"
+            } else if (
+              validationResult.data.rentalStatus === "expired" ||
+              validationResult.data.rentalStatus === "cancelled"
+            ) {
+              newLockerStatus = "available"
+            }
+
+            if (newLockerStatus !== finalLockerStatus) {
+              await db
+                .update(locker)
+                .set({
+                  lockerStatus: newLockerStatus,
+                  updatedAt: sql`CURRENT_TIMESTAMP`,
+                })
+                .where(eq(locker.id, id))
+                .execute()
+
+              finalLockerStatus = newLockerStatus
+            }
+          }
+        }
+      }
     })
 
-    if (!updatedLocker) {
-      return NextResponse.json(
-        { error: "Failed to update locker" },
-        { status: 500 },
-      )
+    const updatedLocker = {
+      id: existingLocker.id,
+      lockerStatus: finalLockerStatus,
+      lockerType: validationResult.data.lockerType ?? existingLocker.lockerType,
+      lockerName: validationResult.data.lockerName ?? existingLocker.lockerName,
+      lockerLocation:
+        validationResult.data.lockerLocation ?? existingLocker.lockerLocation,
+      lockerRentalPrice:
+        validationResult.data.lockerRentalPrice ??
+        existingLocker.lockerRentalPrice,
+      createdAt: existingLocker.createdAt,
+      updatedAt: new Date().getTime(),
     }
 
-    return NextResponse.json(updatedLocker, { status: 201 })
+    return NextResponse.json(updatedLocker, { status: 200 })
   } catch (error) {
+    console.error("Update locker error:", error)
     return NextResponse.json(
       { error: catchError(error) || "Failed to update locker" },
       { status: 500 },

@@ -4,7 +4,6 @@ import {
   integer,
   sqliteTable,
   uniqueIndex,
-  sqliteView,
 } from "drizzle-orm/sqlite-core"
 import { relations, sql } from "drizzle-orm"
 import { nanoid } from "nanoid"
@@ -222,7 +221,7 @@ export const locker = sqliteTable(
       >(),
     lockerType: text("lockerType", { length: 255 }).notNull(),
     lockerName: text("lockerName", { length: 255 }).notNull(),
-    lockerLocation: text("lockerType", { length: 255 }).notNull(),
+    lockerLocation: text("lockerLocation", { length: 255 }).notNull(),
     lockerRentalPrice: integer("lockerRentalPrice").default(0).notNull(),
     createdAt: integer("createdAt", { mode: "timestamp" })
       .notNull()
@@ -234,7 +233,6 @@ export const locker = sqliteTable(
   (t) => [
     index("locker_type_idx").on(t.lockerType),
     index("locker_status_idx").on(t.lockerStatus),
-    index("locker_location_idx").on(t.lockerLocation),
     index("locker_rental_price_idx").on(t.lockerRentalPrice),
   ],
 )
@@ -251,6 +249,7 @@ export const lockerRental = sqliteTable(
     renterId: text("renterId").notNull(),
     renterName: text("renterName", { length: 100 }).notNull(),
     courseAndSet: text("courseAndSet", { length: 100 }).notNull(),
+    renterEmail: text("renterEmail", { length: 100 }).notNull(),
     rentalStatus: text("rentalStatus", { length: 100 }).notNull(),
     paymentStatus: text("paymentStatus", { length: 100 }).notNull(),
     dateRented: integer("dateRented", { mode: "timestamp" }).notNull(),
@@ -336,34 +335,34 @@ export const waterSupply = sqliteTable(
   (_t) => [],
 )
 
-export const waterFunds = sqliteView("water_funds", {
-  id: text("id"),
-  waterVendoId: text("waterVendoId"),
-  waterVendoLocation: text("waterVendoLocation"),
-  gallonsUsed: integer("gallonsUsed"),
-  expenses: integer("expenses"),
-  revenue: integer("revenue"),
-  profit: integer("profit"),
-  createdAt: integer("createdAt", { mode: "timestamp" }),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }),
-}).as(sql`
-  SELECT
-    hex(randomblob(4)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(6)) as id,
-    wv.id as waterVendoId,
-    wv.waterVendoLocation,
-    wv.gallonsUsed,
-    COALESCE(SUM(ws.expenses), 0) as expenses,
-    (wv.gallonsUsed * 10) as revenue,
-    ((wv.gallonsUsed * 10) - COALESCE(SUM(ws.expenses), 0)) as profit,
-    wv.createdAt,
-    wv.updatedAt
-  FROM
-    water_vendo wv
-  LEFT JOIN
-    water_supply ws ON wv.id = ws.waterVendoId
-  GROUP BY
-    wv.id
-`)
+// export const waterFunds = sqliteView("water_funds", {
+//   id: text("id"),
+//   waterVendoId: text("waterVendoId"),
+//   waterVendoLocation: text("waterVendoLocation"),
+//   gallonsUsed: integer("gallonsUsed"),
+//   expenses: integer("expenses"),
+//   revenue: integer("revenue"),
+//   profit: integer("profit"),
+//   createdAt: integer("createdAt", { mode: "timestamp" }),
+//   updatedAt: integer("updatedAt", { mode: "timestamp" }),
+// }).as(sql`
+//   SELECT
+//     hex(randomblob(4)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(6)) as id,
+//     wv.id as waterVendoId,
+//     wv.waterVendoLocation,
+//     wv.gallonsUsed,
+//     COALESCE(SUM(ws.expenses), 0) as expenses,
+//     (wv.gallonsUsed * 10) as revenue,
+//     ((wv.gallonsUsed * 10) - COALESCE(SUM(ws.expenses), 0)) as profit,
+//     wv.createdAt,
+//     wv.updatedAt
+//   FROM
+//     water_vendo wv
+//   LEFT JOIN
+//     water_supply ws ON wv.id = ws.waterVendoId
+//   GROUP BY
+//     wv.id
+// `)
 
 export const igp = sqliteTable(
   "igp",

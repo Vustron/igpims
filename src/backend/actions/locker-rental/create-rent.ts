@@ -5,9 +5,9 @@ import { catchError } from "@/utils/catch-error"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
+import type { PaginatedRentalsResponse } from "@/backend/actions/locker-rental/find-many"
 import type { LockerRental } from "@/schemas/drizzle-schema"
 import type { CreateRentalData } from "@/schemas/rental"
-import type { PaginatedRentalsResponse } from "./find-many"
 
 export async function createRent(
   payload: CreateRentalData,
@@ -130,23 +130,19 @@ export const useCreateRent = () => {
 
         return oldData
       })
-
-      queryClient.invalidateQueries({
-        queryKey: ["locker-rentals"],
-        refetchType: "none",
-      })
-
-      queryClient.invalidateQueries({
-        queryKey: ["locker-rentals-infinite"],
-        refetchType: "none",
-      })
-
-      queryClient.invalidateQueries({
-        queryKey: ["lockers"],
-        refetchType: "none",
-      })
     },
-    onSettled: () => {
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["locker-rentals"],
+      })
+
+      await queryClient.invalidateQueries({
+        queryKey: ["locker-rentals-infinite"],
+      })
+
+      await queryClient.invalidateQueries({
+        queryKey: ["lockers"],
+      })
       router.refresh()
     },
     onError: (error) => catchError(error),

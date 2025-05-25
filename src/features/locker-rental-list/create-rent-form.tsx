@@ -37,11 +37,11 @@ export const CreateLockerRentForm = ({
       renterId: "",
       renterName: "",
       courseAndSet: "",
+      renterEmail: "",
       rentalStatus: "active",
       paymentStatus: "pending",
-      dateRented: new Date("2025-05-24"),
-      dateDue: new Date("2025-06-23"),
-      amount: 0,
+      dateRented: Date.now(),
+      dateDue: Date.now(),
     },
   })
 
@@ -51,7 +51,6 @@ export const CreateLockerRentForm = ({
       type: "select",
       label: "Select Locker",
       placeholder: "Choose an available locker",
-      description: "Select from available lockers",
       options:
         lockersResponse?.data.map((locker) => ({
           label: `${locker.lockerName} - ${locker.lockerLocation} (₱${locker.lockerRentalPrice})`,
@@ -64,7 +63,6 @@ export const CreateLockerRentForm = ({
       type: "text",
       label: "Student ID",
       placeholder: "Enter student ID number",
-      description: "University student identification number",
       required: true,
     },
     {
@@ -72,7 +70,6 @@ export const CreateLockerRentForm = ({
       type: "text",
       label: "Student Name",
       placeholder: "Enter full name of student",
-      description: "Complete name of the renter",
       required: true,
     },
     {
@@ -84,11 +81,17 @@ export const CreateLockerRentForm = ({
       required: true,
     },
     {
+      name: "renterEmail",
+      type: "email",
+      label: "Student Email",
+      placeholder: "Enter student email address",
+      required: true,
+    },
+    {
       name: "rentalStatus",
       type: "select",
       label: "Rental Status",
       placeholder: "Select rental status",
-      description: "Current status of the rental",
       options: [
         { label: "Active", value: "active" },
         { label: "Pending", value: "pending" },
@@ -102,7 +105,6 @@ export const CreateLockerRentForm = ({
       type: "select",
       label: "Payment Status",
       placeholder: "Select payment status",
-      description: "Current payment status",
       options: [
         { label: "Paid", value: "paid" },
         { label: "Pending", value: "pending" },
@@ -116,7 +118,6 @@ export const CreateLockerRentForm = ({
       type: "date",
       label: "Rental Start Date",
       placeholder: "Select start date",
-      description: "When the rental period begins",
       required: true,
     },
     {
@@ -124,15 +125,6 @@ export const CreateLockerRentForm = ({
       type: "date",
       label: "Rental Due Date",
       placeholder: "Select due date",
-      description: "When the rental period ends",
-      required: true,
-    },
-    {
-      name: "amount",
-      type: "currency",
-      label: "Rental Amount",
-      placeholder: "Enter rental amount",
-      description: "Total amount for the rental period",
       required: true,
     },
   ]

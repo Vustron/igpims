@@ -3,7 +3,7 @@ import { api } from "@/backend/helpers/api-client"
 import { useSuspenseQuery } from "@tanstack/react-query"
 
 import type { QueryClient } from "@tanstack/react-query"
-import type { Locker } from "@/schemas/drizzle-schema"
+import type { Locker } from "@/schemas/locker"
 
 export async function findLockerById(id: string): Promise<Locker> {
   return api.get<Locker>("lockers/find-by-id", {

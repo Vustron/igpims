@@ -7,15 +7,18 @@ const withBundleAnalyzerConfig = withBundleAnalyzer({
 const ContentSecurityPolicy = `
     default-src 'self' vercel.live;
     script-src 'self' 'unsafe-eval' 'unsafe-inline' cdn.vercel-insights.com vercel.live va.vercel-scripts.com upload-widget.cloudinary.com firestore.googleapis.com;
+    script-src-elem 'self' 'unsafe-inline' cdn.vercel-insights.com vercel.live va.vercel-scripts.com;
+    worker-src 'self' blob: data:;
+    child-src 'self' blob: data:;
     style-src 'self' 'unsafe-inline';
     img-src * blob: data:;
     media-src 'none';
-    connect-src 'self' firestore.googleapis.com firebasestorage.googleapis.com;
-    font-src 'self' data:;
-    frame-src 'self' *.codesandbox.io vercel.live upload-widget.cloudinary.com;
+    connect-src 'self' blob: data: firestore.googleapis.com firebasestorage.googleapis.com;
+    font-src 'self' data: https://fonts.gstatic.com;
+    frame-src 'self' blob: data: *.codesandbox.io vercel.live upload-widget.cloudinary.com;
     base-uri 'self';
     form-action 'self';
-    object-src 'self' data:;
+    object-src 'self' blob: data:;
     frame-ancestors 'none'
 `
   .replace(/\s{2,}/g, " ")
@@ -42,7 +45,7 @@ export const securityHeaders = [
   },
   {
     key: "X-Frame-Options",
-    value: "DENY",
+    value: "SAMEORIGIN",
   },
   {
     key: "X-XSS-Protection",
@@ -68,6 +71,32 @@ const nextConfig: import("next").NextConfig = {
       dynamic: 0,
       static: 180,
     },
+  },
+  serverExternalPackages: [ '@react-pdf/renderer' ],
+  webpack: (config, { isServer }) => {
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+      layers: true,
+    }
+
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+        stream: false,
+        canvas: false,
+      }
+    }
+
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: 'webassembly/async',
+    })
+
+    return config
   },
   turbopack: {
     rules: {

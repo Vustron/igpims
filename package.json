@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.126",
+  "version": "1.0.127",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -44,6 +44,7 @@
     "@radix-ui/react-tooltip": "1.2.7",
     "@radix-ui/react-visually-hidden": "1.2.3",
     "@react-email/components": "0.0.41",
+    "@react-pdf/renderer": "^4.3.0",
     "@t3-oss/env-nextjs": "0.13.4",
     "@tanstack/react-query": "5.76.2",
     "@tanstack/react-query-devtools": "5.76.2",

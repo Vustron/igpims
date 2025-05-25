@@ -30,6 +30,7 @@ const createRentalQuery = db
     renterName: sql`${sql.placeholder("renterName")}`,
     courseAndSet: sql`${sql.placeholder("courseAndSet")}`,
     rentalStatus: sql`${sql.placeholder("rentalStatus")}`,
+    renterEmail: sql`${sql.placeholder("renterEmail")}`,
     paymentStatus: sql`${sql.placeholder("paymentStatus")}`,
     dateRented: sql`${sql.placeholder("dateRented")}`,
     dateDue: sql`${sql.placeholder("dateDue")}`,
@@ -42,11 +43,13 @@ const updateRentalQuery = db
   .update(lockerRental)
   .set({
     renterId: sql`${sql.placeholder("renterId")}`,
-    renterName: sql`${sql.placeholder("studentName")}`,
+    renterName: sql`${sql.placeholder("renterName")}`,
     courseAndSet: sql`${sql.placeholder("courseAndSet")}`,
+    rentalStatus: sql`${sql.placeholder("rentalStatus")}`,
+    renterEmail: sql`${sql.placeholder("renterEmail")}`,
+    paymentStatus: sql`${sql.placeholder("paymentStatus")}`,
     dateRented: sql`${sql.placeholder("dateRented")}`,
     dateDue: sql`${sql.placeholder("dateDue")}`,
-    paymentStatus: sql`${sql.placeholder("paymentStatus")}`,
     updatedAt: sql`CURRENT_TIMESTAMP`,
   })
   .where(sql`${lockerRental.id} = ${sql.placeholder("id")}`)

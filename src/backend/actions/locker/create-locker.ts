@@ -91,8 +91,8 @@ export const useCreateLocker = () => {
       )
     },
     onSettled: () => {
-      // queryClient.invalidateQueries({ queryKey: [ "lockers" ] })
-      // queryClient.invalidateQueries({ queryKey: [ "lockers-infinite" ] })
+      queryClient.invalidateQueries({ queryKey: ["lockers"] })
+      queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] })
     },
     onError: (error) => catchError(error),
   })

@@ -137,6 +137,7 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
             <PopoverTrigger asChild>
               <div className="relative">
                 <Button
+                  type="button"
                   variant="outline"
                   className={cn(
                     "peer h-12 w-full justify-start text-left font-normal",
@@ -203,6 +204,7 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
             <PopoverTrigger asChild>
               <div className="relative">
                 <Button
+                  type="button"
                   variant="outline"
                   className={cn(
                     "peer h-12 w-full justify-start text-left font-normal",
@@ -278,7 +280,6 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
           )}
         </div>
       )
-
     case "text":
     case "password":
     case "email":
