@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 import { motion } from "framer-motion"
+import toast from "react-hot-toast"
 
 import { useDialog } from "@/hooks/use-dialog"
 
@@ -39,28 +40,42 @@ export function TableActions<TData>({
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
 
+  const handleSendEmail = () => {
+    toast.promise(
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve("Emails sent successfully")
+        }, 1000)
+      }),
+      {
+        loading: <span className="animate-pulse">Sending emails...</span>,
+        success: "Emails sent successfully",
+        error: "Failed to send emails",
+      },
+    )
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {isIgp ||
-        (isLockerRental && (
-          <motion.div
-            key="email-button"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.2 }}
+      {(isIgp || isLockerRental) && (
+        <motion.div
+          key="email-button"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Button
+            size="sm"
+            variant="outline"
+            className="font-normal text-xs shadow-xs"
+            onClick={handleSendEmail}
           >
-            <Button
-              size="sm"
-              variant="outline"
-              className="font-normal text-xs shadow-xs"
-              onClick={() => onOpen("confirm")}
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              Send email
-            </Button>
-          </motion.div>
-        ))}
+            <Mail className="mr-2 h-4 w-4" />
+            Send email
+          </Button>
+        </motion.div>
+      )}
 
       <motion.div
         key="print-button"
@@ -80,26 +95,25 @@ export function TableActions<TData>({
         </Button>
       </motion.div>
 
-      {isLockerRental ||
-        (isUser && (
-          <motion.div
-            key="add-rent-button"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.2 }}
+      {(isLockerRental || isUser) && (
+        <motion.div
+          key="add-rent-button"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Button
+            size="sm"
+            variant="outline"
+            className="font-normal text-xs shadow-xs"
+            onClick={() => onOpen(isUser ? "createUser" : "createRent")}
           >
-            <Button
-              size="sm"
-              variant="outline"
-              className="font-normal text-xs shadow-xs"
-              onClick={() => onOpen(isUser ? "createUser" : "createRent")}
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              {isUser ? "Create user" : "Create rent"}
-            </Button>
-          </motion.div>
-        ))}
+            <PlusCircle className="mr-2 h-4 w-4" />
+            {isUser ? "Create user" : "Create rent"}
+          </Button>
+        </motion.div>
+      )}
 
       <motion.div
         key="refresh-button"

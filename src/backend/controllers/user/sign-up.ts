@@ -66,7 +66,7 @@ export async function signUpUser(
         name: validationResult.data.name,
         email: validationResult.data.email,
         emailVerified: false,
-        role: "user",
+        role: validationResult.data.role,
         userCreatedAt: new Date(timestamp),
         userUpdatedAt: new Date(timestamp),
       })

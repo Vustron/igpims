@@ -43,7 +43,7 @@ export const LockerClient = ({ id }: { id: string }) => {
         (locker?.lockerType as "small" | "medium" | "large" | "extra-large") ||
         "small",
       lockerName: locker?.lockerName || "",
-      lockerRentalPrice: locker?.lockerRentalPrice || 0,
+      lockerRentalPrice: String(locker?.lockerRentalPrice) || "100",
       rentalId: locker?.rental?.id || "",
       lockerId: locker?.rental?.lockerId || "",
       renterId: locker?.rental?.renterId || "",
@@ -61,45 +61,76 @@ export const LockerClient = ({ id }: { id: string }) => {
   const lockerConfigFields: FieldConfig<LockerConfig>[] = [
     {
       name: "lockerName",
-      label: "Locker Name",
       type: "text",
-      placeholder: "Enter the locker name",
-    },
-    {
-      name: "lockerLocation",
-      label: "Location",
-      type: "text",
-      placeholder: "Enter the locker location",
+      label: "Locker Name/Number",
+      placeholder: "Enter locker name or number",
+      description: "A unique identifier for the locker",
+      required: true,
     },
     {
       name: "lockerType",
-      label: "Size Type",
       type: "select",
-      placeholder: "Select the locker type",
+      label: "Locker Type",
+      placeholder: "Select locker type",
+      description: "The size or type of the locker",
       options: [
-        { value: "small", label: "Small" },
-        { value: "medium", label: "Medium" },
-        { value: "large", label: "Large" },
+        { label: "Small", value: "small" },
+        { label: "Large", value: "large" },
       ],
+      required: true,
+    },
+    {
+      name: "lockerLocation",
+      type: "select",
+      label: "Locker Location",
+      placeholder: "Select location (e.g., Building A, Floor 2)",
+      description: "Physical location of the locker",
+      options: [
+        {
+          label: "Academic Building 1st Floor (LEFT)",
+          value: "Academic Building 1st Floor (LEFT)",
+        },
+        {
+          label: "Academic Building 1st Floor (Right)",
+          value: "Academic Building 1st Floor (Right)",
+        },
+        {
+          label: "Academic Building 2nd Floor (Left)",
+          value: "Academic Building 2nd Floor (Left)",
+        },
+        {
+          label: "Academic Building 2nd Floor (Right)",
+          value: "Academic Building 2nd Floor (Right)",
+        },
+      ],
+      required: true,
     },
     {
       name: "lockerStatus",
-      label: "Locker Status",
       type: "select",
-      placeholder: "Select the locker status",
+      label: "Locker Status",
+      placeholder: "Select locker status",
+      description: "Current status of the locker",
       options: [
-        { value: "available", label: "Available" },
-        { value: "occupied", label: "Occupied" },
-        { value: "reserved", label: "Reserved" },
-        { value: "maintenance", label: "Under Maintenance" },
-        { value: "out-of-service", label: "Out of Service" },
+        { label: "Available", value: "available" },
+        { label: "Occupied", value: "occupied" },
+        { label: "Reserved", value: "reserved" },
+        { label: "Maintenance", value: "maintenance" },
+        { label: "Out of Service", value: "out-of-service" },
       ],
+      required: true,
     },
     {
       name: "lockerRentalPrice",
+      type: "select",
       label: "Rental Price",
-      type: "currency",
-      placeholder: "Enter the locker rental price",
+      placeholder: "Select the rental price",
+      description: "Monthly rental price for the locker",
+      options: [
+        { label: "100", value: "100" },
+        { label: "150", value: "150" },
+      ],
+      required: true,
     },
     ...(rental
       ? [
@@ -182,7 +213,12 @@ export const LockerClient = ({ id }: { id: string }) => {
   ]
 
   const handleSubmit = async (values: LockerConfig) => {
-    await toast.promise(updateLocker.mutateAsync(values), {
+    const formData = {
+      ...values,
+      lockerRentalPrice: Number.parseInt(values.lockerRentalPrice, 10),
+    }
+
+    await toast.promise(updateLocker.mutateAsync(formData), {
       loading: (
         <span className="animate-pulse">Updating locker information...</span>
       ),

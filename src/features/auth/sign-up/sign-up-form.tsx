@@ -37,6 +37,26 @@ const SignUpForm = ({ isOnAdmin, onSuccess, onError }: SignUpFormProps) => {
       placeholder: "Your email",
     },
     {
+      name: "role",
+      label: "Role",
+      type: "select",
+      placeholder: "Select user role",
+      options: [
+        { label: "Admin", value: "admin" },
+        { label: "User", value: "user" },
+        { label: "SSC President", value: "ssc_president" },
+        { label: "DPDM Secretary", value: "dpdm_secretary" },
+        { label: "DPDM Officers", value: "dpdm_officers" },
+        { label: "SSC Treasurer", value: "ssc_treasurer" },
+        { label: "SSC Auditor", value: "ssc_auditor" },
+        { label: "Chief Legislator", value: "chief_legislator" },
+        { label: "SSC Secretary", value: "ssc_secretary" },
+        { label: "Student", value: "student" },
+      ],
+      description: "Select the user's role and permissions",
+      required: true,
+    },
+    {
       name: "password",
       type: "password",
       label: "Password",
@@ -49,6 +69,7 @@ const SignUpForm = ({ isOnAdmin, onSuccess, onError }: SignUpFormProps) => {
     defaultValues: {
       name: "",
       email: "",
+      role: "user",
       password: "",
     },
   })

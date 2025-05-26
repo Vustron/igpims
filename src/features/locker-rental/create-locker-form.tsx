@@ -31,8 +31,8 @@ export const CreateLockerForm = ({
       lockerStatus: "available",
       lockerType: "small",
       lockerName: "",
-      lockerLocation: "",
-      lockerRentalPrice: 0,
+      lockerLocation: "Academic Building 1st Floor (LEFT)",
+      lockerRentalPrice: "100",
     },
   })
 
@@ -48,23 +48,39 @@ export const CreateLockerForm = ({
     {
       name: "lockerType",
       type: "select",
-      label: "Locker Size/Type",
+      label: "Locker Type",
       placeholder: "Select locker type",
       description: "The size or type of the locker",
       options: [
         { label: "Small", value: "small" },
-        { label: "Medium", value: "medium" },
         { label: "Large", value: "large" },
-        { label: "Extra Large", value: "extra-large" },
       ],
       required: true,
     },
     {
       name: "lockerLocation",
-      type: "text",
+      type: "select",
       label: "Locker Location",
-      placeholder: "Enter location (e.g., Building A, Floor 2)",
+      placeholder: "Select location (e.g., Building A, Floor 2)",
       description: "Physical location of the locker",
+      options: [
+        {
+          label: "Academic Building 1st Floor (LEFT)",
+          value: "Academic Building 1st Floor (LEFT)",
+        },
+        {
+          label: "Academic Building 1st Floor (Right)",
+          value: "Academic Building 1st Floor (Right)",
+        },
+        {
+          label: "Academic Building 2nd Floor (Left)",
+          value: "Academic Building 2nd Floor (Left)",
+        },
+        {
+          label: "Academic Building 2nd Floor (Right)",
+          value: "Academic Building 2nd Floor (Right)",
+        },
+      ],
       required: true,
     },
     {
@@ -84,10 +100,14 @@ export const CreateLockerForm = ({
     },
     {
       name: "lockerRentalPrice",
-      type: "currency",
+      type: "select",
       label: "Rental Price",
-      placeholder: "Enter price in PHP",
+      placeholder: "Select the rental price",
       description: "Monthly rental price for the locker",
+      options: [
+        { label: "100", value: "100" },
+        { label: "150", value: "150" },
+      ],
       required: true,
     },
   ]

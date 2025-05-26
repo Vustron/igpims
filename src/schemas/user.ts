@@ -13,6 +13,21 @@ export const signUpSchema = z.object({
     .email("Invalid email format")
     .min(1, "Email is required")
     .max(50, "Characters should not exceed 50"),
+  role: z
+    .enum([
+      "admin",
+      "user",
+      "ssc_president",
+      "dpdm_secretary",
+      "dpdm_officers",
+      "ssc_treasurer",
+      "ssc_auditor",
+      "chief_legislator",
+      "ssc_secretary",
+      "student",
+    ])
+    .default("user")
+    .optional(),
   password: z
     .string()
     .trim()
@@ -68,6 +83,22 @@ export const updateUserSchema = z.object({
     .max(50, "Characters should not exceed 50")
     .optional(),
   image: z.any(),
+  emailVerified: z.boolean().optional(),
+  role: z
+    .enum([
+      "admin",
+      "user",
+      "ssc_president",
+      "dpdm_secretary",
+      "dpdm_officers",
+      "ssc_treasurer",
+      "ssc_auditor",
+      "chief_legislator",
+      "ssc_secretary",
+      "student",
+    ])
+    .default("user")
+    .optional(),
   currentPassword: z
     .string()
     .trim()

@@ -14,6 +14,7 @@ export const ViolationList = () => {
         columns={violationListColumns}
         data={exampleViolations}
         placeholder="Search..."
+        isLockerRental
       />
     </div>
   )

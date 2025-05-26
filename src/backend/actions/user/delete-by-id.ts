@@ -105,8 +105,6 @@ export const useDeleteUserById = (id: string) => {
       )
 
       queryClient.removeQueries({ queryKey: ["user", id] })
-
-      router.back()
     },
     onError: (error, _variables, context) => {
       if (context?.previousUsers) {

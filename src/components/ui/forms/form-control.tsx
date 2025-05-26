@@ -95,20 +95,30 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
 
     case "switch":
       return (
-        <div className="flex items-center space-x-2">
-          <Switch
-            checked={formField.value}
-            onCheckedChange={(checked) => {
-              formField.onChange(checked)
-            }}
-            disabled={mutation?.isPending || disabled}
-          />
-          <FormLabel
-            htmlFor={field.name}
-            className="font-medium text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            {formField.value}
-          </FormLabel>
+        <div className="container space-y-2 rounded-lg border p-4 shadow-2xs">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <FormLabel
+                htmlFor={field.name}
+                className="font-medium text-sm leading-none"
+              >
+                {field.label}
+              </FormLabel>
+              {field.description && (
+                <p className="text-muted-foreground text-xs">
+                  {field.description}
+                </p>
+              )}
+            </div>
+            <Switch
+              id={field.name}
+              checked={formField.value}
+              onCheckedChange={(checked) => {
+                formField.onChange(checked)
+              }}
+              disabled={mutation?.isPending || disabled}
+            />
+          </div>
         </div>
       )
 

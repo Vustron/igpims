@@ -25,7 +25,20 @@ export const user = sqliteTable(
     email: text("email", { length: 100 }).notNull().unique(),
     emailVerified: integer("emailVerified", { mode: "boolean" }).notNull(),
     sessionExpired: integer("sessionExpired", { mode: "boolean" }).notNull(),
-    role: text("role", { enum: ["admin", "user"] })
+    role: text("role", {
+      enum: [
+        "admin",
+        "user",
+        "ssc_president",
+        "dpdm_secretary",
+        "dpdm_officers",
+        "ssc_treasurer",
+        "ssc_auditor",
+        "chief_legislator",
+        "ssc_secretary",
+        "student",
+      ],
+    })
       .notNull()
       .default("user"),
     image: text("image"),

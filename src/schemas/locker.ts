@@ -43,11 +43,7 @@ export const lockerSchema = z.object({
     .trim()
     .min(1, "Location is required")
     .max(50, "Characters should not exceed 50"),
-  lockerRentalPrice: z
-    .number()
-    .min(1, "Rental price must be a positive number")
-    .max(1000, "Rental price must be less than 1000")
-    .optional(),
+  lockerRentalPrice: z.any().optional(),
   rental: rentalSchema.nullable().optional(),
   rentalHistory: z.array(rentalSchema).optional(),
 })
@@ -78,11 +74,7 @@ export const lockerConfigSchema = z.object({
     .trim()
     .min(1, "Location is required")
     .max(50, "Characters should not exceed 50"),
-  lockerRentalPrice: z
-    .number()
-    .min(1, "Rental price must be a positive number")
-    .max(1000, "Rental price must be less than 1000")
-    .optional(),
+  lockerRentalPrice: z.any().optional(),
   rentalId: z.string().optional(),
   lockerId: z.string().optional(),
   renterId: z.string().optional(),

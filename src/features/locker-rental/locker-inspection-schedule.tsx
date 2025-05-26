@@ -11,6 +11,7 @@ export const LockerInspectionSchedule = () => {
         columns={violationListColumns}
         data={exampleLockerViolations}
         placeholder="Search..."
+        isLockerRental
       />
     </div>
   )

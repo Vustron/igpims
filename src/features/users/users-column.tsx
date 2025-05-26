@@ -22,9 +22,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/images"
 import { Button } from "@/components/ui/buttons"
 import { Badge } from "@/components/ui/badges"
 
+import { catchError } from "@/utils/catch-error"
+import toast from "react-hot-toast"
+
+import { useDeleteUserById } from "@/backend/actions/user/delete-by-id"
+import { useConfirm } from "@/hooks/use-confirm"
+import { useRouter } from "next-nprogress-bar"
+
 import type { ColumnDef } from "@tanstack/react-table"
 import type { User } from "@/schemas/drizzle-schema"
-import { useRouter } from "next-nprogress-bar"
 
 export const usersColumns: ColumnDef<User>[] = [
   {
@@ -104,26 +110,114 @@ export const usersColumns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => {
       const role = row.getValue("role") as string
+
+      const getRoleBadge = (role: string) => {
+        switch (role) {
+          case "admin":
+            return (
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-sm"
+              >
+                <Shield className="mr-1 h-3 w-3" />
+                Admin
+              </Badge>
+            )
+          case "ssc_president":
+            return (
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-sm"
+              >
+                <Shield className="mr-1 h-3 w-3" />
+                SSC President
+              </Badge>
+            )
+          case "dpdm_secretary":
+            return (
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-sm"
+              >
+                <Shield className="mr-1 h-3 w-3" />
+                DPDM Secretary
+              </Badge>
+            )
+          case "dpdm_officers":
+            return (
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-sm"
+              >
+                <Shield className="mr-1 h-3 w-3" />
+                DPDM Officers
+              </Badge>
+            )
+          case "ssc_treasurer":
+            return (
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-sm"
+              >
+                <Shield className="mr-1 h-3 w-3" />
+                SSC Treasurer
+              </Badge>
+            )
+          case "ssc_auditor":
+            return (
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-sm"
+              >
+                <Shield className="mr-1 h-3 w-3" />
+                SSC Auditor
+              </Badge>
+            )
+          case "chief_legislator":
+            return (
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-sm"
+              >
+                <Shield className="mr-1 h-3 w-3" />
+                Chief Legislator
+              </Badge>
+            )
+          case "ssc_secretary":
+            return (
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-sm"
+              >
+                <Shield className="mr-1 h-3 w-3" />
+                SSC Secretary
+              </Badge>
+            )
+          case "student":
+            return (
+              <Badge
+                variant="outline"
+                className="border-blue-300 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700"
+              >
+                <UserIcon className="mr-1 h-3 w-3" />
+                Student
+              </Badge>
+            )
+          default:
+            return (
+              <Badge
+                variant="secondary"
+                className="border border-gray-300 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700"
+              >
+                <UserIcon className="mr-1 h-3 w-3" />
+                User
+              </Badge>
+            )
+        }
+      }
+
       return (
-        <div className="flex items-center space-x-2">
-          {role === "admin" ? (
-            <Badge
-              variant="default"
-              className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-sm"
-            >
-              <Shield className="mr-1 h-3 w-3" />
-              Admin
-            </Badge>
-          ) : (
-            <Badge
-              variant="secondary"
-              className="border border-gray-300 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700"
-            >
-              <UserIcon className="mr-1 h-3 w-3" />
-              User
-            </Badge>
-          )}
-        </div>
+        <div className="flex items-center space-x-2">{getRoleBadge(role)}</div>
       )
     },
   },
@@ -171,6 +265,23 @@ export const usersColumns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const id = row.original.id
       const router = useRouter()
+      const deleteUser = useDeleteUserById(id)
+      const confirm = useConfirm()
+
+      const handleDelete = async () => {
+        const confirmed = confirm(
+          "Delete User",
+          "Are you sure you want to delete this user? This action cannot be undone.",
+        )
+
+        if (await confirmed) {
+          await toast.promise(deleteUser.mutateAsync(), {
+            loading: <span className="animate-pulse">Deleting user...</span>,
+            success: "User deleted",
+            error: (error: unknown) => catchError(error),
+          })
+        }
+      }
       return (
         <div className="mr-3 flex items-center justify-center">
           <DropdownMenu>
@@ -192,7 +303,10 @@ export const usersColumns: ColumnDef<User>[] = [
                 <span className="font-medium">Edit</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={handleDelete}
+              >
                 <Trash2 className="mr-2 h-4 w-4" />
                 <span className="font-medium">Delete</span>
               </DropdownMenuItem>

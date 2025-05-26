@@ -91,7 +91,8 @@ export async function updateUserInfo(
       if (
         validationResult.data.name ||
         validationResult.data.email ||
-        validationResult.data.image !== undefined
+        validationResult.data.image !== undefined ||
+        validationResult.data.emailVerified !== undefined
       ) {
         const imageValue =
           !validationResult.data.image || validationResult.data.image === ""
@@ -107,7 +108,12 @@ export async function updateUserInfo(
           name: validationResult.data.name || userData.name,
           email: validationResult.data.email || userData.email,
           image: imageValue,
-          emailVerified: isEmailChanged ? false : userData.emailVerified,
+          emailVerified:
+            validationResult.data.emailVerified !== undefined
+              ? validationResult.data.emailVerified
+              : isEmailChanged
+                ? false
+                : userData.emailVerified,
           updatedAt: new Date(),
         })
       }
