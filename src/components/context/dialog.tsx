@@ -3,6 +3,7 @@
 import {
   ConfirmDialog,
   CreateIgpDialog,
+  CreateUserDialog,
   VerifyUserDialog,
   CreateLockerDialog,
   SessionExpiredDialog,
@@ -32,6 +33,7 @@ export const DialogProvider = () => {
       <CreateFundRequestDialog />
       <CreateProjectRequestDialog />
       <CreateLockerRentDialog />
+      <CreateUserDialog />
     </>
   )
 }

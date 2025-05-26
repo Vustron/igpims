@@ -25,12 +25,10 @@ export const SalesReportClient = () => {
   )
   const [searchTerm, setSearchTerm] = useState("")
 
-  // Process and memoize data for charts and summaries
   const processedData = useMemo(() => {
     return processSalesData(salesData, searchTerm, timeRange)
   }, [salesData, searchTerm, timeRange])
 
-  // Format currency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-PH", {
       style: "currency",

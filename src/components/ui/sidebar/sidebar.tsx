@@ -20,7 +20,7 @@ export const Sidebar = () => {
       )}
     >
       <SidebarToggle isOpen={sidebar?.isOpen} setIsOpen={sidebar?.setIsOpen} />
-      <div className="relative flex h-full flex-col overflow-y-auto px-3 py-4 shadow-md dark:shadow-zinc-800">
+      <div className="relative flex h-full flex-col overflow-y-auto bg-[#4A4520] px-3 py-4 shadow-md ">
         <Button
           className={cn(
             "mb-1 transition-all duration-300 ease-in-out",

@@ -12,6 +12,7 @@ export type DialogType =
   | "createIgp"
   | "createFundRequest"
   | "createProjectRequest"
+  | "createUser"
 
 interface ConfirmDialogData {
   title?: string

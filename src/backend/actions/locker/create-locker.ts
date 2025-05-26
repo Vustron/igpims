@@ -4,7 +4,7 @@ import { lockerSchema } from "@/schemas/locker"
 import { sanitizer } from "@/utils/sanitizer"
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-// import { useRouter } from "next-nprogress-bar"
+import { useRouter } from "next-nprogress-bar"
 
 import type { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
 import type { Locker as LockerType } from "@/schemas/locker"
@@ -16,33 +16,45 @@ export async function createLocker(payload: LockerType): Promise<Locker> {
 
 export const useCreateLocker = () => {
   const queryClient = useQueryClient()
-  // const router = useRouter()
+  const router = useRouter()
 
   return useMutation({
-    mutationKey: ["create-locker"],
+    mutationKey: [ "create-locker" ],
     mutationFn: async (payload: LockerType) => {
       const sanitizedData = sanitizer<LockerType>(payload, lockerSchema)
       return await createLocker(sanitizedData)
     },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: [ "lockers" ] })
+      await queryClient.cancelQueries({ queryKey: [ "lockers-infinite" ] })
 
+      const previousLockers = queryClient.getQueryData([ "lockers" ])
+      const previousLockersInfinite = queryClient.getQueryData([ "lockers-infinite" ])
+
+      return {
+        previousLockers,
+        previousLockersInfinite,
+      }
+    },
     onSuccess: async (newLocker: Locker) => {
-      await queryClient.cancelQueries({ queryKey: ["lockers"] })
-
       queryClient.setQueriesData<PaginatedLockersResponse>(
-        { queryKey: ["lockers"] },
+        { queryKey: [ "lockers" ] },
         (oldData) => {
-          if (!oldData || !oldData.meta) return undefined
+          if (!oldData?.data) return oldData
 
           if (oldData.meta.page === 1) {
+            const updatedData = [ newLocker, ...oldData.data.slice(0, oldData.meta.limit - 1) ]
+            const newTotalItems = oldData.meta.totalItems + 1
+
             return {
               ...oldData,
-              data: [newLocker, ...oldData.data],
+              data: updatedData,
               meta: {
                 ...oldData.meta,
-                totalItems: oldData.meta.totalItems + 1,
-                totalPages: Math.ceil(
-                  (oldData.meta.totalItems + 1) / oldData.meta.limit,
-                ),
+                totalItems: newTotalItems,
+                totalPages: Math.ceil(newTotalItems / oldData.meta.limit),
+                hasNextPage: oldData.meta.page < Math.ceil(newTotalItems / oldData.meta.limit),
+                hasPrevPage: oldData.meta.page > 1,
               },
             }
           }
@@ -52,48 +64,55 @@ export const useCreateLocker = () => {
             meta: {
               ...oldData.meta,
               totalItems: oldData.meta.totalItems + 1,
-              totalPages: Math.ceil(
-                (oldData.meta.totalItems + 1) / oldData.meta.limit,
-              ),
+              totalPages: Math.ceil((oldData.meta.totalItems + 1) / oldData.meta.limit),
             },
           }
         },
       )
 
       queryClient.setQueriesData(
-        { queryKey: ["lockers-infinite"] },
+        { queryKey: [ "lockers-infinite" ] },
         (oldData: any) => {
-          if (!oldData || !oldData.pages) return undefined
+          if (!oldData?.pages) return oldData
 
-          const pages = oldData.pages || []
-          if (pages.length === 0) return oldData
+          const updatedPages = [ ...oldData.pages ]
 
-          if (!pages[0] || !pages[0].meta) return oldData
+          if (updatedPages.length > 0 && updatedPages[ 0 ]?.data) {
+            const firstPage = { ...updatedPages[ 0 ] }
+            const newTotalItems = firstPage.meta.totalItems + 1
 
-          const newPages = [...pages]
-          newPages[0] = {
-            ...newPages[0],
-            data: [newLocker, ...newPages[0].data],
-            meta: {
-              ...newPages[0].meta,
-              totalItems: newPages[0].meta.totalItems + 1,
-              totalPages: Math.ceil(
-                (newPages[0].meta.totalItems + 1) / newPages[0].meta.limit,
-              ),
-            },
+            updatedPages[ 0 ] = {
+              ...firstPage,
+              data: [ newLocker, ...firstPage.data ],
+              meta: {
+                ...firstPage.meta,
+                totalItems: newTotalItems,
+                totalPages: Math.ceil(newTotalItems / firstPage.meta.limit),
+                hasNextPage: firstPage.meta.page < Math.ceil(newTotalItems / firstPage.meta.limit),
+                hasPrevPage: firstPage.meta.page > 1,
+              },
+            }
           }
 
           return {
             ...oldData,
-            pages: newPages,
+            pages: updatedPages,
           }
         },
       )
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["lockers"] })
-      queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] })
+    onError: (error, _variables, context) => {
+      if (context?.previousLockers) {
+        queryClient.setQueryData([ "lockers" ], context.previousLockers)
+      }
+      if (context?.previousLockersInfinite) {
+        queryClient.setQueryData([ "lockers-infinite" ], context.previousLockersInfinite)
+      }
+
+      catchError(error)
     },
-    onError: (error) => catchError(error),
+    onSettled: () => {
+      router.refresh()
+    },
   })
 }

@@ -33,9 +33,6 @@ export const UserClient = ({ id }: UserClientProps) => {
 
   useEffect(() => {
     if (user && !isLoading) {
-      if (!user.emailVerified) {
-        onOpen("needVerifyUser")
-      }
       if (user.sessionExpired) {
         onOpen("sessionExpired")
       }

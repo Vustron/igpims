@@ -1,6 +1,8 @@
+import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
 import { ContentLayout } from "@/features/layouts/content-layout"
 import { DashboardClient } from "@/features/dashboard/client"
 
+import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -8,8 +10,10 @@ export const metadata: Metadata = {
 }
 
 export default async function DashboardPage() {
+  const dashboardItems: BreadcrumbItemProps[] = [{ label: "Dashboard" }]
   return (
     <ContentLayout title="Dashboard">
+      <DynamicBreadcrumb items={dashboardItems} />
       <DashboardClient />
     </ContentLayout>
   )

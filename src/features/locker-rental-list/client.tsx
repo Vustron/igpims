@@ -155,6 +155,7 @@ export const LockerRentalListClient = () => {
         onGoToNextPage={goToNextPage}
         onGoToLastPage={goToLastPage}
         onGoToPage={goToPage}
+        resultLabel="rentals"
       />
     </div>
   )

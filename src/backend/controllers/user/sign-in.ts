@@ -1,7 +1,7 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as sessionQuery from "@/backend/queries/session"
-// import { handleOTP } from "@/backend/helpers/handle-otp"
+import { handleOTP } from "@/backend/helpers/handle-otp"
 import * as userQuery from "@/backend/queries/user"
 import { requestJson } from "@/utils/request-json"
 import { catchError } from "@/utils/catch-error"
@@ -47,8 +47,8 @@ export async function signInUser(
 
       if (result.length > 0) {
         existingUser = {
-          user: result[0]?.user as User,
-          accounts: [result[0]?.accounts as Account],
+          user: result[ 0 ]?.user as User,
+          accounts: [ result[ 0 ]?.accounts as Account ],
         }
       }
     })
@@ -60,16 +60,27 @@ export async function signInUser(
       )
     }
 
-    if (!existingUser.accounts[0]?.password) {
+    if (!existingUser.accounts[ 0 ]?.password) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 },
       )
     }
 
-    if (existingUser.accounts[0].otpSignIn) {
-      // await handleOTP(existingUser.user)
-      return NextResponse.json(existingUser.accounts[0], { status: 200 })
+    if (!existingUser.user.emailVerified) {
+      return NextResponse.json(
+        {
+          error: "Account is still verifying. Please contact the Student Council President for further updates on your verification status.",
+          needsVerification: true,
+          userId: existingUser.user.id
+        },
+        { status: 403 },
+      )
+    }
+
+    if (existingUser.accounts[ 0 ].otpSignIn) {
+      await handleOTP(existingUser.user)
+      return NextResponse.json(existingUser.accounts[ 0 ], { status: 200 })
     }
 
     const pepper = env.SECRET_KEY
@@ -77,7 +88,7 @@ export async function signInUser(
 
     const isValidPassword = await compare(
       pepperPassword,
-      existingUser.accounts[0].password,
+      existingUser.accounts[ 0 ].password,
     )
 
     if (!isValidPassword) {
@@ -135,7 +146,7 @@ export async function signInUser(
     })
 
     return NextResponse.json(
-      { otpSignIn: existingUser.accounts[0].otpSignIn },
+      { otpSignIn: existingUser.accounts[ 0 ].otpSignIn },
       { status: 201 },
     )
   } catch (error) {

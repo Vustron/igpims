@@ -6,8 +6,9 @@ import { sanitizer } from "@/utils/sanitizer"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
-import type { LockerConfig } from "@/schemas/locker"
+import type { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
 import type { Locker } from "@/schemas/drizzle-schema"
+import type { LockerConfig } from "@/schemas/locker"
 
 export async function updateLocker(
   id: string,
@@ -27,7 +28,7 @@ export const useUpdateLocker = (id: string) => {
   const router = useRouter()
 
   return useMutation({
-    mutationKey: ["update-locker", id],
+    mutationKey: [ "update-locker", id ],
     mutationFn: async (payload: Partial<LockerConfig>) => {
       const sanitizedData = sanitizer<Partial<LockerConfig>>(
         payload,
@@ -35,93 +36,128 @@ export const useUpdateLocker = (id: string) => {
       )
       return await updateLocker(id, sanitizedData)
     },
-    onMutate: async (payload: Partial<LockerConfig>) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ["locker", id] })
-      await queryClient.cancelQueries({ queryKey: ["lockers"] })
-      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: [ "locker", id ] })
+      await queryClient.cancelQueries({ queryKey: [ "lockers" ] })
+      await queryClient.cancelQueries({ queryKey: [ "lockers-infinite" ] })
+      await queryClient.cancelQueries({ queryKey: [ "locker-rentals" ] })
+      await queryClient.cancelQueries({ queryKey: [ "locker-rentals-infinite" ] })
 
-      // Snapshot the previous values
-      const previousLocker = queryClient.getQueryData<Locker>(["locker", id])
-      const previousLockers = queryClient.getQueryData(["lockers"])
+      const previousLocker = queryClient.getQueryData<Locker>([ "locker", id ])
+      const previousLockers = queryClient.getQueryData([ "lockers" ])
       const previousLockersInfinite = queryClient.getQueryData([
         "lockers-infinite",
       ])
+      const previousRentals = queryClient.getQueryData([ "locker-rentals" ])
+      const previousRentalsInfinite = queryClient.getQueryData([
+        "locker-rentals-infinite",
+      ])
 
-      // Optimistically update the single locker
-      if (previousLocker) {
-        const optimisticLocker: Locker = {
-          ...previousLocker,
-          ...payload,
-          updatedAt: new Date(),
-        }
-        queryClient.setQueryData(["locker", id], optimisticLocker)
-      }
-
-      // Optimistically update the lockers list
-      if (previousLockers && Array.isArray(previousLockers)) {
-        const updatedLockers = previousLockers.map((locker: Locker) =>
-          locker.id === id
-            ? { ...locker, ...payload, updatedAt: new Date() }
-            : locker,
-        )
-        queryClient.setQueryData(["lockers"], updatedLockers)
-      }
-
-      // Optimistically update infinite queries
-      if (previousLockersInfinite) {
-        queryClient.setQueryData(["lockers-infinite"], (old: any) => {
-          if (!old) return old
-
-          return {
-            ...old,
-            pages: old.pages.map((page: any) => ({
-              ...page,
-              data: page.data.map((locker: Locker) =>
-                locker.id === id
-                  ? { ...locker, ...payload, updatedAt: new Date() }
-                  : locker,
-              ),
-            })),
-          }
-        })
-      }
-
-      // Return context for rollback
       return {
         previousLocker,
         previousLockers,
         previousLockersInfinite,
+        previousRentals,
+        previousRentalsInfinite,
       }
     },
     onSuccess: async (updatedLocker: Locker) => {
-      queryClient.setQueryData(["locker", id], updatedLocker)
+      queryClient.setQueryData([ "locker", id ], updatedLocker)
 
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["rentals"] }),
-        queryClient.invalidateQueries({ queryKey: ["rentals-infinite"] }),
-      ])
+      queryClient.setQueriesData<PaginatedLockersResponse>(
+        { queryKey: [ "lockers" ] },
+        (oldData) => {
+          if (!oldData?.data) return oldData
+
+          return {
+            ...oldData,
+            data: oldData.data.map((locker) =>
+              locker.id === id ? updatedLocker : locker,
+            ),
+          }
+        },
+      )
+
+      queryClient.setQueriesData(
+        { queryKey: [ "lockers-infinite" ] },
+        (oldData: any) => {
+          if (!oldData?.pages) return oldData
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: PaginatedLockersResponse) => ({
+              ...page,
+              data: page.data.map((locker) =>
+                locker.id === id ? updatedLocker : locker,
+              ),
+            })),
+          }
+        },
+      )
+
+      if (updatedLocker.lockerStatus) {
+        queryClient.setQueriesData(
+          { queryKey: [ "locker-rentals" ] },
+          (oldData: any) => {
+            if (!oldData?.data) return oldData
+
+            return {
+              ...oldData,
+              data: oldData.data.map((rental: any) =>
+                rental.lockerId === id
+                  ? { ...rental, locker: updatedLocker }
+                  : rental,
+              ),
+            }
+          },
+        )
+
+        queryClient.setQueriesData(
+          { queryKey: [ "locker-rentals-infinite" ] },
+          (oldData: any) => {
+            if (!oldData?.pages) return oldData
+
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                data: page.data.map((rental: any) =>
+                  rental.lockerId === id
+                    ? { ...rental, locker: updatedLocker }
+                    : rental,
+                ),
+              })),
+            }
+          },
+        )
+      }
     },
     onError: (error, _payload, context) => {
       if (context?.previousLocker) {
-        queryClient.setQueryData(["locker", id], context.previousLocker)
+        queryClient.setQueryData([ "locker", id ], context.previousLocker)
       }
       if (context?.previousLockers) {
-        queryClient.setQueryData(["lockers"], context.previousLockers)
+        queryClient.setQueryData([ "lockers" ], context.previousLockers)
       }
       if (context?.previousLockersInfinite) {
         queryClient.setQueryData(
-          ["lockers-infinite"],
+          [ "lockers-infinite" ],
           context.previousLockersInfinite,
+        )
+      }
+      if (context?.previousRentals) {
+        queryClient.setQueryData([ "locker-rentals" ], context.previousRentals)
+      }
+      if (context?.previousRentalsInfinite) {
+        queryClient.setQueryData(
+          [ "locker-rentals-infinite" ],
+          context.previousRentalsInfinite,
         )
       }
 
       catchError(error)
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["locker", id] })
-      queryClient.invalidateQueries({ queryKey: ["lockers"] })
-      queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] })
       router.push("/locker-rental")
     },
   })

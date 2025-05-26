@@ -85,27 +85,22 @@ export function getMenuList(pathname: string): Group[] {
           icon: RiFileList3Fill,
           submenus: [],
         },
-      ],
-    },
-    {
-      groupLabel: "Reporting & Analysis",
-      menus: [
         {
-          href: "/sales-report",
-          label: "Sales Report",
-          active: pathname.includes("/sales-report"),
+          href: "/report",
+          label: "Report",
+          active: pathname.includes("/report"),
           icon: IoBarChartSharp,
           submenus: [],
         },
       ],
     },
     {
-      groupLabel: "User & Management",
+      groupLabel: "User Management",
       menus: [
         {
-          href: "/user",
-          label: "User",
-          active: pathname.includes("/user"),
+          href: "/users",
+          label: "Users",
+          active: pathname.includes("/users"),
           icon: User,
           submenus: [],
         },

@@ -40,7 +40,7 @@ export async function createLocker(
       const result = await lockerQuery.getLockerByNameQuery.execute({
         name: lockerName,
       })
-      return result[0]
+      return result[ 0 ]
     })
 
     if (existingLocker) {
@@ -51,8 +51,10 @@ export async function createLocker(
     }
 
     const newLocker = await db.transaction(async (_tx) => {
-      const result = await lockerQuery.createLockerQuery.execute({
-        id: nanoid(),
+      const lockerId = nanoid()
+
+      await lockerQuery.createLockerQuery.execute({
+        id: lockerId,
         lockerStatus: validationResult.data.lockerStatus || "available",
         lockerType: validationResult.data.lockerType || "small",
         lockerName: validationResult.data.lockerName,
@@ -62,11 +64,15 @@ export async function createLocker(
         updatedAt: new Date(),
       })
 
-      if (!result) {
+      const result = await lockerQuery.getLockerByIdQuery.execute({
+        id: lockerId,
+      })
+
+      if (!result || !result[ 0 ]) {
         throw new Error("Failed to create the locker")
       }
 
-      return result
+      return result[ 0 ]
     })
 
     return NextResponse.json(newLocker, { status: 201 })

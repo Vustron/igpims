@@ -1,5 +1,6 @@
 import { TailwindIndicator } from "@/components/context/tailwind-indicator"
 import { ProgressBarProvider } from "@/components/context/progress-bar"
+
 import { DialogProvider } from "@/components/context/dialog"
 import { ThemeProvider } from "@/components/context/themes"
 import { QueryProvider } from "@/components/context/query"

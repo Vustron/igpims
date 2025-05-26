@@ -16,6 +16,7 @@ interface DynamicResultsSummaryProps {
   totalPages: number
   limit: number
   onPageSizeChange: (newLimit: number) => void
+  resultLabel: string
 }
 
 export const DynamicResultsSummary = ({
@@ -26,11 +27,12 @@ export const DynamicResultsSummary = ({
   totalPages,
   limit,
   onPageSizeChange,
+  resultLabel,
 }: DynamicResultsSummaryProps) => {
   return (
     <div className="flex items-center justify-between text-muted-foreground text-sm">
       <div>
-        Showing {currentDataLength} of {totalItems} rentals
+        Showing {currentDataLength} of {totalItems} {resultLabel}
         {activeFiltersCount > 0 && (
           <span className="ml-1">
             (filtered by {activeFiltersCount} criteria)

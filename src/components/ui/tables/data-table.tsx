@@ -14,9 +14,9 @@ import {
   DynamicPaginationControls,
 } from "@/components/ui/tables"
 import { History } from "lucide-react"
+import { TableActions } from "@/components/ui/tables/table-actions"
 import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
 import { EmptyState, Skeleton } from "@/components/ui/fallbacks"
-import { TableActions } from "./table-actions"
 
 import { useReactTable } from "@tanstack/react-table"
 import { useMemo, useState } from "react"
@@ -71,6 +71,9 @@ interface DataTableProps<TData, TValue> {
   onGoToNextPage?: () => void
   onGoToLastPage?: () => void
   onGoToPage?: (page: number) => void
+  isOnUsers?: boolean
+  filterType?: "rental" | "user"
+  resultLabel?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -107,6 +110,9 @@ export function DataTable<TData, TValue>({
   onGoToNextPage,
   onGoToLastPage,
   onGoToPage,
+  filterType,
+  resultLabel,
+  isOnUsers,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -152,6 +158,7 @@ export function DataTable<TData, TValue>({
           <DynamicSearchHeader
             searchValue={searchValue}
             onSearchChange={onSearchChange}
+            searchPlaceholder={placeholder}
             onToggleFilters={onToggleFilters}
             activeFiltersCount={activeFiltersCount}
             onRefetch={onRefetch!}
@@ -159,6 +166,7 @@ export function DataTable<TData, TValue>({
             isIgp={isIgp}
             isLockerRental={isLockerRental}
             table={table}
+            isUser={isOnUsers}
           />
         )}
 
@@ -171,9 +179,10 @@ export function DataTable<TData, TValue>({
             <DynamicFiltersPanel
               filters={filters}
               activeFiltersCount={activeFiltersCount}
-              onUpdateFilters={onUpdateFilters}
-              onResetFilters={onResetFilters}
-              onClose={onClose}
+              onUpdateFilters={onUpdateFilters!}
+              onResetFilters={onResetFilters!}
+              onClose={onClose!}
+              filterType={filterType}
             />
           )}
 
@@ -187,6 +196,7 @@ export function DataTable<TData, TValue>({
             totalPages={totalPages}
             limit={limit}
             onPageSizeChange={onPageSizeChange}
+            resultLabel={resultLabel!}
           />
         )}
 
@@ -221,7 +231,6 @@ export function DataTable<TData, TValue>({
               <AnimatePresence mode="wait">
                 <TableBody>
                   {isLoading ? (
-                    // Loading skeleton rows
                     Array.from({ length: 5 }).map((_, index) => (
                       <TableRow key={`skeleton-${index}`}>
                         {columns.map((_, colIndex) => (

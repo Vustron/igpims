@@ -45,9 +45,6 @@ export const UserButton = () => {
 
   useEffect(() => {
     if (user && !isLoading) {
-      if (!user.emailVerified) {
-        onOpen("needVerifyUser")
-      }
       if (user.sessionExpired) {
         onOpen("sessionExpired")
       }
@@ -120,7 +117,7 @@ export const UserButton = () => {
         <DropdownMenuGroup>
           <DropdownMenuItem className="p-0 focus:bg-transparent">
             <Link
-              href="/user"
+              href="/current-user"
               className="flex w-full items-center rounded px-2 py-1.5 text-white hover:bg-[#2E2B16] hover:font-bold"
             >
               <UserCog className="mr-3 size-4 text-white" />

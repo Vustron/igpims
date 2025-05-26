@@ -7,9 +7,17 @@ import type { NextRequest } from "next/server"
 
 export const protectedRoutes: string[] = [
   "/",
-  "/user",
+  "/current-user",
   "/locker-rental",
-  "/locker",
+  "/water-vendo",
+  "/other-igps",
+  "/other-igps/*",
+  "/fund-request",
+  "/notification",
+  "/project-approval",
+  "/report",
+  "/users",
+  "/users/*"
 ]
 export const authRoutes: string[] = [
   "/sign-in",

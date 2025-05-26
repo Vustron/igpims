@@ -26,6 +26,7 @@ interface TableActionsProps<TData> {
   onRefetch: () => void
   isFetching: boolean
   table: Table<TData>
+  isUser?: boolean
 }
 
 export function TableActions<TData>({
@@ -34,30 +35,32 @@ export function TableActions<TData>({
   onRefetch,
   isFetching,
   table,
+  isUser,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {isIgp && (
-        <motion.div
-          key="email-button"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Button
-            size="sm"
-            variant="outline"
-            className="font-normal text-xs shadow-xs"
-            onClick={() => onOpen("confirm")}
+      {isIgp ||
+        (isLockerRental && (
+          <motion.div
+            key="email-button"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.2 }}
           >
-            <Mail className="mr-2 h-4 w-4" />
-            Send email
-          </Button>
-        </motion.div>
-      )}
+            <Button
+              size="sm"
+              variant="outline"
+              className="font-normal text-xs shadow-xs"
+              onClick={() => onOpen("confirm")}
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              Send email
+            </Button>
+          </motion.div>
+        ))}
 
       <motion.div
         key="print-button"
@@ -77,8 +80,8 @@ export function TableActions<TData>({
         </Button>
       </motion.div>
 
-      {isLockerRental && (
-        <>
+      {isLockerRental ||
+        (isUser && (
           <motion.div
             key="add-rent-button"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -90,34 +93,33 @@ export function TableActions<TData>({
               size="sm"
               variant="outline"
               className="font-normal text-xs shadow-xs"
-              onClick={() => onOpen("createRent")}
+              onClick={() => onOpen(isUser ? "createUser" : "createRent")}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
-              Create Rent
+              {isUser ? "Create user" : "Create rent"}
             </Button>
           </motion.div>
+        ))}
 
-          <motion.div
-            key="refresh-button"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.2, delay: 0.1 }}
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRefetch}
-              disabled={isFetching}
-            >
-              <RefreshCw
-                className={`mr-1 h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
-          </motion.div>
-        </>
-      )}
+      <motion.div
+        key="refresh-button"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.2, delay: 0.1 }}
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onRefetch}
+          disabled={isFetching}
+        >
+          <RefreshCw
+            className={`mr-1 h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+          />
+          Refresh
+        </Button>
+      </motion.div>
 
       <motion.div
         key="view-button"

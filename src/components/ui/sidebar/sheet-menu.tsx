@@ -27,7 +27,7 @@ export const SheetMenu = () => {
         </Button>
       </SheetTrigger>
       <SheetContent
-        className="flex h-full flex-col overflow-y-auto px-3 py-4 shadow-md sm:w-72 dark:shadow-zinc-800"
+        className="flex h-full flex-col overflow-y-auto bg-[#4A4520] px-3 py-4 shadow-md sm:w-72 "
         side="left"
       >
         <SheetHeader>

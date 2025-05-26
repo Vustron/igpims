@@ -12,8 +12,15 @@ import { useForm } from "react-hook-form"
 
 import type { FieldConfig } from "@/interfaces/form"
 import type { SignUpPayload } from "@/schemas/user"
+import { cn } from "@/utils/cn"
 
-const SignUpForm = () => {
+interface SignUpFormProps {
+  isOnAdmin?: boolean
+  onSuccess?: () => void
+  onError?: () => void
+}
+
+const SignUpForm = ({ isOnAdmin, onSuccess, onError }: SignUpFormProps) => {
   const signUp = useSignUpUser()
 
   const signInFields: FieldConfig<SignUpPayload>[] = [
@@ -53,6 +60,12 @@ const SignUpForm = () => {
       error: (error: unknown) => catchError(error),
     })
     form.reset()
+
+    if (signUp.isSuccess) {
+      onSuccess?.()
+    } else {
+      onError?.()
+    }
   }
 
   return (
@@ -63,7 +76,11 @@ const SignUpForm = () => {
       submitButtonTitle="Sign Up"
       mutation={signUp}
       isSignUp
-      submitButtonClassname="w-full bg-amber-300 text-black hover:bg-amber-400 focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-[#222216] disabled:cursor-not-allowed disabled:opacity-50"
+      submitButtonClassname={cn(
+        isOnAdmin
+          ? "w-full bg-amber-300 text-black hover:bg-amber-400 focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-[#222216] disabled:cursor-not-allowed disabled:opacity-50"
+          : "",
+      )}
     />
   )
 }
