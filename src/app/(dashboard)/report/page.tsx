@@ -1,5 +1,5 @@
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
-import { SalesReportClient } from "@/features/sales-report/client"
+import { ReportClient } from "@/features/report/client"
 import { ContentLayout } from "@/features/layouts/content-layout"
 
 import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
@@ -17,7 +17,7 @@ export default async function SalesReportPage() {
   return (
     <ContentLayout title="Report">
       <DynamicBreadcrumb items={salesReportItems} />
-      <SalesReportClient />
+      <ReportClient />
     </ContentLayout>
   )
 }
