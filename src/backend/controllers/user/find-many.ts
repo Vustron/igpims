@@ -33,16 +33,11 @@ export async function findManyUser(
     const currentUserId = currentSession.userId
 
     const countResult = await db.transaction(async (_tx) => {
-      const conditions = [
-        ne(user.id, currentUserId)
-      ]
+      const conditions = [ne(user.id, currentUserId)]
 
       if (search) {
         conditions.push(
-          or(
-            like(user.name, `%${search}%`),
-            like(user.email, `%${search}%`),
-          )!,
+          or(like(user.name, `%${search}%`), like(user.email, `%${search}%`))!,
         )
       }
 
@@ -56,20 +51,15 @@ export async function findManyUser(
         .where(and(...conditions))
 
       const result = await query
-      return result[ 0 ]?.count || 0
+      return result[0]?.count || 0
     })
 
     const usersData = await db.transaction(async (_tx) => {
-      const conditions = [
-        ne(user.id, currentUserId)
-      ]
+      const conditions = [ne(user.id, currentUserId)]
 
       if (search) {
         conditions.push(
-          or(
-            like(user.name, `%${search}%`),
-            like(user.email, `%${search}%`),
-          )!,
+          or(like(user.name, `%${search}%`), like(user.email, `%${search}%`))!,
         )
       }
 
@@ -103,17 +93,20 @@ export async function findManyUser(
     const hasNextPage = page < totalPages
     const hasPrevPage = page > 1
 
-    return NextResponse.json({
-      data: usersData,
-      meta: {
-        page,
-        limit,
-        totalItems,
-        totalPages,
-        hasNextPage,
-        hasPrevPage,
+    return NextResponse.json(
+      {
+        data: usersData,
+        meta: {
+          page,
+          limit,
+          totalItems,
+          totalPages,
+          hasNextPage,
+          hasPrevPage,
+        },
       },
-    }, { status: 200 })
+      { status: 200 },
+    )
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

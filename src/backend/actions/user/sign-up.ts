@@ -23,17 +23,17 @@ export const useSignUpUser = ({ isSignIn }: SignUpUserProps = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: [ `sign-up-user-${new Date()}` ],
+    mutationKey: [`sign-up-user-${new Date()}`],
     mutationFn: async (payload: SignUpPayload) => {
       const sanitizedData = sanitizer<SignUpPayload>(payload, signUpSchema)
       return await signUp(sanitizedData)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: [ "users" ] })
-      await queryClient.cancelQueries({ queryKey: [ "users-infinite" ] })
+      await queryClient.cancelQueries({ queryKey: ["users"] })
+      await queryClient.cancelQueries({ queryKey: ["users-infinite"] })
 
-      const previousUsers = queryClient.getQueryData([ "users" ])
-      const previousUsersInfinite = queryClient.getQueryData([ "users-infinite" ])
+      const previousUsers = queryClient.getQueryData(["users"])
+      const previousUsersInfinite = queryClient.getQueryData(["users-infinite"])
 
       return {
         previousUsers,
@@ -42,12 +42,11 @@ export const useSignUpUser = ({ isSignIn }: SignUpUserProps = {}) => {
     },
     onSuccess: async (newUser: User) => {
       queryClient.setQueriesData<PaginatedUsersResponse>(
-        { queryKey: [ "users" ] },
+        { queryKey: ["users"] },
         (oldData) => {
           if (!oldData || !oldData.data) return oldData
 
-
-          const updatedData = [ newUser, ...oldData.data ]
+          const updatedData = [newUser, ...oldData.data]
           const newTotalItems = oldData.meta.totalItems + 1
 
           return {
@@ -57,7 +56,9 @@ export const useSignUpUser = ({ isSignIn }: SignUpUserProps = {}) => {
               ...oldData.meta,
               totalItems: newTotalItems,
               totalPages: Math.ceil(newTotalItems / oldData.meta.limit),
-              hasNextPage: oldData.meta.page < Math.ceil(newTotalItems / oldData.meta.limit),
+              hasNextPage:
+                oldData.meta.page <
+                Math.ceil(newTotalItems / oldData.meta.limit),
               hasPrevPage: oldData.meta.page > 1,
             },
           }
@@ -65,18 +66,18 @@ export const useSignUpUser = ({ isSignIn }: SignUpUserProps = {}) => {
       )
 
       queryClient.setQueriesData(
-        { queryKey: [ "users-infinite" ] },
+        { queryKey: ["users-infinite"] },
         (oldData: any) => {
           if (!oldData || !oldData.pages) return oldData
 
-          const updatedPages = [ ...oldData.pages ]
+          const updatedPages = [...oldData.pages]
           if (updatedPages.length > 0) {
-            const firstPage = { ...updatedPages[ 0 ] }
+            const firstPage = { ...updatedPages[0] }
             const newTotalItems = firstPage.meta.totalItems + 1
 
-            updatedPages[ 0 ] = {
+            updatedPages[0] = {
               ...firstPage,
-              data: [ newUser, ...firstPage.data ],
+              data: [newUser, ...firstPage.data],
               meta: {
                 ...firstPage.meta,
                 totalItems: newTotalItems,
@@ -99,10 +100,13 @@ export const useSignUpUser = ({ isSignIn }: SignUpUserProps = {}) => {
     },
     onError: (error, _variables, context) => {
       if (context?.previousUsers) {
-        queryClient.setQueryData([ "users" ], context.previousUsers)
+        queryClient.setQueryData(["users"], context.previousUsers)
       }
       if (context?.previousUsersInfinite) {
-        queryClient.setQueryData([ "users-infinite" ], context.previousUsersInfinite)
+        queryClient.setQueryData(
+          ["users-infinite"],
+          context.previousUsersInfinite,
+        )
       }
 
       catchError(error)

@@ -17,22 +17,22 @@ export const useDeleteLockerById = (id: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: [ `delete-locker-by-id-${id}-${new Date()}` ],
+    mutationKey: [`delete-locker-by-id-${id}-${new Date()}`],
     mutationFn: async () => {
       return await deleteLockerById(id)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: [ "lockers" ] })
-      await queryClient.cancelQueries({ queryKey: [ "lockers-infinite" ] })
-      await queryClient.cancelQueries({ queryKey: [ "locker-rentals" ] })
-      await queryClient.cancelQueries({ queryKey: [ "locker-rentals-infinite" ] })
-      await queryClient.cancelQueries({ queryKey: [ "locker", id ] })
+      await queryClient.cancelQueries({ queryKey: ["lockers"] })
+      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
+      await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
+      await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
+      await queryClient.cancelQueries({ queryKey: ["locker", id] })
 
-      const previousLockers = queryClient.getQueryData([ "lockers" ])
+      const previousLockers = queryClient.getQueryData(["lockers"])
       const previousLockersInfinite = queryClient.getQueryData([
         "lockers-infinite",
       ])
-      const previousRentals = queryClient.getQueryData([ "locker-rentals" ])
+      const previousRentals = queryClient.getQueryData(["locker-rentals"])
       const previousRentalsInfinite = queryClient.getQueryData([
         "locker-rentals-infinite",
       ])
@@ -46,7 +46,7 @@ export const useDeleteLockerById = (id: string) => {
     },
     onSuccess: async () => {
       queryClient.setQueriesData<PaginatedLockersResponse>(
-        { queryKey: [ "lockers" ] },
+        { queryKey: ["lockers"] },
         (oldData) => {
           if (!oldData || !oldData.data) return oldData
 
@@ -73,7 +73,7 @@ export const useDeleteLockerById = (id: string) => {
       )
 
       queryClient.setQueriesData(
-        { queryKey: [ "lockers-infinite" ] },
+        { queryKey: ["lockers-infinite"] },
         (oldData: any) => {
           if (!oldData || !oldData.pages) return oldData
 
@@ -111,26 +111,26 @@ export const useDeleteLockerById = (id: string) => {
         },
       )
 
-      queryClient.removeQueries({ queryKey: [ "locker", id ] })
+      queryClient.removeQueries({ queryKey: ["locker", id] })
 
       router.push("/locker-rental")
     },
     onError: (error, _variables, context) => {
       if (context?.previousLockers) {
-        queryClient.setQueryData([ "lockers" ], context.previousLockers)
+        queryClient.setQueryData(["lockers"], context.previousLockers)
       }
       if (context?.previousLockersInfinite) {
         queryClient.setQueryData(
-          [ "lockers-infinite" ],
+          ["lockers-infinite"],
           context.previousLockersInfinite,
         )
       }
       if (context?.previousRentals) {
-        queryClient.setQueryData([ "locker-rentals" ], context.previousRentals)
+        queryClient.setQueryData(["locker-rentals"], context.previousRentals)
       }
       if (context?.previousRentalsInfinite) {
         queryClient.setQueryData(
-          [ "locker-rentals-infinite" ],
+          ["locker-rentals-infinite"],
           context.previousRentalsInfinite,
         )
       }

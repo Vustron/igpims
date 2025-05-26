@@ -23,21 +23,25 @@ export const useCreateRent = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: [ "create-rent" ],
+    mutationKey: ["create-rent"],
     mutationFn: async (payload: CreateRentalData) => {
       const validatedData = createRentalSchema.parse(payload)
       return await createRent(validatedData)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: [ "locker-rentals" ] })
-      await queryClient.cancelQueries({ queryKey: [ "locker-rentals-infinite" ] })
-      await queryClient.cancelQueries({ queryKey: [ "lockers" ] })
-      await queryClient.cancelQueries({ queryKey: [ "lockers-infinite" ] })
+      await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
+      await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
+      await queryClient.cancelQueries({ queryKey: ["lockers"] })
+      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
 
-      const previousRentals = queryClient.getQueryData([ "locker-rentals" ])
-      const previousRentalsInfinite = queryClient.getQueryData([ "locker-rentals-infinite" ])
-      const previousLockers = queryClient.getQueryData([ "lockers" ])
-      const previousLockersInfinite = queryClient.getQueryData([ "lockers-infinite" ])
+      const previousRentals = queryClient.getQueryData(["locker-rentals"])
+      const previousRentalsInfinite = queryClient.getQueryData([
+        "locker-rentals-infinite",
+      ])
+      const previousLockers = queryClient.getQueryData(["lockers"])
+      const previousLockersInfinite = queryClient.getQueryData([
+        "lockers-infinite",
+      ])
 
       return {
         previousRentals,
@@ -48,12 +52,12 @@ export const useCreateRent = () => {
     },
     onSuccess: async (newRental: LockerRental) => {
       queryClient.setQueryData<LockerRental>(
-        [ "locker-rental", newRental.id ],
+        ["locker-rental", newRental.id],
         newRental,
       )
 
       queryClient.setQueriesData(
-        { queryKey: [ "locker-rentals" ] },
+        { queryKey: ["locker-rentals"] },
         (oldData: PaginatedRentalsResponse | undefined) => {
           if (!oldData?.data) return oldData
 
@@ -76,7 +80,9 @@ export const useCreateRent = () => {
                 ...oldData.meta,
                 totalItems: newTotalItems,
                 totalPages: Math.ceil(newTotalItems / oldData.meta.limit),
-                hasNextPage: oldData.meta.page < Math.ceil(newTotalItems / oldData.meta.limit),
+                hasNextPage:
+                  oldData.meta.page <
+                  Math.ceil(newTotalItems / oldData.meta.limit),
                 hasPrevPage: oldData.meta.page > 1,
               },
             }
@@ -96,29 +102,31 @@ export const useCreateRent = () => {
       )
 
       queryClient.setQueriesData(
-        { queryKey: [ "locker-rentals-infinite" ] },
+        { queryKey: ["locker-rentals-infinite"] },
         (oldData: any) => {
           if (!oldData?.pages) return oldData
 
-          const updatedPages = [ ...oldData.pages ]
+          const updatedPages = [...oldData.pages]
 
-          if (updatedPages.length > 0 && updatedPages[ 0 ]?.data) {
-            const exists = updatedPages[ 0 ].data.some(
+          if (updatedPages.length > 0 && updatedPages[0]?.data) {
+            const exists = updatedPages[0].data.some(
               (rental: LockerRental) => rental.id === newRental.id,
             )
 
             if (!exists) {
-              const firstPage = { ...updatedPages[ 0 ] }
+              const firstPage = { ...updatedPages[0] }
               const newTotalItems = firstPage.meta.totalItems + 1
 
-              updatedPages[ 0 ] = {
+              updatedPages[0] = {
                 ...firstPage,
-                data: [ newRental, ...firstPage.data ],
+                data: [newRental, ...firstPage.data],
                 meta: {
                   ...firstPage.meta,
                   totalItems: newTotalItems,
                   totalPages: Math.ceil(newTotalItems / firstPage.meta.limit),
-                  hasNextPage: firstPage.meta.page < Math.ceil(newTotalItems / firstPage.meta.limit),
+                  hasNextPage:
+                    firstPage.meta.page <
+                    Math.ceil(newTotalItems / firstPage.meta.limit),
                   hasPrevPage: firstPage.meta.page > 1,
                 },
               }
@@ -132,7 +140,7 @@ export const useCreateRent = () => {
         },
       )
 
-      queryClient.setQueriesData({ queryKey: [ "lockers" ] }, (oldData: any) => {
+      queryClient.setQueriesData({ queryKey: ["lockers"] }, (oldData: any) => {
         if (!oldData?.data) return oldData
 
         return {
@@ -145,34 +153,43 @@ export const useCreateRent = () => {
         }
       })
 
-      queryClient.setQueriesData({ queryKey: [ "lockers-infinite" ] }, (oldData: any) => {
-        if (!oldData?.pages) return oldData
+      queryClient.setQueriesData(
+        { queryKey: ["lockers-infinite"] },
+        (oldData: any) => {
+          if (!oldData?.pages) return oldData
 
-        return {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => ({
-            ...page,
-            data: page.data.map((locker: any) =>
-              locker.id === newRental.lockerId
-                ? { ...locker, lockerStatus: "occupied" }
-                : locker,
-            ),
-          })),
-        }
-      })
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => ({
+              ...page,
+              data: page.data.map((locker: any) =>
+                locker.id === newRental.lockerId
+                  ? { ...locker, lockerStatus: "occupied" }
+                  : locker,
+              ),
+            })),
+          }
+        },
+      )
     },
     onError: (error, _variables, context) => {
       if (context?.previousRentals) {
-        queryClient.setQueryData([ "locker-rentals" ], context.previousRentals)
+        queryClient.setQueryData(["locker-rentals"], context.previousRentals)
       }
       if (context?.previousRentalsInfinite) {
-        queryClient.setQueryData([ "locker-rentals-infinite" ], context.previousRentalsInfinite)
+        queryClient.setQueryData(
+          ["locker-rentals-infinite"],
+          context.previousRentalsInfinite,
+        )
       }
       if (context?.previousLockers) {
-        queryClient.setQueryData([ "lockers" ], context.previousLockers)
+        queryClient.setQueryData(["lockers"], context.previousLockers)
       }
       if (context?.previousLockersInfinite) {
-        queryClient.setQueryData([ "lockers-infinite" ], context.previousLockersInfinite)
+        queryClient.setQueryData(
+          ["lockers-infinite"],
+          context.previousLockersInfinite,
+        )
       }
 
       catchError(error)

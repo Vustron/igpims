@@ -28,7 +28,7 @@ export const useUpdateLocker = (id: string) => {
   const router = useRouter()
 
   return useMutation({
-    mutationKey: [ "update-locker", id ],
+    mutationKey: ["update-locker", id],
     mutationFn: async (payload: Partial<LockerConfig>) => {
       const sanitizedData = sanitizer<Partial<LockerConfig>>(
         payload,
@@ -37,18 +37,18 @@ export const useUpdateLocker = (id: string) => {
       return await updateLocker(id, sanitizedData)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: [ "locker", id ] })
-      await queryClient.cancelQueries({ queryKey: [ "lockers" ] })
-      await queryClient.cancelQueries({ queryKey: [ "lockers-infinite" ] })
-      await queryClient.cancelQueries({ queryKey: [ "locker-rentals" ] })
-      await queryClient.cancelQueries({ queryKey: [ "locker-rentals-infinite" ] })
+      await queryClient.cancelQueries({ queryKey: ["locker", id] })
+      await queryClient.cancelQueries({ queryKey: ["lockers"] })
+      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
+      await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
+      await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
 
-      const previousLocker = queryClient.getQueryData<Locker>([ "locker", id ])
-      const previousLockers = queryClient.getQueryData([ "lockers" ])
+      const previousLocker = queryClient.getQueryData<Locker>(["locker", id])
+      const previousLockers = queryClient.getQueryData(["lockers"])
       const previousLockersInfinite = queryClient.getQueryData([
         "lockers-infinite",
       ])
-      const previousRentals = queryClient.getQueryData([ "locker-rentals" ])
+      const previousRentals = queryClient.getQueryData(["locker-rentals"])
       const previousRentalsInfinite = queryClient.getQueryData([
         "locker-rentals-infinite",
       ])
@@ -62,10 +62,10 @@ export const useUpdateLocker = (id: string) => {
       }
     },
     onSuccess: async (updatedLocker: Locker) => {
-      queryClient.setQueryData([ "locker", id ], updatedLocker)
+      queryClient.setQueryData(["locker", id], updatedLocker)
 
       queryClient.setQueriesData<PaginatedLockersResponse>(
-        { queryKey: [ "lockers" ] },
+        { queryKey: ["lockers"] },
         (oldData) => {
           if (!oldData?.data) return oldData
 
@@ -79,7 +79,7 @@ export const useUpdateLocker = (id: string) => {
       )
 
       queryClient.setQueriesData(
-        { queryKey: [ "lockers-infinite" ] },
+        { queryKey: ["lockers-infinite"] },
         (oldData: any) => {
           if (!oldData?.pages) return oldData
 
@@ -97,7 +97,7 @@ export const useUpdateLocker = (id: string) => {
 
       if (updatedLocker.lockerStatus) {
         queryClient.setQueriesData(
-          { queryKey: [ "locker-rentals" ] },
+          { queryKey: ["locker-rentals"] },
           (oldData: any) => {
             if (!oldData?.data) return oldData
 
@@ -113,7 +113,7 @@ export const useUpdateLocker = (id: string) => {
         )
 
         queryClient.setQueriesData(
-          { queryKey: [ "locker-rentals-infinite" ] },
+          { queryKey: ["locker-rentals-infinite"] },
           (oldData: any) => {
             if (!oldData?.pages) return oldData
 
@@ -134,23 +134,23 @@ export const useUpdateLocker = (id: string) => {
     },
     onError: (error, _payload, context) => {
       if (context?.previousLocker) {
-        queryClient.setQueryData([ "locker", id ], context.previousLocker)
+        queryClient.setQueryData(["locker", id], context.previousLocker)
       }
       if (context?.previousLockers) {
-        queryClient.setQueryData([ "lockers" ], context.previousLockers)
+        queryClient.setQueryData(["lockers"], context.previousLockers)
       }
       if (context?.previousLockersInfinite) {
         queryClient.setQueryData(
-          [ "lockers-infinite" ],
+          ["lockers-infinite"],
           context.previousLockersInfinite,
         )
       }
       if (context?.previousRentals) {
-        queryClient.setQueryData([ "locker-rentals" ], context.previousRentals)
+        queryClient.setQueryData(["locker-rentals"], context.previousRentals)
       }
       if (context?.previousRentalsInfinite) {
         queryClient.setQueryData(
-          [ "locker-rentals-infinite" ],
+          ["locker-rentals-infinite"],
           context.previousRentalsInfinite,
         )
       }

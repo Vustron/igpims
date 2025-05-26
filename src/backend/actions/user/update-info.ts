@@ -20,7 +20,7 @@ export const useUpdateUserInfo = (id: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: [ `update-user-${id}-${new Date()}` ],
+    mutationKey: [`update-user-${id}-${new Date()}`],
     mutationFn: async (payload: UpdateUserPayload) => {
       const sanitizedData = sanitizer<UpdateUserPayload>(
         payload,
@@ -29,13 +29,13 @@ export const useUpdateUserInfo = (id: string) => {
       return await updateUserInfo(sanitizedData, id)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: [ "user", id ] })
-      await queryClient.cancelQueries({ queryKey: [ "users" ] })
-      await queryClient.cancelQueries({ queryKey: [ "users-infinite" ] })
+      await queryClient.cancelQueries({ queryKey: ["user", id] })
+      await queryClient.cancelQueries({ queryKey: ["users"] })
+      await queryClient.cancelQueries({ queryKey: ["users-infinite"] })
 
-      const previousUser = queryClient.getQueryData<User>([ "user", id ])
-      const previousUsers = queryClient.getQueryData([ "users" ])
-      const previousUsersInfinite = queryClient.getQueryData([ "users-infinite" ])
+      const previousUser = queryClient.getQueryData<User>(["user", id])
+      const previousUsers = queryClient.getQueryData(["users"])
+      const previousUsersInfinite = queryClient.getQueryData(["users-infinite"])
 
       return {
         previousUser,
@@ -44,34 +44,31 @@ export const useUpdateUserInfo = (id: string) => {
       }
     },
     onSuccess: async (updatedUser: User) => {
-      queryClient.setQueryData([ "user", id ], updatedUser)
+      queryClient.setQueryData(["user", id], updatedUser)
 
-      queryClient.setQueriesData(
-        { queryKey: [ "users" ] },
-        (oldData: any) => {
-          if (!oldData) return oldData
+      queryClient.setQueriesData({ queryKey: ["users"] }, (oldData: any) => {
+        if (!oldData) return oldData
 
-          if (oldData.data && Array.isArray(oldData.data)) {
-            return {
-              ...oldData,
-              data: oldData.data.map((user: User) =>
-                user.id === id ? updatedUser : user,
-              ),
-            }
-          }
-
-          if (Array.isArray(oldData)) {
-            return oldData.map((user: User) =>
+        if (oldData.data && Array.isArray(oldData.data)) {
+          return {
+            ...oldData,
+            data: oldData.data.map((user: User) =>
               user.id === id ? updatedUser : user,
-            )
+            ),
           }
-
-          return oldData
         }
-      )
+
+        if (Array.isArray(oldData)) {
+          return oldData.map((user: User) =>
+            user.id === id ? updatedUser : user,
+          )
+        }
+
+        return oldData
+      })
 
       queryClient.setQueriesData(
-        { queryKey: [ "users-infinite" ] },
+        { queryKey: ["users-infinite"] },
         (oldData: any) => {
           if (!oldData?.pages) return oldData
 
@@ -79,25 +76,30 @@ export const useUpdateUserInfo = (id: string) => {
             ...oldData,
             pages: oldData.pages.map((page: any) => ({
               ...page,
-              data: page.data ? page.data.map((user: User) =>
-                user.id === id ? updatedUser : user,
-              ) : page.data,
+              data: page.data
+                ? page.data.map((user: User) =>
+                    user.id === id ? updatedUser : user,
+                  )
+                : page.data,
             })),
           }
-        }
+        },
       )
 
       router.replace("/users")
     },
     onError: (error, _variables, context) => {
       if (context?.previousUser) {
-        queryClient.setQueryData([ "user", id ], context.previousUser)
+        queryClient.setQueryData(["user", id], context.previousUser)
       }
       if (context?.previousUsers) {
-        queryClient.setQueryData([ "users" ], context.previousUsers)
+        queryClient.setQueryData(["users"], context.previousUsers)
       }
       if (context?.previousUsersInfinite) {
-        queryClient.setQueryData([ "users-infinite" ], context.previousUsersInfinite)
+        queryClient.setQueryData(
+          ["users-infinite"],
+          context.previousUsersInfinite,
+        )
       }
 
       catchError(error)

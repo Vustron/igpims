@@ -40,7 +40,7 @@ export async function createLocker(
       const result = await lockerQuery.getLockerByNameQuery.execute({
         name: lockerName,
       })
-      return result[ 0 ]
+      return result[0]
     })
 
     if (existingLocker) {
@@ -68,11 +68,11 @@ export async function createLocker(
         id: lockerId,
       })
 
-      if (!result || !result[ 0 ]) {
+      if (!result || !result[0]) {
         throw new Error("Failed to create the locker")
       }
 
-      return result[ 0 ]
+      return result[0]
     })
 
     return NextResponse.json(newLocker, { status: 201 })

@@ -19,7 +19,7 @@ export const useSignInUser = () => {
   const resetOtpSignIn = useOtpStore((state) => state.resetOtpSignIn)
 
   return useMutation({
-    mutationKey: [ `sign-in-user-${new Date()}` ],
+    mutationKey: [`sign-in-user-${new Date()}`],
     mutationFn: async (payload: SignInPayload) => {
       const sanitizedData = sanitizer<SignInPayload>(payload, signInSchema)
       return await signIn(sanitizedData)
