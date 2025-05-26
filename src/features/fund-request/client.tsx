@@ -3,14 +3,18 @@
 import { FundRequestFilter } from "@/features/fund-request/fund-request-filter"
 import { FundRequestCard } from "@/features/fund-request/fund-request-card"
 
-import { sampleFundRequests } from "@/features/fund-request/timeline-sample-data"
-
+import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
 import { useState, useMemo } from "react"
 
+import type { FundRequest } from "@/features/fund-request/fund-request-store"
+
+type StatusOption = FundRequest["status"] | "all"
+
 export const FundRequestClient = () => {
+  const { requests } = useFundRequestStore()
   const [filters, setFilters] = useState({
     search: "",
-    status: "all",
+    status: "all" as StatusOption,
     dateRange: {
       from: undefined as Date | undefined,
       to: undefined as Date | undefined,
@@ -18,11 +22,12 @@ export const FundRequestClient = () => {
   })
 
   const filteredRequests = useMemo(() => {
-    return sampleFundRequests.filter((request) => {
+    return requests.filter((request) => {
       if (
         filters.search &&
         !request.id.toLowerCase().includes(filters.search.toLowerCase()) &&
-        !request.purpose.toLowerCase().includes(filters.search.toLowerCase())
+        !request.purpose.toLowerCase().includes(filters.search.toLowerCase()) &&
+        !request.requestor.toLowerCase().includes(filters.search.toLowerCase())
       ) {
         return false
       }
@@ -50,7 +55,7 @@ export const FundRequestClient = () => {
 
       return true
     })
-  }, [filters])
+  }, [requests, filters])
 
   return (
     <div className="space-y-4">
@@ -67,8 +72,7 @@ export const FundRequestClient = () => {
         filters.dateRange.from ||
         filters.dateRange.to) && (
         <div className="mb-4 text-slate-600 text-sm">
-          Showing {filteredRequests.length} of {sampleFundRequests.length} fund
-          requests
+          Showing {filteredRequests.length} of {requests.length} fund requests
         </div>
       )}
 
@@ -81,7 +85,9 @@ export const FundRequestClient = () => {
           <h3 className="font-medium text-lg text-slate-700">
             No fund requests found
           </h3>
-          <p className="mt-1 text-slate-500">Try adjusting your filters</p>
+          <p className="mt-1 text-slate-500">
+            Try adjusting your filters or create a new fund request
+          </p>
         </div>
       )}
     </div>

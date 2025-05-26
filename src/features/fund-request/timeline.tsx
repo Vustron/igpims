@@ -59,8 +59,8 @@ export const Timeline = ({
         <TimelineStep
           key={step.id}
           step={step}
-          isCompleted={step.id < currentStep}
-          isCurrent={step.id === currentStep}
+          isCompleted={step.id <= currentStep}
+          isCurrent={false}
           isMobile={isMobile}
           isRejected={isRejected && step.id === rejectionStep}
         />

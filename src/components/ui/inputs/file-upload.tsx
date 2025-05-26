@@ -3,7 +3,7 @@
 import { FileIcon, UploadIcon, XCircleIcon } from "lucide-react"
 import { Label } from "@/components/ui/labels"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 
 import { motion } from "framer-motion"
@@ -67,6 +67,9 @@ export const FileUpload = ({
 }: FileUploadProps) => {
   const [files, setFiles] = useState<FileValue[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const isInitialMount = useRef(true)
+
+  const memoizedOnChange = useCallback(onChange || (() => {}), [onChange])
 
   useEffect(() => {
     if (value) {
@@ -80,7 +83,9 @@ export const FileUpload = ({
     if (!multiple) {
       const singleFile = newFiles[0] ? [newFiles[0]] : []
       setFiles(singleFile)
-      onChange?.(singleFile)
+      if (!isInitialMount.current) {
+        memoizedOnChange?.(singleFile)
+      }
       return
     }
 
@@ -88,7 +93,9 @@ export const FileUpload = ({
     setFiles((prev) => {
       const combined = [...prev, ...validFiles]
       const limited = combined.slice(0, maxFiles)
-      onChange?.(limited)
+      if (!isInitialMount.current) {
+        memoizedOnChange?.(limited)
+      }
       return limited
     })
   }
@@ -97,8 +104,12 @@ export const FileUpload = ({
     e.stopPropagation()
     const newFiles = files.filter((_, idx) => idx !== indexToRemove)
     setFiles(newFiles)
-    onChange?.(newFiles)
+    memoizedOnChange?.(newFiles)
   }
+
+  useEffect(() => {
+    isInitialMount.current = false
+  }, [])
 
   const handleClick = () => {
     fileInputRef.current?.click()

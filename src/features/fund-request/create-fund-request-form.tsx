@@ -1,6 +1,8 @@
 "use client"
 
 import { DynamicForm } from "@/components/ui/forms"
+import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
+import { useDialog } from "@/hooks/use-dialog"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { catchError } from "@/utils/catch-error"
@@ -14,54 +16,39 @@ import type { FieldConfig } from "@/interfaces/form"
 
 export const fundRequestSchema = z.object({
   requestorName: z.string().min(1, "Requestor name is required"),
-  position: z.string().min(1, "Position is required"),
   purpose: z.string().min(1, "Purpose is required"),
-  amount: z.number().positive("Amount must be greater than 0"),
-  dateOfRequest: z.date({
-    required_error: "Date of request is required",
-  }),
-  dateOfNeed: z
-    .date({
-      required_error: "Date of need is required",
-    })
-    .refine(
-      (date) => {
-        return date >= new Date()
-      },
-      {
-        message: "Date of need must be today or in the future",
-      },
-    ),
-  requestStatus: z.enum(["pending", "approved", "rejected"]).optional(),
+  position: z.string().min(1, "Position is required"),
+  amount: z.coerce.number().positive("Amount must be greater than 0"),
+  requestDate: z.any().optional(),
+  dateNeeded: z.any().optional(),
 })
 
-export type FundRequest = z.infer<typeof fundRequestSchema>
-
-interface CreateFundRequestFormProps {
-  onSuccess?: () => void
-  onError?: () => void
-}
+export type CreateFundRequestForm = z.infer<typeof fundRequestSchema>
 
 export const CreateFundRequestForm = ({
   onSuccess,
   onError,
-}: CreateFundRequestFormProps) => {
-  const [, setIsSubmitting] = useState(false)
+}: {
+  onSuccess?: () => void
+  onError?: () => void
+}) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { addRequest } = useFundRequestStore()
+  const { onClose } = useDialog()
 
-  const form = useForm<FundRequest>({
+  const form = useForm<CreateFundRequestForm>({
     resolver: zodResolver(fundRequestSchema),
     defaultValues: {
       requestorName: "",
-      position: "",
       purpose: "",
+      position: "",
       amount: 0,
-      dateOfRequest: new Date(),
-      dateOfNeed: new Date(),
-      requestStatus: "pending",
+      requestDate: new Date(),
+      dateNeeded: new Date(),
     },
   })
 
-  const createFundRequestFields: FieldConfig<FundRequest>[] = [
+  const createFundRequestFields: FieldConfig<CreateFundRequestForm>[] = [
     {
       name: "requestorName",
       type: "text",
@@ -81,65 +68,80 @@ export const CreateFundRequestForm = ({
     {
       name: "purpose",
       type: "textarea",
-      label: "Purpose",
-      placeholder: "",
-      description: "Detailed explanation of why funds are needed",
+      label: "Fund Request Purpose",
+      placeholder: "Enter purpose of funds",
+      description:
+        "Detailed explanation of why funds are needed and how they will be used",
       required: true,
     },
     {
       name: "amount",
-      type: "currency",
-      label: "Amount",
-      placeholder: "Enter amount in PHP",
-      description: "Amount of funds requested",
+      type: "number",
+      label: "Amount (PHP)",
+      placeholder: "Enter amount",
+      description: "Amount of funds requested in Philippine Pesos",
       required: true,
     },
     {
-      name: "dateOfRequest",
+      name: "requestDate",
       type: "date",
       label: "Date of Request",
-      placeholder: "Enter date of request",
-      description: "Date when the request is submitted",
+      placeholder: "Select date of request",
+      description: "Date when the fund request is being made",
       required: true,
     },
     {
-      name: "dateOfNeed",
+      name: "dateNeeded",
       type: "date",
-      label: "Date of Need",
-      placeholder: "Enter date of need",
-      description: "Date when the funds are needed",
+      label: "Date Needed By",
+      placeholder: "Select date needed by",
+      description:
+        "Date by which the funds are needed for the intended purpose",
       required: true,
     },
   ]
 
-  const onSubmit = async (data: FundRequest) => {
+  const onSubmit = async (data: CreateFundRequestForm) => {
     try {
       setIsSubmitting(true)
 
-      toast.success("Fund request created successfully!")
-
-      const formattedData = {
-        ...data,
-        amount: Number(data.amount),
+      if (data.amount <= 0) {
+        form.setError("amount", {
+          type: "manual",
+          message: "Amount must be greater than 0",
+        })
+        setIsSubmitting(false)
+        return
       }
+
+      const requestId = addRequest({
+        requestor: data.requestorName,
+        position: data.position,
+        purpose: data.purpose,
+        amount: data.amount,
+        requestDate: data.requestDate,
+        dateNeeded: data.dateNeeded,
+        utilizedFunds: 0,
+        allocatedFunds: 0,
+      })
+
+      toast.success(`Fund request ${requestId} created successfully!`)
 
       form.reset({
         requestorName: "",
         position: "",
         purpose: "",
         amount: 0,
-        dateOfRequest: new Date(),
-        dateOfNeed: new Date(),
-        requestStatus: "pending",
+        requestDate: new Date(),
+        dateNeeded: new Date(),
       })
 
-      console.log(formattedData)
-
-      if (onSuccess) onSuccess()
+      onClose()
+      onSuccess?.()
     } catch (error) {
       const errorMessage = catchError(error)
       toast.error(errorMessage || "Failed to create fund request")
-      if (onError) onError()
+      onError?.()
     } finally {
       setIsSubmitting(false)
     }
@@ -150,7 +152,8 @@ export const CreateFundRequestForm = ({
       form={form}
       onSubmit={onSubmit}
       fields={createFundRequestFields}
-      submitButtonTitle="Submit Fund Request"
+      submitButtonTitle={isSubmitting ? "Creating..." : "Submit Fund Request"}
+      disabled={isSubmitting}
       twoColumnLayout
     />
   )

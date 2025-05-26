@@ -3,14 +3,21 @@
 import {
   ConfirmDialog,
   CreateIgpDialog,
+  CheckFundsDialog,
   CreateUserDialog,
   VerifyUserDialog,
   CreateLockerDialog,
+  ReceiveFundsDialog,
+  DisburseFundsDialog,
+  SubmitReceiptDialog,
   SessionExpiredDialog,
+  ValidateExpenseDialog,
   CreateWaterFundDialog,
   CreateLockerRentDialog,
   CreateWaterVendoDialog,
   CreateFundRequestDialog,
+  ReviewFundRequestDialog,
+  ApproveFundRequestDialog,
   CreateProjectRequestDialog,
   RentalAgreementReceiptDialog,
 } from "@/components/ui/dialogs"
@@ -34,6 +41,13 @@ export const DialogProvider = () => {
       <CreateProjectRequestDialog />
       <CreateLockerRentDialog />
       <CreateUserDialog />
+      <ReviewFundRequestDialog />
+      <CheckFundsDialog />
+      <ApproveFundRequestDialog />
+      <DisburseFundsDialog />
+      <ReceiveFundsDialog />
+      <SubmitReceiptDialog />
+      <ValidateExpenseDialog />
     </>
   )
 }

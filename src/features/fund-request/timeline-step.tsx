@@ -21,15 +21,19 @@ export const TimelineStep = ({
   isCurrent,
   isRejected,
   isMobile = false,
+  onStepClick,
 }: {
   step: TimelineStepType
   isCompleted: boolean
   isCurrent: boolean
   isRejected?: boolean
   isMobile?: boolean
+  onStepClick?: (stepId: number) => void
 }) => {
   const showTooltip =
     !isCurrent && (step.description || (isRejected && step.rejectionReason))
+
+  const isClickable = isCompleted && onStepClick
 
   return (
     <TooltipProvider>
@@ -41,11 +45,13 @@ export const TimelineStep = ({
               isMobile
                 ? "w-full items-start gap-3 py-2 pl-12"
                 : "flex-col items-center rounded-xl bg-background p-1 sm:p-2",
+              isClickable && "cursor-pointer",
             )}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: isClickable ? 1.05 : 1 }}
+            onClick={() => isClickable && onStepClick(step.id)}
           >
             {/* Step circle */}
             <motion.div
@@ -54,7 +60,7 @@ export const TimelineStep = ({
                 isRejected
                   ? "border-red-500 bg-red-500 text-white"
                   : isCompleted
-                    ? "border-emerald-500 bg-emerald-500 text-white"
+                    ? "border-green-500 bg-green-500 text-white"
                     : isCurrent
                       ? "border-blue-500 bg-blue-500 text-white"
                       : "border-slate-200 bg-white text-slate-400",
@@ -69,7 +75,9 @@ export const TimelineStep = ({
                     }
                   : isRejected
                     ? { boxShadow: "0 0 0 4px rgba(239, 68, 68, 0.3)" }
-                    : {}
+                    : isCompleted
+                      ? { boxShadow: "0 0 0 4px rgba(34, 197, 94, 0.3)" }
+                      : {}
               }
               transition={{
                 repeat: isCurrent && !isRejected ? Number.POSITIVE_INFINITY : 0,
@@ -95,7 +103,7 @@ export const TimelineStep = ({
                 isRejected
                   ? "text-red-700"
                   : isCompleted
-                    ? "text-emerald-700"
+                    ? "text-green-700"
                     : isCurrent
                       ? "font-medium text-blue-700"
                       : "text-slate-500",
@@ -134,7 +142,11 @@ export const TimelineStep = ({
             align={isMobile ? "start" : "center"}
             className={cn(
               "max-w-xs",
-              isRejected ? "bg-red-800 text-white" : "text-white",
+              isRejected
+                ? "bg-red-800 text-white"
+                : isCompleted
+                  ? "bg-green-800 text-white"
+                  : "text-white",
             )}
           >
             {isRejected && step.rejectionReason ? (

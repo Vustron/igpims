@@ -24,7 +24,7 @@ import { cn } from "@/utils/cn"
 import { useDialog } from "@/hooks/use-dialog"
 import { useState } from "react"
 
-import type { FundRequest } from "@/features/fund-request/timeline-sample-data"
+import type { FundRequest } from "@/features/fund-request/fund-request-store"
 
 type StatusOption = FundRequest["status"] | "all"
 

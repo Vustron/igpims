@@ -1,20 +1,28 @@
 "use client"
 
+import {
+  Play,
+  XCircle,
+  ChevronUp,
+  CheckCircle,
+  ChevronDown,
+} from "lucide-react"
 import { TimelineStatusBadge } from "@/features/fund-request/timeline-status"
 import { timelineSteps } from "@/features/fund-request/timeline-sample-data"
 import { Card, CardContent, CardHeader } from "@/components/ui/cards"
-import { ChevronDown, ChevronUp, XCircle } from "lucide-react"
 import { Timeline } from "@/features/fund-request/timeline"
 import { Button } from "@/components/ui/buttons"
 
+import { useDialog } from "@/hooks/use-dialog"
 import { useState } from "react"
 
-import type { FundRequest } from "@/features/fund-request/timeline-sample-data"
+import type { FundRequest } from "@/features/fund-request/fund-request-store"
 
 export const FundRequestCard = ({
   fundRequest,
 }: { fundRequest: FundRequest }) => {
   const [isExpanded, setIsExpanded] = useState(false)
+  const { onOpen } = useDialog()
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-PH", {
@@ -29,9 +37,93 @@ export const FundRequestCard = ({
       (fundRequest.utilizedFunds / fundRequest.allocatedFunds) * 100,
     ) || 0
 
+  const getStatusAction = () => {
+    switch (fundRequest.status) {
+      case "pending":
+        return {
+          label: "Start Review",
+          action: () =>
+            onOpen("reviewFundRequest", { requestId: fundRequest.id }),
+          color: "bg-blue-600 hover:bg-blue-700",
+        }
+      case "in_review":
+        return {
+          label: "Check Funds",
+          action: () => onOpen("checkFunds", { requestId: fundRequest.id }),
+          color: "bg-purple-600 hover:bg-purple-700",
+        }
+      case "checking":
+        return {
+          label: "Approve Release",
+          action: () =>
+            onOpen("approveFundRequest", { requestId: fundRequest.id }),
+          color: "bg-emerald-600 hover:bg-emerald-700",
+        }
+      case "approved":
+        return {
+          label: "Disburse Funds",
+          action: () => onOpen("disburseFunds", { requestId: fundRequest.id }),
+          color: "bg-indigo-600 hover:bg-indigo-700",
+        }
+      case "disbursed":
+        return {
+          label: "Mark as Received",
+          action: () => onOpen("receiveFunds", { requestId: fundRequest.id }),
+          color: "bg-sky-600 hover:bg-sky-700",
+        }
+      case "received":
+        return {
+          label: "Submit Receipt",
+          action: () => onOpen("submitReceipt", { requestId: fundRequest.id }),
+          color: "bg-teal-600 hover:bg-teal-700",
+        }
+      case "receipted":
+        return {
+          label: "Validate Expense",
+          action: () =>
+            onOpen("validateExpense", { requestId: fundRequest.id }),
+          color: "bg-green-600 hover:bg-green-700",
+        }
+      default:
+        return null
+    }
+  }
+
+  const statusAction = getStatusAction()
+
+  // Determine card styling based on status
+  const getCardStyling = () => {
+    if (fundRequest.status === "validated") {
+      return {
+        cardClass:
+          "mb-4 w-full overflow-hidden border border-green-300 bg-green-50 shadow-sm transition-all hover:border-green-400 hover:shadow-md",
+        headerClass: "p-3 sm:p-4 sm:pb-2 bg-green-100/50",
+        contentClass: "p-3 sm:p-4 sm:pt-2 bg-green-50/30",
+      }
+    }
+
+    if (fundRequest.isRejected) {
+      return {
+        cardClass:
+          "mb-4 w-full overflow-hidden border border-red-200 bg-red-50 shadow-sm transition-all hover:border-red-300 hover:shadow-md",
+        headerClass: "p-3 sm:p-4 sm:pb-2",
+        contentClass: "p-3 sm:p-4 sm:pt-2",
+      }
+    }
+
+    return {
+      cardClass:
+        "mb-4 w-full overflow-hidden border border-slate-200 shadow-sm transition-all hover:border-slate-300 hover:shadow-md",
+      headerClass: "p-3 sm:p-4 sm:pb-2",
+      contentClass: "p-3 sm:p-4 sm:pt-2",
+    }
+  }
+
+  const { cardClass, headerClass, contentClass } = getCardStyling()
+
   return (
-    <Card className="mb-4 w-full overflow-hidden border border-slate-200 shadow-sm transition-all hover:border-slate-300 hover:shadow-md">
-      <CardHeader className="p-3 sm:p-4 sm:pb-2">
+    <Card className={cardClass}>
+      <CardHeader className={headerClass}>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
           {/* ID */}
           <div className="col-span-1 space-y-0.5">
@@ -97,9 +189,38 @@ export const FundRequestCard = ({
           </div>
         </div>
 
+        {/* Completed Badge for Validated */}
+        {fundRequest.status === "validated" && (
+          <div className="mt-3 flex items-center gap-2 rounded-md bg-green-100 p-2 text-green-700">
+            <CheckCircle className="size-4 text-green-600" />
+            <div>
+              <p className="font-medium text-sm">Fund Request Completed</p>
+              <p className="text-xs">
+                All expenses have been validated and approved
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Action Button */}
+        {statusAction &&
+          fundRequest.status !== "validated" &&
+          fundRequest.status !== "rejected" && (
+            <div className="mt-3 flex justify-end">
+              <Button
+                size="sm"
+                className={`gap-2 ${statusAction.color}`}
+                onClick={statusAction.action}
+              >
+                <Play className="h-3 w-3" />
+                {statusAction.label}
+              </Button>
+            </div>
+          )}
+
         {/* Rejection reason (if rejected) */}
         {fundRequest.isRejected && fundRequest.rejectionReason && (
-          <div className="mt-3 flex items-start gap-2 rounded-md bg-red-50 p-2 text-red-700">
+          <div className="mt-3 flex items-start gap-2 rounded-md bg-red-100 p-2 text-red-700">
             <XCircle className="mt-0.5 size-4 shrink-0 text-red-500" />
             <div>
               <p className="font-medium text-sm">Rejected</p>
@@ -109,7 +230,7 @@ export const FundRequestCard = ({
         )}
       </CardHeader>
 
-      <CardContent className="p-3 sm:p-4 sm:pt-2">
+      <CardContent className={contentClass}>
         {/* Timeline for desktop */}
         <div className="mb-3 hidden rounded-md bg-slate-50 p-4 sm:block">
           <Timeline

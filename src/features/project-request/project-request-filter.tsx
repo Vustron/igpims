@@ -25,7 +25,7 @@ import { useState } from "react"
 import { format } from "date-fns"
 import { cn } from "@/utils/cn"
 
-import type { FundRequest } from "@/features/fund-request/timeline-sample-data"
+import type { FundRequest } from "@/features/fund-request/fund-request-store"
 
 type StatusOption = FundRequest["status"] | "all"
 
