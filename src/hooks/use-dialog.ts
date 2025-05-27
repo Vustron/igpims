@@ -32,6 +32,7 @@ export type DialogType =
   | "startImplementation"
   | "completeProject"
   | "deleteProjectRequest"
+  | "deleteFundRequest"
 
 interface ConfirmDialogData {
   title?: string

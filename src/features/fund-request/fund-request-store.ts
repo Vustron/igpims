@@ -52,7 +52,7 @@ interface FundRequestStore {
   requests: FundRequest[]
   addRequest: (
     request: Omit<FundRequest, "id" | "lastUpdated" | "currentStep" | "status">,
-  ) => void
+  ) => string
   updateRequestStatus: (
     id: string,
     status: FundRequest["status"],
@@ -73,7 +73,7 @@ interface FundRequestStore {
   addExpenseTransaction: (
     requestId: string,
     expense: Omit<ExpenseTransaction, "id" | "requestId">,
-  ) => void
+  ) => string
   updateExpenseStatus: (
     requestId: string,
     expenseId: string,
@@ -82,6 +82,8 @@ interface FundRequestStore {
     rejectionReason?: string,
   ) => void
   getExpensesByRequestId: (requestId: string) => ExpenseTransaction[]
+  deleteRequest: (id: string) => void
+  deleteManyRequests: (ids: string[]) => void
 }
 
 const statusToStepMap: Record<FundRequest["status"], number> = {
@@ -309,6 +311,20 @@ export const useFundRequestStore = create<FundRequestStore>()(
       getExpensesByRequestId: (requestId) => {
         const request = get().getRequestById(requestId)
         return request?.expenses || []
+      },
+
+      deleteRequest: (id) => {
+        set((state) => ({
+          requests: state.requests.filter((request) => request.id !== id),
+        }))
+      },
+
+      deleteManyRequests: (ids) => {
+        set((state) => ({
+          requests: state.requests.filter(
+            (request) => !ids.includes(request.id),
+          ),
+        }))
       },
     }),
     {

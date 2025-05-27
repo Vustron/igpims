@@ -67,7 +67,7 @@ interface CreateIgpFormProps {
 }
 
 export const CreateIgpForm = ({
-  onSuccess,
+  // onSuccess,
   onError,
   onClose,
 }: CreateIgpFormProps) => {
@@ -376,8 +376,6 @@ This IGP aims to generate income while providing valuable products/services to t
         department: "",
         position: "",
       })
-
-      if (onSuccess) onSuccess()
     } catch (error) {
       const errorMessage = catchError(error)
 

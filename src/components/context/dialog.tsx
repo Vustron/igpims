@@ -21,6 +21,7 @@ import {
   CreateWaterVendoDialog,
   CreateFundRequestDialog,
   ReviewFundRequestDialog,
+  DeleteFundRequestDialog,
   DueOverduePaymentsDialog,
   ApproveFundRequestDialog,
   IgpFinancialReportDialog,
@@ -70,6 +71,7 @@ export const DialogProvider = () => {
       <StartImplementationDialog />
       <CompleteProjectDialog />
       <DeleteProjectRequestDialog />
+      <DeleteFundRequestDialog />
     </>
   )
 }

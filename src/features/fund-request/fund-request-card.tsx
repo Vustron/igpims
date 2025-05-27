@@ -2,11 +2,19 @@
 
 import {
   Play,
+  Trash2,
   XCircle,
   ChevronUp,
   CheckCircle,
   ChevronDown,
+  MoreVertical,
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "@/components/ui/dropdowns"
 import { TimelineStatusBadge } from "@/features/fund-request/timeline-status"
 import { timelineSteps } from "@/features/fund-request/timeline-sample-data"
 import { Card, CardContent, CardHeader } from "@/components/ui/cards"
@@ -91,6 +99,10 @@ export const FundRequestCard = ({
 
   const statusAction = getStatusAction()
 
+  // Determine if deletion is allowed
+  // const canDelete =
+  //   fundRequest.status === "pending" || fundRequest.status === "rejected"
+
   // Determine card styling based on status
   const getCardStyling = () => {
     if (fundRequest.status === "validated") {
@@ -168,15 +180,17 @@ export const FundRequestCard = ({
             </p>
           </div>
 
-          {/* Status */}
+          {/* Status & Actions */}
           <div className="col-span-2 space-y-0.5 sm:col-span-3 md:col-span-1">
             <p className="text-slate-500 text-xs">Status</p>
             <div className="flex items-center gap-2">
               <TimelineStatusBadge status={fundRequest.status} />
+
+              {/* Mobile expand button */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="ml-auto size-6 sm:hidden"
+                className="size-6 sm:hidden"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? (
@@ -185,6 +199,30 @@ export const FundRequestCard = ({
                   <ChevronDown className="size-4" />
                 )}
               </Button>
+
+              {/* Actions dropdown menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="ml-auto size-6"
+                  >
+                    <MoreVertical className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() =>
+                      onOpen("deleteFundRequest", { requestId: fundRequest.id })
+                    }
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Request
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

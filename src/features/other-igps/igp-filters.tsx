@@ -9,6 +9,11 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdowns"
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltips"
+import {
   X,
   Search,
   Filter,
@@ -20,7 +25,9 @@ import { Button } from "@/components/ui/buttons"
 import { Badge } from "@/components/ui/badges"
 import { Input } from "@/components/ui/inputs"
 
+import { useProjectRequestStore } from "@/features/project-request/project-request-store"
 import { useDialog } from "@/hooks/use-dialog"
+import { cn } from "@/utils/cn"
 
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -60,6 +67,24 @@ export function IgpFilters({
   allIconTypes,
 }: IgpFiltersProps) {
   const { onOpen } = useDialog()
+  const { requests } = useProjectRequestStore()
+
+  // Check if there are any active projects (not completed or rejected)
+  const hasActiveProjects = requests.some(
+    (request) =>
+      request.status !== "completed" && request.status !== "rejected",
+  )
+
+  // Find the latest active project for tooltip message
+  const latestActiveProject = requests
+    .filter(
+      (request) =>
+        request.status !== "completed" && request.status !== "rejected",
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(),
+    )[0]
 
   const getIconTypeDisplayName = (iconType: string) => {
     return iconType.charAt(0).toUpperCase() + iconType.slice(1)
@@ -267,14 +292,48 @@ export function IgpFilters({
             </Button>
           )}
 
-          <Button
-            onClick={() => onOpen("createIgp")}
-            size="sm"
-            className="flex items-center gap-1.5"
-          >
-            <PlusCircleIcon className="h-4 w-4" />
-            <span>New IGP Proposal</span>
-          </Button>
+          {/* New IGP Proposal Button with Tooltip */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => !hasActiveProjects && onOpen("createIgp")}
+                size="sm"
+                className={cn(
+                  "flex items-center gap-1.5",
+                  hasActiveProjects && "cursor-not-allowed opacity-50",
+                )}
+                disabled={hasActiveProjects}
+              >
+                <PlusCircleIcon className="h-4 w-4" />
+                <span>New IGP Proposal</span>
+              </Button>
+            </TooltipTrigger>
+
+            <TooltipContent
+              side="bottom"
+              align="center"
+              className={cn(
+                hasActiveProjects && latestActiveProject
+                  ? "max-w-xs bg-amber-800 text-white"
+                  : "",
+              )}
+            >
+              {hasActiveProjects && latestActiveProject ? (
+                <div className="flex items-start gap-2">
+                  <span className="text-sm">⚠️</span>
+                  <div className="space-y-1">
+                    <p className="font-medium text-sm">Active project exists</p>
+                    <p className="text-amber-100 text-xs">
+                      Complete "{latestActiveProject.projectTitle}" (
+                      {latestActiveProject.id}) first
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <span>Create a new IGP proposal</span>
+              )}
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 

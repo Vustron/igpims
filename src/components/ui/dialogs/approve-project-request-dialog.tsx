@@ -73,7 +73,9 @@ export const ApproveProjectRequestDialog = () => {
 
   return (
     <DialogContent_Component open={isDialogOpen} onOpenChange={onClose}>
-      <Content className={isDesktop ? "max-w-2xl" : ""}>
+      <Content
+        className={isDesktop ? "h-[90vh] max-w-2xl overflow-y-auto" : ""}
+      >
         <Header>
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-emerald-600" />
@@ -114,8 +116,100 @@ export const ApproveProjectRequestDialog = () => {
                 </p>
               </div>
               <div className="col-span-2">
-                <p className="font-medium text-emerald-800 text-sm">Purpose</p>
-                <p className="text-emerald-900 text-sm">{request.purpose}</p>
+                <p className="mb-2 font-medium text-emerald-800 text-sm">
+                  Project Details
+                </p>
+                <div className="space-y-3 rounded-md bg-white p-3 text-emerald-900 text-sm">
+                  {/* Parse and format the purpose */}
+                  {(() => {
+                    const purpose = request.purpose
+                    const lines = purpose
+                      .split("\n")
+                      .filter((line) => line.trim())
+
+                    // Extract the main description (first line)
+                    const mainDescription = lines[0]
+
+                    // Find project details section
+                    const detailsStartIndex = lines.findIndex((line) =>
+                      line.includes("Project Details:"),
+                    )
+                    const conclusionStartIndex = lines.findIndex((line) =>
+                      line.includes("This IGP aims"),
+                    )
+
+                    // Extract project details
+                    const projectDetails =
+                      detailsStartIndex !== -1
+                        ? lines
+                            .slice(
+                              detailsStartIndex + 1,
+                              conclusionStartIndex !== -1
+                                ? conclusionStartIndex
+                                : undefined,
+                            )
+                            .filter((line) => line.trim().startsWith("-"))
+                            .map((line) => line.trim())
+                        : []
+
+                    // Extract conclusion
+                    const conclusion =
+                      conclusionStartIndex !== -1
+                        ? lines[conclusionStartIndex]
+                        : ""
+
+                    return (
+                      <div className="space-y-3">
+                        {/* Main Description */}
+                        <div className="border-emerald-200 border-b pb-2">
+                          <p className="font-medium text-emerald-900">
+                            {mainDescription}
+                          </p>
+                        </div>
+
+                        {/* Project Details */}
+                        {projectDetails.length > 0 && (
+                          <div>
+                            <p className="mb-2 font-medium text-emerald-800 text-xs">
+                              PROJECT DETAILS:
+                            </p>
+                            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                              {projectDetails.map((detail, index) => {
+                                const [label, value] = detail
+                                  .split(":")
+                                  .map((s) => s.trim())
+                                const cleanLabel = label?.replace("- ", "")
+
+                                return (
+                                  <div
+                                    key={index}
+                                    className="flex items-start justify-between rounded border border-emerald-100 bg-emerald-50 p-2"
+                                  >
+                                    <span className="font-medium text-emerald-700 text-xs">
+                                      {cleanLabel}:
+                                    </span>
+                                    <span className="ml-2 text-right text-emerald-900 text-xs">
+                                      {value}
+                                    </span>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Conclusion */}
+                        {conclusion && (
+                          <div className="border-emerald-200 border-t pt-2">
+                            <p className="text-emerald-800 text-xs italic">
+                              {conclusion}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })()}
+                </div>
               </div>
             </div>
           </div>

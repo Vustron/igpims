@@ -12,6 +12,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popovers"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltips"
 import { Calendar } from "@/components/ui/calendars"
 import { Search, CalendarIcon, X } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
@@ -19,6 +24,7 @@ import { Input } from "@/components/ui/inputs"
 import { Badge } from "@/components/ui/badges"
 import { Plus } from "lucide-react"
 
+import { useProjectRequestStore } from "@/features/project-request/project-request-store"
 import { useDialog } from "@/hooks/use-dialog"
 import { useState } from "react"
 
@@ -46,6 +52,24 @@ export const ProjectRequestFilter = ({
   }>({ from: undefined, to: undefined })
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const { onOpen } = useDialog()
+  const { requests } = useProjectRequestStore()
+
+  // Check if there are any active projects (not completed or rejected)
+  const hasActiveProjects = requests.some(
+    (request) =>
+      request.status !== "completed" && request.status !== "rejected",
+  )
+
+  // Find the latest active project for tooltip message
+  const latestActiveProject = requests
+    .filter(
+      (request) =>
+        request.status !== "completed" && request.status !== "rejected",
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(),
+    )[0]
 
   const statusOptions: { value: StatusOption; label: string }[] = [
     { value: "all", label: "All Statuses" },
@@ -229,13 +253,47 @@ export const ProjectRequestFilter = ({
           </PopoverContent>
         </Popover>
 
-        <Button
-          className="gap-2 shadow-sm transition-all hover:shadow"
-          onClick={() => onOpen("createIgp")}
-        >
-          <Plus className="size-4" />
-          <span className="whitespace-nowrap">New IGP Proposal</span>
-        </Button>
+        {/* New IGP Proposal Button with Tooltip */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className={cn(
+                "gap-2 shadow-sm transition-all hover:shadow",
+                hasActiveProjects && "cursor-not-allowed opacity-50",
+              )}
+              onClick={() => !hasActiveProjects && onOpen("createIgp")}
+              disabled={hasActiveProjects}
+            >
+              <Plus className="size-4" />
+              <span className="whitespace-nowrap">New IGP Proposal</span>
+            </Button>
+          </TooltipTrigger>
+
+          <TooltipContent
+            side="bottom"
+            align="center"
+            className={cn(
+              hasActiveProjects && latestActiveProject
+                ? "max-w-xs bg-amber-800 text-white"
+                : "",
+            )}
+          >
+            {hasActiveProjects && latestActiveProject ? (
+              <div className="flex items-start gap-2">
+                <span className="text-sm">⚠️</span>
+                <div className="space-y-1">
+                  <p className="font-medium text-sm">Active project exists</p>
+                  <p className="text-amber-100 text-xs">
+                    Complete "{latestActiveProject.projectTitle}" (
+                    {latestActiveProject.id}) first
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <span>Create a new IGP proposal</span>
+            )}
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       {/* Active filters */}
