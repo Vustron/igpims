@@ -25,9 +25,9 @@ import { useState } from "react"
 import { format } from "date-fns"
 import { cn } from "@/utils/cn"
 
-import type { FundRequest } from "@/features/fund-request/fund-request-store"
+import type { ProjectRequest } from "@/features/project-request/project-request-store"
 
-type StatusOption = FundRequest["status"] | "all"
+type StatusOption = ProjectRequest["status"] | "all"
 
 export const ProjectRequestFilter = ({
   onFilterChange,
@@ -53,10 +53,8 @@ export const ProjectRequestFilter = ({
     { value: "in_review", label: "In Review" },
     { value: "checking", label: "Checking" },
     { value: "approved", label: "Approved" },
-    { value: "disbursed", label: "Disbursed" },
-    { value: "received", label: "Received" },
-    { value: "receipted", label: "Receipted" },
-    { value: "validated", label: "Validated" },
+    { value: "in_progress", label: "In Progress" },
+    { value: "completed", label: "Completed" },
     { value: "rejected", label: "Rejected" },
   ]
 
@@ -168,7 +166,7 @@ export const ProjectRequestFilter = ({
         <div className="relative flex-grow">
           <Search className="-translate-y-1/2 absolute top-1/2 left-3 size-4 text-slate-400" />
           <Input
-            placeholder="Search by ID or purpose..."
+            placeholder="Search by ID, title, or project lead..."
             className="pl-10"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
@@ -233,10 +231,10 @@ export const ProjectRequestFilter = ({
 
         <Button
           className="gap-2 shadow-sm transition-all hover:shadow"
-          onClick={() => onOpen("createProjectRequest")}
+          onClick={() => onOpen("createIgp")}
         >
           <Plus className="size-4" />
-          <span className="whitespace-nowrap">New Project Request</span>
+          <span className="whitespace-nowrap">New IGP Proposal</span>
         </Button>
       </div>
 
@@ -262,11 +260,12 @@ export const ProjectRequestFilter = ({
                 </span>
                 <Button
                   variant={"ghost"}
-                  className="rounded-full bg-background"
+                  size="sm"
+                  className="h-4 w-4 rounded-full p-0"
                   onClick={() => removeFilter(filter)}
                 >
                   <span className="sr-only">Remove</span>
-                  <X className="size-4" />
+                  <X className="size-3" />
                 </Button>
               </Badge>
             )

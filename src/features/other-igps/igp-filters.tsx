@@ -273,7 +273,7 @@ export function IgpFilters({
             className="flex items-center gap-1.5"
           >
             <PlusCircleIcon className="h-4 w-4" />
-            <span>Add IGP</span>
+            <span>New IGP Proposal</span>
           </Button>
         </div>
       </div>

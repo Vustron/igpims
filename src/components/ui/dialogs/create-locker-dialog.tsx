@@ -31,7 +31,7 @@ export const CreateLockerDialog = () => {
   if (isDesktop) {
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="min-w-[450px] max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Create new locker</DialogTitle>
             <DialogDescription>

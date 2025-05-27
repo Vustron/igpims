@@ -15,6 +15,8 @@ import {
   PrintIgpStatusDialog,
   ValidateExpenseDialog,
   CreateWaterFundDialog,
+  CompleteProjectDialog,
+  CreateResolutionDialog,
   CreateLockerRentDialog,
   CreateWaterVendoDialog,
   CreateFundRequestDialog,
@@ -22,8 +24,13 @@ import {
   DueOverduePaymentsDialog,
   ApproveFundRequestDialog,
   IgpFinancialReportDialog,
+  StartImplementationDialog,
   CreateProjectRequestDialog,
+  ReviewProjectRequestDialog,
+  DeleteProjectRequestDialog,
+  ApproveProjectRequestDialog,
   RentalAgreementReceiptDialog,
+  SendEmailLockerViolationDialog,
 } from "@/components/ui/dialogs"
 
 import useMounted from "@/hooks/use-mounted"
@@ -56,6 +63,13 @@ export const DialogProvider = () => {
       <IgpFinancialReportDialog />
       <DueOverduePaymentsDialog />
       <PrintIgpStatusDialog />
+      <SendEmailLockerViolationDialog />
+      <ReviewProjectRequestDialog />
+      <CreateResolutionDialog />
+      <ApproveProjectRequestDialog />
+      <StartImplementationDialog />
+      <CompleteProjectDialog />
+      <DeleteProjectRequestDialog />
     </>
   )
 }

@@ -22,39 +22,50 @@ export const FundRequestClient = () => {
   })
 
   const filteredRequests = useMemo(() => {
-    return requests.filter((request) => {
-      if (
-        filters.search &&
-        !request.id.toLowerCase().includes(filters.search.toLowerCase()) &&
-        !request.purpose.toLowerCase().includes(filters.search.toLowerCase()) &&
-        !request.requestor.toLowerCase().includes(filters.search.toLowerCase())
-      ) {
-        return false
-      }
-
-      if (filters.status !== "all" && request.status !== filters.status) {
-        return false
-      }
-
-      if (filters.dateRange.from || filters.dateRange.to) {
-        const requestDate = new Date(request.requestDate)
-
-        if (filters.dateRange.from && requestDate < filters.dateRange.from) {
+    return requests
+      .filter((request) => {
+        if (
+          filters.search &&
+          !request.id.toLowerCase().includes(filters.search.toLowerCase()) &&
+          !request.purpose
+            .toLowerCase()
+            .includes(filters.search.toLowerCase()) &&
+          !request.requestor
+            .toLowerCase()
+            .includes(filters.search.toLowerCase())
+        ) {
           return false
         }
 
-        if (filters.dateRange.to) {
-          const endDate = new Date(filters.dateRange.to)
-          endDate.setDate(endDate.getDate() + 1)
+        if (filters.status !== "all" && request.status !== filters.status) {
+          return false
+        }
 
-          if (requestDate > endDate) {
+        if (filters.dateRange.from || filters.dateRange.to) {
+          const requestDate = new Date(request.requestDate)
+
+          if (filters.dateRange.from && requestDate < filters.dateRange.from) {
             return false
           }
-        }
-      }
 
-      return true
-    })
+          if (filters.dateRange.to) {
+            const endDate = new Date(filters.dateRange.to)
+            endDate.setDate(endDate.getDate() + 1)
+
+            if (requestDate > endDate) {
+              return false
+            }
+          }
+        }
+
+        return true
+      })
+      .sort((a, b) => {
+        // Sort by lastUpdated date in descending order (newest first)
+        const dateA = new Date(a.lastUpdated)
+        const dateB = new Date(b.lastUpdated)
+        return dateB.getTime() - dateA.getTime()
+      })
   }, [requests, filters])
 
   return (

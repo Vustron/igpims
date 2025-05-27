@@ -77,7 +77,7 @@ const VerifyClient = () => {
 
   return (
     <div className="grid w-full grow items-center px-4 sm:justify-center">
-      <Card className="w-full bg-background shadow-xl sm:w-96">
+      <Card className="w-full border-2 border-[#4A4520] bg-background shadow-xl sm:w-96">
         <CardHeader>
           <div className="flex flex-col items-center justify-center">
             <Image

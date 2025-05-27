@@ -39,7 +39,11 @@ export const CreateIgpDialog = () => {
               Project.
             </DialogDescription>
           </DialogHeader>
-          <CreateIgpForm />
+          <CreateIgpForm
+            onSuccess={handleClose}
+            onError={handleClose}
+            onClose={handleClose}
+          />
         </DialogContent>
       </Dialog>
     )
@@ -55,7 +59,11 @@ export const CreateIgpDialog = () => {
           </DrawerDescription>
         </DrawerHeader>
         <div className="px-6 pb-6">
-          <CreateIgpForm />
+          <CreateIgpForm
+            onSuccess={handleClose}
+            onError={handleClose}
+            onClose={handleClose}
+          />
         </div>
       </DrawerContent>
     </Drawer>

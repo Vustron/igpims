@@ -25,6 +25,13 @@ export type DialogType =
   | "submitReceipt"
   | "validateExpense"
   | "rejectFundRequest"
+  | "sendEmailLockerViolation"
+  | "reviewProjectRequest"
+  | "createResolution"
+  | "approveProjectRequest"
+  | "startImplementation"
+  | "completeProject"
+  | "deleteProjectRequest"
 
 interface ConfirmDialogData {
   title?: string
@@ -37,6 +44,9 @@ interface FundRequestDialogData {
   currentStatus?: string
 }
 
+export interface ProjectRequestData {
+  requestId?: string
+}
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -45,7 +55,7 @@ interface DialogStore {
   onClose: () => void
 }
 
-type DialogData = ConfirmDialogData | FundRequestDialogData
+type DialogData = ConfirmDialogData | FundRequestDialogData | ProjectRequestData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -57,6 +67,10 @@ export const isFundRequestData = (
   data: DialogData | null,
 ): data is FundRequestDialogData => {
   return data !== null && "requestId" in data
+}
+
+export const isProjectRequestData = (data: any): data is ProjectRequestData => {
+  return data && typeof data.requestId === "string"
 }
 
 export const useDialog = create<DialogStore>((set) => ({

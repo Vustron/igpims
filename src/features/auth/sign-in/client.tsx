@@ -24,7 +24,7 @@ const SignInClient = ({ userId }: SignInClientProps) => {
 
   return (
     <div className="flex w-full flex-col items-center justify-between gap-8 px-1 ">
-      <Card className="w-full bg-background shadow-xl sm:w-96">
+      <Card className="w-full border-2 border-[#4A4520] bg-background shadow-xl sm:w-96">
         <CardHeader>
           <div className="flex flex-col items-center justify-center">
             <Image

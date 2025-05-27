@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 import { motion } from "framer-motion"
-import toast from "react-hot-toast"
+// import toast from "react-hot-toast"
 
 import { useDialog } from "@/hooks/use-dialog"
 
@@ -40,21 +40,6 @@ export function TableActions<TData>({
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
 
-  const handleSendEmail = () => {
-    toast.promise(
-      new Promise((resolve) => {
-        setTimeout(() => {
-          resolve("Emails sent successfully")
-        }, 1000)
-      }),
-      {
-        loading: <span className="animate-pulse">Sending emails...</span>,
-        success: "Emails sent successfully",
-        error: "Failed to send emails",
-      },
-    )
-  }
-
   return (
     <div className="flex flex-wrap items-center gap-2">
       {(isIgp || isLockerRental) && (
@@ -69,10 +54,10 @@ export function TableActions<TData>({
             size="sm"
             variant="outline"
             className="font-normal text-xs shadow-xs"
-            onClick={handleSendEmail}
+            onClick={() => onOpen("sendEmailLockerViolation")}
           >
             <Mail className="mr-2 h-4 w-4" />
-            Send email
+            {isLockerRental ? "Send locker violations" : "Send email"}
           </Button>
         </motion.div>
       )}
