@@ -97,6 +97,9 @@ export const CheckFundsDialog = () => {
           <Description>
             Verify fund availability and allocate the appropriate amount.
           </Description>
+          <div className="mt-2 w-full text-center font-bold">
+            Current IGP Funds: P2345.00
+          </div>
         </Header>
 
         <div className="space-y-4 p-6">

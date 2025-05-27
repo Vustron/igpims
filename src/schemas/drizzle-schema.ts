@@ -404,11 +404,11 @@ export const igp = sqliteTable(
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
   },
-  (t) => [
-    index("igp_name_idx").on(t.igpName),
-    index("igp_semester_year_idx").on(t.semesterAndAcademicYear),
-    index("igp_type_idx").on(t.igpType),
-    index("igp_start_date_idx").on(t.igpStartDate),
+  (_t) => [
+    // index("igp_name_idx").on(t.igpName),
+    // index("igp_semester_year_idx").on(t.semesterAndAcademicYear),
+    // index("igp_type_idx").on(t.igpType),
+    // index("igp_start_date_idx").on(t.igpStartDate),
   ],
 )
 
@@ -455,11 +455,11 @@ export const igpTransactions = sqliteTable(
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
   },
-  (t) => [
-    index("igp_transactions_igp_id_idx").on(t.igpId),
-    index("igp_transactions_purchaser_idx").on(t.purchaserName),
-    index("igp_transactions_date_bought_idx").on(t.dateBought),
-    index("igp_transactions_item_received_idx").on(t.itemReceived),
+  (_t) => [
+    // index("igp_transactions_igp_id_idx").on(t.igpId),
+    // index("igp_transactions_purchaser_idx").on(t.purchaserName),
+    // index("igp_transactions_date_bought_idx").on(t.dateBought),
+    // index("igp_transactions_item_received_idx").on(t.itemReceived),
   ],
 )
 
@@ -495,9 +495,9 @@ export const igpSupply = sqliteTable(
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
   },
-  (t) => [
-    index("igp_supply_igp_id_idx").on(t.igpId),
-    index("igp_supply_date_idx").on(t.supplyDate),
+  (_t) => [
+    // index("igp_supply_igp_id_idx").on(t.igpId),
+    // index("igp_supply_date_idx").on(t.supplyDate),
   ],
 )
 
@@ -535,11 +535,11 @@ export const fundRequest = sqliteTable(
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
   },
-  (t) => [
-    index("fund_request_status_idx").on(t.status),
-    index("fund_request_requested_by_idx").on(t.requestedBy),
-    index("fund_request_approved_by_idx").on(t.approvedBy),
-    index("fund_request_created_at_idx").on(t.createdAt),
+  (_t) => [
+    // index("fund_request_status_idx").on(t.status),
+    // index("fund_request_requested_by_idx").on(t.requestedBy),
+    // index("fund_request_approved_by_idx").on(t.approvedBy),
+    // index("fund_request_created_at_idx").on(t.createdAt),
   ],
 )
 
@@ -592,11 +592,11 @@ export const projectRequest = sqliteTable(
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
   },
-  (t) => [
-    index("project_request_status_idx").on(t.status),
-    index("project_request_lead_idx").on(t.projectLead),
-    index("project_request_date_idx").on(t.dateSubmitted),
-    index("project_request_submitted_by_idx").on(t.submittedBy),
+  (_t) => [
+    // index("project_request_status_idx").on(t.status),
+    // index("project_request_lead_idx").on(t.projectLead),
+    // index("project_request_date_idx").on(t.dateSubmitted),
+    // index("project_request_submitted_by_idx").on(t.submittedBy),
   ],
 )
 

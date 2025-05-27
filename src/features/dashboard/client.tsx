@@ -17,16 +17,17 @@ export const DashboardClient = () => {
       metric: "52 Active Lockers",
       percentageChange: "+5.4%",
       trendDescription: "Per Semester Growth",
-      icon: <GiLockers className="size-4 text-muted-foreground" />,
+      icon: <GiLockers className="size-8 text-muted-foreground" />,
     },
     {
       id: "2",
       title: "Water Vendo",
+
       amount: "₱4,500",
-      metric: "15 Active Machines",
+      metric: "4 Active Machines",
       percentageChange: "+3.8%",
       trendDescription: "Weekly Growth",
-      icon: <GiDroplets className="size-4 text-muted-foreground" />,
+      icon: <GiDroplets className="size-8 text-muted-foreground" />,
     },
     {
       id: "3",
@@ -35,7 +36,7 @@ export const DashboardClient = () => {
       metric: "3 Total Items",
       percentageChange: "+4.5%",
       trendDescription: "Monthly Growth",
-      icon: <GiClothes className="size-4 text-muted-foreground" />,
+      icon: <GiClothes className="size-8 text-muted-foreground" />,
     },
   ]
   return (

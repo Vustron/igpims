@@ -8,7 +8,7 @@ export const SalesOverview = () => {
   const data = [
     { name: "Locker Rentals", value: 6500, color: "#3182CE" },
     { name: "Water Vendo", value: 4500, color: "#4FD1C5" },
-    { name: "Merchandise", value: 5300, color: "#319795" },
+    { name: "Other IGPs", value: 5300, color: "#319795" },
   ]
 
   const chartConfig = {
@@ -23,7 +23,7 @@ export const SalesOverview = () => {
   return (
     <Card className="h-full w-full bg-background p-3 sm:p-4 md:p-6">
       <h3 className="mb-3 font-semibold text-sm sm:mb-4 sm:text-base md:mb-6 md:text-lg">
-        Sales Overview
+        Sales Breakdown
       </h3>
 
       <div className="flex flex-col sm:flex-row sm:items-center">
@@ -80,7 +80,7 @@ export const SalesOverview = () => {
           </div>
           <div className="mt-3 border-border/50 border-t pt-2 font-medium text-sm">
             <div className="flex justify-between">
-              <span>Total</span>
+              <span>Total Sales:</span>
               <span>{formatCurrency(total)}</span>
             </div>
           </div>

@@ -35,10 +35,10 @@ const CustomXAxisTick = ({ x, y, payload }: any) => {
 
 export const IgpPerformance = () => {
   const data = [
-    { name: "Kalibulong Tshirts", value: 200 },
-    { name: "Button Pins", value: 800 },
-    { name: "Water Vendo", value: 1200 },
-    { name: "Locker", value: 400 },
+    { name: "Kalibulong Tshirts", value: 3000 },
+    { name: "Button Pins", value: 1800 },
+    { name: "Water Vendo", value: 4500 },
+    { name: "Locker Rentals", value: 6500 },
   ]
 
   const { yAxisDomain, yAxisTicks } = useMemo(() => {
@@ -89,7 +89,7 @@ export const IgpPerformance = () => {
 
   return (
     <Card className="col-span-full h-full w-full bg-background p-6">
-      <h3 className="mb-6 font-semibold text-lg">IGP Performance</h3>
+      <h3 className="mb-6 font-semibold text-lg">IGP Income Performance</h3>
       <ChartContainer config={chartConfig} className="h-full w-full">
         <ResponsiveContainer width="100%" height={350}>
           <BarChart
@@ -130,10 +130,10 @@ export const IgpPerformance = () => {
               content={<ChartTooltipContent />}
               formatter={(value) => [
                 `₱${Number(value).toLocaleString()}`,
-                " Revenue",
+                " Sales Income",
               ]}
             />
-            <Bar dataKey="value" name="Revenue" radius={[8, 8, 0, 0]}>
+            <Bar dataKey="value" name="Sales Income" radius={[8, 8, 0, 0]}>
               {data.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
