@@ -70,7 +70,7 @@ const nextConfig: import("next").NextConfig = {
     staleTimes: {
       dynamic: 0,
       static: 180,
-    },
+    }
   },
   serverExternalPackages: [ '@react-pdf/renderer' ],
   webpack: (config, { isServer }) => {
