@@ -37,7 +37,7 @@ export const signUpSchema = z.object({
       message:
         "Password must be strong (include uppercase, lowercase, number, symbol, and be at least 12 characters)",
     }),
-  providerType: z.string().trim().default("credentials"),
+  providerType: z.string().trim().default("credentials").optional(),
 })
 
 export const signInSchema = z.object({
