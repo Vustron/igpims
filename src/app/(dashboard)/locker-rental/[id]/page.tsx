@@ -1,7 +1,7 @@
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
 import { preFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { ContentLayout } from "@/features/layouts/content-layout"
-import { LockerClient } from "@/features/locker/client"
+import { LockerClient } from "@/features/locker-igp/locker/client"
 import { QueryHydrator } from "@/utils/query-hydrator"
 
 import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"

@@ -8,12 +8,12 @@ import {
 } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { ErrorBoundary } from "react-error-boundary"
+import SuperJSON from "superjson"
+import React from "react"
 
 import { ErrorFallback } from "@/components/ui/fallbacks"
 
 import { useState, useEffect } from "react"
-
-import React from "react"
 
 // init query dev tools
 const ReactQueryDevtoolsProduction = React.lazy(() =>
@@ -36,9 +36,13 @@ function makeQueryClient() {
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       },
       dehydrate: {
+        serializeData: SuperJSON.serialize,
         shouldDehydrateQuery: (query) =>
           defaultShouldDehydrateQuery(query) ||
           query.state.status === "pending",
+      },
+      hydrate: {
+        deserializeData: SuperJSON.deserialize,
       },
     },
   })

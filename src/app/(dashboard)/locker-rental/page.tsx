@@ -1,5 +1,5 @@
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
-import { LockerRentalTabs } from "@/features/locker-rental/locker-rental-tabs"
+import { LockerIgpClient } from "@/features/locker-igp/client"
 import { ContentLayout } from "@/features/layouts/content-layout"
 
 import { preFindManyRentals } from "@/backend/actions/locker-rental/find-many"
@@ -26,7 +26,7 @@ export default async function LockerRentalPage() {
     <ContentLayout title="Locker Rental">
       <DynamicBreadcrumb items={lockerRentalItems} />
       <QueryHydrator prefetchFns={[lockerResults, rentalResults]}>
-        <LockerRentalTabs />
+        <LockerIgpClient />
       </QueryHydrator>
     </ContentLayout>
   )

@@ -1,14 +1,19 @@
+import { lockerConfigSchema } from "@/schemas/locker"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
-import { lockerConfigSchema } from "@/schemas/locker"
 import { sanitizer } from "@/utils/sanitizer"
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
 import type { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
-import type { Locker } from "@/schemas/drizzle-schema"
+import type { Locker, LockerRental } from "@/schemas/drizzle-schema"
 import type { LockerConfig } from "@/schemas/locker"
+
+interface LockerWithRental extends Locker {
+  rental?: LockerRental
+  rentalHistory?: LockerRental[]
+}
 
 export async function updateLocker(
   id: string,
@@ -36,14 +41,17 @@ export const useUpdateLocker = (id: string) => {
       )
       return await updateLocker(id, sanitizedData)
     },
-    onMutate: async () => {
+    onMutate: async (updatedData) => {
       await queryClient.cancelQueries({ queryKey: ["locker", id] })
       await queryClient.cancelQueries({ queryKey: ["lockers"] })
       await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
       await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
       await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
 
-      const previousLocker = queryClient.getQueryData<Locker>(["locker", id])
+      const previousLocker = queryClient.getQueryData<LockerWithRental>([
+        "locker",
+        id,
+      ])
       const previousLockers = queryClient.getQueryData(["lockers"])
       const previousLockersInfinite = queryClient.getQueryData([
         "lockers-infinite",
@@ -53,6 +61,180 @@ export const useUpdateLocker = (id: string) => {
         "locker-rentals-infinite",
       ])
 
+      if (previousLocker) {
+        const updatedLocker = {
+          ...previousLocker,
+          ...updatedData,
+          lockerRentalPrice: updatedData.lockerRentalPrice
+            ? Number(updatedData.lockerRentalPrice)
+            : previousLocker.lockerRentalPrice,
+          updatedAt: new Date().getTime(),
+        } as unknown as LockerWithRental
+
+        if (previousLocker.rental && updatedData.rentalId) {
+          updatedLocker.rental = {
+            ...previousLocker.rental,
+            ...(updatedData.renterId && { renterId: updatedData.renterId }),
+            ...(updatedData.renterName && {
+              renterName: updatedData.renterName,
+            }),
+            ...(updatedData.courseAndSet && {
+              courseAndSet: updatedData.courseAndSet,
+            }),
+            ...(updatedData.renterEmail && {
+              renterEmail: updatedData.renterEmail,
+            }),
+            ...(updatedData.rentalStatus && {
+              rentalStatus: updatedData.rentalStatus,
+            }),
+            ...(updatedData.paymentStatus && {
+              paymentStatus: updatedData.paymentStatus,
+            }),
+            ...(updatedData.dateRented && {
+              dateRented:
+                typeof updatedData.dateRented === "number"
+                  ? updatedData.dateRented
+                  : new Date(updatedData.dateRented).getTime(),
+            }),
+            ...(updatedData.dateDue && {
+              dateDue:
+                typeof updatedData.dateDue === "number"
+                  ? updatedData.dateDue
+                  : new Date(updatedData.dateDue).getTime(),
+            }),
+            updatedAt: new Date().getTime(),
+          }
+        }
+
+        queryClient.setQueryData(["locker", id], updatedLocker)
+      }
+
+      // Update lockers list
+      queryClient.setQueriesData<PaginatedLockersResponse>(
+        { queryKey: ["lockers"] },
+        (oldData: any) => {
+          if (!oldData?.data) return oldData
+          return {
+            ...oldData,
+            data: oldData.data.map((locker: any) =>
+              locker.id === id
+                ? {
+                    ...locker,
+                    ...updatedData,
+                    lockerRentalPrice: updatedData.lockerRentalPrice
+                      ? Number(updatedData.lockerRentalPrice)
+                      : locker.lockerRentalPrice,
+                    updatedAt: new Date().getTime(),
+                    rental:
+                      previousLocker?.rental && updatedData.rentalId
+                        ? {
+                            ...previousLocker.rental,
+                            ...(updatedData.renterId && {
+                              renterId: updatedData.renterId,
+                            }),
+                            ...(updatedData.renterName && {
+                              renterName: updatedData.renterName,
+                            }),
+                            ...(updatedData.courseAndSet && {
+                              courseAndSet: updatedData.courseAndSet,
+                            }),
+                            ...(updatedData.renterEmail && {
+                              renterEmail: updatedData.renterEmail,
+                            }),
+                            ...(updatedData.rentalStatus && {
+                              rentalStatus: updatedData.rentalStatus,
+                            }),
+                            ...(updatedData.paymentStatus && {
+                              paymentStatus: updatedData.paymentStatus,
+                            }),
+                            ...(updatedData.dateRented && {
+                              dateRented:
+                                typeof updatedData.dateRented === "number"
+                                  ? updatedData.dateRented
+                                  : new Date(updatedData.dateRented).getTime(),
+                            }),
+                            ...(updatedData.dateDue && {
+                              dateDue:
+                                typeof updatedData.dateDue === "number"
+                                  ? updatedData.dateDue
+                                  : new Date(updatedData.dateDue).getTime(),
+                            }),
+                            updatedAt: new Date().getTime(),
+                          }
+                        : locker.rental,
+                  }
+                : locker,
+            ),
+          }
+        },
+      )
+
+      // Update infinite lockers
+      queryClient.setQueriesData(
+        { queryKey: ["lockers-infinite"] },
+        (oldData: any) => {
+          if (!oldData?.pages) return oldData
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: PaginatedLockersResponse) => ({
+              ...page,
+              data: page.data.map((locker: any) =>
+                locker.id === id
+                  ? {
+                      ...locker,
+                      ...updatedData,
+                      lockerRentalPrice: updatedData.lockerRentalPrice
+                        ? Number(updatedData.lockerRentalPrice)
+                        : locker.lockerRentalPrice,
+                      updatedAt: new Date().getTime(),
+                      rental:
+                        previousLocker?.rental && updatedData.rentalId
+                          ? {
+                              ...previousLocker.rental,
+                              ...(updatedData.renterId && {
+                                renterId: updatedData.renterId,
+                              }),
+                              ...(updatedData.renterName && {
+                                renterName: updatedData.renterName,
+                              }),
+                              ...(updatedData.courseAndSet && {
+                                courseAndSet: updatedData.courseAndSet,
+                              }),
+                              ...(updatedData.renterEmail && {
+                                renterEmail: updatedData.renterEmail,
+                              }),
+                              ...(updatedData.rentalStatus && {
+                                rentalStatus: updatedData.rentalStatus,
+                              }),
+                              ...(updatedData.paymentStatus && {
+                                paymentStatus: updatedData.paymentStatus,
+                              }),
+                              ...(updatedData.dateRented && {
+                                dateRented:
+                                  typeof updatedData.dateRented === "number"
+                                    ? updatedData.dateRented
+                                    : new Date(
+                                        updatedData.dateRented,
+                                      ).getTime(),
+                              }),
+                              ...(updatedData.dateDue && {
+                                dateDue:
+                                  typeof updatedData.dateDue === "number"
+                                    ? updatedData.dateDue
+                                    : new Date(updatedData.dateDue).getTime(),
+                              }),
+                              updatedAt: new Date().getTime(),
+                            }
+                          : locker.rental,
+                    }
+                  : locker,
+              ),
+            })),
+          }
+        },
+      )
+
       return {
         previousLocker,
         previousLockers,
@@ -61,18 +243,30 @@ export const useUpdateLocker = (id: string) => {
         previousRentalsInfinite,
       }
     },
-    onSuccess: async (updatedLocker: Locker) => {
-      queryClient.setQueryData(["locker", id], updatedLocker)
+    onSuccess: (updatedLocker: Locker) => {
+      const currentData = queryClient.getQueryData<LockerWithRental>([
+        "locker",
+        id,
+      ])
 
+      // Merge the updated locker with the existing rental data
+      const mergedData = {
+        ...updatedLocker,
+        rental: currentData?.rental,
+        rentalHistory: currentData?.rentalHistory,
+      } as LockerWithRental
+
+      queryClient.setQueryData(["locker", id], mergedData)
+
+      // Update all queries that might contain this locker
       queryClient.setQueriesData<PaginatedLockersResponse>(
         { queryKey: ["lockers"] },
         (oldData) => {
           if (!oldData?.data) return oldData
-
           return {
             ...oldData,
             data: oldData.data.map((locker) =>
-              locker.id === id ? updatedLocker : locker,
+              locker.id === id ? mergedData : locker,
             ),
           }
         },
@@ -88,49 +282,62 @@ export const useUpdateLocker = (id: string) => {
             pages: oldData.pages.map((page: PaginatedLockersResponse) => ({
               ...page,
               data: page.data.map((locker) =>
-                locker.id === id ? updatedLocker : locker,
+                locker.id === id ? mergedData : locker,
               ),
             })),
           }
         },
       )
 
-      if (updatedLocker.lockerStatus) {
-        queryClient.setQueriesData(
-          { queryKey: ["locker-rentals"] },
-          (oldData: any) => {
-            if (!oldData?.data) return oldData
+      // Update rentals queries to reflect locker changes
+      queryClient.setQueriesData(
+        { queryKey: ["locker-rentals"] },
+        (oldData: any) => {
+          if (!oldData?.data) return oldData
 
-            return {
-              ...oldData,
-              data: oldData.data.map((rental: any) =>
+          return {
+            ...oldData,
+            data: oldData.data.map((rental: any) =>
+              rental.lockerId === id
+                ? {
+                    ...rental,
+                    locker: mergedData,
+                    ...(mergedData.rental && {
+                      dateRented: mergedData.rental.dateRented,
+                      dateDue: mergedData.rental.dateDue,
+                    }),
+                  }
+                : rental,
+            ),
+          }
+        },
+      )
+
+      queryClient.setQueriesData(
+        { queryKey: ["locker-rentals-infinite"] },
+        (oldData: any) => {
+          if (!oldData?.pages) return oldData
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => ({
+              ...page,
+              data: page.data.map((rental: any) =>
                 rental.lockerId === id
-                  ? { ...rental, locker: updatedLocker }
+                  ? {
+                      ...rental,
+                      locker: mergedData,
+                      ...(mergedData.rental && {
+                        dateRented: mergedData.rental.dateRented,
+                        dateDue: mergedData.rental.dateDue,
+                      }),
+                    }
                   : rental,
               ),
-            }
-          },
-        )
-
-        queryClient.setQueriesData(
-          { queryKey: ["locker-rentals-infinite"] },
-          (oldData: any) => {
-            if (!oldData?.pages) return oldData
-
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page: any) => ({
-                ...page,
-                data: page.data.map((rental: any) =>
-                  rental.lockerId === id
-                    ? { ...rental, locker: updatedLocker }
-                    : rental,
-                ),
-              })),
-            }
-          },
-        )
-      }
+            })),
+          }
+        },
+      )
     },
     onError: (error, _payload, context) => {
       if (context?.previousLocker) {
@@ -158,7 +365,7 @@ export const useUpdateLocker = (id: string) => {
       catchError(error)
     },
     onSettled: () => {
-      router.push("/locker-rental")
+      router.refresh()
     },
   })
 }

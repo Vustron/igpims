@@ -18,7 +18,7 @@ import { Printer, Download, Eye } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { useDialog } from "@/hooks/use-dialog"
+import { useDialog, isRentalReceiptData } from "@/hooks/use-dialog"
 
 import {
   pdf,
@@ -29,8 +29,10 @@ import {
   StyleSheet,
   PDFDownloadLink,
 } from "@react-pdf/renderer"
-
+import { format } from "date-fns"
 import toast from "react-hot-toast"
+
+import type { LockerRentalWithLocker } from "@/interfaces/locker"
 
 const styles = StyleSheet.create({
   page: {
@@ -213,7 +215,7 @@ const styles = StyleSheet.create({
   },
 })
 
-const ReceiptDocument = ({ receipt }: { receipt: any }) => (
+const ReceiptDocument = ({ receiptData }: { receiptData: any }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.receipt}>
@@ -224,27 +226,35 @@ const ReceiptDocument = ({ receipt }: { receipt: any }) => (
         </View>
 
         <View style={styles.metaRow}>
-          <Text style={styles.metaText}>Receipt No.: {receipt.receiptNo}</Text>
-          <Text style={styles.metaText}>Date Issued: {receipt.dateIssued}</Text>
+          <Text style={styles.metaText}>
+            Receipt No.: {receiptData.receiptNo}
+          </Text>
+          <Text style={styles.metaText}>
+            Date Issued: {receiptData.dateIssued}
+          </Text>
         </View>
 
         <View style={styles.studentSection}>
           <Text style={styles.sectionTitle}>Student Information</Text>
-          <Text style={styles.studentText}>Name: {receipt.studentName}</Text>
           <Text style={styles.studentText}>
-            Student ID: {receipt.studentId}
+            Name: {receiptData.studentName}
           </Text>
           <Text style={styles.studentText}>
-            Course & Year: {receipt.course}
+            Student ID: {receiptData.studentId}
+          </Text>
+          <Text style={styles.studentText}>
+            Course & Year: {receiptData.course}
           </Text>
         </View>
 
         <View style={styles.lockerSection}>
           <Text style={styles.sectionTitle}>Locker Information</Text>
-          <Text style={styles.infoText}>Locker ID: {receipt.lockerId}</Text>
-          <Text style={styles.infoText}>Location: {receipt.location}</Text>
-          <Text style={styles.infoText}>Date Rented: {receipt.dateRented}</Text>
-          <Text style={styles.infoText}>Date Due: {receipt.dateDue}</Text>
+          <Text style={styles.infoText}>Locker ID: {receiptData.lockerId}</Text>
+          <Text style={styles.infoText}>Location: {receiptData.location}</Text>
+          <Text style={styles.infoText}>
+            Date Rented: {receiptData.dateRented}
+          </Text>
+          <Text style={styles.infoText}>Date Due: {receiptData.dateDue}</Text>
         </View>
 
         <View style={styles.paymentSection}>
@@ -257,16 +267,16 @@ const ReceiptDocument = ({ receipt }: { receipt: any }) => (
 
           <View style={styles.amountRow}>
             <Text style={styles.amountLabel}>Locker Rental Fee</Text>
-            <Text style={styles.amountValue}>PHP {receipt.rentalFee}</Text>
+            <Text style={styles.amountValue}>{receiptData.rentalFee}</Text>
           </View>
 
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>TOTAL PAID:</Text>
-            <Text style={styles.totalValue}>{receipt.totalPaid}</Text>
+            <Text style={styles.totalValue}>{receiptData.totalPaid}</Text>
           </View>
 
           <Text style={styles.paymentMethod}>
-            Payment Method: {receipt.paymentMethod}
+            Payment Method: {receiptData.paymentStatus}
           </Text>
         </View>
 
@@ -291,28 +301,76 @@ const ReceiptDocument = ({ receipt }: { receipt: any }) => (
 )
 
 export const RentalAgreementReceiptDialog = () => {
-  const { isOpen, onClose, type } = useDialog()
+  const { isOpen, onClose, type, data } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "printRentalAgreementReceipt"
 
-  const receipt = {
-    receiptNo: "2024-0115001",
-    dateIssued: "January 15, 2024",
-    studentName: "Michelle G. Uy",
-    studentId: "2023-01155",
-    course: "BSDRM 2nd Year",
-    lockerId: "L-01",
-    location: "AB Building, 2nd Floor",
-    dateRented: "January 15, 2024",
-    dateDue: "May 30, 2024",
+  // Default fallback in case no rental is provided
+  const defaultReceipt = {
+    receiptNo: "N/A",
+    dateIssued: format(new Date(), "MMMM d, yyyy"),
+    studentName: "N/A",
+    studentId: "N/A",
+    course: "N/A",
+    lockerId: "N/A",
+    location: "N/A",
+    dateRented: "N/A",
+    dateDue: "N/A",
     rentalFee: "150.00",
     totalPaid: "PHP 150.00",
-    paymentMethod: "Cash",
+    paymentMethod: "N/A",
+  }
+
+  let receipt = defaultReceipt
+
+  if (isRentalReceiptData(data) && data.rental) {
+    const rental = data.rental as LockerRentalWithLocker
+    const locker = rental.locker
+
+    // For dateRented, default to today if it's an invalid date
+    let rentedDate = new Date()
+    try {
+      const parsedDate = new Date(rental.dateRented)
+      if (
+        !Number.isNaN(parsedDate.getTime()) &&
+        parsedDate.getFullYear() < 2100
+      ) {
+        rentedDate = parsedDate
+      }
+    } catch (e) {}
+
+    // For dateDue, default to tomorrow if it's an invalid date
+    let dueDate = new Date()
+    dueDate.setDate(dueDate.getDate() + 1) // Tomorrow by default
+    try {
+      const parsedDate = new Date(rental.dateDue)
+      if (
+        !Number.isNaN(parsedDate.getTime()) &&
+        parsedDate.getFullYear() < 2100
+      ) {
+        dueDate = parsedDate
+      }
+    } catch (e) {}
+
+    receipt = {
+      receiptNo: `R-${rental.id.substring(0, 6)}`,
+      dateIssued: format(new Date(), "MMMM d, yyyy"),
+      studentName: rental.renterName,
+      studentId: rental.renterId,
+      course: rental.courseAndSet,
+      lockerId: locker?.lockerName || rental.lockerId,
+      location: locker?.lockerLocation || "Unknown Location",
+      dateRented: format(rentedDate, "MMMM d, yyyy"),
+      dateDue: format(dueDate, "MMMM d, yyyy"),
+      rentalFee: `${locker?.lockerRentalPrice || 150}.00`,
+      totalPaid: `PHP ${locker?.lockerRentalPrice || 150}.00`,
+      paymentMethod: rental.paymentStatus === "paid" ? "Cash" : "Pending",
+    }
   }
 
   const handlePrint = async () => {
     try {
-      const blob = await pdf(<ReceiptDocument receipt={receipt} />).toBlob()
+      const blob = await pdf(<ReceiptDocument receiptData={receipt} />).toBlob()
       const url = URL.createObjectURL(blob)
 
       const iframe = document.createElement("iframe")
@@ -437,7 +495,7 @@ export const RentalAgreementReceiptDialog = () => {
               <div className="mt-2 space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span>Locker Rental Fee:</span>
-                  <span className="font-medium">PHP {receipt.rentalFee}</span>
+                  <span className="font-medium">{receipt.rentalFee}</span>
                 </div>
                 <div className="border-black border-t-2 pt-2">
                   <div className="flex justify-between font-bold">
@@ -476,7 +534,7 @@ export const RentalAgreementReceiptDialog = () => {
   const renderFooter = () => (
     <div className="flex w-full gap-3">
       <PDFDownloadLink
-        document={<ReceiptDocument receipt={receipt} />}
+        document={<ReceiptDocument receiptData={receipt} />}
         fileName={`locker-receipt-${receipt.receiptNo}.pdf`}
         className="flex-1"
       >

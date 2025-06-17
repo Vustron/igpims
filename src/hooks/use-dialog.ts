@@ -1,5 +1,7 @@
 import { create } from "zustand"
 
+import type { Locker, LockerRental } from "@/schemas/drizzle-schema"
+
 export type DialogType =
   | "confirm"
   | "needVerifyUser"
@@ -48,6 +50,12 @@ interface FundRequestDialogData {
 export interface ProjectRequestData {
   requestId?: string
 }
+
+interface RentalReceiptData {
+  rental?: LockerRental
+  locker?: Locker
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -56,7 +64,11 @@ interface DialogStore {
   onClose: () => void
 }
 
-type DialogData = ConfirmDialogData | FundRequestDialogData | ProjectRequestData
+export type DialogData =
+  | ConfirmDialogData
+  | FundRequestDialogData
+  | ProjectRequestData
+  | RentalReceiptData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -72,6 +84,10 @@ export const isFundRequestData = (
 
 export const isProjectRequestData = (data: any): data is ProjectRequestData => {
   return data && typeof data.requestId === "string"
+}
+
+export const isRentalReceiptData = (data: any): data is RentalReceiptData => {
+  return data && data.rental !== undefined
 }
 
 export const useDialog = create<DialogStore>((set) => ({

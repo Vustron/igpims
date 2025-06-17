@@ -11,7 +11,7 @@ import {
   RefreshCw,
   Settings2,
   PlusCircle,
-  PrinterIcon,
+  // PrinterIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 import { motion } from "framer-motion"
@@ -57,12 +57,12 @@ export function TableActions<TData>({
             onClick={() => onOpen("sendEmailLockerViolation")}
           >
             <Mail className="mr-2 h-4 w-4" />
-            {isLockerRental ? "Send locker violations" : "Send email"}
+            {isLockerRental ? "Send email" : "Send locker violations"}
           </Button>
         </motion.div>
       )}
 
-      <motion.div
+      {/* <motion.div
         key="print-button"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -78,7 +78,7 @@ export function TableActions<TData>({
           <PrinterIcon className="mr-2 h-4 w-4" />
           Print
         </Button>
-      </motion.div>
+      </motion.div> */}
 
       {(isLockerRental || isUser) && (
         <motion.div

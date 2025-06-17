@@ -151,10 +151,17 @@ export async function updateLocker(
               validationResult.data.paymentStatus ||
               existingRental.paymentStatus,
             dateRented: validationResult.data.dateRented
-              ? toTimestamp(validationResult.data.dateRented)
+              ? typeof validationResult.data.dateRented === "string"
+                ? new Date(validationResult.data.dateRented).getTime()
+                : toTimestamp(validationResult.data.dateRented)
               : existingRental.dateRented,
             dateDue: validationResult.data.dateDue
-              ? toTimestamp(validationResult.data.dateDue)
+              ? typeof validationResult.data.dateDue === "string"
+                ? new Date(validationResult.data.dateDue).getTime()
+                : typeof validationResult.data.dateDue === "object" &&
+                    Object.keys(validationResult.data.dateDue).length === 0
+                  ? existingRental.dateDue
+                  : toTimestamp(validationResult.data.dateDue)
               : existingRental.dateDue,
           })
 

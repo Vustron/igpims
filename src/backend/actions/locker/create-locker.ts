@@ -24,19 +24,45 @@ export const useCreateLocker = () => {
       const sanitizedData = sanitizer<LockerType>(payload, lockerSchema)
       return await createLocker(sanitizedData)
     },
-    onMutate: async () => {
+    onMutate: async (newLockerData) => {
       await queryClient.cancelQueries({ queryKey: ["lockers"] })
       await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
 
-      const previousLockers = queryClient.getQueryData(["lockers"])
+      const previousLockers =
+        queryClient.getQueryData<PaginatedLockersResponse>(["lockers"])
       const previousLockersInfinite = queryClient.getQueryData([
         "lockers-infinite",
       ])
 
-      return {
-        previousLockers,
-        previousLockersInfinite,
+      const optimisticLocker: Partial<Locker> = {
+        id: `temp-${Date.now()}`,
+        lockerName: newLockerData.lockerName,
+        lockerType: newLockerData.lockerType,
+        lockerLocation: newLockerData.lockerLocation,
+        lockerStatus: newLockerData.lockerStatus,
+        lockerRentalPrice: Number(newLockerData.lockerRentalPrice),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
+
+      if (previousLockers) {
+        queryClient.setQueryData<PaginatedLockersResponse>(
+          ["lockers"],
+          (old) => ({
+            ...old!,
+            data: [optimisticLocker as Locker, ...old!.data],
+            meta: {
+              ...old!.meta,
+              totalItems: old!.meta.totalItems + 1,
+              totalPages: Math.ceil(
+                (old!.meta.totalItems + 1) / old!.meta.limit,
+              ),
+            },
+          }),
+        )
+      }
+
+      return { previousLockers, previousLockersInfinite }
     },
     onSuccess: async (newLocker: Locker) => {
       queryClient.setQueriesData<PaginatedLockersResponse>(
@@ -44,10 +70,14 @@ export const useCreateLocker = () => {
         (oldData) => {
           if (!oldData?.data) return oldData
 
+          const filteredData = oldData.data.filter(
+            (item) => !item.id.toString().startsWith("temp-"),
+          )
+
           if (oldData.meta.page === 1) {
             const updatedData = [
               newLocker,
-              ...oldData.data.slice(0, oldData.meta.limit - 1),
+              ...filteredData.slice(0, oldData.meta.limit - 1),
             ]
             const newTotalItems = oldData.meta.totalItems + 1
 
@@ -88,6 +118,12 @@ export const useCreateLocker = () => {
 
           if (updatedPages.length > 0 && updatedPages[0]?.data) {
             const firstPage = { ...updatedPages[0] }
+
+            firstPage.data = firstPage.data.filter(
+              (item: { id: { toString: () => string } }) =>
+                !item.id.toString().startsWith("temp-"),
+            )
+
             const newTotalItems = firstPage.meta.totalItems + 1
 
             updatedPages[0] = {
@@ -111,6 +147,7 @@ export const useCreateLocker = () => {
           }
         },
       )
+      queryClient.invalidateQueries({ queryKey: ["lockers"], exact: false })
     },
     onError: (error, _variables, context) => {
       if (context?.previousLockers) {

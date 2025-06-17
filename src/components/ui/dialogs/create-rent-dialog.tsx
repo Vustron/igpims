@@ -14,7 +14,7 @@ import {
   DialogContent,
   DialogDescription,
 } from "@/components/ui/dialogs"
-import { CreateLockerRentForm } from "@/features/locker-rental-list/create-rent-form"
+import { CreateLockerRentForm } from "@/features/locker-igp/rent/create-rent-form"
 
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useDialog } from "@/hooks/use-dialog"

@@ -1,6 +1,6 @@
-import { lockerRental } from "@/schemas/drizzle-schema"
+import { locker, lockerRental } from "@/schemas/drizzle-schema"
 import { db } from "@/config/drizzle"
-import { sql } from "drizzle-orm"
+import { sql, eq } from "drizzle-orm"
 
 const getRentalByIdQuery = db
   .select()
@@ -19,6 +19,22 @@ const getRentalsByLockerIdQuery = db
   .from(lockerRental)
   .where(sql`${lockerRental.lockerId} = ${sql.placeholder("lockerId")}`)
   .orderBy(sql`${lockerRental.createdAt} DESC`)
+  .prepare()
+
+export const getLockerByRentalIdQuery = db
+  .select({
+    id: locker.id,
+    lockerName: locker.lockerName,
+    lockerLocation: locker.lockerLocation,
+    lockerStatus: locker.lockerStatus,
+    lockerType: locker.lockerType,
+    lockerRentalPrice: locker.lockerRentalPrice,
+    createdAt: locker.createdAt,
+    updatedAt: locker.updatedAt,
+  })
+  .from(lockerRental)
+  .innerJoin(locker, eq(lockerRental.lockerId, locker.id))
+  .where(eq(lockerRental.id, sql.placeholder("id")))
   .prepare()
 
 const createRentalQuery = db
