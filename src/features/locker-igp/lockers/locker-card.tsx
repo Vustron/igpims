@@ -52,9 +52,7 @@ export const LockerCard: React.FC<LockerCardProps> = ({
             compact
               ? "h-50 w-24 p-2"
               : "h-50 w-28 p-2 sm:h-50 sm:w-30 sm:p-2.5 md:h-50 md:w-32 md:p-3"
-          }
-            ${getStatusColor(locker.lockerStatus!)}
-            ${isDisabled ? "cursor-not-allowed opacity-90" : "cursor-pointer hover:shadow-lg"}`}
+          } ${getStatusColor(locker.lockerStatus!)} ${isDisabled ? "cursor-not-allowed opacity-90" : "cursor-pointer hover:shadow-lg"}`}
         >
           <LockerStatusIndicator status={locker.lockerStatus!} />
 
@@ -73,8 +71,7 @@ export const LockerCard: React.FC<LockerCardProps> = ({
 
         {/* Shadow effect */}
         <div
-          className={`-bottom-1 absolute inset-x-2 h-2 rounded-b-md blur-sm transition-opacity duration-300 ${isSelected ? "opacity-60" : "opacity-30"}
-            ${getStatusColor(locker.lockerStatus!).replace("to-", "").replace("from-", "")}`}
+          className={`-bottom-1 absolute inset-x-2 h-2 rounded-b-md blur-sm transition-opacity duration-300 ${isSelected ? "opacity-60" : "opacity-30"} ${getStatusColor(locker.lockerStatus!).replace("to-", "").replace("from-", "")}`}
         />
       </motion.div>
     </AnimatePresence>

@@ -4,7 +4,6 @@ import CurrencyInput from "react-currency-input-field"
 import { FloatingLabel } from "@/components/ui/inputs"
 
 import { cn } from "@/utils/cn"
-import React from "react"
 
 type FloatingLabelAmountInputProps = {
   id: string

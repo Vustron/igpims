@@ -20,7 +20,10 @@ import { Badge } from "@/components/ui/badges"
 export const ColumnHeader = ({
   icon,
   text,
-}: { icon: React.ReactNode; text: string }) => (
+}: {
+  icon: React.ReactNode
+  text: string
+}) => (
   <div className="flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
     {icon}
     <span>{text}</span>
@@ -30,7 +33,10 @@ export const ColumnHeader = ({
 export const SelectCell = ({
   row,
   table = undefined,
-}: { row?: any; table?: any }) => {
+}: {
+  row?: any
+  table?: any
+}) => {
   if (table) {
     return (
       <div className="px-1">

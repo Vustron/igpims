@@ -28,7 +28,9 @@ import type { FundRequest } from "@/features/fund-request/fund-request-store"
 
 export const FundRequestCard = ({
   fundRequest,
-}: { fundRequest: FundRequest }) => {
+}: {
+  fundRequest: FundRequest
+}) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { onOpen } = useDialog()
 

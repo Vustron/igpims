@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useId } from "react"
 import { format } from "date-fns"
 import {
   User,
@@ -67,6 +67,8 @@ export function AdvancedFilter({
   statusOptions,
   onClearAllFilters,
 }: AdvancedFilterProps) {
+  const renterNameFilterId = useId()
+  const courseFilterId = useId()
   const [showDatePickerFor, setShowDatePickerFor] = useState<string | null>(
     null,
   )
@@ -167,7 +169,7 @@ export function AdvancedFilter({
               <Label className="font-medium text-xs">Renter Name</Label>
             </div>
             <Input
-              id="renter-name-filter"
+              id={renterNameFilterId}
               type="text"
               placeholder=""
               value={advancedFilters.renterName}
@@ -188,7 +190,7 @@ export function AdvancedFilter({
               <Label className="font-medium text-xs">Course & Set</Label>
             </div>
             <Input
-              id="course-filter"
+              id={courseFilterId}
               type="text"
               placeholder=""
               value={advancedFilters.courseAndSet}

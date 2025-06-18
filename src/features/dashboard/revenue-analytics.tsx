@@ -14,9 +14,13 @@ import {
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 import { Card } from "@/components/ui/cards"
 import { TrendingUp } from "lucide-react"
-import { useMemo } from "react"
+import { useId, useMemo } from "react"
 
 export const RevenueAnalytics = () => {
+  const colorIdRentals = useId()
+  const colorIdWaterVendo = useId()
+  const colorIdMerchandise = useId()
+
   const rawData = [
     {
       month: "Jan",
@@ -145,18 +149,12 @@ export const RevenueAnalytics = () => {
             >
               <defs>
                 {/* Gradient definitions for lines */}
-                <linearGradient
-                  id="colorLockerRentals"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
+                <linearGradient id={colorIdRentals} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3182CE" stopOpacity={0.8} />
                   <stop offset="95%" stopColor="#3182CE" stopOpacity={0.1} />
                 </linearGradient>
                 <linearGradient
-                  id="colorWaterVendo"
+                  id={colorIdWaterVendo}
                   x1="0"
                   y1="0"
                   x2="0"
@@ -166,7 +164,7 @@ export const RevenueAnalytics = () => {
                   <stop offset="95%" stopColor="#38B2AC" stopOpacity={0.1} />
                 </linearGradient>
                 <linearGradient
-                  id="colorMerchandise"
+                  id={colorIdMerchandise}
                   x1="0"
                   y1="0"
                   x2="0"

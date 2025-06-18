@@ -2,6 +2,7 @@
 
 import { FileIcon, UploadIcon, XCircleIcon } from "lucide-react"
 import { Label } from "@/components/ui/labels"
+import Image from "next/image"
 
 import { useRef, useState, useEffect, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
@@ -171,7 +172,7 @@ export const FileUpload = ({
 
                     {isImageFile(file) ? (
                       <div className="relative size-8 overflow-hidden rounded-md">
-                        <img
+                        <Image
                           src={getImageUrl(file)}
                           alt={getFileName(file)}
                           className="size-full object-fill"

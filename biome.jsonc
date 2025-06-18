@@ -1,13 +1,10 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
   "files": {
     "maxSize": 1572864
   },
   // imports section
-  "organizeImports": {
-    "enabled": true,
-    "ignore": ["node_modules", ".next", "out"]
-  },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
   // formatter section
   "formatter": {
     "enabled": true,
@@ -17,7 +14,7 @@
     "lineEnding": "lf",
     "lineWidth": 80,
     "attributePosition": "auto",
-    "ignore": ["node_modules", ".next", "out"]
+    "includes": ["**", "!**/node_modules", "!**/.next", "!**/out"]
   },
   // linter section
   "linter": {
@@ -34,8 +31,7 @@
       "correctness": {
         "useExhaustiveDependencies": "off",
         "noPrecisionLoss": "error",
-        "noUnusedVariables": "off",
-        "useArrayLiterals": "off"
+        "noUnusedVariables": "off"
       },
       "security": {
         "noDangerouslySetInnerHtml": "off"
@@ -47,7 +43,16 @@
         "useBlockStatements": "off",
         "useConsistentArrayType": "warn",
         "noNonNullAssertion": "off",
-        "useImportType": "warn"
+        "useImportType": "warn",
+        "noParameterAssign": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noUselessElse": "error",
+        "useArrayLiterals": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off",
@@ -57,16 +62,21 @@
         "noUnsafeDeclarationMerging": "error"
       },
       "nursery": {
-        "useSortedClasses": "error"
+        "useSortedClasses": "error",
+        "noNestedComponentDefinitions": "error"
       },
       "a11y": {
         "noSvgWithoutTitle": "off",
         "useKeyWithClickEvents": "off",
         "useFocusableInteractive": "off",
-        "useSemanticElements": "off"
+        "useSemanticElements": "off",
+        "noRedundantRoles": "off"
+      },
+      "performance": {
+        "noImgElement": "off"
       }
     },
-    "ignore": ["node_modules", ".next", "out"]
+    "includes": ["**", "!**/node_modules", "!**/.next", "!**/out"]
   },
   // javascript section
   "javascript": {
@@ -98,7 +108,7 @@
   // overrides section
   "overrides": [
     {
-      "include": ["*.json"],
+      "includes": ["**/*.json"],
       "formatter": {
         "indentWidth": 2
       }

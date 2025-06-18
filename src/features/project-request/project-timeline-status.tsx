@@ -5,7 +5,9 @@ import type { ProjectRequest } from "@/features/project-request/project-request-
 
 export const TimelineStatusBadge = ({
   status,
-}: { status: ProjectRequest["status"] }) => {
+}: {
+  status: ProjectRequest["status"]
+}) => {
   const statusConfig = {
     pending: {
       label: "Pending",

@@ -205,7 +205,7 @@ export async function updateLocker(
         validationResult.data.lockerRentalPrice ??
         existingLocker.lockerRentalPrice,
       createdAt: existingLocker.createdAt,
-      updatedAt: new Date().getTime(),
+      updatedAt: Date.now(),
     }
 
     return NextResponse.json(updatedLocker, { status: 200 })

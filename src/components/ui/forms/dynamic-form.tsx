@@ -9,7 +9,7 @@ import {
   FormControlRenderer,
 } from "@/components/ui/forms"
 import { Loader2Icon, ChevronDown, ChevronUp } from "lucide-react"
-import { DynamicButton } from "@/components/ui/buttons"
+import { Button, DynamicButton } from "@/components/ui/buttons"
 import { Switch } from "@/components/ui/inputs"
 import Image from "next/image"
 
@@ -111,7 +111,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
                 section.className,
               )}
             >
-              <div
+              <Button
                 className={cn(
                   "flex cursor-pointer items-center justify-between px-4 py-3",
                   section.titleClassName,
@@ -133,7 +133,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
                     <ChevronDown className="h-5 w-5" />
                   )}
                 </div>
-              </div>
+              </Button>
 
               <AnimatePresence>
                 {expandedSections[section.id] && (

@@ -21,7 +21,9 @@ import type { Inspection } from "@/schemas/inspection"
 
 export const InspectionActions = ({
   inspection,
-}: { inspection: Inspection }) => {
+}: {
+  inspection: Inspection
+}) => {
   const handleView = () => {
     console.log("View inspection:", inspection.id)
   }

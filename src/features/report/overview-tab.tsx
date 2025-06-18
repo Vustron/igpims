@@ -34,6 +34,7 @@ import type {
   IgpSummary,
   MonthlySales,
 } from "@/features/report/sales-report-types"
+import { useId } from "react"
 
 interface SalesOverviewTabProps {
   chartType: "bar" | "line" | "pie" | "area"
@@ -54,6 +55,9 @@ export const SalesOverviewTab = ({
   timeRange,
   formatCurrency,
 }: SalesOverviewTabProps) => {
+  const colorRentalId = useId()
+  const colorWaterVendoId = useId()
+  const colorMerchandiseId = useId()
   return (
     <>
       {/* Main charts section */}
@@ -191,7 +195,7 @@ export const SalesOverviewTab = ({
                   >
                     <defs>
                       <linearGradient
-                        id="colorLockerRental"
+                        id={colorRentalId}
                         x1="0"
                         y1="0"
                         x2="0"
@@ -209,7 +213,7 @@ export const SalesOverviewTab = ({
                         />
                       </linearGradient>
                       <linearGradient
-                        id="colorWaterVendo"
+                        id={colorWaterVendoId}
                         x1="0"
                         y1="0"
                         x2="0"
@@ -227,7 +231,7 @@ export const SalesOverviewTab = ({
                         />
                       </linearGradient>
                       <linearGradient
-                        id="colorMerchandise"
+                        id={colorMerchandiseId}
                         x1="0"
                         y1="0"
                         x2="0"

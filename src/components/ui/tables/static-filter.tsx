@@ -4,6 +4,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
 import { FloatingLabelInput } from "@/components/ui/inputs"
 
 import type { Table } from "@tanstack/react-table"
+import { useId } from "react"
 
 interface StaticFilterProps<TData> {
   placeholder: string
@@ -21,13 +22,14 @@ export function StaticFilter<TData>({
   filterValue,
   onFilterChange,
 }: StaticFilterProps<TData>) {
+  const filterInputId = useId()
   return (
     <ScrollArea>
       <ScrollBar orientation="horizontal" className="z-10" />
       <div className="flex flex-col justify-between gap-4 p-2 sm:flex-row">
         <div className="flex flex-1 flex-wrap gap-2">
           <FloatingLabelInput
-            id="filter-input"
+            id={filterInputId}
             type="text"
             label={placeholder}
             placeholder={placeholder}

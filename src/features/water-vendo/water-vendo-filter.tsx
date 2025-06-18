@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/labels"
 import { Badge } from "@/components/ui/badges"
 import { Filter, X } from "lucide-react"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/utils/cn"
@@ -45,6 +45,16 @@ export const WaterVendoFilters = ({
   totalCount,
   filteredCount,
 }: WaterVendoFiltersProps) => {
+  const statusOnlineId = useId()
+  const statusOfflineId = useId()
+  const statusMaintenanceId = useId()
+  const refillFullId = useId()
+  const refillLowId = useId()
+  const refillCriticalId = useId()
+  const refillEmptyId = useId()
+  const refillTodayId = useId()
+  const refillWeekId = useId()
+  const refillMonthId = useId()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   // Check if any filter is active
@@ -150,38 +160,38 @@ export const WaterVendoFilters = ({
                 <div className="space-y-2">
                   <div className="flex items-center">
                     <Checkbox
-                      id="status-online"
+                      id={statusOnlineId}
                       checked={filters.status.online}
                       onCheckedChange={(checked) =>
                         toggleFilter("status", "online", checked === true)
                       }
                     />
-                    <Label htmlFor="status-online" className="ml-2 text-sm">
+                    <Label htmlFor={statusOnlineId} className="ml-2 text-sm">
                       Online
                     </Label>
                   </div>
                   <div className="flex items-center">
                     <Checkbox
-                      id="status-offline"
+                      id={statusOfflineId}
                       checked={filters.status.offline}
                       onCheckedChange={(checked) =>
                         toggleFilter("status", "offline", checked === true)
                       }
                     />
-                    <Label htmlFor="status-offline" className="ml-2 text-sm">
+                    <Label htmlFor={statusOfflineId} className="ml-2 text-sm">
                       Offline
                     </Label>
                   </div>
                   <div className="flex items-center">
                     <Checkbox
-                      id="status-maintenance"
+                      id={statusMaintenanceId}
                       checked={filters.status.maintenance}
                       onCheckedChange={(checked) =>
                         toggleFilter("status", "maintenance", checked === true)
                       }
                     />
                     <Label
-                      htmlFor="status-maintenance"
+                      htmlFor={statusMaintenanceId}
                       className="ml-2 text-sm"
                     >
                       Maintenance
@@ -198,49 +208,49 @@ export const WaterVendoFilters = ({
                 <div className="space-y-2">
                   <div className="flex items-center">
                     <Checkbox
-                      id="refill-full"
+                      id={refillFullId}
                       checked={filters.refill.full}
                       onCheckedChange={(checked) =>
                         toggleFilter("refill", "full", checked === true)
                       }
                     />
-                    <Label htmlFor="refill-full" className="ml-2 text-sm">
+                    <Label htmlFor={refillFullId} className="ml-2 text-sm">
                       Full
                     </Label>
                   </div>
                   <div className="flex items-center">
                     <Checkbox
-                      id="refill-low"
+                      id={refillLowId}
                       checked={filters.refill.low}
                       onCheckedChange={(checked) =>
                         toggleFilter("refill", "low", checked === true)
                       }
                     />
-                    <Label htmlFor="refill-low" className="ml-2 text-sm">
+                    <Label htmlFor={refillLowId} className="ml-2 text-sm">
                       Low
                     </Label>
                   </div>
                   <div className="flex items-center">
                     <Checkbox
-                      id="refill-critical"
+                      id={refillCriticalId}
                       checked={filters.refill.critical}
                       onCheckedChange={(checked) =>
                         toggleFilter("refill", "critical", checked === true)
                       }
                     />
-                    <Label htmlFor="refill-critical" className="ml-2 text-sm">
+                    <Label htmlFor={refillCriticalId} className="ml-2 text-sm">
                       Critical
                     </Label>
                   </div>
                   <div className="flex items-center">
                     <Checkbox
-                      id="refill-empty"
+                      id={refillEmptyId}
                       checked={filters.refill.empty}
                       onCheckedChange={(checked) =>
                         toggleFilter("refill", "empty", checked === true)
                       }
                     />
-                    <Label htmlFor="refill-empty" className="ml-2 text-sm">
+                    <Label htmlFor={refillEmptyId} className="ml-2 text-sm">
                       Empty
                     </Label>
                   </div>
@@ -255,37 +265,37 @@ export const WaterVendoFilters = ({
                 <div className="space-y-2">
                   <div className="flex items-center">
                     <Checkbox
-                      id="refill-today"
+                      id={refillTodayId}
                       checked={filters.lastRefilled === "today"}
                       onCheckedChange={(checked) =>
                         setLastRefilledFilter(checked ? "today" : null)
                       }
                     />
-                    <Label htmlFor="refill-today" className="ml-2 text-sm">
+                    <Label htmlFor={refillTodayId} className="ml-2 text-sm">
                       Today
                     </Label>
                   </div>
                   <div className="flex items-center">
                     <Checkbox
-                      id="refill-week"
+                      id={refillWeekId}
                       checked={filters.lastRefilled === "week"}
                       onCheckedChange={(checked) =>
                         setLastRefilledFilter(checked ? "week" : null)
                       }
                     />
-                    <Label htmlFor="refill-week" className="ml-2 text-sm">
+                    <Label htmlFor={refillWeekId} className="ml-2 text-sm">
                       In the last 7 days
                     </Label>
                   </div>
                   <div className="flex items-center">
                     <Checkbox
-                      id="refill-month"
+                      id={refillMonthId}
                       checked={filters.lastRefilled === "month"}
                       onCheckedChange={(checked) =>
                         setLastRefilledFilter(checked ? "month" : null)
                       }
                     />
-                    <Label htmlFor="refill-month" className="ml-2 text-sm">
+                    <Label htmlFor={refillMonthId} className="ml-2 text-sm">
                       In the last 30 days
                     </Label>
                   </div>

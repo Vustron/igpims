@@ -35,7 +35,7 @@ import { Input } from "@/components/ui/inputs"
 import { Label } from "@/components/ui/labels"
 
 import { useDialog } from "@/hooks/use-dialog"
-import { useState } from "react"
+import { useId, useState } from "react"
 
 import { motion } from "framer-motion"
 
@@ -69,6 +69,12 @@ export const WaterFundsControls = ({
     hasExpenses: false,
     dateRange: {},
   })
+  const hasExpensesId = useId()
+  const locationId = useId()
+  const gallonsId = useId()
+  const expensesId = useId()
+  const revenueId = useId()
+  const dateId = useId()
   const { onOpen } = useDialog()
 
   const hasActiveFilters =
@@ -254,7 +260,7 @@ export const WaterFundsControls = ({
                   <div className="space-y-2">
                     <div className="flex items-center">
                       <Checkbox
-                        id="has-expenses"
+                        id={hasExpensesId}
                         checked={activeFilters.hasExpenses}
                         onCheckedChange={(checked) =>
                           setActiveFilters((prev) => ({
@@ -263,7 +269,7 @@ export const WaterFundsControls = ({
                           }))
                         }
                       />
-                      <label htmlFor="has-expenses" className="ml-2 text-sm">
+                      <label htmlFor={hasExpensesId} className="ml-2 text-sm">
                         Has expenses
                       </label>
                     </div>
@@ -346,9 +352,9 @@ export const WaterFundsControls = ({
 
               <div className="mt-6 space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor={locationId}>Location</Label>
                   <Select>
-                    <SelectTrigger id="location">
+                    <SelectTrigger id={locationId}>
                       <SelectValue placeholder="Select vendo location" />
                     </SelectTrigger>
                     <SelectContent>
@@ -365,9 +371,9 @@ export const WaterFundsControls = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="gallons">Gallons Used</Label>
+                  <Label htmlFor={gallonsId}>Gallons Used</Label>
                   <Input
-                    id="gallons"
+                    id={gallonsId}
                     type="number"
                     min="0"
                     placeholder="Enter gallons used"
@@ -375,9 +381,9 @@ export const WaterFundsControls = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="expenses">Expenses (₱)</Label>
+                  <Label htmlFor={expensesId}>Expenses (₱)</Label>
                   <Input
-                    id="expenses"
+                    id={expensesId}
                     type="number"
                     min="0"
                     placeholder="Enter expenses"
@@ -385,9 +391,9 @@ export const WaterFundsControls = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="revenue">Revenue (₱)</Label>
+                  <Label htmlFor={revenueId}>Revenue (₱)</Label>
                   <Input
-                    id="revenue"
+                    id={revenueId}
                     type="number"
                     min="0"
                     placeholder="Enter revenue"
@@ -395,8 +401,8 @@ export const WaterFundsControls = ({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="date">Collection Date</Label>
-                  <Input id="date" type="date" />
+                  <Label htmlFor={dateId}>Collection Date</Label>
+                  <Input id={dateId} type="date" />
                 </div>
               </div>
 

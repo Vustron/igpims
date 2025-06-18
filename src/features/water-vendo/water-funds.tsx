@@ -106,7 +106,8 @@ export const WaterFunds = () => {
             layout
             className="overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md"
           >
-            <div
+            <Button
+              variant="ghost"
               className="flex cursor-pointer items-center justify-between bg-gradient-to-r from-yellow-50 to-yellow-100/50 p-4"
               onClick={() => toggleWeekExpanded(week.id)}
             >
@@ -178,7 +179,7 @@ export const WaterFunds = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Button>
 
             <AnimatePresence>
               {week.expanded && (

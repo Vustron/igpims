@@ -68,7 +68,7 @@ export const useUpdateLocker = (id: string) => {
           lockerRentalPrice: updatedData.lockerRentalPrice
             ? Number(updatedData.lockerRentalPrice)
             : previousLocker.lockerRentalPrice,
-          updatedAt: new Date().getTime(),
+          updatedAt: Date.now(),
         } as unknown as LockerWithRental
 
         if (previousLocker.rental && updatedData.rentalId) {
@@ -102,7 +102,7 @@ export const useUpdateLocker = (id: string) => {
                   ? updatedData.dateDue
                   : new Date(updatedData.dateDue).getTime(),
             }),
-            updatedAt: new Date().getTime(),
+            updatedAt: Date.now(),
           }
         }
 
@@ -124,7 +124,7 @@ export const useUpdateLocker = (id: string) => {
                     lockerRentalPrice: updatedData.lockerRentalPrice
                       ? Number(updatedData.lockerRentalPrice)
                       : locker.lockerRentalPrice,
-                    updatedAt: new Date().getTime(),
+                    updatedAt: Date.now(),
                     rental:
                       previousLocker?.rental && updatedData.rentalId
                         ? {
@@ -159,7 +159,7 @@ export const useUpdateLocker = (id: string) => {
                                   ? updatedData.dateDue
                                   : new Date(updatedData.dateDue).getTime(),
                             }),
-                            updatedAt: new Date().getTime(),
+                            updatedAt: Date.now(),
                           }
                         : locker.rental,
                   }
@@ -187,7 +187,7 @@ export const useUpdateLocker = (id: string) => {
                       lockerRentalPrice: updatedData.lockerRentalPrice
                         ? Number(updatedData.lockerRentalPrice)
                         : locker.lockerRentalPrice,
-                      updatedAt: new Date().getTime(),
+                      updatedAt: Date.now(),
                       rental:
                         previousLocker?.rental && updatedData.rentalId
                           ? {
@@ -224,7 +224,7 @@ export const useUpdateLocker = (id: string) => {
                                     ? updatedData.dateDue
                                     : new Date(updatedData.dateDue).getTime(),
                               }),
-                              updatedAt: new Date().getTime(),
+                              updatedAt: Date.now(),
                             }
                           : locker.rental,
                     }

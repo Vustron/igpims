@@ -10,7 +10,9 @@ import { cn } from "@/utils/cn"
 
 export const DashboardSideBar = ({
   children,
-}: { children: React.ReactNode }) => {
+}: {
+  children: React.ReactNode
+}) => {
   const sidebar = useStore(useSidebarToggle, (state) => state)
   if (!sidebar) return null
   return (

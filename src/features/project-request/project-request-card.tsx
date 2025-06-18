@@ -30,7 +30,9 @@ import type { ProjectRequest } from "@/features/project-request/project-request-
 
 export const ProjectRequestCard = ({
   projectRequest,
-}: { projectRequest: ProjectRequest }) => {
+}: {
+  projectRequest: ProjectRequest
+}) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { onOpen } = useDialog()
 

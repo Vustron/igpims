@@ -48,7 +48,7 @@ function makeQueryClient() {
   })
 }
 
-let browserQueryClient: QueryClient | undefined = undefined
+let browserQueryClient: QueryClient | undefined
 
 // get query client
 function getQueryClient() {
@@ -67,11 +67,7 @@ function getQueryClient() {
   return browserQueryClient
 }
 
-export const QueryProvider = ({
-  children,
-}: {
-  children: React.ReactNode
-}) => {
+export const QueryProvider = ({ children }: { children: React.ReactNode }) => {
   // devtools state
   const [showDevtools, setShowDevtools] = useState(false)
 

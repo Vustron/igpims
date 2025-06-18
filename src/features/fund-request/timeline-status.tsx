@@ -5,7 +5,9 @@ import type { FundRequest } from "@/features/fund-request/fund-request-store"
 
 export const TimelineStatusBadge = ({
   status,
-}: { status: FundRequest["status"] }) => {
+}: {
+  status: FundRequest["status"]
+}) => {
   const statusConfig = {
     pending: {
       label: "Pending",

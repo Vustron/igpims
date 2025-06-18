@@ -329,76 +329,74 @@ export function DataTable<TData, TValue>({
           action={undefined}
         />
       ) : (
-        <>
-          <ScrollArea className="h-[calc(80vh-100px)] rounded-md border md:h-[calc(80vh-100px)]">
-            <ScrollBar orientation="horizontal" className="z-10" />
-            <Table className="relative">
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <AnimatePresence mode="wait">
-                <TableBody>
-                  {isLoading ? (
-                    // Loading skeleton rows
-                    Array.from({ length: 5 }).map((_, index) => (
-                      <TableRow key={`skeleton-${index}`}>
-                        {columns.map((_, colIndex) => (
-                          <TableCell key={`skeleton-cell-${colIndex}`}>
-                            <Skeleton className="h-4 w-full" />
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : memoizedRows.length > 0 ? (
-                    memoizedRows.map((row) => (
-                      <motion.tr
-                        key={row.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.15 }}
-                        className={
-                          row.getIsSelected() ? "bg-muted/50" : undefined
-                        }
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        ))}
-                      </motion.tr>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
-                      >
-                        No results match your search.
-                      </TableCell>
+        <ScrollArea className="h-[calc(80vh-100px)] rounded-md border md:h-[calc(80vh-100px)]">
+          <ScrollBar orientation="horizontal" className="z-10" />
+          <Table className="relative">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <AnimatePresence mode="wait">
+              <TableBody>
+                {isLoading ? (
+                  // Loading skeleton rows
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={`skeleton-${index}`}>
+                      {columns.map((_, colIndex) => (
+                        <TableCell key={`skeleton-cell-${colIndex}`}>
+                          <Skeleton className="h-4 w-full" />
+                        </TableCell>
+                      ))}
                     </TableRow>
-                  )}
-                </TableBody>
-              </AnimatePresence>
-            </Table>
-          </ScrollArea>
-        </>
+                  ))
+                ) : memoizedRows.length > 0 ? (
+                  memoizedRows.map((row) => (
+                    <motion.tr
+                      key={row.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className={
+                        row.getIsSelected() ? "bg-muted/50" : undefined
+                      }
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </motion.tr>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results match your search.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </AnimatePresence>
+          </Table>
+        </ScrollArea>
       )}
     </div>
   )

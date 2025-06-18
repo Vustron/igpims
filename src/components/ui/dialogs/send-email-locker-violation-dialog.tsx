@@ -29,7 +29,7 @@ import { X } from "lucide-react"
 
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { useDialog } from "@/hooks/use-dialog"
-import { useState } from "react"
+import { useId, useState } from "react"
 
 import toast from "react-hot-toast"
 
@@ -116,7 +116,54 @@ const sampleUsers = [
   },
 ]
 
+const DialogContent_Component = ({
+  children,
+  isDialogOpen,
+  handleClose,
+  isDesktop,
+}: {
+  children: React.ReactNode
+  isDialogOpen: boolean
+  handleClose: () => void
+  isDesktop: boolean
+}) => {
+  if (isDesktop) {
+    return (
+      <Dialog open={isDialogOpen} onOpenChange={handleClose}>
+        <DialogContent className="max-h-[95vh] overflow-y-auto sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>Send Locker Violation Emails</DialogTitle>
+            <DialogDescription>
+              Select recipients and customize the message to send violation
+              notifications to students.
+            </DialogDescription>
+          </DialogHeader>
+          {children}
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  return (
+    <Drawer open={isDialogOpen} onOpenChange={handleClose}>
+      <DrawerContent className="max-h-[90%]">
+        <DrawerHeader className="px-6">
+          <DrawerTitle>Send Locker Violation Emails</DrawerTitle>
+          <DrawerDescription>
+            Select recipients and customize the message to send violation
+            notifications to students.
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="px-6 pb-6">{children}</div>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
 export const SendEmailLockerViolationDialog = () => {
+  const userSelectId = useId()
+  const templateSelectId = useId()
+  const emailContentId = useId()
   const { isOpen, onClose, type } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "sendEmailLockerViolation"
@@ -144,13 +191,11 @@ export const SendEmailLockerViolationDialog = () => {
 
   const handleUserSelect = (userEmail: string) => {
     if (userEmail === "all-violators") {
-      // If "All Students with Violations" is selected, clear other selections and add all user emails
       const allUserEmails = sampleUsers
         .filter((user) => user.value !== "all-violators")
         .map((user) => user.value)
       setSelectedUsers(allUserEmails)
     } else {
-      // Toggle individual user selection
       setSelectedUsers((prev) => {
         if (prev.includes(userEmail)) {
           return prev.filter((email) => email !== userEmail)
@@ -213,50 +258,18 @@ export const SendEmailLockerViolationDialog = () => {
     handleClose()
   }
 
-  const DialogContent_Component = ({
-    children,
-  }: { children: React.ReactNode }) => {
-    if (isDesktop) {
-      return (
-        <Dialog open={isDialogOpen} onOpenChange={handleClose}>
-          <DialogContent className="max-h-[95vh] overflow-y-auto sm:max-w-[700px]">
-            <DialogHeader>
-              <DialogTitle>Send Locker Violation Emails</DialogTitle>
-              <DialogDescription>
-                Select recipients and customize the message to send violation
-                notifications to students.
-              </DialogDescription>
-            </DialogHeader>
-            {children}
-          </DialogContent>
-        </Dialog>
-      )
-    }
-
-    return (
-      <Drawer open={isDialogOpen} onOpenChange={handleClose}>
-        <DrawerContent className="max-h-[90%]">
-          <DrawerHeader className="px-6">
-            <DrawerTitle>Send Locker Violation Emails</DrawerTitle>
-            <DrawerDescription>
-              Select recipients and customize the message to send violation
-              notifications to students.
-            </DrawerDescription>
-          </DrawerHeader>
-          <div className="px-6 pb-6">{children}</div>
-        </DrawerContent>
-      </Drawer>
-    )
-  }
-
   return (
-    <DialogContent_Component>
+    <DialogContent_Component
+      isDialogOpen={isDialogOpen}
+      handleClose={handleClose}
+      isDesktop={isDesktop}
+    >
       <div className="space-y-6">
         {/* User Selection */}
         <div className="space-y-2">
-          <Label htmlFor="user-select">Select Recipients</Label>
+          <Label htmlFor={userSelectId}>Select Recipients</Label>
           <Select onValueChange={handleUserSelect}>
-            <SelectTrigger id="user-select">
+            <SelectTrigger id={userSelectId}>
               <SelectValue placeholder="Choose students to send emails to" />
             </SelectTrigger>
             <SelectContent>
@@ -301,9 +314,9 @@ export const SendEmailLockerViolationDialog = () => {
 
         {/* Template Selection */}
         <div className="space-y-2">
-          <Label htmlFor="template-select">Select Email Template</Label>
+          <Label htmlFor={templateSelectId}>Select Email Template</Label>
           <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
-            <SelectTrigger id="template-select">
+            <SelectTrigger id={templateSelectId}>
               <SelectValue placeholder="Choose a violation type template" />
             </SelectTrigger>
             <SelectContent>
@@ -318,14 +331,14 @@ export const SendEmailLockerViolationDialog = () => {
 
         {/* Email Content */}
         <div className="space-y-2">
-          <Label htmlFor="email-content">
+          <Label htmlFor={emailContentId}>
             Email Content
             <span className="ml-2 text-muted-foreground text-sm">
               ({emailContent.length}/1000 characters)
             </span>
           </Label>
           <Textarea
-            id="email-content"
+            id={emailContentId}
             placeholder="Enter your violation email message here..."
             value={emailContent}
             onChange={(e) => setEmailContent(e.target.value)}

@@ -84,9 +84,7 @@ export const ResetPasswordClient = () => {
         </CardHeader>
         <CardContent>
           {token && email ? (
-            <>
-              <ResetPasswordForm token={token} email={email} />
-            </>
+            <ResetPasswordForm token={token} email={email} />
           ) : (
             <>
               {cooldownTime > 0 && (
