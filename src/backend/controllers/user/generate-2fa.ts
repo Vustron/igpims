@@ -9,7 +9,7 @@ import { env } from "@/config/env"
 import speakeasy from "speakeasy"
 import QRCode from "qrcode"
 
-import type { Account, User } from "@/schemas/drizzle-schema"
+import type { Account, User } from "@/backend/db/schemas"
 import type { NextRequest } from "next/server"
 
 export async function generate2fa(

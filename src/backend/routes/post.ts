@@ -7,6 +7,7 @@ import { signInOtpAuth } from "@/backend/controllers/user/sign-in-otp-auth"
 import { sendResetLink } from "@/backend/controllers/user/send-reset-link"
 import { verifyUserEmail } from "@/backend/controllers/user/verify-email"
 import { createLocker } from "@/backend/controllers/locker/create-locker"
+import { createViolation } from "@/backend/controllers/violation/create"
 import { signOutUser } from "@/backend/controllers/user/sign-out"
 import { signInUser } from "@/backend/controllers/user/sign-in"
 import { signUpUser } from "@/backend/controllers/user/sign-up"
@@ -26,5 +27,6 @@ export const postRoutes: Route[] = [
   { path: "/api/v1/auth/sign-in-otp-authenticator", handler: signInOtpAuth },
   { path: "/api/v1/lockers/create-locker", handler: createLocker },
   { path: "/api/v1/locker-rentals/create-rent", handler: createRent },
+  { path: "/api/v1/violations/create-violation", handler: createViolation },
   // Add more POST routes here
 ]

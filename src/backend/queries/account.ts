@@ -1,11 +1,26 @@
-import { account } from "@/schemas/drizzle-schema"
 import { eq, inArray, sql } from "drizzle-orm"
 import { db } from "@/config/drizzle"
 
+import { account } from "../db/schemas"
+
 const findByAccountUserIdQuery = db
-  .select()
+  .select({
+    id: account.id,
+    userId: account.userId,
+    providerType: account.providerType,
+    twoFactorSecret: account.twoFactorSecret,
+    accessToken: account.accessToken,
+    accessTokenExpiresAt: account.accessTokenExpiresAt,
+    createdAt: account.createdAt,
+    updatedAt: account.updatedAt,
+    otpSignIn: account.otpSignIn,
+    salt: account.salt,
+    accountId: account.accountId,
+    password: account.password,
+  })
   .from(account)
   .where(eq(account.userId, sql.placeholder("accountUserId")))
+  .limit(1)
   .prepare()
 
 const deleteByUserIdQuery = db

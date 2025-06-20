@@ -1,13 +1,13 @@
 import { api } from "@/backend/helpers/api-client"
-import { updateUserSchema } from "@/schemas/user"
+import { updateUserSchema } from "@/validation/user"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
-import type { UpdateUserPayload } from "@/schemas/user"
-import type { User } from "@/schemas/drizzle-schema"
+import type { UpdateUserPayload } from "@/validation/user"
+import type { User } from "@/backend/db/schemas"
 
 export async function updateUserInfo(payload: UpdateUserPayload, id: string) {
   return api.patch<UpdateUserPayload, User>("auth/update-info", payload, {

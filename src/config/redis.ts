@@ -21,7 +21,7 @@ redis.config("SET", "notify-keyspace-events", "Ex")
 
 export const rateLimiter = new RateLimiter({
   db: redis,
-  max: 5,
+  max: 10,
   duration: 10_000,
   namespace: "rate-limiter",
 })

@@ -3,12 +3,12 @@ import { checkAuth } from "@/backend/middlewares/check-auth"
 import * as lockerQuery from "@/backend/queries/locker"
 import { requestJson } from "@/utils/request-json"
 import { catchError } from "@/utils/catch-error"
-import { lockerSchema } from "@/schemas/locker"
+import { lockerSchema } from "@/validation/locker"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 import { nanoid } from "nanoid"
 
-import type { Locker } from "@/schemas/locker"
+import type { Locker } from "@/validation/locker"
 import type { NextRequest } from "next/server"
 
 export async function createLocker(

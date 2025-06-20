@@ -10,7 +10,7 @@ import { cn } from "@/utils/cn"
 
 import { InfoItem } from "./info-item"
 
-import type { Locker } from "@/schemas/locker"
+import type { Locker } from "@/validation/locker"
 
 interface RentalDetailsProps {
   rental: any

@@ -4,7 +4,7 @@ import { catchError } from "@/utils/catch-error"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
-import type { User } from "@/schemas/drizzle-schema"
+import type { User } from "@/backend/db/schemas"
 
 export async function deleteUserById(id: string) {
   return api.delete("auth/delete-user-by-id", {

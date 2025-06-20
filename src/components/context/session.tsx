@@ -4,7 +4,7 @@ import { createContext } from "react"
 
 import { useContext } from "react"
 
-import type { Session } from "@/schemas/drizzle-schema"
+import type { Session } from "@/backend/db/schemas"
 
 const SessionContext = createContext<Session | null>(null)
 

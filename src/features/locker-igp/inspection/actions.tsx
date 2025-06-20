@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdowns"
 import { Button } from "@/components/ui/buttons"
 
-import type { Inspection } from "@/schemas/inspection"
+import type { Inspection } from "@/validation/inspection"
 
 export const InspectionActions = ({
   inspection,

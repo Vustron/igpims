@@ -10,7 +10,7 @@ import { PiLockers } from "react-icons/pi"
 
 import type { UseFormReturn } from "react-hook-form"
 import type { FieldConfig } from "@/interfaces/form"
-import type { Locker } from "@/schemas/locker"
+import type { Locker } from "@/validation/locker"
 
 interface LockerConfigurationCardProps {
   form: UseFormReturn<Locker>

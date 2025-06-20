@@ -1,4 +1,4 @@
-import { rateLimit } from "@/schemas/drizzle-schema"
+import { rateLimit } from "@/backend/db/schemas"
 import { catchError } from "@/utils/catch-error"
 import { NextResponse } from "next/server"
 import { getClientIp } from "request-ip"
@@ -6,7 +6,7 @@ import { db } from "@/config/drizzle"
 import { eq } from "drizzle-orm"
 import { nanoid } from "nanoid"
 
-import type { RateLimit } from "@/schemas/drizzle-schema"
+import type { RateLimit } from "@/backend/db/schemas"
 import type { IncomingMessage } from "node:http"
 import type { NextRequest } from "next/server"
 
@@ -24,7 +24,7 @@ export async function httpRequestLimit(request: NextRequest) {
       method: request.method,
     } as CompatibleRequest
 
-    const MAX_ATTEMPTS = 7
+    const MAX_ATTEMPTS = 10
     const WINDOW_TIME = 20 * 1000
     const timestamp = Date.now()
     const ipAddress =

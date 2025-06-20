@@ -10,7 +10,7 @@ import { User } from "lucide-react"
 import { StudentInformation } from "./student-info"
 import { RentalDetails } from "./rental-details"
 
-import type { Locker } from "@/schemas/locker"
+import type { Locker } from "@/validation/locker"
 
 interface CurrentRentalCardProps {
   rental: any

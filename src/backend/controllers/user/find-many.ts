@@ -1,8 +1,8 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { checkAuth } from "@/backend/middlewares/check-auth"
-import { catchError } from "@/utils/catch-error"
 import { and, eq, like, or, sql, ne } from "drizzle-orm"
-import { user } from "@/schemas/drizzle-schema"
+import { catchError } from "@/utils/catch-error"
+import { user } from "@/backend/db/schemas"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 

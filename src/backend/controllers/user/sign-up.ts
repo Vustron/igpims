@@ -3,15 +3,15 @@ import * as accountQuery from "@/backend/queries/account"
 import * as userQuery from "@/backend/queries/user"
 import { requestJson } from "@/utils/request-json"
 import { catchError } from "@/utils/catch-error"
-import { signUpSchema } from "@/schemas/user"
+import { signUpSchema } from "@/validation/user"
 import { NextResponse } from "next/server"
 import { genSalt, hash } from "bcrypt-ts"
 import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
 import { nanoid } from "nanoid"
 
-import type { User } from "@/schemas/drizzle-schema"
-import type { SignUpPayload } from "@/schemas/user"
+import type { User } from "@/backend/db/schemas"
+import type { SignUpPayload } from "@/validation/user"
 import type { NextRequest } from "next/server"
 
 export async function signUpUser(

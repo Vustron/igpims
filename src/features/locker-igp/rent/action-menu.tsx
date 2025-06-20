@@ -20,7 +20,7 @@ import { catchError } from "@/utils/catch-error"
 import toast from "react-hot-toast"
 
 import type { LockerRentalWithLocker } from "@/interfaces/locker"
-import type { LockerRental } from "@/schemas/drizzle-schema"
+import type { LockerRental } from "@/backend/db/schemas"
 
 interface ActionMenuProps {
   rental: LockerRental

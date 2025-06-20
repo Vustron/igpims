@@ -1,4 +1,4 @@
-import { account, user } from "@/schemas/drizzle-schema"
+import { account, user } from "@/backend/db/schemas"
 import { eq, inArray, sql, ne, and } from "drizzle-orm"
 import { db } from "@/config/drizzle"
 

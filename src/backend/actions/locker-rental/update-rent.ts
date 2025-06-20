@@ -1,4 +1,4 @@
-import { updateRentalSchema } from "@/schemas/rental"
+import { updateRentalSchema } from "@/validation/rental"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
@@ -7,8 +7,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
 import type { PaginatedRentalsResponse } from "@/backend/actions/locker-rental/find-many"
-import type { LockerRental } from "@/schemas/drizzle-schema"
-import type { UpdateRentalData } from "@/schemas/rental"
+import type { UpdateRentalData } from "@/validation/rental"
+import type { LockerRental } from "@/backend/db/schemas"
 
 export async function updateRent(
   id: string,

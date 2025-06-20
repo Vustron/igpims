@@ -2,14 +2,14 @@ import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import * as rentalQuery from "@/backend/queries/rental"
 import * as lockerQuery from "@/backend/queries/locker"
-import { createRentalSchema } from "@/schemas/rental"
+import { createRentalSchema } from "@/validation/rental"
 import { requestJson } from "@/utils/request-json"
 import { catchError } from "@/utils/catch-error"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 import { nanoid } from "nanoid"
 
-import type { CreateRentalData } from "@/schemas/rental"
+import type { CreateRentalData } from "@/validation/rental"
 import type { NextRequest } from "next/server"
 
 export async function createRent(

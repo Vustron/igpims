@@ -4,14 +4,14 @@ import { DynamicForm } from "@/components/ui/forms"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { catchError } from "@/utils/catch-error"
-import { signInSchema } from "@/schemas/user"
+import { signInSchema } from "@/validation/user"
 import toast from "react-hot-toast"
 
 import { useSignInUser } from "@/backend/actions/user/sign-in"
 import { useForm } from "react-hook-form"
 
 import type { FieldConfig } from "@/interfaces/form"
-import type { SignInPayload } from "@/schemas/user"
+import type { SignInPayload } from "@/validation/user"
 
 export const SignInEmailForm = () => {
   const signIn = useSignInUser()

@@ -1,0 +1,66 @@
+import { text, integer, sqliteTable, index } from "drizzle-orm/sqlite-core"
+import { relations, sql } from "drizzle-orm"
+import { nanoid } from "nanoid"
+
+import { user } from "./user"
+
+import type { InferSelectModel } from "drizzle-orm"
+
+export const projectRequest = sqliteTable(
+  "projectRequest",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid()),
+    projectLead: text("projectLead", { length: 255 }).notNull(),
+    projectTitle: text("projectTitle", { length: 500 }).notNull(),
+    dateSubmitted: integer("dateSubmitted", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    status: text("status", { length: 20 })
+      .notNull()
+      .default("pending")
+      .$type<
+        | "pending"
+        | "approved"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+        | "rejected"
+      >(),
+    description: text("description", { length: 2000 }),
+    submittedBy: text("submittedBy").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    approvedBy: text("approvedBy").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    createdAt: integer("createdAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => [
+    index("projectRequest_status_idx").on(t.status),
+    index("projectRequest_lead_idx").on(t.projectLead),
+    index("projectRequest_date_idx").on(t.dateSubmitted),
+    index("projectRequest_submitted_by_idx").on(t.submittedBy),
+  ],
+)
+
+export const projectRequestRelations = relations(projectRequest, ({ one }) => ({
+  submitter: one(user, {
+    fields: [projectRequest.submittedBy],
+    references: [user.id],
+    relationName: "submittedProjects",
+  }),
+  approver: one(user, {
+    fields: [projectRequest.approvedBy],
+    references: [user.id],
+    relationName: "approvedProjects",
+  }),
+}))
+
+export type ProjectRequest = InferSelectModel<typeof projectRequest>

@@ -1,4 +1,4 @@
-import { lockerConfigSchema } from "@/schemas/locker"
+import { lockerConfigSchema } from "@/validation/locker"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
@@ -7,8 +7,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
 import type { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
-import type { Locker, LockerRental } from "@/schemas/drizzle-schema"
-import type { LockerConfig } from "@/schemas/locker"
+import type { Locker, LockerRental } from "@/backend/db/schemas"
+import type { LockerConfig } from "@/validation/locker"
 
 interface LockerWithRental extends Locker {
   rental?: LockerRental
@@ -42,12 +42,13 @@ export const useUpdateLocker = (id: string) => {
       return await updateLocker(id, sanitizedData)
     },
     onMutate: async (updatedData) => {
-      await queryClient.cancelQueries({ queryKey: ["locker", id] })
-      await queryClient.cancelQueries({ queryKey: ["lockers"] })
-      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
-
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["locker", id] }),
+        queryClient.cancelQueries({ queryKey: ["lockers"] }),
+        queryClient.cancelQueries({ queryKey: ["lockers-infinite"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] }),
+      ])
       const previousLocker = queryClient.getQueryData<LockerWithRental>([
         "locker",
         id,
@@ -109,7 +110,6 @@ export const useUpdateLocker = (id: string) => {
         queryClient.setQueryData(["locker", id], updatedLocker)
       }
 
-      // Update lockers list
       queryClient.setQueriesData<PaginatedLockersResponse>(
         { queryKey: ["lockers"] },
         (oldData: any) => {
@@ -169,7 +169,6 @@ export const useUpdateLocker = (id: string) => {
         },
       )
 
-      // Update infinite lockers
       queryClient.setQueriesData(
         { queryKey: ["lockers-infinite"] },
         (oldData: any) => {
@@ -249,7 +248,6 @@ export const useUpdateLocker = (id: string) => {
         id,
       ])
 
-      // Merge the updated locker with the existing rental data
       const mergedData = {
         ...updatedLocker,
         rental: currentData?.rental,
@@ -258,7 +256,6 @@ export const useUpdateLocker = (id: string) => {
 
       queryClient.setQueryData(["locker", id], mergedData)
 
-      // Update all queries that might contain this locker
       queryClient.setQueriesData<PaginatedLockersResponse>(
         { queryKey: ["lockers"] },
         (oldData) => {
@@ -289,7 +286,6 @@ export const useUpdateLocker = (id: string) => {
         },
       )
 
-      // Update rentals queries to reflect locker changes
       queryClient.setQueriesData(
         { queryKey: ["locker-rentals"] },
         (oldData: any) => {
@@ -365,6 +361,7 @@ export const useUpdateLocker = (id: string) => {
       catchError(error)
     },
     onSettled: () => {
+      router.back()
       router.refresh()
     },
   })

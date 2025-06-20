@@ -4,14 +4,14 @@ import { DynamicForm } from "@/components/ui/forms"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { catchError } from "@/utils/catch-error"
-import { signUpSchema } from "@/schemas/user"
+import { signUpSchema } from "@/validation/user"
 import toast from "react-hot-toast"
 
 import { useSignUpUser } from "@/backend/actions/user/sign-up"
 import { useForm } from "react-hook-form"
 
 import type { FieldConfig } from "@/interfaces/form"
-import type { SignUpPayload } from "@/schemas/user"
+import type { SignUpPayload } from "@/validation/user"
 import { cn } from "@/utils/cn"
 
 interface SignUpFormProps {

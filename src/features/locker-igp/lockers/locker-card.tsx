@@ -13,7 +13,7 @@ import { LockerControls } from "./locker-controls"
 import { LockerHeader } from "./locker-header"
 import { LockerDoor } from "./locker-door"
 
-import type { Locker } from "@/schemas/locker"
+import type { Locker } from "@/validation/locker"
 
 interface LockerCardProps {
   id: string
@@ -32,7 +32,28 @@ export const LockerCard: React.FC<LockerCardProps> = ({
   onSelect,
   compact = false,
 }) => {
-  const isDisabled = locker.lockerStatus === "maintenance"
+  // Convert API status to UI status
+  const getUiStatus = (apiStatus: string | undefined) => {
+    if (!apiStatus) return "active"
+
+    switch (apiStatus) {
+      case "available":
+        return "active"
+      case "occupied":
+      case "reserved":
+        return "inactive"
+      case "maintenance":
+      case "out-of-service":
+        return "under_maintenance"
+      default:
+        return "inactive"
+    }
+  }
+
+  const uiStatus = getUiStatus(locker.lockerStatus)
+  const isDisabled =
+    locker.lockerStatus === "maintenance" ||
+    locker.lockerStatus === "out-of-service"
   const router = useRouter()
 
   return (
@@ -52,26 +73,26 @@ export const LockerCard: React.FC<LockerCardProps> = ({
             compact
               ? "h-50 w-24 p-2"
               : "h-50 w-28 p-2 sm:h-50 sm:w-30 sm:p-2.5 md:h-50 md:w-32 md:p-3"
-          } ${getStatusColor(locker.lockerStatus!)} ${isDisabled ? "cursor-not-allowed opacity-90" : "cursor-pointer hover:shadow-lg"}`}
+          } ${getStatusColor(uiStatus)} ${isDisabled ? "cursor-not-allowed opacity-90" : "cursor-pointer hover:shadow-lg"}`}
         >
-          <LockerStatusIndicator status={locker.lockerStatus!} />
+          <LockerStatusIndicator status={uiStatus} />
 
           {isDisabled && <MaintenanceTape index={index} />}
 
           <LockerHeader
             name={locker.lockerName!}
-            status={locker.lockerStatus!}
+            status={uiStatus}
             isSelected={isSelected}
           />
 
-          <LockerDoor status={locker.lockerStatus!} isSelected={isSelected} />
+          <LockerDoor status={uiStatus} isSelected={isSelected} />
 
-          <LockerControls status={locker.lockerStatus!} />
+          <LockerControls status={uiStatus} />
         </Card>
 
         {/* Shadow effect */}
         <div
-          className={`-bottom-1 absolute inset-x-2 h-2 rounded-b-md blur-sm transition-opacity duration-300 ${isSelected ? "opacity-60" : "opacity-30"} ${getStatusColor(locker.lockerStatus!).replace("to-", "").replace("from-", "")}`}
+          className={`-bottom-1 absolute inset-x-2 h-2 rounded-b-md blur-sm transition-opacity duration-300 ${isSelected ? "opacity-60" : "opacity-30"} ${getStatusColor(uiStatus).replace("to-", "").replace("from-", "")}`}
         />
       </motion.div>
     </AnimatePresence>

@@ -3,14 +3,14 @@
 import { DynamicForm } from "@/components/ui/forms"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { resetPasswordSchema } from "@/schemas/user"
+import { resetPasswordSchema } from "@/validation/user"
 import { catchError } from "@/utils/catch-error"
 import toast from "react-hot-toast"
 
 import { useResetPassword } from "@/backend/actions/user/reset-password"
 import { useForm } from "react-hook-form"
 
-import type { ResetPasswordPayload } from "@/schemas/user"
+import type { ResetPasswordPayload } from "@/validation/user"
 import type { FieldConfig } from "@/interfaces/form"
 
 interface ResetPasswordFormProps {

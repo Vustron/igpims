@@ -1,5 +1,5 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { emailVerificationSchema } from "@/schemas/user"
+import { emailVerificationSchema } from "@/validation/user"
 import * as tokenQuery from "@/backend/queries/token"
 import * as userQuery from "@/backend/queries/user"
 import { requestJson } from "@/utils/request-json"
@@ -7,7 +7,7 @@ import { catchError } from "@/utils/catch-error"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 
-import type { VerifyEmailPayload } from "@/schemas/user"
+import type { VerifyEmailPayload } from "@/validation/user"
 import type { NextRequest } from "next/server"
 
 export async function verifyUserEmail(

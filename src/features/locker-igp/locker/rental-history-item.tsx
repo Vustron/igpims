@@ -8,7 +8,7 @@ import {
 import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { cn } from "@/utils/cn"
 
-import type { Locker } from "@/schemas/locker"
+import type { Locker } from "@/validation/locker"
 
 interface RentalHistoryItemProps {
   rental: any

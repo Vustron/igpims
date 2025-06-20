@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
 import type { PaginatedRentalsResponse } from "@/backend/actions/locker-rental/find-many"
-import type { LockerRental } from "@/schemas/drizzle-schema"
+import type { LockerRental } from "@/backend/db/schemas"
 
 export async function deleteRent(rentalId: string) {
   return api.delete("locker-rentals/delete-rent-by-id", {

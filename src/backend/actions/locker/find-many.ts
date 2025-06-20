@@ -3,7 +3,7 @@ import { api } from "@/backend/helpers/api-client"
 import { useQuery } from "@tanstack/react-query"
 
 import type { QueryClient } from "@tanstack/react-query"
-import type { Locker } from "@/schemas/drizzle-schema"
+import type { Locker } from "@/backend/db/schemas"
 
 export type LockerFilters = {
   page?: number

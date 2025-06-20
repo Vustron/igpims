@@ -1,6 +1,6 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { checkAuth } from "@/backend/middlewares/check-auth"
-import { lockerRental } from "@/schemas/drizzle-schema"
+import { lockerRental } from "@/backend/db/schemas"
 import { and, eq, like, or, sql } from "drizzle-orm"
 import { catchError } from "@/utils/catch-error"
 import { NextResponse } from "next/server"

@@ -1,8 +1,4 @@
-import {
-  otpToken,
-  resetToken,
-  verificationToken,
-} from "@/schemas/drizzle-schema"
+import { otpToken, resetToken, verificationToken } from "@/backend/db/schemas"
 import { sql, eq, and } from "drizzle-orm"
 import { db } from "@/config/drizzle"
 

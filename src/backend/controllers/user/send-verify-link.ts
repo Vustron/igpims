@@ -5,7 +5,7 @@ import * as tokenQuery from "@/backend/queries/token"
 import * as userQuery from "@/backend/queries/user"
 import { requestJson } from "@/utils/request-json"
 import { transporter } from "@/config/nodemailer"
-import { sendEmailSchema } from "@/schemas/user"
+import { sendEmailSchema } from "@/validation/user"
 import { catchError } from "@/utils/catch-error"
 import { render } from "@react-email/components"
 import { NextResponse } from "next/server"
@@ -13,8 +13,8 @@ import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
 import { nanoid } from "nanoid"
 
-import type { SendEmailPayload } from "@/schemas/user"
-import type { User } from "@/schemas/drizzle-schema"
+import type { SendEmailPayload } from "@/validation/user"
+import type { User } from "@/backend/db/schemas"
 import type { NextRequest } from "next/server"
 
 export async function sendVerifyLink(
@@ -40,7 +40,7 @@ export async function sendVerifyLink(
       const result = await userQuery.findByEmailQuery.execute({
         email: validationResult.data.email,
       })
-      existingUser = result[0] as User
+      existingUser = result[ 0 ] as User
 
       if (!existingUser) {
         throw new Error("User does not exist")

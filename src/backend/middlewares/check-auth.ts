@@ -6,7 +6,7 @@ import { getSession } from "@/config/session"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 
-import type { Account, Session, User } from "@/schemas/drizzle-schema"
+import type { Account, Session, User } from "@/backend/db/schemas"
 import { cleanupSession } from "@/backend/helpers/cleanup-session"
 
 export async function checkAuth() {

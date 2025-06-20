@@ -30,7 +30,7 @@ import { useConfirm } from "@/hooks/use-confirm"
 import { useRouter } from "next-nprogress-bar"
 
 import type { ColumnDef } from "@tanstack/react-table"
-import type { User } from "@/schemas/drizzle-schema"
+import type { User } from "@/backend/db/schemas"
 
 export const usersColumns: ColumnDef<User>[] = [
   {

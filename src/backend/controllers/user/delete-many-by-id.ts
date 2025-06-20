@@ -1,6 +1,6 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { checkAuth } from "@/backend/middlewares/check-auth"
-import { deleteManyUserByIdSchema } from "@/schemas/user"
+import { deleteManyUserByIdSchema } from "@/validation/user"
 import * as sessionQuery from "@/backend/queries/session"
 import * as accountQuery from "@/backend/queries/account"
 import * as userQuery from "@/backend/queries/user"
@@ -9,7 +9,7 @@ import { catchError } from "@/utils/catch-error"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 
-import type { DeleteManyUserByIdPayload } from "@/schemas/user"
+import type { DeleteManyUserByIdPayload } from "@/validation/user"
 import type { NextRequest } from "next/server"
 
 export async function deleteManyUserById(

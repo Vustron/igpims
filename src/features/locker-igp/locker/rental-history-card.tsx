@@ -9,7 +9,7 @@ import { Calendar } from "lucide-react"
 
 import { RentalHistoryItem } from "./rental-history-item"
 
-import type { Locker } from "@/schemas/locker"
+import type { Locker } from "@/validation/locker"
 
 interface RentalHistoryCardProps {
   rentalHistory: any[]

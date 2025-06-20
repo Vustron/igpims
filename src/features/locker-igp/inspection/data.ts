@@ -1,4 +1,4 @@
-import type { Inspection } from "@/schemas/inspection"
+import type { Inspection } from "@/validation/inspection"
 
 export const exampleLockerInspections: Inspection[] = [
   {

@@ -6,7 +6,7 @@ import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
 import { nanoid } from "nanoid"
 
-import type { User } from "@/schemas/drizzle-schema"
+import type { User } from "@/backend/db/schemas"
 
 export async function handleOTP(user: User) {
   const otpToken = nanoid(6)

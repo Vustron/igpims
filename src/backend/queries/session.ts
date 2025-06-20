@@ -1,4 +1,4 @@
-import { session } from "@/schemas/drizzle-schema"
+import { session } from "@/backend/db/schemas"
 import { eq, inArray, sql } from "drizzle-orm"
 import { db } from "@/config/drizzle"
 

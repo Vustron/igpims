@@ -13,7 +13,7 @@ import {
 import { columnHeaders } from "./column-helper"
 import { ActionMenu } from "./action-menu"
 
-import type { LockerRental } from "@/schemas/drizzle-schema"
+import type { LockerRental } from "@/backend/db/schemas"
 import type { ColumnDef } from "@tanstack/react-table"
 
 export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [

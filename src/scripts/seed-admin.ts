@@ -1,4 +1,4 @@
-import { user, account } from "@/schemas/drizzle-schema"
+import { user, account } from "@/backend/db/schemas"
 import { genSalt, hash } from "bcrypt-ts"
 import { db } from "@/config/drizzle"
 import { nanoid } from "nanoid"

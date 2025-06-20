@@ -1,14 +1,14 @@
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
-import { signInSchema } from "@/schemas/user"
+import { signInSchema } from "@/validation/user"
 import { sanitizer } from "@/utils/sanitizer"
 
 import { useOtpStore } from "@/hooks/use-otp-store"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
-import type { Account } from "@/schemas/drizzle-schema"
-import type { SignInPayload } from "@/schemas/user"
+import type { SignInPayload } from "@/validation/user"
+import type { Account } from "@/backend/db/schemas"
 
 export async function signIn(payload: SignInPayload): Promise<Account> {
   return api.post<SignInPayload, Account>("auth/sign-in", payload)

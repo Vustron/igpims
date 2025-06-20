@@ -1,5 +1,5 @@
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { signInOtpAuthenticatorSchema } from "@/schemas/user"
+import { signInOtpAuthenticatorSchema } from "@/validation/user"
 import * as accountQuery from "@/backend/queries/account"
 import * as sessionQuery from "@/backend/queries/session"
 import * as userQuery from "@/backend/queries/user"
@@ -13,8 +13,8 @@ import speakeasy from "speakeasy"
 import { nanoid } from "nanoid"
 
 import type { CompatibleRequest } from "@/backend/middlewares/http-request-limit"
-import type { SignInOtpAuthenticatorPayload } from "@/schemas/user"
-import type { User, Account } from "@/schemas/drizzle-schema"
+import type { SignInOtpAuthenticatorPayload } from "@/validation/user"
+import type { User, Account } from "@/backend/db/schemas"
 import type { NextRequest } from "next/server"
 
 export async function signInOtpAuth(
@@ -49,15 +49,15 @@ export async function signInOtpAuth(
     let accountData: Account | undefined
 
     await db.transaction(async (_tx) => {
-      const [userResult, accountResult] = await Promise.all([
+      const [ userResult, accountResult ] = await Promise.all([
         userQuery.findByUserIdQuery.execute({ userId }),
         accountQuery.findByAccountUserIdQuery.execute({
           accountUserId: userId,
         }),
       ])
 
-      userData = userResult[0] as User
-      accountData = accountResult[0] as Account
+      userData = userResult[ 0 ] as User
+      accountData = accountResult[ 0 ] as Account
 
       if (!userData || !accountData) {
         throw new Error("User not found")

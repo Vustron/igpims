@@ -1,4 +1,4 @@
-import * as schema from "@/schemas/drizzle-schema"
+import * as schema from "@/backend/db/schemas"
 import { drizzle } from "drizzle-orm/libsql"
 import { config } from "dotenv"
 

@@ -1,4 +1,4 @@
-import { locker } from "@/schemas/drizzle-schema"
+import { locker } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
 import { sql } from "drizzle-orm"
 

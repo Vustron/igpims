@@ -21,7 +21,7 @@ import {
 import { ViolationActions } from "./actions"
 
 import type { ColumnDef } from "@tanstack/react-table"
-import type { Violation } from "@/schemas/violation"
+import type { Violation } from "@/validation/violation"
 
 export const violationListColumns: ColumnDef<Violation>[] = [
   {

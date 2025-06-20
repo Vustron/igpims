@@ -13,7 +13,7 @@ import {
 import { InspectionActions } from "./actions"
 
 import type { ColumnDef } from "@tanstack/react-table"
-import type { Inspection } from "@/schemas/inspection"
+import type { Inspection } from "@/validation/inspection"
 
 export const inspectionColumn: ColumnDef<Inspection>[] = [
   {

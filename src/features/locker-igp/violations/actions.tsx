@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdowns"
 import { Button } from "@/components/ui/buttons"
 
-import type { Violation } from "@/schemas/violation"
+import type { Violation } from "@/validation/violation"
 
 export const ViolationActions = ({ violation }: { violation: Violation }) => {
   const handleView = () => {

@@ -1,4 +1,4 @@
-import { createRentalSchema } from "@/schemas/rental"
+import { createRentalSchema } from "@/validation/rental"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 
@@ -6,8 +6,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 
 import type { PaginatedRentalsResponse } from "@/backend/actions/locker-rental/find-many"
-import type { LockerRental } from "@/schemas/drizzle-schema"
-import type { CreateRentalData } from "@/schemas/rental"
+import type { CreateRentalData } from "@/validation/rental"
+import type { LockerRental } from "@/backend/db/schemas"
 
 export async function createRent(
   payload: CreateRentalData,

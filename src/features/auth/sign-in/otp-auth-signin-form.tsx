@@ -2,7 +2,7 @@
 
 import { DynamicForm } from "@/components/ui/forms"
 
-import { signInOtpAuthenticatorSchema } from "@/schemas/user"
+import { signInOtpAuthenticatorSchema } from "@/validation/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { catchError } from "@/utils/catch-error"
 import toast from "react-hot-toast"
@@ -10,7 +10,7 @@ import toast from "react-hot-toast"
 import { useSignInOtpAuthenticator } from "@/backend/actions/user/sign-in-otp-auth"
 import { useForm } from "react-hook-form"
 
-import type { SignInOtpAuthenticatorPayload } from "@/schemas/user"
+import type { SignInOtpAuthenticatorPayload } from "@/validation/user"
 import type { FieldConfig } from "@/interfaces/form"
 
 interface SignInOtpAuthenticatorFormProps {

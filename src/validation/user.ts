@@ -1,4 +1,4 @@
-import { passwordValidator } from "@/schemas/utils"
+import { passwordValidator } from "@/validation/utils"
 import { z } from "zod"
 
 export const signUpSchema = z.object({

@@ -6,7 +6,7 @@ import { getSession } from "@/config/session"
 import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 
-import type { Account, User } from "@/schemas/drizzle-schema"
+import type { Account, User } from "@/backend/db/schemas"
 import type { NextRequest } from "next/server"
 
 export async function findUserById(

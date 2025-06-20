@@ -5,11 +5,11 @@ import { useForm } from "react-hook-form"
 
 import { convertImageToBase64 } from "@/utils/image-convert-base64"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { updateUserSchema } from "@/schemas/user"
+import { updateUserSchema } from "@/validation/user"
 import { catchError } from "@/utils/catch-error"
 import toast from "react-hot-toast"
 
-import type { UpdateUserPayload } from "@/schemas/user"
+import type { UpdateUserPayload } from "@/validation/user"
 import type { FieldConfig } from "@/interfaces/form"
 
 interface EditUserFormProps {

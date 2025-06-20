@@ -1,6 +1,6 @@
 "use client"
 
-import { lockerConfigSchema } from "@/schemas/locker"
+import { lockerConfigSchema } from "@/validation/locker"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { catchError } from "@/utils/catch-error"
 import toast from "react-hot-toast"
@@ -22,7 +22,7 @@ import { CurrentRentalCard } from "./current-rental-card"
 import { RentalHistoryCard } from "./rental-history-card"
 import { LockerInfoHeader } from "./locker-info-header"
 
-import type { LockerConfig } from "@/schemas/locker"
+import type { LockerConfig } from "@/validation/locker"
 import type { FieldConfig } from "@/interfaces/form"
 
 export const LockerClient = ({ id }: { id: string }) => {

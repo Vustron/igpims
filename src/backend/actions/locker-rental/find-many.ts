@@ -1,8 +1,9 @@
 import { queryOptions, useInfiniteQuery } from "@tanstack/react-query"
+import type { LockerRental } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
+
 import { useQuery } from "@tanstack/react-query"
 
-import type { LockerRental } from "@/schemas/drizzle-schema"
 import type { QueryClient } from "@tanstack/react-query"
 
 export type RentalFilters = {

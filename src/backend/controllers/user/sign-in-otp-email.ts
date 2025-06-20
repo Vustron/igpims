@@ -1,7 +1,7 @@
 import * as accountQuery from "@/backend/queries/account"
 import * as sessionQuery from "@/backend/queries/session"
 import * as tokenQuery from "@/backend/queries/token"
-import { signInOtpEmailSchema } from "@/schemas/user"
+import { signInOtpEmailSchema } from "@/validation/user"
 import * as userQuery from "@/backend/queries/user"
 import { requestJson } from "@/utils/request-json"
 import { catchError } from "@/utils/catch-error"
@@ -12,8 +12,8 @@ import { db } from "@/config/drizzle"
 import { nanoid } from "nanoid"
 
 import type { CompatibleRequest } from "@/backend/middlewares/http-request-limit"
-import type { User, Account, OtpToken } from "@/schemas/drizzle-schema"
-import type { SignInOtpEmailPayload } from "@/schemas/user"
+import type { User, Account, OtpToken } from "@/backend/db/schemas"
+import type { SignInOtpEmailPayload } from "@/validation/user"
 import type { NextRequest } from "next/server"
 
 export async function signInOtpEmail(

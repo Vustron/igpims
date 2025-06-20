@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-import type { Locker, LockerRental } from "@/schemas/drizzle-schema"
+import type { Locker, LockerRental } from "@/backend/db/schemas"
 
 export type DialogType =
   | "confirm"

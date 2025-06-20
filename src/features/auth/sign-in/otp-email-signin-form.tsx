@@ -3,14 +3,14 @@
 import { DynamicForm } from "@/components/ui/forms"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signInOtpEmailSchema } from "@/schemas/user"
+import { signInOtpEmailSchema } from "@/validation/user"
 import { catchError } from "@/utils/catch-error"
 import toast from "react-hot-toast"
 
 import { useSignInOTPEmail } from "@/backend/actions/user/sign-in-otp-email"
 import { useForm } from "react-hook-form"
 
-import type { SignInOtpEmailPayload } from "@/schemas/user"
+import type { SignInOtpEmailPayload } from "@/validation/user"
 import type { FieldConfig } from "@/interfaces/form"
 
 export const SignInOTPEmailForm = () => {

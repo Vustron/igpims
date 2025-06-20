@@ -1,4 +1,4 @@
-import type { Violation } from "@/schemas/violation"
+import type { Violation } from "@/validation/violation"
 
 export const exampleViolations: Violation[] = [
   {

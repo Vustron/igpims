@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { env } from "@/config/env"
 
 import type { IronSession, SessionOptions } from "iron-session"
-import type { session } from "@/schemas/drizzle-schema"
+import type { session } from "@/backend/db/schemas"
 import type { InferSelectModel } from "drizzle-orm"
 
 export type SessionType = InferSelectModel<typeof session>
