@@ -1,6 +1,6 @@
 import { BellRing, Check, RefreshCw } from "lucide-react"
-import { Button } from "@/components/ui/buttons"
 import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
 
 interface NotificationHeaderProps {
   unreadCount: number

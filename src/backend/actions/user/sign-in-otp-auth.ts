@@ -1,14 +1,14 @@
-import { signInOtpAuthenticatorSchema } from "@/validation/user"
-import { api } from "@/backend/helpers/api-client"
-import { catchError } from "@/utils/catch-error"
-import { sanitizer } from "@/utils/sanitizer"
-
-import { useOtpStore } from "@/hooks/use-otp-store"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { SignInOtpAuthenticatorPayload } from "@/validation/user"
-import type { Account } from "@/backend/db/schemas"
+import { Account } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
+import { useOtpStore } from "@/hooks/use-otp-store"
+import { catchError } from "@/utils/catch-error"
+import { sanitizer } from "@/utils/sanitizer"
+import {
+  SignInOtpAuthenticatorPayload,
+  signInOtpAuthenticatorSchema,
+} from "@/validation/user"
 
 export async function signInOtpAuthenticator(
   payload: SignInOtpAuthenticatorPayload,

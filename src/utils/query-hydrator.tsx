@@ -1,7 +1,7 @@
 import {
   dehydrate,
-  QueryClient,
   HydrationBoundary,
+  QueryClient,
 } from "@tanstack/react-query"
 
 export type PrefetchFunction = (

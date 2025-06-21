@@ -1,11 +1,10 @@
-import { queryOptions } from "@tanstack/react-query"
+import {
+  QueryClient,
+  queryOptions,
+  useSuspenseQuery,
+} from "@tanstack/react-query"
+import { User } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
-
-import type { User } from "@/backend/db/schemas"
-
-import { useSuspenseQuery } from "@tanstack/react-query"
-
-import type { QueryClient } from "@tanstack/react-query"
 
 export async function findUserById(id: string): Promise<User> {
   return await api.get<User>("auth/find-by-id", {

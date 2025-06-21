@@ -1,38 +1,35 @@
 "use client"
 
+import { motion } from "framer-motion"
 import {
-  Power,
-  Settings,
   Activity,
-  RefreshCw,
-  MapPinIcon,
-  DropletIcon,
   ChevronRight,
+  DropletIcon,
+  MapPinIcon,
   MoreVertical,
+  Power,
+  RefreshCw,
+  Settings,
 } from "lucide-react"
-
+import { useState } from "react"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
 import {
   Card,
-  CardTitle,
-  CardHeader,
-  CardFooter,
   CardContent,
   CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/cards"
 import {
   DropdownMenu,
+  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
-import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
-
-import { motion } from "framer-motion"
-
-import { useState } from "react"
 
 interface WaterVendoCardProps {
   id: string

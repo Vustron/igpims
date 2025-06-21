@@ -1,36 +1,34 @@
 "use client"
 
+import { ColumnDef } from "@tanstack/react-table"
 import {
-  Eye,
+  ArrowRight,
   Box,
-  Clock,
-  Truck,
   Boxes,
+  Calendar,
+  Clock,
+  Eye,
+  MoreHorizontal,
   Pencil,
   Receipt,
-  Calendar,
-  ArrowRight,
   TrendingDown,
-  MoreHorizontal,
+  Truck,
 } from "lucide-react"
+import { z } from "zod"
+import { Button } from "@/components/ui/buttons"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdowns"
+import { Progress } from "@/components/ui/progress"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdowns"
-import { Button } from "@/components/ui/buttons"
-import { Progress } from "@/components/ui/progress"
-
-import { z } from "zod"
-
-import type { ColumnDef } from "@tanstack/react-table"
 
 export const SupplySchema = z.object({
   id: z.string(),

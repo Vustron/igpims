@@ -1,20 +1,18 @@
 "use client"
 
-import {
-  weekSummaries,
-  waterVendoEntries,
-  waterVendoEntryColumn,
-} from "@/features/water-vendo/water-vendo-entry-column"
-import { WaterFundsControls } from "@/features/water-vendo/water-funds-control"
+import { AnimatePresence, motion } from "framer-motion"
 import { Calendar, ChevronDown, ChevronUp, Edit } from "lucide-react"
+import { useState } from "react"
+import { z } from "zod"
+import { Button } from "@/components/ui/buttons"
 import { Separator } from "@/components/ui/separators"
 import { DataTable } from "@/components/ui/tables"
-import { Button } from "@/components/ui/buttons"
-
-import { useState } from "react"
-
-import { motion, AnimatePresence } from "framer-motion"
-import { z } from "zod"
+import { WaterFundsControls } from "./water-funds-control"
+import {
+  waterVendoEntries,
+  waterVendoEntryColumn,
+  weekSummaries,
+} from "./water-vendo-entry-column"
 
 export const WaterVendoEntrySchema = z.object({
   id: z.string(),

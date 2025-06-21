@@ -1,34 +1,26 @@
 "use client"
 
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/separators/tabs"
-import {
-  WaterVendoCard,
-  exampleWaterVendos,
-} from "@/features/water-vendo/water-vendo-card"
-import { WaterVendoFilters } from "@/features/water-vendo/water-vendo-filter"
-import { WaterSupply } from "@/features/water-vendo/water-supply-list"
-import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
-import { WaterFunds } from "@/features/water-vendo/water-funds"
-import { GiWaterGallon, GiWaterSplash } from "react-icons/gi"
+import { motion } from "framer-motion"
+import { Plus, Search } from "lucide-react"
+import { useEffect, useState } from "react"
 import { FaMoneyBill1Wave } from "react-icons/fa6"
+import { GiWaterGallon, GiWaterSplash } from "react-icons/gi"
 import { Button } from "@/components/ui/buttons"
 import { Input } from "@/components/ui/inputs"
-import { Search, Plus } from "lucide-react"
-
-import { useMediaQuery } from "@/hooks/use-media-query"
+import { MobileTabNav, TabItem } from "@/components/ui/separators/mobile-tab"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/separators/tabs"
 import { useDialog } from "@/hooks/use-dialog"
-import { useState, useEffect } from "react"
-
-import { motion } from "framer-motion"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { cn } from "@/utils/cn"
-
-import type { FilterState } from "@/features/water-vendo/water-vendo-filter"
-import type { TabItem } from "@/components/ui/separators/mobile-tab"
+import { WaterFunds } from "./water-funds"
+import { WaterSupply } from "./water-supply-list"
+import { exampleWaterVendos, WaterVendoCard } from "./water-vendo-card"
+import { FilterState, WaterVendoFilters } from "./water-vendo-filter"
 
 export const WaterVendoTabs = () => {
   const [activeTab, setActiveTab] = useState("water_vendo_monitoring")

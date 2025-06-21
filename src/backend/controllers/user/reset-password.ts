@@ -1,16 +1,13 @@
+import { genSalt, hash } from "bcrypt-ts"
+import { NextRequest, NextResponse } from "next/server"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as tokenQuery from "@/backend/queries/token"
-import { resetPasswordSchema } from "@/validation/user"
-import { requestJson } from "@/utils/request-json"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
-import { genSalt, hash } from "bcrypt-ts"
 import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
-
-import type { ResetPasswordPayload } from "@/validation/user"
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
+import { requestJson } from "@/utils/request-json"
+import { ResetPasswordPayload, resetPasswordSchema } from "@/validation/user"
 
 export async function resetUserPassword(
   request: NextRequest,

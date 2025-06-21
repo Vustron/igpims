@@ -1,10 +1,7 @@
-import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core"
-import { relations, sql } from "drizzle-orm"
+import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-
 import { user } from "./user"
-
-import type { InferSelectModel } from "drizzle-orm"
 
 export const otpToken = sqliteTable("otp_token", {
   id: text("id")

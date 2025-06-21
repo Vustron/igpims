@@ -1,17 +1,15 @@
+import { motion } from "framer-motion"
 import {
-  ArrowUp,
-  PieChart,
-  FileText,
   ArrowDown,
+  ArrowUp,
   BarChart3,
+  FileText,
   LineChart,
+  PieChart,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/cards"
-
-import { motion } from "framer-motion"
 import { cn } from "@/utils/cn"
-
-import type { IgpSummary } from "@/features/report/sales-report-types"
+import { IgpSummary } from "./sales-report-types"
 
 const SummaryCard = ({
   title,

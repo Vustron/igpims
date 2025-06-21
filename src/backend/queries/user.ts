@@ -1,5 +1,5 @@
+import { and, eq, inArray, ne, sql } from "drizzle-orm"
 import { account, user } from "@/backend/db/schemas"
-import { eq, inArray, sql, ne, and } from "drizzle-orm"
 import { db } from "@/config/drizzle"
 
 const findByUserIdQuery = db

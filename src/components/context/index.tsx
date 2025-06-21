@@ -1,11 +1,10 @@
-import { TailwindIndicator } from "@/components/context/tailwind-indicator"
-import { ProgressBarProvider } from "@/components/context/progress-bar"
-
 import { DialogProvider } from "@/components/context/dialog"
-import { ThemeProvider } from "@/components/context/themes"
+import { ProgressBarProvider } from "@/components/context/progress-bar"
 import { QueryProvider } from "@/components/context/query"
-import { TooltipProvider } from "@/components/ui/tooltips"
+import { TailwindIndicator } from "@/components/context/tailwind-indicator"
+import { ThemeProvider } from "@/components/context/themes"
 import { ToastProvider } from "@/components/context/toast"
+import { TooltipProvider } from "@/components/ui/tooltips"
 
 export const Contexts = ({ children }: { children: React.ReactNode }) => {
   return (

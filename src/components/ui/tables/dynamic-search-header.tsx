@@ -16,6 +16,7 @@ interface DynamicSearchHeaderProps {
   isLockerRental?: boolean
   table: any
   isUser?: boolean
+  isOnViolations?: boolean
 }
 
 export const DynamicSearchHeader = ({
@@ -28,6 +29,7 @@ export const DynamicSearchHeader = ({
   isLockerRental,
   table,
   isUser,
+  isOnViolations,
 }: DynamicSearchHeaderProps) => {
   return (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -50,6 +52,7 @@ export const DynamicSearchHeader = ({
         isFetching={isFetching}
         isUser={isUser}
         table={table}
+        isOnViolations={isOnViolations}
       />
     </div>
   )

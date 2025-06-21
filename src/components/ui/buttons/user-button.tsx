@@ -1,35 +1,32 @@
 "use client"
 
+import { User as FallbackUser, Loader2, LogOut, UserCog } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next-nprogress-bar"
+import { useEffect } from "react"
+import toast from "react-hot-toast"
+import { useSession } from "@/components/context/session"
+import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
   DropdownMenuContent,
-  DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/images"
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
   TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltips"
-import { LogOut, UserCog, Loader2, User as FallbackUser } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/images"
-import { Button } from "@/components/ui/buttons"
-
 import { useFindAccountById } from "@/backend/actions/user/find-by-id"
 import { useSignOutUser } from "@/backend/actions/user/sign-out"
-import { useSession } from "@/components/context/session"
 import { useDialog } from "@/hooks/use-dialog"
-import { useRouter } from "next-nprogress-bar"
-import { useEffect } from "react"
-
 import { catchError } from "@/utils/catch-error"
-
-import toast from "react-hot-toast"
-import Link from "next/link"
 
 export const UserButton = () => {
   const session = useSession()

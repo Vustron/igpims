@@ -1,13 +1,11 @@
+import { Metadata, Viewport } from "next"
 import { getBaseUrl } from "@/utils/get-base-url"
-
-import type { Metadata, Viewport } from "next"
 
 export type SiteConfig = {
   meta: Metadata
   viewport: Viewport
 }
 
-// site config
 export const siteConfig: SiteConfig = {
   meta: {
     metadataBase: new URL(getBaseUrl()),

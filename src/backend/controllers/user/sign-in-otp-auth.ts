@@ -1,21 +1,23 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { signInOtpAuthenticatorSchema } from "@/validation/user"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
+import { getClientIp } from "request-ip"
+import speakeasy from "speakeasy"
+import { Account, User } from "@/backend/db/schemas"
+import {
+  CompatibleRequest,
+  httpRequestLimit,
+} from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as sessionQuery from "@/backend/queries/session"
 import * as userQuery from "@/backend/queries/user"
-import { requestJson } from "@/utils/request-json"
-import { catchError } from "@/utils/catch-error"
-import { getSession } from "@/config/session"
-import { NextResponse } from "next/server"
-import { getClientIp } from "request-ip"
 import { db } from "@/config/drizzle"
-import speakeasy from "speakeasy"
-import { nanoid } from "nanoid"
-
-import type { CompatibleRequest } from "@/backend/middlewares/http-request-limit"
-import type { SignInOtpAuthenticatorPayload } from "@/validation/user"
-import type { User, Account } from "@/backend/db/schemas"
-import type { NextRequest } from "next/server"
+import { getSession } from "@/config/session"
+import { catchError } from "@/utils/catch-error"
+import { requestJson } from "@/utils/request-json"
+import {
+  SignInOtpAuthenticatorPayload,
+  signInOtpAuthenticatorSchema,
+} from "@/validation/user"
 
 export async function signInOtpAuth(
   request: NextRequest,
@@ -49,15 +51,15 @@ export async function signInOtpAuth(
     let accountData: Account | undefined
 
     await db.transaction(async (_tx) => {
-      const [ userResult, accountResult ] = await Promise.all([
+      const [userResult, accountResult] = await Promise.all([
         userQuery.findByUserIdQuery.execute({ userId }),
         accountQuery.findByAccountUserIdQuery.execute({
           accountUserId: userId,
         }),
       ])
 
-      userData = userResult[ 0 ] as User
-      accountData = accountResult[ 0 ] as Account
+      userData = userResult[0] as User
+      accountData = accountResult[0] as Account
 
       if (!userData || !accountData) {
         throw new Error("User not found")

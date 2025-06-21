@@ -1,20 +1,20 @@
 "use client"
 
-import {
-  Area,
-  XAxis,
-  YAxis,
-  Legend,
-  Tooltip,
-  CartesianGrid,
-  ReferenceLine,
-  ComposedChart,
-  ResponsiveContainer,
-} from "recharts"
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
-import { Card } from "@/components/ui/cards"
 import { TrendingUp } from "lucide-react"
 import { useId, useMemo } from "react"
+import {
+  Area,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
+import { Card } from "@/components/ui/cards"
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 
 export const RevenueAnalytics = () => {
   const colorIdRentals = useId()

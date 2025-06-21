@@ -1,23 +1,22 @@
 "use client"
 
 import {
-  Drawer,
-  DrawerTitle,
-  DrawerHeader,
-  DrawerContent,
-  DrawerDescription,
-} from "@/components/ui/drawers"
-import {
   Dialog,
-  DialogTitle,
-  DialogHeader,
   DialogContent,
   DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialogs"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawers"
 import { CreateIgpForm } from "@/features/other-igps/create-igp-form"
-
-import { useMediaQuery } from "@/hooks/use-media-query"
 import { useDialog } from "@/hooks/use-dialog"
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 export const CreateIgpDialog = () => {
   const { isOpen, onClose, type } = useDialog()

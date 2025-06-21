@@ -1,14 +1,13 @@
 "use client"
 
-import {
-  igpManagementColumn,
-  exampleIgpManagementData,
-} from "@/features/other-igps/igp-management-column"
-import { DataTable } from "@/components/ui/tables"
+import { useMemo, useState } from "react"
 import { Badge } from "@/components/ui/badges"
-
-import { useState, useMemo } from "react"
+import { DataTable } from "@/components/ui/tables"
 import { cn } from "@/utils/cn"
+import {
+  exampleIgpManagementData,
+  igpManagementColumn,
+} from "./igp-management-column"
 
 export const IgpManagement = () => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)

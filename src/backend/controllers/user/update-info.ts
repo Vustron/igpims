@@ -1,17 +1,14 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { compare, genSalt, hash } from "bcrypt-ts"
+import { NextRequest, NextResponse } from "next/server"
+import { User } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
-import { updateUserSchema } from "@/validation/user"
 import * as userQuery from "@/backend/queries/user"
-import { genSalt, hash, compare } from "bcrypt-ts"
-import { requestJson } from "@/utils/request-json"
-import type { User } from "@/backend/db/schemas"
-import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
-
-import type { UpdateUserPayload } from "@/validation/user"
-import type { NextRequest } from "next/server"
+import { requestJson } from "@/utils/request-json"
+import { UpdateUserPayload, updateUserSchema } from "@/validation/user"
 
 export async function updateUserInfo(
   request: NextRequest,

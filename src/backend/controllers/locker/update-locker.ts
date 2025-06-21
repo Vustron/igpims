@@ -1,18 +1,15 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { eq, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
+import { locker } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as lockerQuery from "@/backend/queries/locker"
 import * as rentalQuery from "@/backend/queries/rental"
-import { lockerConfigSchema } from "@/validation/locker"
+import { db } from "@/config/drizzle"
+import { catchError } from "@/utils/catch-error"
 import { toTimestamp } from "@/utils/date-convert"
 import { requestJson } from "@/utils/request-json"
-import { locker } from "@/backend/db/schemas"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
-import { db } from "@/config/drizzle"
-import { eq, sql } from "drizzle-orm"
-
-import type { LockerConfig } from "@/validation/locker"
-import type { NextRequest } from "next/server"
+import { LockerConfig, lockerConfigSchema } from "@/validation/locker"
 
 export async function updateLocker(
   request: NextRequest,

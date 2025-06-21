@@ -1,9 +1,11 @@
-import { queryOptions, useInfiniteQuery } from "@tanstack/react-query"
+import {
+  QueryClient,
+  queryOptions,
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query"
+import { Locker } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
-import { useQuery } from "@tanstack/react-query"
-
-import type { QueryClient } from "@tanstack/react-query"
-import type { Locker } from "@/backend/db/schemas"
 
 export type LockerFilters = {
   page?: number

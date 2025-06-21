@@ -1,18 +1,17 @@
-import {
-  Sheet,
-  SheetTitle,
-  SheetHeader,
-  SheetTrigger,
-  SheetContent,
-  SheetDescription,
-} from "@/components/ui/sheets"
-import VisuallyHiddenComponent from "@/components/ui/separators/visually-hidden"
-import { Menu } from "@/components/ui/sidebar/menu"
-import { Button } from "@/components/ui/buttons"
 import { MenuIcon } from "lucide-react"
-
 import Image from "next/image"
 import Link from "next/link"
+import { Button } from "@/components/ui/buttons"
+import VisuallyHiddenComponent from "@/components/ui/separators/visually-hidden"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheets"
+import { Menu } from "@/components/ui/sidebar/menu"
 
 export const SheetMenu = () => {
   return (

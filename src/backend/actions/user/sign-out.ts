@@ -1,8 +1,7 @@
-import { api } from "@/backend/helpers/api-client"
-import { catchError } from "@/utils/catch-error"
-
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
+import { api } from "@/backend/helpers/api-client"
+import { catchError } from "@/utils/catch-error"
 
 interface SignOutUserProps {
   isVerify?: boolean

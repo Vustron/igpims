@@ -1,12 +1,11 @@
 "use client"
 
-import { Card, CardTitle, CardHeader, CardContent } from "@/components/ui/cards"
-import { SignInOtpAuthenticatorForm } from "@/features/auth/sign-in/otp-auth-signin-form"
-import { SignInOTPEmailForm } from "@/features/auth/sign-in/otp-email-signin-form"
-import { SignInEmailForm } from "@/features/auth/sign-in/email-signin-form"
 import Image from "next/image"
-
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
 import { useOtpStore } from "@/hooks/use-otp-store"
+import { SignInEmailForm } from "./email-signin-form"
+import { SignInOtpAuthenticatorForm } from "./otp-auth-signin-form"
+import { SignInOTPEmailForm } from "./otp-email-signin-form"
 
 interface SignInClientProps {
   userId?: string

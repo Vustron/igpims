@@ -1,7 +1,6 @@
-import { NotificationClient } from "@/features/notification/client"
+import { Metadata } from "next"
 import { ContentLayout } from "@/features/layouts/content-layout"
-
-import type { Metadata } from "next"
+import { NotificationClient } from "@/features/notification/client"
 
 export const metadata: Metadata = {
   title: "Notification",

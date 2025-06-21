@@ -1,15 +1,12 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { checkAuth } from "@/backend/middlewares/check-auth"
-import * as lockerQuery from "@/backend/queries/locker"
-import { requestJson } from "@/utils/request-json"
-import { catchError } from "@/utils/catch-error"
-import { lockerSchema } from "@/validation/locker"
-import { NextResponse } from "next/server"
-import { db } from "@/config/drizzle"
 import { nanoid } from "nanoid"
-
-import type { Locker } from "@/validation/locker"
-import type { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import * as lockerQuery from "@/backend/queries/locker"
+import { db } from "@/config/drizzle"
+import { catchError } from "@/utils/catch-error"
+import { requestJson } from "@/utils/request-json"
+import { Locker, lockerSchema } from "@/validation/locker"
 
 export async function createLocker(
   request: NextRequest,

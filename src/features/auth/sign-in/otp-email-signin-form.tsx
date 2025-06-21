@@ -1,17 +1,13 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { signInOtpEmailSchema } from "@/validation/user"
-import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
-import { useSignInOTPEmail } from "@/backend/actions/user/sign-in-otp-email"
 import { useForm } from "react-hook-form"
-
-import type { SignInOtpEmailPayload } from "@/validation/user"
-import type { FieldConfig } from "@/interfaces/form"
+import toast from "react-hot-toast"
+import { DynamicForm } from "@/components/ui/forms"
+import { useSignInOTPEmail } from "@/backend/actions/user/sign-in-otp-email"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { SignInOtpEmailPayload, signInOtpEmailSchema } from "@/validation/user"
 
 export const SignInOTPEmailForm = () => {
   const signInOTPEmail = useSignInOTPEmail()

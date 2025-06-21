@@ -1,23 +1,22 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { compare } from "bcrypt-ts"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
+import { getClientIp } from "request-ip"
+import { Account, User } from "@/backend/db/schemas"
+import { handleOTP } from "@/backend/helpers/handle-otp"
+import {
+  CompatibleRequest,
+  httpRequestLimit,
+} from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as sessionQuery from "@/backend/queries/session"
-import { handleOTP } from "@/backend/helpers/handle-otp"
 import * as userQuery from "@/backend/queries/user"
-import { requestJson } from "@/utils/request-json"
-import { catchError } from "@/utils/catch-error"
-import { getSession } from "@/config/session"
-import { signInSchema } from "@/validation/user"
-import { NextResponse } from "next/server"
-import { getClientIp } from "request-ip"
 import { db } from "@/config/drizzle"
-import { compare } from "bcrypt-ts"
 import { env } from "@/config/env"
-import { nanoid } from "nanoid"
-
-import type { CompatibleRequest } from "@/backend/middlewares/http-request-limit"
-import type { User, Account } from "@/backend/db/schemas"
-import type { SignInPayload } from "@/validation/user"
-import type { NextRequest } from "next/server"
+import { getSession } from "@/config/session"
+import { catchError } from "@/utils/catch-error"
+import { requestJson } from "@/utils/request-json"
+import { SignInPayload, signInSchema } from "@/validation/user"
 
 export async function signInUser(
   request: NextRequest,

@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/components/ui/cards"
-import { Button } from "@/components/ui/buttons"
 import { PiLockers } from "react-icons/pi"
+import { Button } from "@/components/ui/buttons"
+import { Card, CardContent } from "@/components/ui/cards"
 
 export const LockerInfoErrorState = () => {
   return (

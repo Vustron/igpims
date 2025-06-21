@@ -1,9 +1,11 @@
-import { queryOptions, useInfiniteQuery } from "@tanstack/react-query"
+import {
+  QueryClient,
+  queryOptions,
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query"
+import { User } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
-import { useQuery } from "@tanstack/react-query"
-
-import type { QueryClient } from "@tanstack/react-query"
-import type { User } from "@/backend/db/schemas"
 
 export type UserFilters = {
   page?: number

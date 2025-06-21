@@ -1,27 +1,26 @@
 "use client"
 
-import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectContent,
-  SelectTrigger,
-} from "@/components/ui/selects"
+import { CheckCircle2, Filter, PlusCircleIcon, Search, X } from "lucide-react"
 import {
   Accordion,
-  AccordionItem,
   AccordionContent,
+  AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordions"
-import { Search, Filter, PlusCircleIcon, CheckCircle2, X } from "lucide-react"
-import { Separator } from "@/components/ui/separators"
-import { Button } from "@/components/ui/buttons"
-import { Label } from "@/components/ui/labels"
 import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
 import { Input } from "@/components/ui/inputs"
-
-import { getStatusColor, getStatusLabel } from "@/utils/get-percentage-color"
+import { Label } from "@/components/ui/labels"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/selects"
+import { Separator } from "@/components/ui/separators"
 import { useDialog } from "@/hooks/use-dialog"
+import { getStatusColor, getStatusLabel } from "@/utils/get-percentage-color"
 
 interface LockerFilterProps {
   searchTerm: string

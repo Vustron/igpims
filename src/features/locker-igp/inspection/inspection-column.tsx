@@ -1,19 +1,17 @@
 "use client"
 
-import { Users, Receipt, Calendar, ClipboardCopy } from "lucide-react"
-
+import { ColumnDef } from "@tanstack/react-table"
+import { Calendar, ClipboardCopy, Receipt, Users } from "lucide-react"
+import { Inspection } from "@/validation/inspection"
+import { InspectionActions } from "./actions"
 import {
-  IdCell,
-  DateCell,
   AmountCell,
-  SelectCell,
   ColumnHeader,
+  DateCell,
+  IdCell,
+  SelectCell,
   ViolatorsCell,
 } from "./column-helpers"
-import { InspectionActions } from "./actions"
-
-import type { ColumnDef } from "@tanstack/react-table"
-import type { Inspection } from "@/validation/inspection"
 
 export const inspectionColumn: ColumnDef<Inspection>[] = [
   {

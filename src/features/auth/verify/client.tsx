@@ -1,23 +1,22 @@
 "use client"
 
+import { CircleX, Loader2Icon, ShieldCheck } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useSearchParams } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
+import { DynamicButton } from "@/components/ui/buttons"
 import {
   Card,
-  CardTitle,
-  CardHeader,
-  CardFooter,
   CardContent,
   CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/cards"
-import { VerifyForm } from "@/features/auth/verify/verification-form"
-import { Loader2Icon, CircleX, ShieldCheck } from "lucide-react"
-import { DynamicButton } from "@/components/ui/buttons"
 import { Label } from "@/components/ui/labels"
-import Link from "next/link"
-
 import { useVerifyEmail } from "@/backend/actions/user/verify-email"
-import { useCallback, useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
-import Image from "next/image"
+import { VerifyForm } from "./verification-form"
 
 export const COOLDOWN_TIME = 3 * 60 * 1000
 

@@ -1,14 +1,11 @@
-import { api } from "@/backend/helpers/api-client"
-import { catchError } from "@/utils/catch-error"
-import { lockerSchema } from "@/validation/locker"
-import { sanitizer } from "@/utils/sanitizer"
-
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
-import type { Locker as LockerType } from "@/validation/locker"
-import type { Locker } from "@/backend/db/schemas"
+import { Locker } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
+import { catchError } from "@/utils/catch-error"
+import { sanitizer } from "@/utils/sanitizer"
+import { Locker as LockerType, lockerSchema } from "@/validation/locker"
+import { PaginatedLockersResponse } from "../locker/find-many"
 
 export async function createLocker(payload: LockerType): Promise<Locker> {
   return api.post<LockerType, Locker>("lockers/create-locker", payload)

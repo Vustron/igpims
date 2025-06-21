@@ -1,5 +1,5 @@
-import { session } from "@/backend/db/schemas"
 import { eq, inArray, sql } from "drizzle-orm"
+import { session } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
 
 const findBySessionIdQuery = db

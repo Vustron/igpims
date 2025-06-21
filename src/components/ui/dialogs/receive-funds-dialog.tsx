@@ -1,38 +1,37 @@
 "use client"
 
+import { format } from "date-fns/format"
 import {
-  Dialog,
-  DialogTitle,
-  DialogFooter,
-  DialogHeader,
-  DialogContent,
-  DialogDescription,
-} from "@/components/ui/dialogs/dialog"
-import {
-  Drawer,
-  DrawerTitle,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerContent,
-  DrawerDescription,
-} from "@/components/ui/drawers"
-import { Textarea } from "@/components/ui/inputs"
-import { Button } from "@/components/ui/buttons"
-import { Label } from "@/components/ui/labels"
-import {
+  AlertCircle,
   ArrowDownToLine,
   Calendar,
   Target,
   User,
-  AlertCircle,
 } from "lucide-react"
-
+import { useState } from "react"
+import toast from "react-hot-toast"
+import { Button } from "@/components/ui/buttons"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialogs/dialog"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawers"
+import { Textarea } from "@/components/ui/inputs"
+import { Label } from "@/components/ui/labels"
 import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
 import { isFundRequestData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { useState } from "react"
-import { format } from "date-fns/format"
-import toast from "react-hot-toast"
 
 export const ReceiveFundsDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()

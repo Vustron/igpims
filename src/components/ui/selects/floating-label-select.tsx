@@ -1,19 +1,17 @@
 "use client"
 
+import { SelectProps } from "@radix-ui/react-select"
+import * as React from "react"
+import { FieldErrors, FieldValues } from "react-hook-form"
+import { Label } from "@/components/ui/labels"
 import {
   Select,
-  SelectItem,
-  SelectValue,
-  SelectTrigger,
   SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/selects"
-import { Label } from "@/components/ui/labels"
-
 import { cn } from "@/utils/cn"
-import * as React from "react"
-
-import type { FieldErrors, FieldValues } from "react-hook-form"
-import type { SelectProps } from "@radix-ui/react-select"
 
 interface FloatingSelectProps extends SelectProps {
   options: Array<{ value: string; label: string }>

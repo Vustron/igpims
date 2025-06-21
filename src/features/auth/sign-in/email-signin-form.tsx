@@ -1,17 +1,13 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { catchError } from "@/utils/catch-error"
-import { signInSchema } from "@/validation/user"
-import toast from "react-hot-toast"
-
-import { useSignInUser } from "@/backend/actions/user/sign-in"
 import { useForm } from "react-hook-form"
-
-import type { FieldConfig } from "@/interfaces/form"
-import type { SignInPayload } from "@/validation/user"
+import toast from "react-hot-toast"
+import { DynamicForm } from "@/components/ui/forms"
+import { useSignInUser } from "@/backend/actions/user/sign-in"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { SignInPayload, signInSchema } from "@/validation/user"
 
 export const SignInEmailForm = () => {
   const signIn = useSignInUser()

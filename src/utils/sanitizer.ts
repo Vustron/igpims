@@ -1,14 +1,11 @@
 import DOMPurify from "isomorphic-dompurify"
+import { z } from "zod"
 
-import type { z } from "zod"
-
-// data sanitizer
 export const sanitizer = <T>(
   data: unknown,
   schema: z.ZodObject<z.ZodRawShape>,
 ): T => {
   const clean = DOMPurify
-  // Sanitize each field of the object
   const sanitizeObject = (obj: unknown): unknown => {
     if (obj === null || obj === undefined) return obj
 
@@ -31,10 +28,8 @@ export const sanitizer = <T>(
     }
   }
 
-  // Sanitize the data
   const sanitizedData = sanitizeObject(data)
 
-  // Validate and parse the object
   const parsedData = schema.safeParse(sanitizedData)
 
   if (!parsedData.success) {

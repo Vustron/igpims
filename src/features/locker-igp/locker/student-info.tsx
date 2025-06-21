@@ -1,5 +1,4 @@
-import { User, CreditCard } from "lucide-react"
-
+import { CreditCard, User } from "lucide-react"
 import { InfoItem } from "./info-item"
 
 interface StudentInformationProps {

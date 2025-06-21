@@ -11,7 +11,6 @@ export function presentor<T>(data: T): DateToString<T> {
 
   const convertedValues: any = { ...data }
 
-  // Convert dates to ISO strings
   for (const key of Object.keys(convertedValues)) {
     const value = convertedValues[key]
 

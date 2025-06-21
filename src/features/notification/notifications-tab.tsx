@@ -1,18 +1,17 @@
 "use client"
 
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/separators"
-import { NotificationDateGroup } from "@/features/notification/notification-date-group"
-import { NotificationEmptyState } from "@/features/notification/notification-empty-state"
+import { Check } from "lucide-react"
 import { Badge } from "@/components/ui/badges"
 import { Card } from "@/components/ui/cards"
-import { Check } from "lucide-react"
-
-import type { Notification } from "@/features/notification/notification-types"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/separators"
+import { NotificationDateGroup } from "./notification-date-group"
+import { NotificationEmptyState } from "./notification-empty-state"
+import { Notification } from "./notification-types"
 
 interface NotificationTabsProps {
   activeTab: string

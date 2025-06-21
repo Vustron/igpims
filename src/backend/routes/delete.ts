@@ -1,9 +1,8 @@
-import { deleteViolation } from "@/backend/controllers/violation/delete-violation"
-import { deleteRentById } from "@/backend/controllers/locker-rental/delete-rent"
-import { deleteLockerById } from "@/backend/controllers/locker/delete-by-id"
-import { deleteUserById } from "@/backend/controllers/user/delete-by-id"
-
-import type { Route } from "@/backend/routes/api-routes"
+import { deleteLockerById } from "../controllers/locker/delete-by-id"
+import { deleteRentById } from "../controllers/locker-rental/delete-rent"
+import { deleteUserById } from "../controllers/user/delete-by-id"
+import { deleteViolation } from "../controllers/violation/delete-violation"
+import { Route } from "../routes/api-routes"
 
 export const deleteRoutes: Route[] = [
   { path: "/api/v1/auth/delete-user-by-id", handler: deleteUserById },

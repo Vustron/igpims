@@ -1,8 +1,8 @@
+import { DataTable } from "@/components/ui/tables"
 import {
   exampleWaterSupplies,
   waterSupplyListColumn,
-} from "@/features/water-vendo/water-supply-column"
-import { DataTable } from "@/components/ui/tables"
+} from "./water-supply-column"
 
 export const WaterSupply = () => {
   return (

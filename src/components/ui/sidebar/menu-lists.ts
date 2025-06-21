@@ -1,21 +1,18 @@
+import { LayoutGrid, LucideIcon, User } from "lucide-react"
 import { FaMoneyBillTransfer } from "react-icons/fa6"
-import { IoBarChartSharp } from "react-icons/io5"
-import { IoWaterOutline } from "react-icons/io5"
-import { RiFileList3Fill } from "react-icons/ri"
-import { LayoutGrid, User } from "lucide-react"
 import { GiClothes } from "react-icons/gi"
+import { IoBarChartSharp, IoWaterOutline } from "react-icons/io5"
+import { IconType } from "react-icons/lib"
 import { PiLockers } from "react-icons/pi"
+import { RiFileList3Fill } from "react-icons/ri"
 
-import type { IconType } from "react-icons/lib"
-import type { LucideIcon } from "lucide-react"
-
-type Submenu = {
+interface Submenu {
   href: string
   label: string
   active: boolean
 }
 
-type Menu = {
+interface Menu {
   href: string
   label: string
   active: boolean
@@ -23,7 +20,7 @@ type Menu = {
   submenus: Submenu[]
 }
 
-type Group = {
+interface Group {
   groupLabel: string
   menus: Menu[]
 }

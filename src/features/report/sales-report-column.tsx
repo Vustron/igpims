@@ -1,9 +1,8 @@
-import { Badge } from "@/components/ui/badges"
+import { ColumnDef } from "@tanstack/react-table"
 import { Calendar } from "lucide-react"
+import { Badge } from "@/components/ui/badges"
 import { cn } from "@/utils/cn"
-
-import type { IgpType, SalesData } from "@/features/report/sales-report-types"
-import type { ColumnDef } from "@tanstack/react-table"
+import { IgpType, SalesData } from "./sales-report-types"
 
 export const salesReportColumn = (): ColumnDef<SalesData>[] => [
   {

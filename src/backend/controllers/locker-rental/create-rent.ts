@@ -1,16 +1,13 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { checkAuth } from "@/backend/middlewares/check-auth"
-import * as rentalQuery from "@/backend/queries/rental"
-import * as lockerQuery from "@/backend/queries/locker"
-import { createRentalSchema } from "@/validation/rental"
-import { requestJson } from "@/utils/request-json"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
-import { db } from "@/config/drizzle"
 import { nanoid } from "nanoid"
-
-import type { CreateRentalData } from "@/validation/rental"
-import type { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import * as lockerQuery from "@/backend/queries/locker"
+import * as rentalQuery from "@/backend/queries/rental"
+import { db } from "@/config/drizzle"
+import { catchError } from "@/utils/catch-error"
+import { requestJson } from "@/utils/request-json"
+import { CreateRentalData, createRentalSchema } from "@/validation/rental"
 
 export async function createRent(
   request: NextRequest,

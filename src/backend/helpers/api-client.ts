@@ -1,6 +1,4 @@
-import { httpRequest } from "@/config/http"
-
-import type { RequestConfig } from "@/config/http"
+import { httpRequest, RequestConfig } from "@/config/http"
 
 export const api = {
   get: <ResponseType = unknown>(

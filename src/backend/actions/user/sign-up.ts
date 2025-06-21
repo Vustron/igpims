@@ -1,14 +1,11 @@
-import { api } from "@/backend/helpers/api-client"
-import { catchError } from "@/utils/catch-error"
-import { signUpSchema } from "@/validation/user"
-import { sanitizer } from "@/utils/sanitizer"
-
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { PaginatedUsersResponse } from "@/backend/actions/user/find-many"
-import type { SignUpPayload } from "@/validation/user"
-import type { User } from "@/backend/db/schemas"
+import { User } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
+import { catchError } from "@/utils/catch-error"
+import { sanitizer } from "@/utils/sanitizer"
+import { SignUpPayload, signUpSchema } from "@/validation/user"
+import { PaginatedUsersResponse } from "../user/find-many"
 
 interface SignUpUserProps {
   isSignIn?: boolean

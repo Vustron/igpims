@@ -3,12 +3,9 @@ import {
   ChevronRightIcon,
   MoreHorizontalIcon,
 } from "lucide-react"
-
-import { buttonVariants } from "@/components/ui/buttons/button"
+import * as React from "react"
+import { Button, buttonVariants } from "@/components/ui/buttons/button"
 import { cn } from "@/utils/cn"
-
-import type { Button } from "@/components/ui/buttons/button"
-import type * as React from "react"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (

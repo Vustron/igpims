@@ -1,11 +1,9 @@
+import { NextRequest, NextResponse } from "next/server"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { findViolationByIdQuery } from "@/backend/queries/violation"
-import { catchError } from "@/utils/catch-error"
-import { getSession } from "@/config/session"
-import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
-
-import type { NextRequest } from "next/server"
+import { getSession } from "@/config/session"
+import { catchError } from "@/utils/catch-error"
 
 export async function findViolationById(
   request: NextRequest,

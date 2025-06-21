@@ -1,11 +1,8 @@
 "use client"
 
-import {
-  igpSupplyColumns,
-  exampleSupplyData,
-} from "@/features/other-igps/igp-supply-column"
 import { Card, CardContent } from "@/components/ui/cards"
 import { DataTable } from "@/components/ui/tables"
+import { exampleSupplyData, igpSupplyColumns } from "./igp-supply-column"
 
 export const IgpSupply = () => {
   return (

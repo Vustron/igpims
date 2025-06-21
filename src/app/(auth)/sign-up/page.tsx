@@ -1,6 +1,5 @@
+import { Metadata } from "next"
 import SignUpClient from "@/features/auth/sign-up/client"
-
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Sign Up",

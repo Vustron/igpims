@@ -1,8 +1,7 @@
-import { Button } from "@/components/ui/buttons"
-import { PiLockers } from "react-icons/pi"
 import { Trash2 } from "lucide-react"
-
-import type { Locker } from "@/validation/locker"
+import { PiLockers } from "react-icons/pi"
+import { Button } from "@/components/ui/buttons"
+import { Locker } from "@/validation/locker"
 
 interface LockerInfoHeaderProps {
   id: string

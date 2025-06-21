@@ -1,10 +1,8 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { NextRequest, NextResponse } from "next/server"
 import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as rentalQuery from "@/backend/queries/rental"
 import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
-
-import type { NextRequest } from "next/server"
 
 export async function findRentById(
   request: NextRequest,

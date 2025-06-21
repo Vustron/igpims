@@ -1,8 +1,10 @@
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query"
+import {
+  QueryClient,
+  queryOptions,
+  useSuspenseQuery,
+} from "@tanstack/react-query"
 import { api } from "@/backend/helpers/api-client"
-
-import type { LockerRentalWithLocker } from "@/interfaces/locker"
-import type { QueryClient } from "@tanstack/react-query"
+import { LockerRentalWithLocker } from "@/interfaces/locker"
 
 export async function findRentById(
   id: string,

@@ -1,41 +1,38 @@
 "use client"
 
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+} from "@tanstack/react-table"
 import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { AnimatePresence, motion } from "framer-motion"
+import { History } from "lucide-react"
+import { useMemo, useState } from "react"
+import { EmptyState, Skeleton } from "@/components/ui/fallbacks"
+import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
+import {
+  DynamicFiltersPanel,
+  DynamicPaginationControls,
+  DynamicResultsSummary,
+  DynamicSearchHeader,
+  StaticFilter,
   Table,
-  TableRow,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  StaticFilter,
-  DynamicSearchHeader,
-  DynamicFiltersPanel,
-  DynamicResultsSummary,
-  DynamicPaginationControls,
+  TableRow,
 } from "@/components/ui/tables"
-import { History } from "lucide-react"
 import { TableActions } from "@/components/ui/tables/table-actions"
-import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
-import { EmptyState, Skeleton } from "@/components/ui/fallbacks"
-
-import { useReactTable } from "@tanstack/react-table"
-import { useMemo, useState } from "react"
-
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-} from "@tanstack/react-table"
-import { AnimatePresence, motion } from "framer-motion"
 import { deepSearch } from "@/utils/deep-search"
-
-import type {
-  ColumnDef,
-  SortingState,
-  VisibilityState,
-  ColumnFiltersState,
-} from "@tanstack/react-table"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -72,8 +69,9 @@ interface DataTableProps<TData, TValue> {
   onGoToLastPage?: () => void
   onGoToPage?: (page: number) => void
   isOnUsers?: boolean
-  filterType?: "rental" | "user"
+  filterType?: "rental" | "user" | "violations"
   resultLabel?: string
+  isOnViolations?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -113,6 +111,7 @@ export function DataTable<TData, TValue>({
   filterType,
   resultLabel,
   isOnUsers,
+  isOnViolations,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -167,6 +166,7 @@ export function DataTable<TData, TValue>({
             isLockerRental={isLockerRental}
             table={table}
             isUser={isOnUsers}
+            isOnViolations={isOnViolations}
           />
         )}
 

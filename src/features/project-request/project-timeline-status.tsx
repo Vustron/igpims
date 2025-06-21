@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badges"
 import { cn } from "@/utils/cn"
-
-import type { ProjectRequest } from "@/features/project-request/project-request-store"
+import { ProjectRequest } from "./project-request-store"
 
 export const TimelineStatusBadge = ({
   status,

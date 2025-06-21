@@ -1,18 +1,18 @@
 import {
-  X,
+  ArrowDownToLine,
   BellRing,
-  FileText,
-  PiggyBank,
-  RefreshCw,
+  CheckCircle2,
+  ClipboardCheck,
   DollarSign,
   FileSearch,
-  ScrollText,
+  FileText,
+  PiggyBank,
   ReceiptText,
-  CheckCircle2,
-  ArrowDownToLine,
-  ClipboardCheck,
+  RefreshCw,
+  ScrollText,
+  X,
 } from "lucide-react"
-import type { NotificationAction } from "@/features/notification/notification-types"
+import { NotificationAction } from "./notification-types"
 
 export const getActionIcon = (action: NotificationAction) => {
   const iconMap = {

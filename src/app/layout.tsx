@@ -1,7 +1,5 @@
 import { Contexts } from "@/components/context"
-
 import { siteConfig } from "@/config/meta-data"
-
 import { inter } from "@/fonts/inter"
 
 import "@/styles/globals.css"

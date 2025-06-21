@@ -1,19 +1,19 @@
 "use client"
 
+import { useMemo } from "react"
 import {
   Bar,
-  Cell,
-  XAxis,
-  YAxis,
-  Text,
-  Tooltip,
   BarChart,
   CartesianGrid,
+  Cell,
   ResponsiveContainer,
+  Text,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts"
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 import { Card } from "@/components/ui/cards"
-import { useMemo } from "react"
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
   return (

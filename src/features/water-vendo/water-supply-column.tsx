@@ -1,20 +1,17 @@
 "use client"
 
-import { z } from "zod"
+import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
-
+import { CalendarIcon, Droplet, MoreHorizontal } from "lucide-react"
+import { z } from "zod"
+import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
-import { Button } from "@/components/ui/buttons"
-import { MoreHorizontal, CalendarIcon, Droplet } from "lucide-react"
 
-import type { ColumnDef } from "@tanstack/react-table"
-
-// Zod schema for water supply data
 export const WaterSupplySchema = z.object({
   id: z.string(),
   date: z.coerce.date(),
@@ -23,10 +20,8 @@ export const WaterSupplySchema = z.object({
   usedGallons: z.number().nonnegative(),
 })
 
-// Type definition from the schema
 export type WaterSupply = z.infer<typeof WaterSupplySchema>
 
-// Example data for water supply
 export const exampleWaterSupplies: WaterSupply[] = [
   {
     id: "WS-2023-001",

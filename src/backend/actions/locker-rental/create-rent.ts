@@ -1,13 +1,10 @@
-import { createRentalSchema } from "@/validation/rental"
-import { api } from "@/backend/helpers/api-client"
-import { catchError } from "@/utils/catch-error"
-
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { PaginatedRentalsResponse } from "@/backend/actions/locker-rental/find-many"
-import type { CreateRentalData } from "@/validation/rental"
-import type { LockerRental } from "@/backend/db/schemas"
+import { LockerRental } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
+import { catchError } from "@/utils/catch-error"
+import { CreateRentalData, createRentalSchema } from "@/validation/rental"
+import { PaginatedRentalsResponse } from "../locker-rental/find-many"
 
 export async function createRent(
   payload: CreateRentalData,
@@ -29,10 +26,12 @@ export const useCreateRent = () => {
       return await createRent(validatedData)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
-      await queryClient.cancelQueries({ queryKey: ["lockers"] })
-      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] }),
+        queryClient.cancelQueries({ queryKey: ["lockers"] }),
+        queryClient.cancelQueries({ queryKey: ["lockers-infinite"] }),
+      ])
 
       const previousRentals = queryClient.getQueryData(["locker-rentals"])
       const previousRentalsInfinite = queryClient.getQueryData([

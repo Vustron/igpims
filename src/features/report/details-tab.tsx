@@ -1,17 +1,16 @@
+import { Search, SlidersHorizontal, X } from "lucide-react"
+import { Button } from "@/components/ui/buttons"
 import {
   Card,
-  CardTitle,
   CardContent,
-  CardHeader,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/cards"
-import { salesReportColumn } from "@/features/report/sales-report-column"
-import { Search, SlidersHorizontal, X } from "lucide-react"
-import { DataTable } from "@/components/ui/tables"
-import { Button } from "@/components/ui/buttons"
 import { Input } from "@/components/ui/inputs"
-
-import type { SalesData } from "@/features/report/sales-report-types"
+import { DataTable } from "@/components/ui/tables"
+import { salesReportColumn } from "./sales-report-column"
+import { SalesData } from "./sales-report-types"
 
 interface SalesDetailsTabProps {
   filteredSalesData: SalesData[]

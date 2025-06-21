@@ -1,13 +1,11 @@
+import { NextRequest, NextResponse } from "next/server"
+import { Account, User } from "@/backend/db/schemas"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as userQuery from "@/backend/queries/user"
-import { catchError } from "@/utils/catch-error"
-import { getSession } from "@/config/session"
-import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
-
-import type { Account, User } from "@/backend/db/schemas"
-import type { NextRequest } from "next/server"
+import { getSession } from "@/config/session"
+import { catchError } from "@/utils/catch-error"
 
 export async function findUserById(
   request: NextRequest,

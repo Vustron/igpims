@@ -1,27 +1,26 @@
 "use client"
 
-import {
-  Drawer,
-  DrawerTitle,
-  DrawerHeader,
-  DrawerFooter,
-  DrawerContent,
-  DrawerDescription,
-} from "@/components/ui/drawers"
+import { AlertCircle, Clock, UserCheck } from "lucide-react"
+import { useState } from "react"
+import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
-  DialogTitle,
-  DialogHeader,
-  DialogFooter,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialogs"
-import { Button } from "@/components/ui/buttons"
-import { Clock, UserCheck, AlertCircle } from "lucide-react"
-
-import { useMediaQuery } from "@/hooks/use-media-query"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawers"
 import { useDialog } from "@/hooks/use-dialog"
-import { useState } from "react"
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 export const VerifyUserDialog = () => {
   const { isOpen, onClose, type } = useDialog()

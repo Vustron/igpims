@@ -1,10 +1,10 @@
-import { queryOptions } from "@tanstack/react-query"
+import {
+  QueryClient,
+  queryOptions,
+  useSuspenseQuery,
+} from "@tanstack/react-query"
 import { api } from "@/backend/helpers/api-client"
-
-import { useSuspenseQuery } from "@tanstack/react-query"
-
-import type { QueryClient } from "@tanstack/react-query"
-import type { Locker } from "@/validation/locker"
+import { Locker } from "@/validation/locker"
 
 export async function findLockerById(id: string): Promise<Locker> {
   return api.get<Locker>("lockers/find-by-id", {

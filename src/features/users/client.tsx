@@ -1,13 +1,10 @@
 "use client"
 
-import { usersColumns } from "@/features/users/users-column"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { DataTable } from "@/components/ui/tables"
-
-import { useFindManyUser } from "@/backend/actions/user/find-many"
-import { useState, useMemo, useCallback, useEffect } from "react"
+import { UserFilters, useFindManyUser } from "@/backend/actions/user/find-many"
 import { useDebounce } from "@/hooks/use-debounce"
-
-import type { UserFilters } from "@/backend/actions/user/find-many"
+import { usersColumns } from "./users-column"
 
 export const UsersClient = () => {
   const [searchValue, setSearchValue] = useState("")

@@ -1,6 +1,6 @@
+import { eq, sql } from "drizzle-orm"
 import { locker, lockerRental } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
-import { sql, eq } from "drizzle-orm"
 
 const getRentalByIdQuery = db
   .select()

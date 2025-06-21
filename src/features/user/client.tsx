@@ -1,25 +1,23 @@
 "use client"
 
+import { Trash2 } from "lucide-react"
+import { useEffect } from "react"
+import toast from "react-hot-toast"
+import { DynamicButton } from "@/components/ui/buttons"
 import {
   Card,
-  CardTitle,
-  CardHeader,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/cards"
 import FallbackBoundary from "@/components/ui/fallbacks/fallback-boundary"
-import { DynamicButton } from "@/components/ui/buttons"
-import { EditUserForm } from "@/features/user/form"
-import { Trash2 } from "lucide-react"
-
-import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
 import { useDeleteUserById } from "@/backend/actions/user/delete-by-id"
 import { useFindAccountById } from "@/backend/actions/user/find-by-id"
 import { useConfirm } from "@/hooks/use-confirm"
 import { useDialog } from "@/hooks/use-dialog"
-import { useEffect } from "react"
+import { catchError } from "@/utils/catch-error"
+import { EditUserForm } from "./form"
 
 interface UserClientProps {
   id: string

@@ -1,13 +1,10 @@
 "use client"
 
 import { EyeIcon, EyeOffIcon } from "lucide-react"
-import { Button } from "@/components/ui/buttons"
-
-import { useState } from "react"
-
-import { cn } from "@/utils/cn"
-
 import * as React from "react"
+import { useState } from "react"
+import { Button } from "@/components/ui/buttons"
+import { cn } from "@/utils/cn"
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

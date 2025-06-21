@@ -1,18 +1,15 @@
-// types
-import type {
-  Path,
+import {
   FieldValues,
+  Path,
   SubmitHandler,
   UseFormReturn,
 } from "react-hook-form"
 
-/* SelectOption Type */
 export interface SelectOption {
   value: string
   label: string
 }
 
-/* FormSection Type */
 export interface FormSection {
   id: string
   title: string
@@ -23,7 +20,6 @@ export interface FormSection {
   contentClassName?: string
 }
 
-/* FieldConfig Type */
 export interface FieldConfig<TFieldValues> {
   name: Path<TFieldValues>
   type:
@@ -32,6 +28,7 @@ export interface FieldConfig<TFieldValues> {
     | "email"
     | "number"
     | "select"
+    | "multiselect"
     | "image"
     | "textarea"
     | "file"
@@ -53,12 +50,10 @@ export interface FieldConfig<TFieldValues> {
   span?: 1 | 2
 }
 
-/* Mutation Type */
 export interface Mutation {
   isPending: boolean
 }
 
-/* DynamicFormProps Type */
 export interface DynamicFormProps<TFieldValues extends FieldValues> {
   form: UseFormReturn<TFieldValues>
   onSubmit: SubmitHandler<TFieldValues>

@@ -1,6 +1,6 @@
+import { sql } from "drizzle-orm"
 import { locker } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
-import { sql } from "drizzle-orm"
 
 const createLockerQuery = db
   .insert(locker)

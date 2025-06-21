@@ -1,37 +1,35 @@
 "use client"
 
-import {
-  Drawer,
-  DrawerTitle,
-  DrawerHeader,
-  DrawerContent,
-  DrawerDescription,
-} from "@/components/ui/drawers"
+import { X } from "lucide-react"
+import { useId, useState } from "react"
+import toast from "react-hot-toast"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
-  DialogTitle,
-  DialogHeader,
   DialogContent,
   DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialogs"
 import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-} from "@/components/ui/selects"
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawers"
 import { Textarea } from "@/components/ui/inputs"
-import { Button } from "@/components/ui/buttons"
 import { Label } from "@/components/ui/labels"
-import { Badge } from "@/components/ui/badges"
-import { X } from "lucide-react"
-
-import { useMediaQuery } from "@/hooks/use-media-query"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/selects"
 import { useDialog } from "@/hooks/use-dialog"
-import { useId, useState } from "react"
-
-import toast from "react-hot-toast"
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 const sampleEmails = [
   {

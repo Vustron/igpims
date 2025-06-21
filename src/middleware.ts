@@ -1,9 +1,6 @@
-import { isEmptySession, sessionOptions } from "@/config/session"
-import { NextResponse } from "next/server"
 import { unsealData } from "iron-session"
-
-import type { SessionType } from "@/config/session"
-import type { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { isEmptySession, SessionType, sessionOptions } from "@/config/session"
 
 export const protectedRoutes: string[] = [
   "/",

@@ -1,9 +1,8 @@
+import { Metadata } from "next"
+import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
-import { WaterVendoTabs } from "@/features/water-vendo/water-vendo-tabs"
 import { ContentLayout } from "@/features/layouts/content-layout"
-
-import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
-import type { Metadata } from "next"
+import { WaterVendoTabs } from "@/features/water-vendo/water-vendo-tabs"
 
 export const metadata: Metadata = {
   title: "Water Vendo",

@@ -1,12 +1,10 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { checkAuth } from "@/backend/middlewares/check-auth"
-import { and, eq, like, or, sql, ne } from "drizzle-orm"
-import { catchError } from "@/utils/catch-error"
+import { and, eq, like, ne, or, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 import { user } from "@/backend/db/schemas"
-import { NextResponse } from "next/server"
+import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
-
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
 
 export async function findManyUser(
   request: NextRequest,

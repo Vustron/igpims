@@ -1,16 +1,12 @@
-import { DynamicForm } from "@/components/ui/forms"
-
-import { useUpdateUserInfo } from "@/backend/actions/user/update-info"
-import { useForm } from "react-hook-form"
-
-import { convertImageToBase64 } from "@/utils/image-convert-base64"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { updateUserSchema } from "@/validation/user"
-import { catchError } from "@/utils/catch-error"
+import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-
-import type { UpdateUserPayload } from "@/validation/user"
-import type { FieldConfig } from "@/interfaces/form"
+import { DynamicForm } from "@/components/ui/forms"
+import { useUpdateUserInfo } from "@/backend/actions/user/update-info"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { convertImageToBase64 } from "@/utils/image-convert-base64"
+import { UpdateUserPayload, updateUserSchema } from "@/validation/user"
 
 interface EditUserFormProps {
   data: UpdateUserPayload

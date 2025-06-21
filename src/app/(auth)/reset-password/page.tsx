@@ -1,6 +1,5 @@
+import { Metadata } from "next"
 import { ResetPasswordClient } from "@/features/auth/reset-password/client"
-
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Reset Password",

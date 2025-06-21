@@ -1,19 +1,17 @@
 "use client"
 
-import { Button } from "@/components/ui/buttons"
+import { formatDistanceToNow } from "date-fns"
+import { motion } from "framer-motion"
+import { Check } from "lucide-react"
 import { Badge } from "@/components/ui/badges"
-
+import { Button } from "@/components/ui/buttons"
+import { cn } from "@/utils/cn"
 import {
   getActionColor,
   getActionIcon,
   getActionLabel,
-} from "@/features/notification/notification-helpers"
-import { formatDistanceToNow } from "date-fns"
-import { motion } from "framer-motion"
-import { Check } from "lucide-react"
-import { cn } from "@/utils/cn"
-
-import type { Notification } from "@/features/notification/notification-types"
+} from "./notification-helpers"
+import { Notification } from "./notification-types"
 
 interface NotificationItemProps {
   notification: Notification

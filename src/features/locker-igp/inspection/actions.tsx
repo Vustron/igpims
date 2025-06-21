@@ -1,23 +1,22 @@
 "use client"
 
 import {
+  ClipboardCopy,
   Eye,
   FilePen,
-  Printer,
-  ClipboardCopy,
   MoreHorizontal,
+  Printer,
 } from "lucide-react"
+import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
+  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
-import { Button } from "@/components/ui/buttons"
-
-import type { Inspection } from "@/validation/inspection"
+import { Inspection } from "@/validation/inspection"
 
 export const InspectionActions = ({
   inspection,

@@ -1,12 +1,9 @@
 "use client"
 
-import { ProjectRequestFilter } from "@/features/project-request/project-request-filter"
-import { ProjectRequestCard } from "@/features/project-request/project-request-card"
-
-import { useProjectRequestStore } from "@/features/project-request/project-request-store"
-import { useState, useMemo } from "react"
-
-import type { ProjectRequest } from "@/features/project-request/project-request-store"
+import { useMemo, useState } from "react"
+import { ProjectRequestCard } from "./project-request-card"
+import { ProjectRequestFilter } from "./project-request-filter"
+import { ProjectRequest, useProjectRequestStore } from "./project-request-store"
 
 type StatusOption = ProjectRequest["status"] | "all"
 

@@ -1,29 +1,23 @@
 "use client"
 
-import { lockerConfigSchema } from "@/validation/locker"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
-import { useDeleteLockerById } from "@/backend/actions/locker/delete-by-id"
-import { useUpdateLocker } from "@/backend/actions/locker/update-locker"
-import { useFindLockerById } from "@/backend/actions/locker/find-by-id"
-
-import { useConfirm } from "@/hooks/use-confirm"
 import { useForm } from "react-hook-form"
-
+import toast from "react-hot-toast"
+import { useDeleteLockerById } from "@/backend/actions/locker/delete-by-id"
+import { useFindLockerById } from "@/backend/actions/locker/find-by-id"
+import { useUpdateLocker } from "@/backend/actions/locker/update-locker"
+import { useConfirm } from "@/hooks/use-confirm"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
-
-import { LockerInfoLoadingState } from "./locker-info-loading"
-import { LockerInfoErrorState } from "./locker-info-error"
-import { LockerInfoEmptyState } from "./locker-info-empty"
-import { LockerConfigurationCard } from "./locker-config"
+import { LockerConfig, lockerConfigSchema } from "@/validation/locker"
 import { CurrentRentalCard } from "./current-rental-card"
-import { RentalHistoryCard } from "./rental-history-card"
+import { LockerConfigurationCard } from "./locker-config"
+import { LockerInfoEmptyState } from "./locker-info-empty"
+import { LockerInfoErrorState } from "./locker-info-error"
 import { LockerInfoHeader } from "./locker-info-header"
-
-import type { LockerConfig } from "@/validation/locker"
-import type { FieldConfig } from "@/interfaces/form"
+import { LockerInfoLoadingState } from "./locker-info-loading"
+import { RentalHistoryCard } from "./rental-history-card"
 
 export const LockerClient = ({ id }: { id: string }) => {
   const { data: lockerData, error: lockerError } = useFindLockerById(id)

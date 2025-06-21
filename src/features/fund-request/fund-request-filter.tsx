@@ -1,30 +1,27 @@
 "use client"
 
-import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-} from "@/components/ui/selects"
+import { format } from "date-fns"
+import { CalendarIcon, Plus, Search, X } from "lucide-react"
+import { useState } from "react"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { Calendar } from "@/components/ui/calendars"
+import { Input } from "@/components/ui/inputs"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popovers"
-import { Search, CalendarIcon, X, Plus } from "lucide-react"
-import { Calendar } from "@/components/ui/calendars"
-import { Button } from "@/components/ui/buttons"
-import { Input } from "@/components/ui/inputs"
-import { Badge } from "@/components/ui/badges"
-
-import { format } from "date-fns"
-import { cn } from "@/utils/cn"
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/selects"
 import { useDialog } from "@/hooks/use-dialog"
-import { useState } from "react"
-
-import type { FundRequest } from "@/features/fund-request/fund-request-store"
+import { cn } from "@/utils/cn"
+import { FundRequest } from "./fund-request-store"
 
 type StatusOption = FundRequest["status"] | "all"
 

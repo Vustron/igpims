@@ -1,28 +1,26 @@
 "use client"
 
+import { format } from "date-fns"
+import { Calendar, ClipboardCopy } from "lucide-react"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { Checkbox } from "@/components/ui/checkboxes"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
-import { Calendar, ClipboardCopy } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkboxes"
-import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
-
 import {
+  getPaymentStatusStyle,
   getRemainingDays,
   getRentalStatusStyle,
-  getPaymentStatusStyle,
 } from "@/utils/locker-rental-utils"
-import { format } from "date-fns"
-
 import {
-  getStatusIcon,
+  getPaymentDescription,
   getPaymentIcon,
   getStatusDescription,
-  getPaymentDescription,
+  getStatusIcon,
 } from "./rental-status-indicators"
 
 export const SelectCell = ({

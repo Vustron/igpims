@@ -1,8 +1,8 @@
-import { user, account } from "@/backend/db/schemas"
 import { genSalt, hash } from "bcrypt-ts"
-import { db } from "@/config/drizzle"
-import { nanoid } from "nanoid"
 import { config } from "dotenv"
+import { nanoid } from "nanoid"
+import { account, user } from "@/backend/db/schemas"
+import { db } from "@/config/drizzle"
 
 config({ path: ".env.local" })
 

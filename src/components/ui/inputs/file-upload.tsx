@@ -1,13 +1,11 @@
 "use client"
 
-import { FileIcon, UploadIcon, XCircleIcon } from "lucide-react"
-import { Label } from "@/components/ui/labels"
-import Image from "next/image"
-
-import { useRef, useState, useEffect, useCallback } from "react"
-import { useDropzone } from "react-dropzone"
-
 import { motion } from "framer-motion"
+import { FileIcon, UploadIcon, XCircleIcon } from "lucide-react"
+import Image from "next/image"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { useDropzone } from "react-dropzone"
+import { Label } from "@/components/ui/labels"
 import { cn } from "@/utils/cn"
 
 type FileValue = File | string

@@ -1,10 +1,8 @@
 "use client"
 
-import { TimelineStep } from "@/features/fund-request/timeline-step"
-
 import { cn } from "@/utils/cn"
-
-import type { TimelineStepType } from "@/features/fund-request/timeline-sample-data"
+import { TimelineStepType } from "./timeline-sample-data"
+import { TimelineStep } from "./timeline-step"
 
 export const Timeline = ({
   currentStep,

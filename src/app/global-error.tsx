@@ -1,12 +1,8 @@
 "use client"
 
 import Link from "next/link"
-
 import { useEffect } from "react"
-
-import { ErrorHandler } from "@/utils/error"
-
-import type { ErrorResponseData } from "@/utils/error"
+import { ErrorHandler, ErrorResponseData } from "@/utils/error"
 
 export default function GlobalError({
   error,

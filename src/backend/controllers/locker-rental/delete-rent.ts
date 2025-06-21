@@ -1,12 +1,10 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { NextRequest, NextResponse } from "next/server"
 import { checkAuth } from "@/backend/middlewares/check-auth"
-import * as rentalQuery from "@/backend/queries/rental"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as lockerQuery from "@/backend/queries/locker"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
+import * as rentalQuery from "@/backend/queries/rental"
 import { db } from "@/config/drizzle"
-
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
 
 export async function deleteRentById(
   request: NextRequest,

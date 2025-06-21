@@ -1,17 +1,13 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { resetPasswordSchema } from "@/validation/user"
-import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
-import { useResetPassword } from "@/backend/actions/user/reset-password"
 import { useForm } from "react-hook-form"
-
-import type { ResetPasswordPayload } from "@/validation/user"
-import type { FieldConfig } from "@/interfaces/form"
+import toast from "react-hot-toast"
+import { DynamicForm } from "@/components/ui/forms"
+import { useResetPassword } from "@/backend/actions/user/reset-password"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { ResetPasswordPayload, resetPasswordSchema } from "@/validation/user"
 
 interface ResetPasswordFormProps {
   onSuccess?: () => void

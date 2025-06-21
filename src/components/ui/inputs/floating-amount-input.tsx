@@ -2,10 +2,9 @@
 
 import CurrencyInput from "react-currency-input-field"
 import { FloatingLabel } from "@/components/ui/inputs"
-
 import { cn } from "@/utils/cn"
 
-type FloatingLabelAmountInputProps = {
+interface FloatingLabelAmountInputProps {
   id: string
   value: string | number
   onChange: (value: string | undefined) => void

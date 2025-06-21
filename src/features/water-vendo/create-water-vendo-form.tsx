@@ -1,18 +1,14 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { z } from "zod"
 import { DynamicForm } from "@/components/ui/forms"
-
-import { zodResolver } from "@hookform/resolvers/zod"
+import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
 
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-
-import type { FieldConfig } from "@/interfaces/form"
-
-// Water vendo schema
 const waterVendoSchema = z.object({
   id: z.string().optional(),
   watervendoLocation: z

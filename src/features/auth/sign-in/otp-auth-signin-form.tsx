@@ -1,17 +1,16 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-
-import { signInOtpAuthenticatorSchema } from "@/validation/user"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
-import { useSignInOtpAuthenticator } from "@/backend/actions/user/sign-in-otp-auth"
 import { useForm } from "react-hook-form"
-
-import type { SignInOtpAuthenticatorPayload } from "@/validation/user"
-import type { FieldConfig } from "@/interfaces/form"
+import toast from "react-hot-toast"
+import { DynamicForm } from "@/components/ui/forms"
+import { useSignInOtpAuthenticator } from "@/backend/actions/user/sign-in-otp-auth"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import {
+  SignInOtpAuthenticatorPayload,
+  signInOtpAuthenticatorSchema,
+} from "@/validation/user"
 
 interface SignInOtpAuthenticatorFormProps {
   userId: string

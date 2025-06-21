@@ -1,4 +1,4 @@
-import type { Locker, LockerRental } from "@/backend/db/schemas"
+import { Locker, LockerRental } from "@/backend/db/schemas"
 
 export interface LockerRentalWithLocker extends LockerRental {
   locker?: Locker

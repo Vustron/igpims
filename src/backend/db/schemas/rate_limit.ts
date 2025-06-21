@@ -1,13 +1,11 @@
+import { InferSelectModel, sql } from "drizzle-orm"
 import {
-  text,
   integer,
   sqliteTable,
+  text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core"
-import { sql } from "drizzle-orm"
 import { nanoid } from "nanoid"
-
-import type { InferSelectModel } from "drizzle-orm"
 
 export const rateLimit = sqliteTable(
   "rateLimit",

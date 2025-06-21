@@ -1,32 +1,29 @@
+import { format } from "date-fns"
+import { FieldValues, UseFormReturn } from "react-hook-form"
+import { Button } from "@/components/ui/buttons"
+import { Calendar } from "@/components/ui/calendars"
+import { FormLabel, PasswordStrengthMeter } from "@/components/ui/forms"
 import {
-  Input,
-  Switch,
-  InputOTP,
   FileUpload,
-  InputOTPSlot,
-  InputOTPGroup,
   FloatingLabel,
+  FloatingLabelAmountInput,
   FloatingLabelInput,
   FloatingLabelTextArea,
-  FloatingLabelAmountInput,
+  Input,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+  Switch,
 } from "@/components/ui/inputs"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popovers"
-import { FormLabel, PasswordStrengthMeter } from "@/components/ui/forms"
-import { FloatingSelect } from "@/components/ui/selects"
-import { Calendar } from "@/components/ui/calendars"
-import { Button } from "@/components/ui/buttons"
-import { format } from "date-fns"
-
-import { cn } from "@/utils/cn"
-
+import { FloatingSelect, Multiselect } from "@/components/ui/selects"
 import { useOtpStore } from "@/hooks/use-otp-store"
-
-import type { FieldValues, UseFormReturn } from "react-hook-form"
-import type { FieldConfig, Mutation } from "@/interfaces/form"
+import { FieldConfig, Mutation } from "@/interfaces/form"
+import { cn } from "@/utils/cn"
 
 interface FormControlRendererProps<TFieldValues extends FieldValues> {
   field: FieldConfig<TFieldValues>
@@ -384,6 +381,33 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
             </>
           )}
         </>
+      )
+
+    case "multiselect":
+      return (
+        <div className="relative">
+          <Multiselect
+            options={field.options || []}
+            value={formField.value || []}
+            onChange={formField.onChange}
+            placeholder={field.placeholder}
+            hasErrors={!!form.formState.errors[field.name]}
+            disabled={mutation?.isPending || disabled}
+            className={cn("peer pt-5", field.className)}
+          />
+          <FloatingLabel
+            htmlFor={field.name}
+            hasErrors={!!form.formState.errors[field.name]}
+            className={cn(
+              "z-10",
+              formField.value && formField.value.length > 0
+                ? "-translate-y-3 scale-75"
+                : "",
+            )}
+          >
+            {field.label}
+          </FloatingLabel>
+        </div>
       )
 
     case "currency":

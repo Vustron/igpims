@@ -1,7 +1,6 @@
 import { DataTable } from "@/components/ui/tables"
-
-import { inspectionColumn } from "./inspection-column"
 import { exampleLockerInspections } from "./data"
+import { inspectionColumn } from "./inspection-column"
 
 export const InspectionClient = () => {
   return (

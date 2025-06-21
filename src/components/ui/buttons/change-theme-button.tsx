@@ -1,14 +1,13 @@
 "use client"
 
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
+import { Button } from "@/components/ui/buttons"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
-import { Button } from "@/components/ui/buttons"
-import { Moon, Sun } from "lucide-react"
-
-import { useTheme } from "next-themes"
 
 export const ChangeThemeButton = () => {
   const { setTheme, theme } = useTheme()

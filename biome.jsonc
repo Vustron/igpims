@@ -1,12 +1,63 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
   "files": {
     "maxSize": 1572864
   },
   // imports section
-  "organizeImports": {
-    "enabled": true,
-    "ignore": ["node_modules", ".next", "out"]
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              // React and third-party libraries
+              ":NODE:",
+              ":BUN:",
+              ":PACKAGE:",
+              ["npm:*", "npm:*/**"],
+              ":PACKAGE_WITH_PROTOCOL:",
+              ":URL:",
+
+              // Empty line between groups
+              "",
+
+              // Global application imports (@ paths)
+              ["@/components/**"],
+              ["@/features/**"],
+              ["@/backend/**"],
+              ["@/hooks/**"],
+              ["@/**"],
+
+              // Empty line between groups
+              "",
+
+              // Absolute paths
+              ["/**"],
+
+              // Empty line between groups
+              "",
+
+              // Sharp aliases
+              ["#*", "#*/**"],
+
+              // Empty line between groups
+              "",
+
+              // Local imports
+              ["./**"],
+              ":PATH:",
+
+              // Empty line between groups
+              "",
+
+              // Type imports - make sure these are handled properly
+              "type:*"
+            ]
+          }
+        }
+      }
+    }
   },
   // formatter section
   "formatter": {
@@ -17,7 +68,7 @@
     "lineEnding": "lf",
     "lineWidth": 80,
     "attributePosition": "auto",
-    "ignore": ["node_modules", ".next", "out"]
+    "includes": ["**", "!**/node_modules", "!**/.next", "!**/out"]
   },
   // linter section
   "linter": {
@@ -34,8 +85,7 @@
       "correctness": {
         "useExhaustiveDependencies": "off",
         "noPrecisionLoss": "error",
-        "noUnusedVariables": "off",
-        "useArrayLiterals": "off"
+        "noUnusedVariables": "off"
       },
       "security": {
         "noDangerouslySetInnerHtml": "off"
@@ -47,7 +97,16 @@
         "useBlockStatements": "off",
         "useConsistentArrayType": "warn",
         "noNonNullAssertion": "off",
-        "useImportType": "warn"
+        "useImportType": "off",
+        "noParameterAssign": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noUselessElse": "error",
+        "useArrayLiterals": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off",
@@ -66,7 +125,7 @@
         "useSemanticElements": "off"
       }
     },
-    "ignore": ["node_modules", ".next", "out"]
+    "includes": ["**", "!**/node_modules", "!**/.next", "!**/out"]
   },
   // javascript section
   "javascript": {
@@ -92,13 +151,14 @@
   // json section
   "json": {
     "formatter": {
-      "trailingCommas": "none"
+      "trailingCommas": "none",
+      "expand": "auto"
     }
   },
   // overrides section
   "overrides": [
     {
-      "include": ["*.json"],
+      "includes": ["**/*.json"],
       "formatter": {
         "indentWidth": 2
       }

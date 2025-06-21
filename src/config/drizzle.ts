@@ -1,6 +1,6 @@
-import * as schema from "@/backend/db/schemas"
-import { drizzle } from "drizzle-orm/libsql"
 import { config } from "dotenv"
+import { drizzle } from "drizzle-orm/libsql"
+import * as schema from "@/backend/db/schemas"
 
 config({ path: ".env.local" })
 

@@ -1,9 +1,8 @@
 "use client"
 
+import { LucideIcon } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 import { cn } from "@/utils/cn"
-
-import type { LucideIcon } from "lucide-react"
 
 interface EmptyStateProps {
   icon: LucideIcon | React.FC<React.SVGProps<SVGSVGElement>>

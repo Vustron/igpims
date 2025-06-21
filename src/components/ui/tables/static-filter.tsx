@@ -1,10 +1,9 @@
 "use client"
 
-import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
-import { FloatingLabelInput } from "@/components/ui/inputs"
-
-import type { Table } from "@tanstack/react-table"
+import { Table } from "@tanstack/react-table"
 import { useId } from "react"
+import { FloatingLabelInput } from "@/components/ui/inputs"
+import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
 
 interface StaticFilterProps<TData> {
   placeholder: string

@@ -1,18 +1,14 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { catchError } from "@/utils/catch-error"
-import { signUpSchema } from "@/validation/user"
-import toast from "react-hot-toast"
-
-import { useSignUpUser } from "@/backend/actions/user/sign-up"
 import { useForm } from "react-hook-form"
-
-import type { FieldConfig } from "@/interfaces/form"
-import type { SignUpPayload } from "@/validation/user"
+import toast from "react-hot-toast"
+import { DynamicForm } from "@/components/ui/forms"
+import { useSignUpUser } from "@/backend/actions/user/sign-up"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
 import { cn } from "@/utils/cn"
+import { SignUpPayload, signUpSchema } from "@/validation/user"
 
 interface SignUpFormProps {
   isOnAdmin?: boolean

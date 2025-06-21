@@ -1,22 +1,18 @@
 "use client"
 
+import { Boxes, Store } from "lucide-react"
+import { useEffect, useState } from "react"
+import { MobileTabNav, TabItem } from "@/components/ui/separators/mobile-tab"
 import {
   Tabs,
-  TabsList,
   TabsContent,
+  TabsList,
   TabsTrigger,
 } from "@/components/ui/separators/tabs"
-import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
-import { IgpManagement } from "@/features/other-igps/igp-management"
-import { IgpSupply } from "@/features/other-igps/igp-supply"
-import { Boxes, Store } from "lucide-react"
-
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { useState, useEffect } from "react"
-
 import { cn } from "@/utils/cn"
-
-import type { TabItem } from "@/components/ui/separators/mobile-tab"
+import { IgpManagement } from "./igp-management"
+import { IgpSupply } from "./igp-supply"
 
 interface IgpTabsProps {
   igpTab?: string

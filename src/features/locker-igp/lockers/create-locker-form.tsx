@@ -1,17 +1,13 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { catchError } from "@/utils/catch-error"
-import { lockerSchema } from "@/validation/locker"
-import toast from "react-hot-toast"
-
-import { useCreateLocker } from "@/backend/actions/locker/create-locker"
 import { useForm } from "react-hook-form"
-
-import type { FieldConfig } from "@/interfaces/form"
-import type { Locker } from "@/validation/locker"
+import toast from "react-hot-toast"
+import { DynamicForm } from "@/components/ui/forms"
+import { useCreateLocker } from "@/backend/actions/locker/create-locker"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { Locker, lockerSchema } from "@/validation/locker"
 
 interface CreateLockerFormProps {
   onSuccess?: () => void

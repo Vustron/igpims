@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badges"
 import { cn } from "@/utils/cn"
-
-import type { FundRequest } from "@/features/fund-request/fund-request-store"
+import { FundRequest } from "./fund-request-store"
 
 export const TimelineStatusBadge = ({
   status,

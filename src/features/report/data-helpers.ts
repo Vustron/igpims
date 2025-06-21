@@ -1,13 +1,12 @@
-import { igpColorMap } from "@/features/report/sales-report-types"
-
-import type {
-  IgpType,
-  SalesData,
-  TimeRange,
+import {
   IgpSummary,
+  IgpType,
+  igpColorMap,
   MonthlySales,
   ProcessedSalesData,
-} from "@/features/report/sales-report-types"
+  SalesData,
+  TimeRange,
+} from "./sales-report-types"
 
 export function generateMonthlySalesData(
   salesData: SalesData[],

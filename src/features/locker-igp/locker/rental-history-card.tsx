@@ -1,15 +1,13 @@
+import { Calendar } from "lucide-react"
 import {
   Card,
-  CardTitle,
-  CardHeader,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/cards"
-import { Calendar } from "lucide-react"
-
+import { Locker } from "@/validation/locker"
 import { RentalHistoryItem } from "./rental-history-item"
-
-import type { Locker } from "@/validation/locker"
 
 interface RentalHistoryCardProps {
   rentalHistory: any[]

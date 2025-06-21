@@ -1,10 +1,8 @@
-import { api } from "@/backend/helpers/api-client"
-import { catchError } from "@/utils/catch-error"
-
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
+import { api } from "@/backend/helpers/api-client"
+import { catchError } from "@/utils/catch-error"
+import { PaginatedLockersResponse } from "../locker/find-many"
 
 export async function deleteLockerById(id: string) {
   return api.delete("lockers/delete-locker-by-id", {

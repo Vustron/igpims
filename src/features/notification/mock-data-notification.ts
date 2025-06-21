@@ -1,4 +1,4 @@
-import type { Notification, NotificationAction } from "./notification-types"
+import { Notification, NotificationAction } from "./notification-types"
 
 export const generateMockNotifications = (): Notification[] => {
   const notifications: Notification[] = []

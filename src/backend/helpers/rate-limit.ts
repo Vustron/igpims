@@ -1,9 +1,7 @@
-import { rateLimiter } from "@/config/redis"
-import { NextResponse } from "next/server"
+import { IncomingMessage } from "node:http"
+import { NextRequest, NextResponse } from "next/server"
 import { getClientIp } from "request-ip"
-
-import type { IncomingMessage } from "node:http"
-import type { NextRequest } from "next/server"
+import { rateLimiter } from "@/config/redis"
 
 export interface CompatibleRequest extends IncomingMessage {
   headers: Record<string, string | string[]>
@@ -11,11 +9,6 @@ export interface CompatibleRequest extends IncomingMessage {
   method: string
 }
 
-/**
- * Rate limits requests based on client IP
- * @param request - NextRequest object
- * @returns RateLimitResponse or NextResponse with 429 status
- */
 export async function rateLimit(request: NextRequest) {
   const compatibleRequest: CompatibleRequest = {
     headers: Object.fromEntries(request.headers.entries()),

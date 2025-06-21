@@ -1,12 +1,30 @@
 "use client"
 
+import type { ColumnDef } from "@tanstack/react-table"
+import { format } from "date-fns"
+import { motion } from "framer-motion"
+import {
+  ArrowUpDown,
+  BarChart2,
+  Calendar,
+  Copy,
+  DollarSign,
+  Droplet,
+  Edit,
+  MapPin,
+  MoreHorizontal,
+  Trash2,
+  TrendingUp,
+} from "lucide-react"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
-  DropdownMenuItem,
   DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
 import {
   Tooltip,
@@ -14,33 +32,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
-import {
-  Edit,
-  Trash2,
-  Calendar,
-  ArrowUpDown,
-  MoreHorizontal,
-  BarChart2,
-  Copy,
-  Droplet,
-  DollarSign,
-  TrendingUp,
-  MapPin,
-} from "lucide-react"
-import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
 import { cn } from "@/utils/cn"
+import { WaterVendoEntry, WeekSummary } from "./water-funds"
 
-import { format } from "date-fns"
-import { motion } from "framer-motion"
-
-import type {
-  WeekSummary,
-  WaterVendoEntry,
-} from "@/features/water-vendo/water-funds"
-import type { ColumnDef } from "@tanstack/react-table"
-
-// Mock data for week summaries
 export const weekSummaries: WeekSummary[] = [
   {
     id: "week-3",

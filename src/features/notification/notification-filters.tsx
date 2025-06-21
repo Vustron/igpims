@@ -1,19 +1,18 @@
 "use client"
 
+import { ChevronDown, Filter, Search, X } from "lucide-react"
+import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
+  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuContent,
 } from "@/components/ui/dropdowns"
-import { getActionLabel } from "@/features/notification/notification-helpers"
-import { Filter, Search, X, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/buttons"
 import { Input } from "@/components/ui/inputs"
-
-import type {
-  NotificationType,
+import { getActionLabel } from "@/features/notification/notification-helpers"
+import {
   NotificationAction,
+  NotificationType,
 } from "@/features/notification/notification-types"
 
 interface NotificationFiltersProps {

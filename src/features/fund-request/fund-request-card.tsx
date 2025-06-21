@@ -1,30 +1,28 @@
 "use client"
 
 import {
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  MoreVertical,
   Play,
   Trash2,
   XCircle,
-  ChevronUp,
-  CheckCircle,
-  ChevronDown,
-  MoreVertical,
 } from "lucide-react"
+import { useState } from "react"
+import { Button } from "@/components/ui/buttons"
+import { Card, CardContent, CardHeader } from "@/components/ui/cards"
 import {
   DropdownMenu,
+  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuContent,
 } from "@/components/ui/dropdowns"
-import { TimelineStatusBadge } from "@/features/fund-request/timeline-status"
-import { timelineSteps } from "@/features/fund-request/timeline-sample-data"
-import { Card, CardContent, CardHeader } from "@/components/ui/cards"
-import { Timeline } from "@/features/fund-request/timeline"
-import { Button } from "@/components/ui/buttons"
-
 import { useDialog } from "@/hooks/use-dialog"
-import { useState } from "react"
-
-import type { FundRequest } from "@/features/fund-request/fund-request-store"
+import { FundRequest } from "./fund-request-store"
+import { Timeline } from "./timeline"
+import { timelineSteps } from "./timeline-sample-data"
+import { TimelineStatusBadge } from "./timeline-status"
 
 export const FundRequestCard = ({
   fundRequest,

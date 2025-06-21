@@ -1,4 +1,3 @@
-// change color badge function
 export const getPercentageChangeColor = (percentageChange: string) => {
   const value = Number.parseFloat(percentageChange)
   return value >= 0

@@ -1,9 +1,8 @@
-import { updateRental } from "@/backend/controllers/locker-rental/update-rental"
+import { Route } from "@/backend/routes/api-routes"
+import { updateLocker } from "../controllers/locker/update-locker"
+import { updateRental } from "../controllers/locker-rental/update-rental"
+import { updateUserInfo } from "../controllers/user/update-info"
 import { updateViolation } from "../controllers/violation/update-violation"
-import { updateLocker } from "@/backend/controllers/locker/update-locker"
-import { updateUserInfo } from "@/backend/controllers/user/update-info"
-
-import type { Route } from "@/backend/routes/api-routes"
 
 export const patchRoutes: Route[] = [
   { path: "/api/v1/auth/update-info", handler: updateUserInfo },

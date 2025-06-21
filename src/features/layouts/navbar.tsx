@@ -1,16 +1,13 @@
 "use client"
 
+import { BellDot } from "lucide-react"
+import { useRouter } from "next-nprogress-bar"
+import React from "react"
+import { Badge } from "@/components/ui/badges"
 import { Button, ChangeThemeButton, UserButton } from "@/components/ui/buttons"
 import { SheetMenu } from "@/components/ui/sidebar"
-import { Badge } from "@/components/ui/badges"
-import { BellDot } from "lucide-react"
-
 import { useNotificationStore } from "@/features/notification/notification-store"
-import { useRouter } from "next-nprogress-bar"
-
 import { cn } from "@/utils/cn"
-
-import type React from "react"
 
 interface NavbarProps {
   title: string

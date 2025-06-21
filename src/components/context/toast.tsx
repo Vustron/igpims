@@ -1,17 +1,10 @@
 "use client"
 
-// components
+import { AnimatePresence, motion } from "framer-motion"
 import { CircleAlert, CircleCheckBig, Loader2 } from "lucide-react"
+import { FC, JSX } from "react"
+import { resolveValue, Toast, Toaster, ToastType } from "react-hot-toast"
 
-// utils
-import { Toaster, resolveValue } from "react-hot-toast"
-import { motion, AnimatePresence } from "framer-motion"
-
-// types
-import type { ToastType, Toast } from "react-hot-toast"
-import type { FC, JSX } from "react"
-
-// Define the colors for each toast type
 const colors: Record<ToastType, string> = {
   success: "#16A34A",
   error: "#DC2626",
@@ -20,13 +13,10 @@ const colors: Record<ToastType, string> = {
   custom: "#094CC9",
 }
 
-// Get the primary color based on the toast type
 const getColor = (type: ToastType): string => colors[type] || colors.error
 
-// Get the background color with transparency
 const getBackgroundColor = (type: ToastType): string => `${getColor(type)}20`
 
-// Icon mapping based on toast type
 const getIcon = (type: ToastType): JSX.Element => {
   switch (type) {
     case "loading":

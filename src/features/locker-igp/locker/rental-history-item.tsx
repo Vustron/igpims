@@ -1,14 +1,12 @@
 import { Badge } from "@/components/ui/badges"
 import { Label } from "@/components/ui/labels"
-
-import {
-  getRentalStatusColor,
-  getPaymentStatusColor,
-} from "@/utils/status-color"
-import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { cn } from "@/utils/cn"
-
-import type { Locker } from "@/validation/locker"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
+import {
+  getPaymentStatusColor,
+  getRentalStatusColor,
+} from "@/utils/status-color"
+import { Locker } from "@/validation/locker"
 
 interface RentalHistoryItemProps {
   rental: any

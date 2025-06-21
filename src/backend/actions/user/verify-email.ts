@@ -1,12 +1,9 @@
-import { emailVerificationSchema } from "@/validation/user"
+import { useMutation } from "@tanstack/react-query"
+import { useRouter } from "next-nprogress-bar"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
-
-import { useMutation } from "@tanstack/react-query"
-import { useRouter } from "next-nprogress-bar"
-
-import type { VerifyEmailPayload } from "@/validation/user"
+import { emailVerificationSchema, VerifyEmailPayload } from "@/validation/user"
 
 export async function verifyEmail(payload: VerifyEmailPayload) {
   return api.post<VerifyEmailPayload>("auth/verify-email", payload)

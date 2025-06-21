@@ -1,9 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion"
-
-import { usePasswordStrength } from "@/hooks/use-password-strength"
 import { useEffect } from "react"
+import { usePasswordStrength } from "@/hooks/use-password-strength"
 
 interface PasswordStrengthMeterProps {
   password: string | undefined | null

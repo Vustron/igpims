@@ -1,3 +1,23 @@
+import { motion } from "framer-motion"
+import { useId } from "react"
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 import {
   Card,
   CardContent,
@@ -5,36 +25,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/cards"
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  ReferenceLine,
-} from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
-
-import { chartConfig } from "@/features/report/sales-report-types"
-import { motion } from "framer-motion"
-
-import type {
-  IgpType,
-  TimeRange,
+import {
+  chartConfig,
   IgpSummary,
+  IgpType,
   MonthlySales,
-} from "@/features/report/sales-report-types"
-import { useId } from "react"
+  TimeRange,
+} from "./sales-report-types"
 
 interface SalesOverviewTabProps {
   chartType: "bar" | "line" | "pie" | "area"

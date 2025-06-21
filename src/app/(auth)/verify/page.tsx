@@ -1,6 +1,5 @@
+import { Metadata } from "next"
 import VerifyClient from "@/features/auth/verify/client"
-
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Verify",

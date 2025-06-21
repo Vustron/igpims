@@ -1,6 +1,5 @@
-import { DashboardSideBar } from "@/features/layouts/dashboard-sidebar"
 import { SessionProvider } from "@/components/context/session"
-
+import { DashboardSideBar } from "@/features/layouts/dashboard-sidebar"
 import { getSession } from "@/config/session"
 import { presentor } from "@/utils/presentor"
 

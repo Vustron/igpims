@@ -1,36 +1,33 @@
 "use client"
 
+import { ColumnDef } from "@tanstack/react-table"
 import {
-  Edit,
-  Mail,
-  Trash2,
-  Shield,
-  XCircle,
   ArrowUpDown,
   CheckCircle,
+  Edit,
+  Mail,
   MoreHorizontal,
+  Shield,
+  Trash2,
   User as UserIcon,
+  XCircle,
 } from "lucide-react"
+import { useRouter } from "next-nprogress-bar"
+import toast from "react-hot-toast"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
-  DropdownMenuItem,
   DropdownMenuContent,
-  DropdownMenuTrigger,
+  DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/images"
-import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
-
-import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
 import { useDeleteUserById } from "@/backend/actions/user/delete-by-id"
+import { User } from "@/backend/db/schemas"
 import { useConfirm } from "@/hooks/use-confirm"
-import { useRouter } from "next-nprogress-bar"
-
-import type { ColumnDef } from "@tanstack/react-table"
-import type { User } from "@/backend/db/schemas"
+import { catchError } from "@/utils/catch-error"
 
 export const usersColumns: ColumnDef<User>[] = [
   {

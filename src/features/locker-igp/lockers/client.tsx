@@ -1,14 +1,11 @@
 "use client"
 
-import { Button } from "@/components/ui/buttons"
-
-import { useFindManyLockers } from "@/backend/actions/locker/find-many"
-import { useState } from "react"
-
 import { motion } from "framer-motion"
-
-import { LockerFilter, getGridLayoutClass } from "./locker-filter"
+import { useState } from "react"
+import { Button } from "@/components/ui/buttons"
+import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { LockerCard } from "./locker-card"
+import { getGridLayoutClass, LockerFilter } from "./locker-filter"
 
 export const LockersClient = ({ isSidebarOpen = false }) => {
   const [selectedLocker, setSelectedLocker] = useState<string | null>(null)

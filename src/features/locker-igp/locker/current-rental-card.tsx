@@ -1,16 +1,14 @@
+import { User } from "lucide-react"
 import {
   Card,
-  CardTitle,
-  CardHeader,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/cards"
-import { User } from "lucide-react"
-
-import { StudentInformation } from "./student-info"
+import { Locker } from "@/validation/locker"
 import { RentalDetails } from "./rental-details"
-
-import type { Locker } from "@/validation/locker"
+import { StudentInformation } from "./student-info"
 
 interface CurrentRentalCardProps {
   rental: any

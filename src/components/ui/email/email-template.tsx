@@ -1,16 +1,16 @@
 import {
-  Hr,
-  Img,
-  Html,
-  Head,
   Body,
-  Text,
-  Link,
   Button,
+  Container,
+  Head,
+  Hr,
+  Html,
+  Img,
+  Link,
   Preview,
   Section,
-  Container,
   Tailwind,
+  Text,
 } from "@react-email/components"
 import { env } from "@/config/env"
 

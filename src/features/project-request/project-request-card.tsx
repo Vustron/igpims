@@ -1,32 +1,30 @@
 "use client"
 
+import { format } from "date-fns"
 import {
-  Play,
-  Trash2,
-  XCircle,
-  ChevronUp,
   Calendar,
   CheckCircle,
   ChevronDown,
+  ChevronUp,
   MoreVertical,
+  Play,
+  Trash2,
+  XCircle,
 } from "lucide-react"
+import { useState } from "react"
+import { Button } from "@/components/ui/buttons"
+import { Card, CardContent, CardHeader } from "@/components/ui/cards"
 import {
   DropdownMenu,
-  DropdownMenuItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
-import { TimelineStatusBadge } from "@/features/project-request/project-timeline-status"
-import { timelineSteps } from "@/features/project-request/project-timeline-sample-data"
-import { ProjectTimeline } from "@/features/project-request/project-timeline"
-import { Card, CardContent, CardHeader } from "@/components/ui/cards"
-import { Button } from "@/components/ui/buttons"
-
 import { useDialog } from "@/hooks/use-dialog"
-import { useState } from "react"
-import { format } from "date-fns"
-
-import type { ProjectRequest } from "@/features/project-request/project-request-store"
+import { ProjectRequest } from "./project-request-store"
+import { ProjectTimeline } from "./project-timeline"
+import { timelineSteps } from "./project-timeline-sample-data"
+import { TimelineStatusBadge } from "./project-timeline-status"
 
 export const ProjectRequestCard = ({
   projectRequest,

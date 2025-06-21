@@ -1,9 +1,9 @@
+import { NextRequest, NextResponse } from "next/server"
 import { deleteRoutes } from "@/backend/routes/delete"
+import { getRoutes } from "@/backend/routes/get"
 import { patchRoutes } from "@/backend/routes/patch"
 import { postRoutes } from "@/backend/routes/post"
-import { getRoutes } from "@/backend/routes/get"
 
-import type { NextRequest, NextResponse } from "next/server"
 export type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE"
 
 export interface Route {

@@ -1,14 +1,11 @@
-import { api } from "@/backend/helpers/api-client"
-import { catchError } from "@/utils/catch-error"
-import { signInSchema } from "@/validation/user"
-import { sanitizer } from "@/utils/sanitizer"
-
-import { useOtpStore } from "@/hooks/use-otp-store"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { SignInPayload } from "@/validation/user"
-import type { Account } from "@/backend/db/schemas"
+import { Account } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
+import { useOtpStore } from "@/hooks/use-otp-store"
+import { catchError } from "@/utils/catch-error"
+import { sanitizer } from "@/utils/sanitizer"
+import { SignInPayload, signInSchema } from "@/validation/user"
 
 export async function signIn(payload: SignInPayload): Promise<Account> {
   return api.post<SignInPayload, Account>("auth/sign-in", payload)

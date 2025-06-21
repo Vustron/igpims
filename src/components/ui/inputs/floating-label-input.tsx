@@ -1,12 +1,10 @@
 "use client"
 
+import * as React from "react"
+import { FieldError } from "react-hook-form"
 import { Input } from "@/components/ui/inputs/input"
 import { Label } from "@/components/ui/labels"
-
 import { cn } from "@/utils/cn"
-import * as React from "react"
-
-import type { FieldError } from "react-hook-form"
 
 export interface FloatingInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

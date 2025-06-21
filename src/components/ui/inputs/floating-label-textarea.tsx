@@ -1,7 +1,6 @@
+import { TextareaHTMLAttributes } from "react"
 import { Textarea } from "@/components/ui/inputs"
 import { cn } from "@/utils/cn"
-
-import type { TextareaHTMLAttributes } from "react"
 
 interface FloatingLabelTextAreaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {

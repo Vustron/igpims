@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/cards"
 import { Loader2 } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/cards"
 
 export const LockerInfoLoadingState = () => {
   return (

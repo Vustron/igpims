@@ -1,17 +1,16 @@
 "use client"
 
+import Image from "next/image"
+import Link from "next/link"
+import { DynamicButton } from "@/components/ui/buttons"
 import {
   Card,
-  CardTitle,
-  CardHeader,
-  CardFooter,
   CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/cards"
-import { DynamicButton } from "@/components/ui/buttons"
-import SignUpForm from "@/features/auth/sign-up/sign-up-form"
-
-import Link from "next/link"
-import Image from "next/image"
+import SignUpForm from "./sign-up-form"
 
 const SignUpClient = () => {
   return (

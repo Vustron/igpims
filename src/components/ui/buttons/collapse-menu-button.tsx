@@ -1,33 +1,29 @@
 "use client"
 
+import { DropdownMenuArrow } from "@radix-ui/react-dropdown-menu"
+import { ChevronDown, Dot, LucideIcon } from "lucide-react"
+import Link from "next/link"
+import { useState } from "react"
+import { IconType } from "react-icons/lib"
+import { Button } from "@/components/ui/buttons"
 import {
   Collapsible,
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuLabel,
   CollapsibleContent,
   CollapsibleTrigger,
-  DropdownMenuTrigger,
+  DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
   TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltips"
-import { DropdownMenuArrow } from "@radix-ui/react-dropdown-menu"
-import { Button } from "@/components/ui/buttons"
-import { ChevronDown, Dot } from "lucide-react"
-
-import { useState } from "react"
-
 import { cn } from "@/utils/cn"
-import Link from "next/link"
-
-import type { IconType } from "react-icons/lib"
-import type { LucideIcon } from "lucide-react"
 
 type Submenu = {
   href: string

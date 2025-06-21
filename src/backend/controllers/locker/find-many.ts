@@ -1,11 +1,9 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { and, eq, like, or, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 import { locker } from "@/backend/db/schemas"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
-
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
 
 export async function findManyLockers(
   request: NextRequest,

@@ -1,6 +1,5 @@
 import { eq, inArray, sql } from "drizzle-orm"
 import { db } from "@/config/drizzle"
-
 import { account } from "../db/schemas"
 
 const findByAccountUserIdQuery = db

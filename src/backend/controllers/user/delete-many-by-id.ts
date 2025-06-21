@@ -1,16 +1,16 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { NextRequest, NextResponse } from "next/server"
 import { checkAuth } from "@/backend/middlewares/check-auth"
-import { deleteManyUserByIdSchema } from "@/validation/user"
-import * as sessionQuery from "@/backend/queries/session"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
+import * as sessionQuery from "@/backend/queries/session"
 import * as userQuery from "@/backend/queries/user"
-import { requestJson } from "@/utils/request-json"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
-
-import type { DeleteManyUserByIdPayload } from "@/validation/user"
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
+import { requestJson } from "@/utils/request-json"
+import {
+  DeleteManyUserByIdPayload,
+  deleteManyUserByIdSchema,
+} from "@/validation/user"
 
 export async function deleteManyUserById(
   request: NextRequest,

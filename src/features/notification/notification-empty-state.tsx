@@ -1,6 +1,6 @@
+import { Clock } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 import { Card } from "@/components/ui/cards"
-import { Clock } from "lucide-react"
 
 interface NotificationEmptyStateProps {
   hasFilters: boolean

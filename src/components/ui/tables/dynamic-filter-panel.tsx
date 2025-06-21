@@ -1,28 +1,30 @@
 "use client"
 
 import { X } from "lucide-react"
-import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectContent,
-  SelectTrigger,
-} from "@/components/ui/selects"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
 import { Button } from "@/components/ui/buttons"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
 import { Input } from "@/components/ui/inputs"
 import { Label } from "@/components/ui/labels"
-
-import type { RentalFilters } from "@/backend/actions/locker-rental/find-many"
-import type { UserFilters } from "@/backend/actions/user/find-many"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/selects"
+import { RentalFilters } from "@/backend/actions/locker-rental/find-many"
+import { UserFilters } from "@/backend/actions/user/find-many"
+import { ViolationFilters } from "@/backend/actions/violation/find-many"
 
 interface DynamicFiltersPanelProps {
-  filters: RentalFilters | UserFilters
+  filters: RentalFilters | UserFilters | ViolationFilters
   activeFiltersCount: number
-  onUpdateFilters: (newFilters: Partial<RentalFilters | UserFilters>) => void
+  onUpdateFilters: (
+    newFilters: Partial<RentalFilters | UserFilters | ViolationFilters>,
+  ) => void
   onResetFilters: () => void
   onClose: () => void
-  filterType?: "rental" | "user"
+  filterType?: "rental" | "user" | "violations"
 }
 
 export const DynamicFiltersPanel = ({
@@ -35,6 +37,7 @@ export const DynamicFiltersPanel = ({
 }: DynamicFiltersPanelProps) => {
   const isRentalFilter = filterType === "rental"
   const isUserFilter = filterType === "user"
+  const isViolationsFilter = filterType === "violations"
 
   return (
     <Card>
@@ -183,6 +186,148 @@ export const DynamicFiltersPanel = ({
               </SelectContent>
             </Select>
           </div>
+        )}
+
+        {/* Violation Filters */}
+        {isViolationsFilter && (
+          <>
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Violation Type</Label>
+              <Select
+                value={(filters as ViolationFilters).violationType || "all"}
+                onValueChange={(value) =>
+                  onUpdateFilters({
+                    violationType:
+                      value === "all"
+                        ? undefined
+                        : (value as ViolationFilters["violationType"]),
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem key="all" value="all">
+                    All types
+                  </SelectItem>
+                  <SelectItem key="lost_key" value="lost_key">
+                    Lost Key
+                  </SelectItem>
+                  <SelectItem key="damaged_locker" value="damaged_locker">
+                    Damaged Locker
+                  </SelectItem>
+                  <SelectItem key="unauthorized_use" value="unauthorized_use">
+                    Unauthorized Use
+                  </SelectItem>
+                  <SelectItem key="prohibited_items" value="prohibited_items">
+                    Prohibited Items
+                  </SelectItem>
+                  <SelectItem key="late_renewal" value="late_renewal">
+                    Late Renewal
+                  </SelectItem>
+                  <SelectItem key="abandoned_items" value="abandoned_items">
+                    Abandoned Items
+                  </SelectItem>
+                  <SelectItem key="other" value="other">
+                    Other
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Fine Status</Label>
+              <Select
+                value={(filters as ViolationFilters).fineStatus || "all"}
+                onValueChange={(value) =>
+                  onUpdateFilters({
+                    fineStatus:
+                      value === "all"
+                        ? undefined
+                        : (value as ViolationFilters["fineStatus"]),
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem key="all" value="all">
+                    All statuses
+                  </SelectItem>
+                  <SelectItem key="paid" value="paid">
+                    Paid
+                  </SelectItem>
+                  <SelectItem key="unpaid" value="unpaid">
+                    Unpaid
+                  </SelectItem>
+                  <SelectItem key="partial" value="partial">
+                    Partial
+                  </SelectItem>
+                  <SelectItem key="waived" value="waived">
+                    Waived
+                  </SelectItem>
+                  <SelectItem key="under_review" value="under_review">
+                    Under Review
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Student Name/ID</Label>
+              <Input
+                placeholder="Filter by student..."
+                value={(filters as ViolationFilters).search || ""}
+                onChange={(e) =>
+                  onUpdateFilters({ search: e.target.value || undefined })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Date Range</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  placeholder="From"
+                  value={
+                    (filters as ViolationFilters).fromDate
+                      ? new Date((filters as ViolationFilters).fromDate!)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    onUpdateFilters({
+                      fromDate: e.target.value
+                        ? new Date(e.target.value).getTime()
+                        : undefined,
+                    })
+                  }
+                />
+                <Input
+                  type="date"
+                  placeholder="To"
+                  value={
+                    (filters as ViolationFilters).toDate
+                      ? new Date((filters as ViolationFilters).toDate!)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    onUpdateFilters({
+                      toDate: e.target.value
+                        ? new Date(e.target.value).getTime()
+                        : undefined,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>

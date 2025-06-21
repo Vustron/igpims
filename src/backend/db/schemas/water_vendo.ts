@@ -1,8 +1,6 @@
-import { text, integer, sqliteTable, index } from "drizzle-orm/sqlite-core"
-import { relations, sql } from "drizzle-orm"
+import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-
-import type { InferSelectModel } from "drizzle-orm"
 
 export const waterVendo = sqliteTable(
   "waterVendo",

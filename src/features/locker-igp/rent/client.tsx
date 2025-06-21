@@ -1,15 +1,14 @@
 "use client"
 
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
 import { DataTable } from "@/components/ui/tables"
-
-import { useFindManyRentals } from "@/backend/actions/locker-rental/find-many"
-import { useState, useMemo, useCallback, useEffect } from "react"
+import {
+  RentalFilters,
+  useFindManyRentals,
+} from "@/backend/actions/locker-rental/find-many"
 import { useDebounce } from "@/hooks/use-debounce"
-
 import { lockerRentalListColumns } from "./locker-rental-list-columns"
-
-import type { RentalFilters } from "@/backend/actions/locker-rental/find-many"
 
 export const LockerRentClient = () => {
   const [filters, setFilters] = useState<RentalFilters>({

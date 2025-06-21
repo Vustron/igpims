@@ -1,20 +1,19 @@
 "use client"
 
-import {
-  IdCell,
-  DateDueCell,
-  LockerIdCell,
-  RenterNameCell,
-  DateRentedCell,
-  CourseAndSetCell,
-  RentalStatusCell,
-  PaymentStatusCell,
-} from "./table-cells"
-import { columnHeaders } from "./column-helper"
+import { ColumnDef } from "@tanstack/react-table"
+import { LockerRental } from "@/backend/db/schemas"
 import { ActionMenu } from "./action-menu"
-
-import type { LockerRental } from "@/backend/db/schemas"
-import type { ColumnDef } from "@tanstack/react-table"
+import { columnHeaders } from "./column-helper"
+import {
+  CourseAndSetCell,
+  DateDueCell,
+  DateRentedCell,
+  IdCell,
+  LockerIdCell,
+  PaymentStatusCell,
+  RentalStatusCell,
+  RenterNameCell,
+} from "./table-cells"
 
 export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   {

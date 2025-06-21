@@ -1,25 +1,23 @@
 "use client"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdowns"
+// import toast from "react-hot-toast"
+import { Table } from "@tanstack/react-table"
+import { motion } from "framer-motion"
 import {
   Mail,
+  PlusCircle,
   RefreshCw,
   Settings2,
-  PlusCircle,
   // PrinterIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
-import { motion } from "framer-motion"
-// import toast from "react-hot-toast"
-
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdowns"
 import { useDialog } from "@/hooks/use-dialog"
-
-import type { Table } from "@tanstack/react-table"
 
 interface TableActionsProps<TData> {
   isIgp?: boolean
@@ -28,6 +26,7 @@ interface TableActionsProps<TData> {
   isFetching: boolean
   table: Table<TData>
   isUser?: boolean
+  isOnViolations?: boolean
 }
 
 export function TableActions<TData>({
@@ -37,6 +36,7 @@ export function TableActions<TData>({
   isFetching,
   table,
   isUser,
+  isOnViolations,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
 
@@ -80,9 +80,9 @@ export function TableActions<TData>({
         </Button>
       </motion.div> */}
 
-      {(isLockerRental || isUser) && (
+      {(isLockerRental || isUser || isOnViolations) && (
         <motion.div
-          key="add-rent-button"
+          key="add-button"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
@@ -92,10 +92,22 @@ export function TableActions<TData>({
             size="sm"
             variant="outline"
             className="font-normal text-xs shadow-xs"
-            onClick={() => onOpen(isUser ? "createUser" : "createRent")}
+            onClick={() =>
+              onOpen(
+                isUser
+                  ? "createUser"
+                  : isOnViolations
+                    ? "createViolation"
+                    : "createRent",
+              )
+            }
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            {isUser ? "Create user" : "Create rent"}
+            {isUser
+              ? "Create user"
+              : isOnViolations
+                ? "Create violation"
+                : "Create rent"}
           </Button>
         </motion.div>
       )}

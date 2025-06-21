@@ -1,39 +1,40 @@
 "use client"
 
 import {
-  ConfirmDialog,
-  CreateIgpDialog,
-  CheckFundsDialog,
-  CreateUserDialog,
-  VerifyUserDialog,
-  ProfitLossDialog,
-  CreateLockerDialog,
-  ReceiveFundsDialog,
-  DisburseFundsDialog,
-  SubmitReceiptDialog,
-  SessionExpiredDialog,
-  PrintIgpStatusDialog,
-  ValidateExpenseDialog,
-  CreateWaterFundDialog,
-  CompleteProjectDialog,
-  CreateResolutionDialog,
-  CreateLockerRentDialog,
-  CreateWaterVendoDialog,
-  CreateFundRequestDialog,
-  ReviewFundRequestDialog,
-  DeleteFundRequestDialog,
-  DueOverduePaymentsDialog,
   ApproveFundRequestDialog,
-  IgpFinancialReportDialog,
-  StartImplementationDialog,
-  CreateProjectRequestDialog,
-  ReviewProjectRequestDialog,
-  DeleteProjectRequestDialog,
   ApproveProjectRequestDialog,
+  CheckFundsDialog,
+  CompleteProjectDialog,
+  ConfirmDialog,
+  CreateFundRequestDialog,
+  CreateIgpDialog,
+  CreateLockerDialog,
+  CreateLockerRentDialog,
+  CreateProjectRequestDialog,
+  CreateResolutionDialog,
+  CreateUserDialog,
+  CreateViolationDialog,
+  CreateWaterFundDialog,
+  CreateWaterVendoDialog,
+  DeleteFundRequestDialog,
+  DeleteProjectRequestDialog,
+  DisburseFundsDialog,
+  DueOverduePaymentsDialog,
+  EditViolationDialog,
+  IgpFinancialReportDialog,
+  PrintIgpStatusDialog,
+  ProfitLossDialog,
+  ReceiveFundsDialog,
   RentalAgreementReceiptDialog,
+  ReviewFundRequestDialog,
+  ReviewProjectRequestDialog,
   SendEmailLockerViolationDialog,
+  SessionExpiredDialog,
+  StartImplementationDialog,
+  SubmitReceiptDialog,
+  ValidateExpenseDialog,
+  VerifyUserDialog,
 } from "@/components/ui/dialogs"
-
 import useMounted from "@/hooks/use-mounted"
 
 export const DialogProvider = () => {
@@ -72,6 +73,8 @@ export const DialogProvider = () => {
       <CompleteProjectDialog />
       <DeleteProjectRequestDialog />
       <DeleteFundRequestDialog />
+      <CreateViolationDialog />
+      <EditViolationDialog />
     </>
   )
 }

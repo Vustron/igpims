@@ -1,18 +1,14 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { createRentalSchema } from "@/validation/rental"
-import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
-import { useCreateRent } from "@/backend/actions/locker-rental/create-rent"
-import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { useForm } from "react-hook-form"
-
-import type { CreateRentalData } from "@/validation/rental"
-import type { FieldConfig } from "@/interfaces/form"
+import toast from "react-hot-toast"
+import { DynamicForm } from "@/components/ui/forms"
+import { useFindManyLockers } from "@/backend/actions/locker/find-many"
+import { useCreateRent } from "@/backend/actions/locker-rental/create-rent"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { CreateRentalData, createRentalSchema } from "@/validation/rental"
 
 interface CreateLockerRentFormProps {
   onSuccess?: () => void

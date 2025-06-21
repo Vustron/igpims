@@ -1,13 +1,11 @@
-import { SidebarToggle } from "@/components/ui/sidebar/sidebar-toggle"
-import { Menu } from "@/components/ui/sidebar/menu"
-import { Button } from "@/components/ui/buttons"
-
-import { useSidebarToggle } from "@/hooks/use-sidebar-toggle"
-import { useStore } from "@/hooks/use-store"
-
-import { cn } from "@/utils/cn"
 import Image from "next/image"
 import Link from "next/link"
+import { Button } from "@/components/ui/buttons"
+import { Menu } from "@/components/ui/sidebar/menu"
+import { SidebarToggle } from "@/components/ui/sidebar/sidebar-toggle"
+import { useSidebarToggle } from "@/hooks/use-sidebar-toggle"
+import { useStore } from "@/hooks/use-store"
+import { cn } from "@/utils/cn"
 
 export const Sidebar = () => {
   const sidebar = useStore(useSidebarToggle, (state) => state)

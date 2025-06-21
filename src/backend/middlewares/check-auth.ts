@@ -1,13 +1,12 @@
+import { NextResponse } from "next/server"
+import { Account, Session, User } from "@/backend/db/schemas"
+import { cleanupSession } from "@/backend/helpers/cleanup-session"
 import * as accountQuery from "@/backend/queries/account"
 import * as sessionQuery from "@/backend/queries/session"
 import * as userQuery from "@/backend/queries/user"
-import { catchError } from "@/utils/catch-error"
-import { getSession } from "@/config/session"
-import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
-
-import type { Account, Session, User } from "@/backend/db/schemas"
-import { cleanupSession } from "@/backend/helpers/cleanup-session"
+import { getSession } from "@/config/session"
+import { catchError } from "@/utils/catch-error"
 
 export async function checkAuth() {
   try {

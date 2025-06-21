@@ -1,4 +1,3 @@
-// utils
 import { ZodError } from "zod"
 
 export interface ErrorResponseData {
@@ -6,7 +5,6 @@ export interface ErrorResponseData {
   statusCode?: number
 }
 
-// http error
 export class HttpError extends Error {
   constructor(
     public statusCode: number,
@@ -17,7 +15,6 @@ export class HttpError extends Error {
   }
 }
 
-// error class handler
 export class ErrorHandler {
   public static handleError(error: unknown): ErrorResponseData {
     if (error instanceof HttpError) {

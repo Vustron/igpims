@@ -1,9 +1,6 @@
-import { routes } from "@/backend/routes/api-routes"
+import { NextRequest, NextResponse } from "next/server"
+import { HttpMethod, routes } from "@/backend/routes/api-routes"
 import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
-
-import type { HttpMethod } from "@/backend/routes/api-routes"
-import type { NextRequest } from "next/server"
 
 export const requestHandler = async (
   request: NextRequest,

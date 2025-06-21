@@ -1,12 +1,10 @@
 "use client"
 
-import { RevenueAnalytics } from "@/features/dashboard/revenue-analytics"
-import { IgpPerformance } from "@/features/dashboard/igp-performance"
-import { DashboardCard } from "@/features/dashboard/dashboard-card"
-import { SalesOverview } from "@/features/dashboard/sales-overview"
-import { GiDroplets } from "react-icons/gi"
-import { GiClothes } from "react-icons/gi"
-import { GiLockers } from "react-icons/gi"
+import { GiClothes, GiDroplets, GiLockers } from "react-icons/gi"
+import { DashboardCard } from "./dashboard-card"
+import { IgpPerformance } from "./igp-performance"
+import { RevenueAnalytics } from "./revenue-analytics"
+import { SalesOverview } from "./sales-overview"
 
 export const DashboardClient = () => {
   const dashboardItems = [

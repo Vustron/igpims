@@ -1,14 +1,12 @@
+import { NextRequest, NextResponse } from "next/server"
+import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import {
   deleteViolationQuery,
   findViolationByIdQuery,
 } from "@/backend/queries/violation"
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { checkAuth } from "@/backend/middlewares/check-auth"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
-
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
 
 export async function deleteViolation(
   request: NextRequest,

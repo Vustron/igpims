@@ -1,7 +1,6 @@
+import { Metadata } from "next"
 import { ContentLayout } from "@/features/layouts/content-layout"
 import { SpecificIgp } from "@/features/other-igps/specific-igp"
-
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "IGP",

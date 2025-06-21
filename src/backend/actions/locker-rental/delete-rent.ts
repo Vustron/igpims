@@ -1,10 +1,9 @@
-import { api } from "@/backend/helpers/api-client"
-import { catchError } from "@/utils/catch-error"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { PaginatedRentalsResponse } from "@/backend/actions/locker-rental/find-many"
-import type { LockerRental } from "@/backend/db/schemas"
+import { LockerRental } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
+import { catchError } from "@/utils/catch-error"
+import { PaginatedRentalsResponse } from "../locker-rental/find-many"
 
 export async function deleteRent(rentalId: string) {
   return api.delete("locker-rentals/delete-rent-by-id", {

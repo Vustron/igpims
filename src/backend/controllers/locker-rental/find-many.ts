@@ -1,12 +1,10 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { checkAuth } from "@/backend/middlewares/check-auth"
-import { lockerRental } from "@/backend/db/schemas"
 import { and, eq, like, or, sql } from "drizzle-orm"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { lockerRental } from "@/backend/db/schemas"
+import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
-
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
 
 export async function findManyRents(
   request: NextRequest,

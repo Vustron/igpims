@@ -1,12 +1,9 @@
-import { api } from "@/backend/helpers/api-client"
-import { sendEmailSchema } from "@/validation/user"
-import { catchError } from "@/utils/catch-error"
-import { sanitizer } from "@/utils/sanitizer"
-
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { SendEmailPayload } from "@/validation/user"
+import { api } from "@/backend/helpers/api-client"
+import { catchError } from "@/utils/catch-error"
+import { sanitizer } from "@/utils/sanitizer"
+import { SendEmailPayload, sendEmailSchema } from "@/validation/user"
 
 export async function sendResetLink(payload: SendEmailPayload) {
   return api.post<SendEmailPayload>("auth/send-reset-link", payload)

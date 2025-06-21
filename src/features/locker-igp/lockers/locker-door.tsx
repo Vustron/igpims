@@ -1,7 +1,7 @@
 "use client"
 
-import { LockIcon, UnlockIcon, WrenchIcon } from "lucide-react"
 import { motion } from "framer-motion"
+import { LockIcon, UnlockIcon, WrenchIcon } from "lucide-react"
 
 interface LockerDoorProps {
   status: string

@@ -1,8 +1,7 @@
 import { env } from "@/config/env"
-
 import { dataSerializer } from "@/utils/data-serializer"
-import { buildQueryString } from "@/utils/query-string"
 import { HttpError } from "@/utils/error"
+import { buildQueryString } from "@/utils/query-string"
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
 

@@ -1,13 +1,11 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { NextRequest, NextResponse } from "next/server"
 import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as lockerQuery from "@/backend/queries/locker"
 import * as rentalQuery from "@/backend/queries/rental"
-import { toTimestamp } from "@/utils/date-convert"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
 import { db } from "@/config/drizzle"
-
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
+import { toTimestamp } from "@/utils/date-convert"
 
 export async function findLockerById(
   request: NextRequest,

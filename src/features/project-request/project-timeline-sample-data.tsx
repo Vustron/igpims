@@ -1,10 +1,10 @@
 import {
-  Files,
-  FileText,
-  FileSearch,
-  ScrollText,
   CheckCircle2,
   ClipboardCheck,
+  FileSearch,
+  Files,
+  FileText,
+  ScrollText,
 } from "lucide-react"
 
 export interface TimelineStepType {

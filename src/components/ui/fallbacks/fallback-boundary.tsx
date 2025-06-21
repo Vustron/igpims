@@ -1,10 +1,9 @@
 "use client"
 
-import { ErrorBoundary } from "react-error-boundary"
 import { Loader2, ServerCrash } from "lucide-react"
-import toast from "react-hot-toast"
 import { Suspense } from "react"
-
+import { ErrorBoundary } from "react-error-boundary"
+import toast from "react-hot-toast"
 import { Button } from "@/components/ui/buttons/button"
 
 export const LoadingFallback = () => {

@@ -1,18 +1,15 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
-import { useDialog } from "@/hooks/use-dialog"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { catchError } from "@/utils/catch-error"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { z } from "zod"
-
-import { useForm } from "react-hook-form"
-import { useState } from "react"
-
-import type { FieldConfig } from "@/interfaces/form"
+import { DynamicForm } from "@/components/ui/forms"
+import { useDialog } from "@/hooks/use-dialog"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { useFundRequestStore } from "./fund-request-store"
 
 export const fundRequestSchema = z.object({
   requestorName: z.string().min(1, "Requestor name is required"),

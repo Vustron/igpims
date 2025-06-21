@@ -1,23 +1,21 @@
 "use client"
 
+import { Ellipsis } from "lucide-react"
+import Link from "next/link"
+// import { useSignOutUser } from "@/backend/actions/user/sign-out"
+import { usePathname } from "next/navigation"
+import { Button, CollapseMenuButton } from "@/components/ui/buttons"
+import { ScrollArea } from "@/components/ui/scrollareas"
+import { getMenuList } from "@/components/ui/sidebar"
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
   TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltips"
-import { Button, CollapseMenuButton } from "@/components/ui/buttons"
-import { ScrollArea } from "@/components/ui/scrollareas"
-import { Ellipsis } from "lucide-react"
-
-// import { useSignOutUser } from "@/backend/actions/user/sign-out"
-import { usePathname } from "next/navigation"
-
-import { getMenuList } from "@/components/ui/sidebar"
 // import { catchError } from "@/utils/catch-error"
 // import toast from "react-hot-toast"
 import { cn } from "@/utils/cn"
-import Link from "next/link"
 
 interface MenuProps {
   isOpen: boolean | undefined

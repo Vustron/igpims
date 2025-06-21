@@ -1,16 +1,11 @@
 "use client"
 
-import { IgpFilters } from "@/features/other-igps/igp-filters"
-import { IgpCard } from "@/features/other-igps/igp-card"
-import { Separator } from "@/components/ui/separators"
-import { Button } from "@/components/ui/buttons"
-
-import { motion, AnimatePresence } from "framer-motion"
-
+import { AnimatePresence, motion } from "framer-motion"
 import { useState } from "react"
-
-import type { SortOption } from "@/features/other-igps/igp-filters"
-import type { IgpCardProps } from "@/features/other-igps/igp-card"
+import { Button } from "@/components/ui/buttons"
+import { Separator } from "@/components/ui/separators"
+import { IgpCard, IgpCardProps } from "./igp-card"
+import { IgpFilters, SortOption } from "./igp-filters"
 
 export const OtherIgpsClient = () => {
   const [searchTerm, setSearchTerm] = useState("")

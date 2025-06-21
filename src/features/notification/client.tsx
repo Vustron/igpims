@@ -1,20 +1,17 @@
 "use client"
 
-import { NotificationFilters } from "@/features/notification/notification-filters"
-import { NotificationHeader } from "@/features/notification/notification-header"
-import { NotificationTabs } from "@/features/notification/notifications-tab"
-
-import { useNotificationStore } from "@/features/notification/notification-store"
-import { useState, useEffect } from "react"
-
-import { generateMockNotifications } from "@/features/notification/mock-data-notification"
 import { format } from "date-fns/format"
-
-import type {
+import { useEffect, useState } from "react"
+import { generateMockNotifications } from "./mock-data-notification"
+import { NotificationFilters } from "./notification-filters"
+import { NotificationHeader } from "./notification-header"
+import { useNotificationStore } from "./notification-store"
+import {
   Notification,
-  NotificationType,
   NotificationAction,
-} from "@/features/notification/notification-types"
+  NotificationType,
+} from "./notification-types"
+import { NotificationTabs } from "./notifications-tab"
 
 export const NotificationClient = () => {
   const {

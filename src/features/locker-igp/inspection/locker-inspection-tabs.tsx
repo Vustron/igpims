@@ -1,37 +1,34 @@
 "use client"
 
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/separators/tabs"
-import {
-  Sheet,
-  SheetTitle,
-  SheetContent,
-  SheetTrigger,
-  SheetDescription,
-} from "@/components/ui/sheets"
+import { ChevronsUpDown, ClipboardList, InspectIcon, Menu } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/buttons"
 import {
   Drawer,
-  DrawerTitle,
-  DrawerHeader,
-  DrawerTrigger,
   DrawerContent,
   DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawers"
-import { InspectionClient } from "@/features/locker-igp/inspection/client"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/separators/tabs"
 import VisuallyHiddenComponent from "@/components/ui/separators/visually-hidden"
-import { Menu, ClipboardList, ChevronsUpDown, InspectIcon } from "lucide-react"
-
-import { Button } from "@/components/ui/buttons"
-
-import { useMediaQuery } from "@/hooks/use-media-query"
-import { useState, useEffect } from "react"
-
-import { cn } from "@/utils/cn"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheets"
+import { InspectionClient } from "@/features/locker-igp/inspection/client"
 import { ViolationClient } from "@/features/locker-igp/violations/client"
+import { useMediaQuery } from "@/hooks/use-media-query"
+import { cn } from "@/utils/cn"
 
 interface TabItem {
   id: string

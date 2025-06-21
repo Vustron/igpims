@@ -1,12 +1,9 @@
 "use client"
 
-import { FundRequestFilter } from "@/features/fund-request/fund-request-filter"
-import { FundRequestCard } from "@/features/fund-request/fund-request-card"
-
-import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
-import { useState, useMemo } from "react"
-
-import type { FundRequest } from "@/features/fund-request/fund-request-store"
+import { useMemo, useState } from "react"
+import { FundRequestCard } from "./fund-request-card"
+import { FundRequestFilter } from "./fund-request-filter"
+import { FundRequest, useFundRequestStore } from "./fund-request-store"
 
 type StatusOption = FundRequest["status"] | "all"
 

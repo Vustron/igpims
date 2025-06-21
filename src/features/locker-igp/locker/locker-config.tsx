@@ -1,16 +1,15 @@
+import { UseFormReturn } from "react-hook-form"
+import { PiLockers } from "react-icons/pi"
 import {
   Card,
-  CardTitle,
-  CardHeader,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/cards"
 import { DynamicForm } from "@/components/ui/forms"
-import { PiLockers } from "react-icons/pi"
-
-import type { UseFormReturn } from "react-hook-form"
-import type { FieldConfig } from "@/interfaces/form"
-import type { Locker } from "@/validation/locker"
+import { FieldConfig } from "@/interfaces/form"
+import { Locker } from "@/validation/locker"
 
 interface LockerConfigurationCardProps {
   form: UseFormReturn<Locker>

@@ -1,5 +1,7 @@
 "use client"
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { ReactNode, useCallback } from "react"
 import {
   Pagination,
   PaginationContent,
@@ -17,8 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/selects/select"
 import { cn } from "@/utils/cn"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { type ReactNode, useCallback } from "react"
 
 export interface PaginationWithLinksProps {
   pageSizeSelectOptions?: {

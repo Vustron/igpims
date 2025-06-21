@@ -1,14 +1,17 @@
-import { deleteManyUserByIdSchema } from "@/validation/user"
+import {
+  QueryFilters,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query"
+import { useRouter } from "next-nprogress-bar"
+import { User } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
-
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next-nprogress-bar"
-
-import type { DeleteManyUserByIdPayload } from "@/validation/user"
-import type { QueryFilters } from "@tanstack/react-query"
-import type { User } from "@/backend/db/schemas"
+import {
+  DeleteManyUserByIdPayload,
+  deleteManyUserByIdSchema,
+} from "@/validation/user"
 
 export async function deleteManyUserById(payload: DeleteManyUserByIdPayload) {
   return api.post<DeleteManyUserByIdPayload, { deletedIds: string[] }>(

@@ -1,12 +1,10 @@
-import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { NextRequest, NextResponse } from "next/server"
 import { checkAuth } from "@/backend/middlewares/check-auth"
-import * as sessionQuery from "@/backend/queries/session"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
-import { catchError } from "@/utils/catch-error"
-import { NextResponse } from "next/server"
+import * as sessionQuery from "@/backend/queries/session"
 import { db } from "@/config/drizzle"
-
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
 
 export async function signOutUser(
   request: NextRequest,

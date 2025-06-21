@@ -1,4 +1,3 @@
-// Construct query string utility
 export function buildQueryString(
   params?: Record<string, string | number | boolean | undefined | null>,
 ): string {

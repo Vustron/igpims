@@ -1,31 +1,29 @@
 "use client"
 
+import { format } from "date-fns/format"
+import { Calendar, PiggyBank } from "lucide-react"
+import { useState } from "react"
+import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
-  DialogTitle,
-  DialogFooter,
-  DialogHeader,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialogs/dialog"
 import {
   Drawer,
-  DrawerTitle,
-  DrawerFooter,
-  DrawerHeader,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
 } from "@/components/ui/drawers"
-import { Calendar, PiggyBank } from "lucide-react"
 import { Textarea } from "@/components/ui/inputs"
-import { Button } from "@/components/ui/buttons"
-
 import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
 import { isFundRequestData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { useState } from "react"
-
-import { format } from "date-fns/format"
 
 export const CheckFundsDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()

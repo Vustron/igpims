@@ -1,8 +1,8 @@
 "use client"
 
+import { RefreshCw } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alerts"
 import { Button } from "@/components/ui/buttons"
-import { RefreshCw } from "lucide-react"
 
 interface TableErrorStateProps {
   error: Error | null

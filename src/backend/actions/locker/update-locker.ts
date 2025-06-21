@@ -1,14 +1,11 @@
-import { lockerConfigSchema } from "@/validation/locker"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next-nprogress-bar"
+import { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
+import { Locker, LockerRental } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
-
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next-nprogress-bar"
-
-import type { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
-import type { Locker, LockerRental } from "@/backend/db/schemas"
-import type { LockerConfig } from "@/validation/locker"
+import { LockerConfig, lockerConfigSchema } from "@/validation/locker"
 
 interface LockerWithRental extends Locker {
   rental?: LockerRental

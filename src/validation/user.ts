@@ -1,5 +1,5 @@
-import { passwordValidator } from "@/validation/utils"
 import { z } from "zod"
+import { passwordValidator } from "@/validation/utils"
 
 export const signUpSchema = z.object({
   name: z

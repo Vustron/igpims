@@ -1,11 +1,10 @@
+import { Metadata } from "next"
+import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
-import { preFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { ContentLayout } from "@/features/layouts/content-layout"
 import { LockerClient } from "@/features/locker-igp/locker/client"
+import { preFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { QueryHydrator } from "@/utils/query-hydrator"
-
-import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Locker",

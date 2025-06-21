@@ -1,7 +1,7 @@
 "use client"
 
-import { KeyIcon, AlertTriangleIcon, WrenchIcon } from "lucide-react"
 import { motion } from "framer-motion"
+import { AlertTriangleIcon, KeyIcon, WrenchIcon } from "lucide-react"
 
 interface LockerControlsProps {
   status: string

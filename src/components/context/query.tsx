@@ -1,21 +1,17 @@
 "use client"
 
 import {
+  defaultShouldDehydrateQuery,
   isServer,
   QueryClient,
   QueryClientProvider,
-  defaultShouldDehydrateQuery,
 } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import React, { useEffect, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import SuperJSON from "superjson"
-import React from "react"
-
 import { ErrorFallback } from "@/components/ui/fallbacks"
 
-import { useState, useEffect } from "react"
-
-// init query dev tools
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   import("@tanstack/react-query-devtools/build/modern/production.js").then(
     (d) => ({
@@ -24,7 +20,6 @@ const ReactQueryDevtoolsProduction = React.lazy(() =>
   ),
 )
 
-// init creation of query client
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
@@ -50,28 +45,21 @@ function makeQueryClient() {
 
 let browserQueryClient: QueryClient | undefined
 
-// get query client
 function getQueryClient() {
-  // if server component make a client
   if (isServer) {
     return makeQueryClient()
   }
 
-  // if the window is undefined make a client
   if (typeof window === "undefined") {
     return makeQueryClient()
   }
 
-  // if the there's no browser query client make one
   if (!browserQueryClient) browserQueryClient = makeQueryClient()
   return browserQueryClient
 }
 
 export const QueryProvider = ({ children }: { children: React.ReactNode }) => {
-  // devtools state
   const [showDevtools, setShowDevtools] = useState(false)
-
-  // query client
   const queryClient = getQueryClient()
 
   useEffect(() => {

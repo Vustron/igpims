@@ -1,9 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
-import { ArrowUp, ArrowDown } from "lucide-react"
-
 import { motion } from "framer-motion"
+import { ArrowDown, ArrowUp } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
 
 interface WaterFundsSummaryCardsProps {
   totalRevenue: number

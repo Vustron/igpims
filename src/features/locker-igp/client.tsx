@@ -1,26 +1,22 @@
 "use client"
 
-import {
-  Tabs,
-  TabsList,
-  TabsContent,
-  TabsTrigger,
-} from "@/components/ui/separators/tabs"
-import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
-
 import { ClipboardList, FileX } from "lucide-react"
+import { useEffect, useState } from "react"
 import { GiMagnifyingGlass } from "react-icons/gi"
 import { PiLockers } from "react-icons/pi"
-
+import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/separators/tabs"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { useState, useEffect } from "react"
-
-import { InspectionClient } from "./inspection/client"
-import { ViolationClient } from "./violations/client"
-import { LockerRentClient } from "./rent/client"
-import { LockersClient } from "./lockers/client"
-
 import { cn } from "@/utils/cn"
+import { InspectionClient } from "./inspection/client"
+import { LockersClient } from "./lockers/client"
+import { LockerRentClient } from "./rent/client"
+import { ViolationClient } from "./violations/client"
 
 interface TabItem {
   id: string

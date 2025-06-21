@@ -1,4 +1,5 @@
 import withBundleAnalyzer from "@next/bundle-analyzer"
+import withRspack from 'next-rspack';
 
 const withBundleAnalyzerConfig = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -70,7 +71,9 @@ const nextConfig: import("next").NextConfig = {
     staleTimes: {
       dynamic: 0,
       static: 180,
-    }
+    },
+    useLightningcss: true,
+    viewTransition: true,
   },
   serverExternalPackages: [ '@react-pdf/renderer' ],
   webpack: (config, { isServer }) => {
@@ -157,4 +160,4 @@ const nextConfig: import("next").NextConfig = {
   },
 }
 
-export default withBundleAnalyzerConfig(nextConfig)
+export default withRspack(withBundleAnalyzerConfig(nextConfig))

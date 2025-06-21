@@ -1,29 +1,26 @@
 "use client"
 
-import {
-  Form,
-  FormItem,
-  FormField,
-  FormControl,
-  FormMessage,
-  FormControlRenderer,
-} from "@/components/ui/forms"
-import { Loader2Icon, ChevronDown, ChevronUp } from "lucide-react"
-import { Button, DynamicButton } from "@/components/ui/buttons"
-import { Switch } from "@/components/ui/inputs"
+import { AnimatePresence, motion } from "framer-motion"
+import { ChevronDown, ChevronUp, Loader2Icon } from "lucide-react"
 import Image from "next/image"
-
-import { useGenerate2FA } from "@/backend/actions/user/generate-2fa"
-import { useOtpStore } from "@/hooks/use-otp-store"
+import Link from "next/link"
 import { useRouter } from "next-nprogress-bar"
 import { useEffect, useState } from "react"
-
-import { motion, AnimatePresence } from "framer-motion"
+import { FieldValues, Path, PathValue } from "react-hook-form"
+import { Button, DynamicButton } from "@/components/ui/buttons"
+import {
+  Form,
+  FormControl,
+  FormControlRenderer,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/forms"
+import { Switch } from "@/components/ui/inputs"
+import { useGenerate2FA } from "@/backend/actions/user/generate-2fa"
+import { useOtpStore } from "@/hooks/use-otp-store"
+import { DynamicFormProps } from "@/interfaces/form"
 import { cn } from "@/utils/cn"
-import Link from "next/link"
-
-import type { FieldValues, Path, PathValue } from "react-hook-form"
-import type { DynamicFormProps } from "@/interfaces/form"
 
 export const DynamicForm = <TFieldValues extends FieldValues>({
   form,

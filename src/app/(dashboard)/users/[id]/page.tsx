@@ -1,12 +1,10 @@
+import { Metadata } from "next"
+import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
 import { ContentLayout } from "@/features/layouts/content-layout"
-import { QueryHydrator } from "@/utils/query-hydrator"
 import { UserClient } from "@/features/user/client"
-
 import { preFindUserById } from "@/backend/actions/user/find-by-id"
-
-import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
-import type { Metadata } from "next"
+import { QueryHydrator } from "@/utils/query-hydrator"
 
 export const metadata: Metadata = {
   title: "User",

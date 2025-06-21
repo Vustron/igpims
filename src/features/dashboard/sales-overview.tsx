@@ -1,8 +1,8 @@
 "use client"
 
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 import { Card } from "@/components/ui/cards"
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 
 export const SalesOverview = () => {
   const data = [

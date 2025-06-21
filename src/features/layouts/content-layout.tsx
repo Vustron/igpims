@@ -1,6 +1,6 @@
 "use client"
 
-import { Navbar } from "@/features/layouts/navbar"
+import { Navbar } from "./navbar"
 
 interface ContentLayoutProps {
   children: React.ReactNode

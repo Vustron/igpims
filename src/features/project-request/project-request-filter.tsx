@@ -1,37 +1,32 @@
 "use client"
 
-import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-} from "@/components/ui/selects"
+import { format } from "date-fns"
+import { CalendarIcon, Plus, Search, X } from "lucide-react"
+import { useState } from "react"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { Calendar } from "@/components/ui/calendars"
+import { Input } from "@/components/ui/inputs"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popovers"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/selects"
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
-import { Calendar } from "@/components/ui/calendars"
-import { Search, CalendarIcon, X } from "lucide-react"
-import { Button } from "@/components/ui/buttons"
-import { Input } from "@/components/ui/inputs"
-import { Badge } from "@/components/ui/badges"
-import { Plus } from "lucide-react"
-
-import { useProjectRequestStore } from "@/features/project-request/project-request-store"
 import { useDialog } from "@/hooks/use-dialog"
-import { useState } from "react"
-
-import { format } from "date-fns"
 import { cn } from "@/utils/cn"
-
-import type { ProjectRequest } from "@/features/project-request/project-request-store"
+import { ProjectRequest, useProjectRequestStore } from "./project-request-store"
 
 type StatusOption = ProjectRequest["status"] | "all"
 

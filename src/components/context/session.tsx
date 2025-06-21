@@ -1,10 +1,7 @@
 "use client"
 
-import { createContext } from "react"
-
-import { useContext } from "react"
-
-import type { Session } from "@/backend/db/schemas"
+import { createContext, useContext } from "react"
+import { Session } from "@/backend/db/schemas"
 
 const SessionContext = createContext<Session | null>(null)
 

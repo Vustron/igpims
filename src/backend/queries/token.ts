@@ -1,5 +1,5 @@
+import { and, eq, sql } from "drizzle-orm"
 import { otpToken, resetToken, verificationToken } from "@/backend/db/schemas"
-import { sql, eq, and } from "drizzle-orm"
 import { db } from "@/config/drizzle"
 
 const findResetPasswordTokenQuery = db

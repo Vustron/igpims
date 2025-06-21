@@ -1,13 +1,10 @@
-import { text, index, integer, sqliteTable } from "drizzle-orm/sqlite-core"
-import { relations, sql } from "drizzle-orm"
+import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-
-import { projectRequest } from "./project_request"
-import { fundRequest } from "./fund_request"
-import { session } from "./session"
 import { account } from "./account"
-
-import type { InferSelectModel } from "drizzle-orm"
+import { fundRequest } from "./fund_request"
+import { projectRequest } from "./project_request"
+import { session } from "./session"
 
 export const UserRole = {
   ADMIN: "admin",

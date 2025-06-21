@@ -1,9 +1,7 @@
-import { NotificationItem } from "@/features/notification/notification-item"
-import { Badge } from "@/components/ui/badges"
-
 import { AnimatePresence } from "framer-motion"
-
-import type { Notification } from "@/features/notification/notification-types"
+import { Badge } from "@/components/ui/badges"
+import { NotificationItem } from "./notification-item"
+import { Notification } from "./notification-types"
 
 interface NotificationDateGroupProps {
   date: string

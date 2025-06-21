@@ -1,16 +1,13 @@
 import { Calendar, Clock, DollarSign, MapPin } from "lucide-react"
 import { Badge } from "@/components/ui/badges"
-
-import {
-  getRentalStatusColor,
-  getPaymentStatusColor,
-} from "@/utils/status-color"
-import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { cn } from "@/utils/cn"
-
+import { formatDateFromTimestamp } from "@/utils/date-convert"
+import {
+  getPaymentStatusColor,
+  getRentalStatusColor,
+} from "@/utils/status-color"
+import { Locker } from "@/validation/locker"
 import { InfoItem } from "./info-item"
-
-import type { Locker } from "@/validation/locker"
 
 interface RentalDetailsProps {
   rental: any

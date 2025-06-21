@@ -1,14 +1,13 @@
 "use client"
 
-import { Card, CardTitle, CardHeader, CardContent } from "@/components/ui/cards"
-import { SendResetLinkForm } from "@/features/auth/reset-password/send-reset-link-form"
-import { ResetPasswordForm } from "@/features/auth/reset-password/reset-password-form"
-import { Label } from "@/components/ui/labels"
 import { Loader2Icon } from "lucide-react"
-
-import { useCallback, useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
 import Image from "next/image"
+import { useSearchParams } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
+import { Label } from "@/components/ui/labels"
+import { ResetPasswordForm } from "./reset-password-form"
+import { SendResetLinkForm } from "./send-reset-link-form"
 
 const COOLDOWN_TIME = 3 * 60 * 1000
 

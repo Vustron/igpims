@@ -1,15 +1,12 @@
 "use client"
 
-import { SalesReportHeader } from "@/features/report/sales-report-header"
-import { SalesSummaryCards } from "@/features/report/sales-summary-card"
-import { SalesReportTabs } from "@/features/report/sales-report-tabs"
-
-import { useState, useMemo } from "react"
-
-import { generateMockSalesData } from "@/features/report/mock-data"
-import { processSalesData } from "@/features/report/data-helpers"
-
-import type { SalesData, TimeRange } from "@/features/report/sales-report-types"
+import { useMemo, useState } from "react"
+import { processSalesData } from "./data-helpers"
+import { generateMockSalesData } from "./mock-data"
+import { SalesReportHeader } from "./sales-report-header"
+import { SalesReportTabs } from "./sales-report-tabs"
+import { SalesData, TimeRange } from "./sales-report-types"
+import { SalesSummaryCards } from "./sales-summary-card"
 
 export const ReportClient = () => {
   const [salesData] = useState<SalesData[]>(generateMockSalesData())

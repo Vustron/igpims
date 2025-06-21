@@ -1,19 +1,15 @@
 "use client"
 
-import { Card } from "@/components/ui/cards"
-
-import { getStatusColor } from "@/utils/get-percentage-color"
-import { motion, AnimatePresence } from "framer-motion"
-
+import { AnimatePresence, motion } from "framer-motion"
 import { useRouter } from "next-nprogress-bar"
-
+import { Card } from "@/components/ui/cards"
+import { getStatusColor } from "@/utils/get-percentage-color"
+import { Locker } from "@/validation/locker"
+import { LockerControls } from "./locker-controls"
+import { LockerDoor } from "./locker-door"
+import { LockerHeader } from "./locker-header"
 import { LockerStatusIndicator } from "./locker-status-indicator"
 import { MaintenanceTape } from "./maintainance-tape"
-import { LockerControls } from "./locker-controls"
-import { LockerHeader } from "./locker-header"
-import { LockerDoor } from "./locker-door"
-
-import type { Locker } from "@/validation/locker"
 
 interface LockerCardProps {
   id: string

@@ -1,9 +1,8 @@
+import { Metadata } from "next"
+import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
-import { ReportClient } from "@/features/report/client"
 import { ContentLayout } from "@/features/layouts/content-layout"
-
-import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
-import type { Metadata } from "next"
+import { ReportClient } from "@/features/report/client"
 
 export const metadata: Metadata = {
   title: "Report",

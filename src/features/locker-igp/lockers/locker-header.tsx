@@ -1,9 +1,8 @@
 "use client"
 
-import { Badge } from "@/components/ui/badges"
-
-import { getStatusText } from "@/utils/get-percentage-color"
 import { motion } from "framer-motion"
+import { Badge } from "@/components/ui/badges"
+import { getStatusText } from "@/utils/get-percentage-color"
 
 interface LockerHeaderProps {
   name: string

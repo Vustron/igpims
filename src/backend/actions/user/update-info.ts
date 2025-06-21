@@ -1,13 +1,10 @@
-import { api } from "@/backend/helpers/api-client"
-import { updateUserSchema } from "@/validation/user"
-import { catchError } from "@/utils/catch-error"
-import { sanitizer } from "@/utils/sanitizer"
-
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
-
-import type { UpdateUserPayload } from "@/validation/user"
-import type { User } from "@/backend/db/schemas"
+import { User } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
+import { catchError } from "@/utils/catch-error"
+import { sanitizer } from "@/utils/sanitizer"
+import { UpdateUserPayload, updateUserSchema } from "@/validation/user"
 
 export async function updateUserInfo(payload: UpdateUserPayload, id: string) {
   return api.patch<UpdateUserPayload, User>("auth/update-info", payload, {

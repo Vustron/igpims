@@ -1,4 +1,4 @@
-import type { IgpType, SalesData } from "@/features/report/sales-report-types"
+import { IgpType, SalesData } from "./sales-report-types"
 
 export function generateMockSalesData(): SalesData[] {
   const igpTypes: IgpType[] = [

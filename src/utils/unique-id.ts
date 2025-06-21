@@ -1,7 +1,5 @@
-/* Unique Id Type */
 type UniqueId = string
 
-// Unique Id generator
 export function createUniqueId(
   length = 21,
   alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_",

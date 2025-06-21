@@ -1,9 +1,8 @@
 "use client"
 
-import { IgpTabs } from "@/features/other-igps/igp-tabs"
 import { Store } from "lucide-react"
-
 import { useState } from "react"
+import { IgpTabs } from "./igp-tabs"
 
 interface SpecificIgpProps {
   igpTab: string

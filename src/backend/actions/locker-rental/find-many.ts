@@ -1,10 +1,11 @@
-import { queryOptions, useInfiniteQuery } from "@tanstack/react-query"
-import type { LockerRental } from "@/backend/db/schemas"
+import {
+  QueryClient,
+  queryOptions,
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query"
+import { LockerRental } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
-
-import { useQuery } from "@tanstack/react-query"
-
-import type { QueryClient } from "@tanstack/react-query"
 
 export type RentalFilters = {
   page?: number

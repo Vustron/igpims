@@ -1,12 +1,12 @@
 import {
+  ArrowDownToLine,
+  CheckCircle2,
+  ClipboardCheck,
+  DollarSign,
+  FileSearch,
   FileText,
   PiggyBank,
-  FileSearch,
-  DollarSign,
   ReceiptText,
-  CheckCircle2,
-  ArrowDownToLine,
-  ClipboardCheck,
 } from "lucide-react"
 
 export interface TimelineStepType {
@@ -18,7 +18,6 @@ export interface TimelineStepType {
   rejectionReason?: string
 }
 
-// Timeline steps definition
 export const timelineSteps: TimelineStepType[] = [
   {
     id: 1,

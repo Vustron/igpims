@@ -1,18 +1,15 @@
+import { genSalt, hash } from "bcrypt-ts"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
+import { User } from "@/backend/db/schemas"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as userQuery from "@/backend/queries/user"
-import { requestJson } from "@/utils/request-json"
-import { catchError } from "@/utils/catch-error"
-import { signUpSchema } from "@/validation/user"
-import { NextResponse } from "next/server"
-import { genSalt, hash } from "bcrypt-ts"
 import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
-import { nanoid } from "nanoid"
-
-import type { User } from "@/backend/db/schemas"
-import type { SignUpPayload } from "@/validation/user"
-import type { NextRequest } from "next/server"
+import { catchError } from "@/utils/catch-error"
+import { requestJson } from "@/utils/request-json"
+import { SignUpPayload, signUpSchema } from "@/validation/user"
 
 export async function signUpUser(
   request: NextRequest,

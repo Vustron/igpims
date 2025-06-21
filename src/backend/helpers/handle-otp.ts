@@ -1,12 +1,11 @@
-import { EmailTemplate } from "@/components/ui/email/email-template"
-import * as tokenQuery from "@/backend/queries/token"
-import { transporter } from "@/config/nodemailer"
 import { render } from "@react-email/components"
+import { nanoid } from "nanoid"
+import { EmailTemplate } from "@/components/ui/email"
+import { User } from "@/backend/db/schemas"
+import * as tokenQuery from "@/backend/queries/token"
 import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
-import { nanoid } from "nanoid"
-
-import type { User } from "@/backend/db/schemas"
+import { transporter } from "@/config/nodemailer"
 
 export async function handleOTP(user: User) {
   const otpToken = nanoid(6)

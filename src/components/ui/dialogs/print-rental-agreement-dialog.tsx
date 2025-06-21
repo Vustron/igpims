@@ -1,37 +1,34 @@
 "use client"
 
 import {
+  Document,
+  Page,
+  PDFDownloadLink,
+  pdf,
+  StyleSheet,
+  Text,
+  View,
+} from "@react-pdf/renderer"
+import { format } from "date-fns"
+import { Download, Eye, Printer } from "lucide-react"
+import toast from "react-hot-toast"
+import { Button } from "@/components/ui/buttons"
+import {
   Dialog,
-  DialogTitle,
+  DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialogs"
 import {
   Drawer,
-  DrawerTitle,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  DrawerContent,
+  DrawerTitle,
 } from "@/components/ui/drawers"
-import { Printer, Download, Eye } from "lucide-react"
-import { Button } from "@/components/ui/buttons"
-
+import { isRentalReceiptData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { useDialog, isRentalReceiptData } from "@/hooks/use-dialog"
-
-import {
-  pdf,
-  Page,
-  Text,
-  View,
-  Document,
-  StyleSheet,
-  PDFDownloadLink,
-} from "@react-pdf/renderer"
-import { format } from "date-fns"
-import toast from "react-hot-toast"
-
 import type { LockerRentalWithLocker } from "@/interfaces/locker"
 
 const styles = StyleSheet.create({

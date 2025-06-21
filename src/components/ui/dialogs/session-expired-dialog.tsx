@@ -1,31 +1,29 @@
 "use client"
 
-import {
-  Drawer,
-  DrawerTitle,
-  DrawerHeader,
-  DrawerFooter,
-  DrawerContent,
-  DrawerDescription,
-} from "@/components/ui/drawers"
+import { AlertCircle, Loader2Icon } from "lucide-react"
+import { useState } from "react"
+import { toast } from "react-hot-toast"
+import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
-  DialogTitle,
-  DialogHeader,
-  DialogFooter,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialogs"
-import { Button } from "@/components/ui/buttons"
-import { AlertCircle, Loader2Icon } from "lucide-react"
-import { toast } from "react-hot-toast"
-
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawers"
 import { cleanupSession } from "@/backend/helpers/cleanup-session"
-import { catchError } from "@/utils/catch-error"
-
-import { useMediaQuery } from "@/hooks/use-media-query"
 import { useDialog } from "@/hooks/use-dialog"
-import { useState } from "react"
+import { useMediaQuery } from "@/hooks/use-media-query"
+import { catchError } from "@/utils/catch-error"
 
 export const SessionExpiredDialog = () => {
   const { isOpen, onClose, type } = useDialog()

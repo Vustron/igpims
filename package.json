@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.143",
+  "version": "1.0.144",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -92,7 +92,7 @@
     "zustand": "5.0.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.0.0",
     "@next/bundle-analyzer": "15.3.0",
     "@tailwindcss/postcss": "4.1.10",
     "@types/bun": "1.2.16",
@@ -107,6 +107,7 @@
     "cross-env": "7.0.3",
     "drizzle-kit": "0.31.1",
     "husky": "9.1.7",
+    "next-rspack": "^15.3.4",
     "postcss": "8.5.6",
     "tailwindcss": "4.1.10",
     "turbo": "2.5.4",

@@ -1,17 +1,13 @@
 "use client"
 
-import { DynamicForm } from "@/components/ui/forms"
-
 import { zodResolver } from "@hookform/resolvers/zod"
-import { sendEmailSchema } from "@/validation/user"
-import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
-import { useSendResetLink } from "@/backend/actions/user/send-reset-link"
 import { useForm } from "react-hook-form"
-
-import type { SendEmailPayload } from "@/validation/user"
-import type { FieldConfig } from "@/interfaces/form"
+import toast from "react-hot-toast"
+import { DynamicForm } from "@/components/ui/forms"
+import { useSendResetLink } from "@/backend/actions/user/send-reset-link"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { SendEmailPayload, sendEmailSchema } from "@/validation/user"
 
 interface ResetLinkFormProps {
   onSuccess?: () => void

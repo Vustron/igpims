@@ -1,26 +1,23 @@
 "use client"
 
+import { Edit, Eye, MoreHorizontal, Printer, Trash2 } from "lucide-react"
+import { useRouter } from "next-nprogress-bar"
+import toast from "react-hot-toast"
+import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
+  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  DropdownMenuContent,
 } from "@/components/ui/dropdowns"
-import { Button } from "@/components/ui/buttons"
-import { Eye, Edit, Trash2, MoreHorizontal, Printer } from "lucide-react"
-
-import { useFindRentById } from "@/backend/actions/locker-rental/find-by-id"
 import { useDeleteRent } from "@/backend/actions/locker-rental/delete-rent"
+import { useFindRentById } from "@/backend/actions/locker-rental/find-by-id"
+import { LockerRental } from "@/backend/db/schemas"
 import { useConfirm } from "@/hooks/use-confirm"
 import { useDialog } from "@/hooks/use-dialog"
-import { useRouter } from "next-nprogress-bar"
-
+import { LockerRentalWithLocker } from "@/interfaces/locker"
 import { catchError } from "@/utils/catch-error"
-import toast from "react-hot-toast"
-
-import type { LockerRentalWithLocker } from "@/interfaces/locker"
-import type { LockerRental } from "@/backend/db/schemas"
 
 interface ActionMenuProps {
   rental: LockerRental

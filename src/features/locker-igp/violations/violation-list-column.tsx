@@ -1,75 +1,61 @@
 "use client"
 
-import {
-  User,
-  Receipt,
-  Calendar,
-  AlertCircle,
-  ClipboardCopy,
-} from "lucide-react"
-
-import {
-  IdCell,
-  DateCell,
-  AmountCell,
-  SelectCell,
-  ColumnHeader,
-  ViolationCell,
-  RenterNameCell,
-  PaymentStatusCell,
-} from "./column-helpers"
+import { ColumnDef } from "@tanstack/react-table"
+import { AlertCircle, Calendar, Package, Receipt, User } from "lucide-react"
+import { Violation } from "@/backend/db/schemas"
 import { ViolationActions } from "./actions"
-
-import type { ColumnDef } from "@tanstack/react-table"
-import type { Violation } from "@/validation/violation"
+import {
+  AmountCell,
+  ColumnHeader,
+  DateCell,
+  LockerCell,
+  PaymentStatusCell,
+  RenterNameCell,
+  ViolationCell,
+} from "./column-helpers"
 
 export const violationListColumns: ColumnDef<Violation>[] = [
-  {
-    id: "select",
-    header: ({ table }) => <SelectCell table={table} />,
-    cell: ({ row }) => <SelectCell row={row} />,
-    enableSorting: false,
-    enableHiding: false,
-    size: 40,
-  },
-  {
-    accessorKey: "id",
-    header: () => (
-      <ColumnHeader
-        icon={<ClipboardCopy className="h-3.5 w-3.5" />}
-        text="ID"
-      />
-    ),
-    cell: ({ row }) => <IdCell value={row.getValue("id")} />,
-    size: 80,
-  },
   {
     accessorKey: "studentName",
     header: () => (
       <ColumnHeader icon={<User className="h-3.5 w-3.5" />} text="Student" />
     ),
     cell: ({ row }) => <RenterNameCell value={row.getValue("studentName")} />,
-    size: 120,
+    size: 140,
+  },
+  {
+    accessorKey: "lockerId",
+    header: () => (
+      <ColumnHeader icon={<Package className="h-3.5 w-3.5" />} text="Locker" />
+    ),
+    cell: ({ row }) => <LockerCell value={row.getValue("lockerId")} />,
+    size: 100,
   },
   {
     accessorKey: "violations",
     header: () => (
       <ColumnHeader
         icon={<AlertCircle className="h-3.5 w-3.5" />}
-        text="Violation"
+        text="Violations"
       />
     ),
     cell: ({ row }) => <ViolationCell value={row.getValue("violations")} />,
-    size: 120,
+    size: 150,
   },
   {
     accessorKey: "dateOfInspection",
     header: () => (
-      <ColumnHeader icon={<Calendar className="h-3.5 w-3.5" />} text="Date" />
+      <ColumnHeader
+        icon={<Calendar className="h-3.5 w-3.5" />}
+        text="Inspection"
+      />
     ),
-    cell: ({ row }) => <DateCell value={row.getValue("dateOfInspection")} />,
+    cell: ({ row }) => {
+      const timestamp = row.getValue("dateOfInspection") as number
+      return <DateCell value={timestamp} />
+    },
     sortingFn: "datetime",
-    size: 100,
+    size: 120,
   },
   {
     accessorKey: "totalFine",
@@ -85,7 +71,7 @@ export const violationListColumns: ColumnDef<Violation>[] = [
       <ColumnHeader icon={<Receipt className="h-3.5 w-3.5" />} text="Status" />
     ),
     cell: ({ row }) => <PaymentStatusCell value={row.getValue("fineStatus")} />,
-    size: 90,
+    size: 100,
   },
   {
     id: "actions",

@@ -1,12 +1,9 @@
 "use client"
 
-import { OTPInput } from "input-otp"
+import { OTPInput, SlotProps } from "input-otp"
 import { Minus } from "lucide-react"
 import * as React from "react"
-
 import { cn } from "@/utils/cn"
-
-import type { SlotProps } from "input-otp"
 
 const InputOTP = React.forwardRef<
   React.ComponentRef<typeof OTPInput>,

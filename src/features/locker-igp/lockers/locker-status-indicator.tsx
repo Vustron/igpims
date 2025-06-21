@@ -1,7 +1,7 @@
 "use client"
 
-import { getStatusIndicator } from "@/utils/get-percentage-color"
 import { motion } from "framer-motion"
+import { getStatusIndicator } from "@/utils/get-percentage-color"
 
 interface LockerStatusIndicatorProps {
   status: string

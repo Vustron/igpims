@@ -1,7 +1,7 @@
 "use client"
 
-import { WrenchIcon } from "lucide-react"
 import { motion } from "framer-motion"
+import { WrenchIcon } from "lucide-react"
 
 interface MaintenanceTapeProps {
   index: number

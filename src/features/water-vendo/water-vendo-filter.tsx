@@ -1,20 +1,18 @@
 "use client"
 
+import { AnimatePresence, motion } from "framer-motion"
+import { Filter, X } from "lucide-react"
+import { useId, useState } from "react"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { Checkbox } from "@/components/ui/checkboxes"
+import { Label } from "@/components/ui/labels"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popovers"
 import { Separator } from "@/components/ui/separators"
-import { Checkbox } from "@/components/ui/checkboxes"
-import { Button } from "@/components/ui/buttons"
-import { Label } from "@/components/ui/labels"
-import { Badge } from "@/components/ui/badges"
-import { Filter, X } from "lucide-react"
-
-import { useId, useState } from "react"
-
-import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/utils/cn"
 
 export type FilterState = {

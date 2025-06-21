@@ -1,13 +1,11 @@
+import { Metadata } from "next"
+import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
-import { LockerIgpClient } from "@/features/locker-igp/client"
 import { ContentLayout } from "@/features/layouts/content-layout"
-
-import { preFindManyRentals } from "@/backend/actions/locker-rental/find-many"
+import { LockerIgpClient } from "@/features/locker-igp/client"
 import { preFindManyLockers } from "@/backend/actions/locker/find-many"
+import { preFindManyRentals } from "@/backend/actions/locker-rental/find-many"
 import { QueryHydrator } from "@/utils/query-hydrator"
-
-import type { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Locker Rental",

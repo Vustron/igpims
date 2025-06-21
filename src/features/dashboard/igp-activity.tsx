@@ -1,4 +1,4 @@
-import { GiLockers, GiDroplets, GiClothes } from "react-icons/gi"
+import { GiClothes, GiDroplets, GiLockers } from "react-icons/gi"
 import { Card } from "@/components/ui/cards"
 import { cn } from "@/utils/cn"
 

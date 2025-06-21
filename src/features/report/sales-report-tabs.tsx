@@ -1,27 +1,26 @@
-import {
-  Tabs,
-  TabsList,
-  TabsContent,
-  TabsTrigger,
-} from "@/components/ui/separators"
+import { BarChart3, LineChart, PieChart, RefreshCw } from "lucide-react"
+import { Button } from "@/components/ui/buttons"
 import {
   Select,
-  SelectItem,
-  SelectValue,
   SelectContent,
+  SelectItem,
   SelectTrigger,
+  SelectValue,
 } from "@/components/ui/selects"
-import { BarChart3, LineChart, PieChart, RefreshCw } from "lucide-react"
-import { SalesOverviewTab } from "@/features/report/overview-tab"
-import { SalesDetailsTab } from "@/features/report/details-tab"
-import { Button } from "@/components/ui/buttons"
-
-import type {
-  SalesData,
-  TimeRange,
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/separators"
+import { SalesDetailsTab } from "./details-tab"
+import { SalesOverviewTab } from "./overview-tab"
+import {
   IgpSummary,
   MonthlySales,
-} from "@/features/report/sales-report-types"
+  SalesData,
+  TimeRange,
+} from "./sales-report-types"
 
 interface SalesReportTabsProps {
   selectedTab: "overview" | "details"

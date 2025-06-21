@@ -1,18 +1,17 @@
 "use client"
 
+import { motion } from "framer-motion"
+import { Calendar, ClipboardCopy, Receipt, Users } from "lucide-react"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { Checkbox } from "@/components/ui/checkboxes"
+import { Avatar, AvatarFallback } from "@/components/ui/images"
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
   TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltips"
-import { Calendar, ClipboardCopy, Receipt, Users } from "lucide-react"
-import { Avatar, AvatarFallback } from "@/components/ui/images"
-import { Checkbox } from "@/components/ui/checkboxes"
-import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
-
-import { motion } from "framer-motion"
 
 export const ColumnHeader = ({
   icon,

@@ -1,7 +1,6 @@
-import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core"
 import { relations, sql } from "drizzle-orm"
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-
 import { user } from "./user"
 
 export const verificationToken = sqliteTable("verificationToken", {

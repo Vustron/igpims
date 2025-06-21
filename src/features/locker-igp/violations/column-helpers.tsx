@@ -1,21 +1,23 @@
 "use client"
 
+import { format } from "date-fns/format"
+import {
+  AlertCircle,
+  Calendar,
+  ClipboardCopy,
+  Package,
+  Receipt,
+  User,
+} from "lucide-react"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { Checkbox } from "@/components/ui/checkboxes"
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
   TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltips"
-import {
-  User,
-  Receipt,
-  Calendar,
-  AlertCircle,
-  ClipboardCopy,
-} from "lucide-react"
-import { Checkbox } from "@/components/ui/checkboxes"
-import { Button } from "@/components/ui/buttons"
-import { Badge } from "@/components/ui/badges"
 
 export const ColumnHeader = ({
   icon,
@@ -24,7 +26,7 @@ export const ColumnHeader = ({
   icon: React.ReactNode
   text: string
 }) => (
-  <div className="flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
+  <div className="ml-5 flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
     {icon}
     <span>{text}</span>
   </div>
@@ -65,41 +67,100 @@ export const SelectCell = ({
   )
 }
 
-export const ViolationCell = ({ value }: { value: string }) => {
+// Updated ViolationCell to handle both string and array values
+export const ViolationCell = ({ value }: { value: string[] | string }) => {
   const getBadgeColor = (violationType: string) => {
     switch (violationType.toLowerCase()) {
+      case "lost_key":
       case "lost key":
         return "bg-amber-100 text-amber-800 border-amber-200"
+      case "damaged_locker":
       case "damaged locker":
         return "bg-red-100 text-red-800 border-red-200"
+      case "unauthorized_use":
       case "unauthorized use":
         return "bg-blue-100 text-blue-800 border-blue-200"
+      case "prohibited_items":
       case "prohibited items":
         return "bg-purple-100 text-purple-800 border-purple-200"
-      case "late renewal":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "abandoned items":
+      case "other":
         return "bg-gray-100 text-gray-800 border-gray-200"
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return "bg-slate-100 text-slate-800 border-slate-200"
     }
   }
+
+  const getViolationLabel = (violation: string) => {
+    switch (violation) {
+      case "damaged_locker":
+        return "Damaged Locker"
+      case "lost_key":
+        return "Lost Key"
+      case "unauthorized_use":
+        return "Unauthorized Use"
+      case "prohibited_items":
+        return "Prohibited Items"
+      case "other":
+        return "Other"
+      default:
+        return (
+          violation.charAt(0).toUpperCase() +
+          violation.slice(1).replace("_", " ")
+        )
+    }
+  }
+
+  let violations: string[] = []
+  try {
+    if (typeof value === "string") {
+      violations = JSON.parse(value)
+    } else if (Array.isArray(value)) {
+      violations = value
+    }
+  } catch (error) {
+    violations = typeof value === "string" ? [value] : []
+  }
+
+  violations = violations.filter((v) => v && v.trim() !== "")
+
+  if (!violations || violations.length === 0) {
+    return <span className="text-muted-foreground text-xs">No violations</span>
+  }
+
+  const primaryViolation = violations[0]
+  const hasMultiple = violations.length > 1
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Badge
-            className={`${getBadgeColor(value)} border font-medium`}
-            variant="outline"
-          >
-            {value}
-          </Badge>
+          <div className="flex items-center gap-1">
+            <Badge
+              className={`${getBadgeColor(primaryViolation!)} border font-medium text-xs`}
+              variant="outline"
+            >
+              {getViolationLabel(primaryViolation!)}
+            </Badge>
+            {hasMultiple && (
+              <Badge variant="secondary" className="text-xs">
+                +{violations.length - 1}
+              </Badge>
+            )}
+          </div>
         </TooltipTrigger>
-        <TooltipContent side="top">
-          <div className="flex items-center gap-1.5">
-            <AlertCircle className="h-3.5 w-3.5" />
-            <span>Violation Type: {value}</span>
+        <TooltipContent side="top" className="max-w-xs">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 font-medium">
+              <AlertCircle className="h-3.5 w-3.5" />
+              <span>Violations ({violations.length})</span>
+            </div>
+            <div className="space-y-1">
+              {violations.map((violation, index) => (
+                <div key={index} className="text-xs">
+                  • {getViolationLabel(violation)}
+                </div>
+              ))}
+            </div>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -108,32 +169,26 @@ export const ViolationCell = ({ value }: { value: string }) => {
 }
 
 export const DateCell = ({ value }: { value: number }) => {
-  const date = new Date(value)
-  const formattedDate = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date)
+  const date = typeof value === "string" ? new Date(value) : new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return (
+      <div className="whitespace-nowrap text-red-500 text-xs">Invalid Date</div>
+    )
+  }
+
+  const formattedDate = format(date, "MMM dd, yyyy")
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="whitespace-nowrap text-xs">{formattedDate}</span>
+          <div className="whitespace-nowrap text-xs">{formattedDate}</div>
         </TooltipTrigger>
         <TooltipContent side="top">
-          <div className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5" />
-            <span>
-              {date.toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
+          <div className="flex items-center">
+            <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+            {format(date, "PPP")}
           </div>
         </TooltipContent>
       </Tooltip>
@@ -142,15 +197,19 @@ export const DateCell = ({ value }: { value: number }) => {
 }
 
 export const IdCell = ({ value }: { value: string }) => {
+  const shortId = value.slice(0, 8)
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="font-medium font-mono text-xs">{value}</span>
+          <span className="font-medium font-mono text-muted-foreground text-xs transition-colors hover:text-foreground">
+            {shortId}...
+          </span>
         </TooltipTrigger>
         <TooltipContent side="top">
           <div className="flex items-center gap-1.5">
-            <span>ID: {value}</span>
+            <span className="font-mono text-xs">{value}</span>
             <Button
               size="icon"
               variant="ghost"
@@ -167,13 +226,47 @@ export const IdCell = ({ value }: { value: string }) => {
   )
 }
 
-export const RenterNameCell = ({ value }: { value: string }) => {
+export const LockerCell = ({ value }: { value: string }) => {
+  const shortId = value.slice(0, 8)
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex items-center gap-1.5">
-            <span className="max-w-[100px] truncate font-medium text-xs">
+            <Package className="h-3 w-3 text-muted-foreground" />
+            <span className="font-medium font-mono text-muted-foreground text-xs transition-colors hover:text-foreground">
+              {shortId}...
+            </span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <div className="flex items-center gap-1.5">
+            <Package className="h-3.5 w-3.5" />
+            <span>Locker ID: {value}</span>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-5 w-5"
+              onClick={() => navigator.clipboard.writeText(value)}
+            >
+              <ClipboardCopy className="h-3 w-3" />
+              <span className="sr-only">Copy Locker ID</span>
+            </Button>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
+export const RenterNameCell = ({ value }: { value: string }) => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="ml-5 flex items-center gap-1.5">
+            <span className="max-w-[120px] truncate font-medium text-xs">
               {value}
             </span>
           </div>
@@ -197,16 +290,29 @@ export const AmountCell = ({ value }: { value: number }) => {
     maximumFractionDigits: 0,
   }).format(value)
 
+  const isHighAmount = value >= 1000
+  const isMediumAmount = value >= 500
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="font-medium text-xs">{formatted}</span>
+          <span
+            className={`font-medium text-xs ${
+              isHighAmount
+                ? "text-red-600"
+                : isMediumAmount
+                  ? "text-amber-600"
+                  : "text-foreground"
+            }`}
+          >
+            {formatted}
+          </span>
         </TooltipTrigger>
         <TooltipContent side="top">
           <div className="flex items-center gap-1.5">
             <Receipt className="h-3.5 w-3.5" />
-            <span>Amount: {formatted}</span>
+            <span>Total Fine: {formatted}</span>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -236,13 +342,18 @@ export const PaymentStatusCell = ({ value }: { value: string }) => {
     switch (status) {
       case "under_review":
         return "Under Review"
+      case "partial":
+        return "Partial"
       default:
         return status.charAt(0).toUpperCase() + status.slice(1)
     }
   }
 
   return (
-    <Badge className={`${getStatusStyles(value)} border`} variant="outline">
+    <Badge
+      className={`${getStatusStyles(value)} border text-xs`}
+      variant="outline"
+    >
       {getStatusLabel(value)}
     </Badge>
   )

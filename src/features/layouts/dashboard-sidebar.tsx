@@ -1,12 +1,10 @@
 "use client"
 
-import { Footer } from "@/features/layouts/footer"
 import { Sidebar } from "@/components/ui/sidebar"
-
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle"
 import { useStore } from "@/hooks/use-store"
-
 import { cn } from "@/utils/cn"
+import { Footer } from "./footer"
 
 export const DashboardSideBar = ({
   children,
