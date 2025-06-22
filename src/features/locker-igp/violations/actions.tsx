@@ -1,6 +1,6 @@
 "use client"
 
-import { FilePen, MoreHorizontal, Printer, Trash } from "lucide-react"
+import { FilePen, MoreHorizontal, Trash } from "lucide-react"
 import toast from "react-hot-toast"
 import { Button } from "@/components/ui/buttons"
 import {
@@ -34,11 +34,6 @@ export const ViolationActions = ({ violation }: { violation: Violation }) => {
     })
   }
 
-  const handlePrint = () => {
-    toast.success("Report being prepared for printing")
-    window.print()
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -49,7 +44,7 @@ export const ViolationActions = ({ violation }: { violation: Violation }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuLabel className="text-xs">Actions</DropdownMenuLabel>
-
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer text-xs"
           onClick={handleEdit}
@@ -59,13 +54,8 @@ export const ViolationActions = ({ violation }: { violation: Violation }) => {
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer text-xs"
-          onClick={handlePrint}
+          onClick={handleDelete}
         >
-          <Printer className="mr-2 h-3.5 w-3.5" />
-          Print Report
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer" onClick={handleDelete}>
           <Trash className="mr-2 h-3.5 w-3.5" />
           Delete Record
         </DropdownMenuItem>

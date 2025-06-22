@@ -72,8 +72,6 @@ const nextConfig: import("next").NextConfig = {
       dynamic: 0,
       static: 180,
     },
-    useLightningcss: true,
-    viewTransition: true,
   },
   serverExternalPackages: [ '@react-pdf/renderer' ],
   webpack: (config, { isServer }) => {

@@ -67,7 +67,6 @@ export const SelectCell = ({
   )
 }
 
-// Updated ViolationCell to handle both string and array values
 export const ViolationCell = ({ value }: { value: string[] | string }) => {
   const getBadgeColor = (violationType: string) => {
     switch (violationType.toLowerCase()) {
@@ -91,7 +90,7 @@ export const ViolationCell = ({ value }: { value: string[] | string }) => {
   }
 
   const getViolationLabel = (violation: string) => {
-    switch (violation) {
+    switch (violation.toLowerCase()) {
       case "damaged_locker":
         return "Damaged Locker"
       case "lost_key":
@@ -105,20 +104,30 @@ export const ViolationCell = ({ value }: { value: string[] | string }) => {
       default:
         return (
           violation.charAt(0).toUpperCase() +
-          violation.slice(1).replace("_", " ")
+          violation.slice(1).replace(/_/g, " ")
         )
     }
   }
 
   let violations: string[] = []
-  try {
-    if (typeof value === "string") {
+
+  if (Array.isArray(value)) {
+    violations = value.flatMap((item) => {
+      if (typeof item === "string") {
+        try {
+          return JSON.parse(item)
+        } catch {
+          return [item]
+        }
+      }
+      return [item]
+    })
+  } else if (typeof value === "string") {
+    try {
       violations = JSON.parse(value)
-    } else if (Array.isArray(value)) {
-      violations = value
+    } catch {
+      violations = [value]
     }
-  } catch (error) {
-    violations = typeof value === "string" ? [value] : []
   }
 
   violations = violations.filter((v) => v && v.trim() !== "")

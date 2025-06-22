@@ -27,3 +27,10 @@ export const formatDateFromTimestamp = (timestamp: number) => {
     return "Invalid Date"
   }
 }
+
+export const convertDateToEpoch = (date: any) => {
+  if (!date) return null
+  if (date instanceof Date) return date.getTime()
+  if (typeof date === "string") return new Date(date).getTime()
+  return date
+}

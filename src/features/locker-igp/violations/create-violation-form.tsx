@@ -28,14 +28,20 @@ export const ViolationForm = ({
     violation?.lockerId || "",
   )
   const [selectedViolations, setSelectedViolations] = useState<string[]>(
-    violation?.violations || [],
+    Array.isArray(violation?.violations)
+      ? violation.violations.map((v) => String(v).trim()).filter((v) => v)
+      : [],
   )
 
-  const { data: lockersData, isLoading: isLoadingLockers } = useFindManyLockers(
-    {
-      limit: 10,
-    },
-  )
+  const {
+    data: lockersData,
+    isLoading: isLoadingLockers,
+    isError,
+  } = useFindManyLockers({
+    limit: 100,
+  })
+
+  const [isFormReady, setIsFormReady] = useState(false)
 
   const violationOptions = [
     { value: "damaged_locker", label: "Damaged Locker" },
@@ -48,7 +54,7 @@ export const ViolationForm = ({
   const lockerOptions =
     lockersData?.data.map((locker) => ({
       value: locker.id,
-      label: `${locker.lockerName} (${locker.lockerLocation})`,
+      label: `${locker.lockerName}`,
     })) || []
 
   const form = useForm<Omit<Violation, "id">>({
@@ -65,15 +71,14 @@ export const ViolationForm = ({
 
   useEffect(() => {
     form.setValue("lockerId", selectedLocker)
-
-    const safeViolations = selectedViolations.filter(
-      (v) => typeof v === "string",
-    ) as string[]
-    form.setValue(
-      "violations",
-      safeViolations.length > 0 ? safeViolations : [""],
-    )
+    form.setValue("violations", selectedViolations)
   }, [selectedLocker, selectedViolations, form])
+
+  useEffect(() => {
+    if (!isLoadingLockers && (lockersData?.data?.length! > 0 || isError)) {
+      setIsFormReady(true)
+    }
+  }, [isLoadingLockers, lockersData, isError])
 
   const violationFields: FieldConfig<Omit<Violation, "id">>[] = [
     {
@@ -140,7 +145,21 @@ export const ViolationForm = ({
       toast.error("Please select a locker")
       return
     }
-    if (values.violations.length === 0) {
+    if (!values.violations || values.violations.length === 0) {
+      toast.error("Please select at least one violation")
+      return
+    }
+
+    const violationsArray = Array.isArray(values.violations)
+      ? values.violations
+      : typeof values.violations === "string"
+        ? values.violations
+            .split(",")
+            .map((v) => v.trim())
+            .filter((v) => v)
+        : []
+
+    if (violationsArray.length === 0) {
       toast.error("Please select at least one violation")
       return
     }
@@ -149,7 +168,7 @@ export const ViolationForm = ({
       ...values,
       dateOfInspection: new Date(values.dateOfInspection).setHours(0, 0, 0, 0),
       totalFine: Number(values.totalFine),
-      violations: values.violations.filter((v: string) => v.trim() !== ""),
+      violations: violationsArray,
     }
 
     await toast.promise(createViolation.mutateAsync(submissionData), {
@@ -169,10 +188,19 @@ export const ViolationForm = ({
     }
   }
 
-  if (isLoadingLockers) {
+  if (isLoadingLockers || !isFormReady) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (isError || (!isLoadingLockers && lockerOptions.length === 0)) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+        <h3 className="mb-2 font-semibold">Error Loading Form</h3>
+        <p>There was a problem loading the locker data.</p>
       </div>
     )
   }

@@ -41,7 +41,14 @@ export async function findViolationById(
       )
     }
 
-    return NextResponse.json(result, { status: 200 })
+    const responseData = {
+      ...result,
+      dateOfInspection: result.dateOfInspection
+        ? new Date(result.dateOfInspection).getTime()
+        : null,
+    }
+
+    return NextResponse.json(responseData, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

@@ -8,7 +8,7 @@ import toast from "react-hot-toast"
 import { DynamicForm } from "@/components/ui/forms"
 import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { useUpdateViolation } from "@/backend/actions/violation/update-violation"
-import { Violation } from "@/backend/db/schemas"
+import { parseViolations } from "@/backend/helpers/violation-helpers"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import {
@@ -17,7 +17,7 @@ import {
 } from "@/validation/violation"
 
 interface EditViolationFormProps {
-  violation: Violation
+  violation: UpdateViolation
   onSuccess?: () => void
   onError?: () => void
 }
@@ -28,18 +28,34 @@ export const EditViolationForm = ({
   onError,
 }: EditViolationFormProps) => {
   const updateViolation = useUpdateViolation(violation.id!)
-  const [selectedLocker, setSelectedLocker] = useState(
-    violation?.lockerId || "",
-  )
-  const [selectedViolations, setSelectedViolations] = useState<string[]>(
-    violation?.violations || [],
-  )
+  const {
+    data: lockersData,
+    isLoading: isLoadingLockers,
+    isError,
+  } = useFindManyLockers({
+    limit: 100,
+  })
 
-  const { data: lockersData, isLoading: isLoadingLockers } = useFindManyLockers(
-    {
-      limit: 10,
+  const [isFormReady, setIsFormReady] = useState(false)
+
+  const form = useForm<UpdateViolation>({
+    resolver: zodResolver(ViolationSchema),
+    defaultValues: {
+      id: violation.id,
+      lockerId: violation.lockerId,
+      studentName: violation.studentName,
+      violations: parseViolations(violation.violations),
+      dateOfInspection: violation.dateOfInspection,
+      totalFine: violation.totalFine,
+      fineStatus: violation.fineStatus,
     },
-  )
+  })
+
+  useEffect(() => {
+    if (!isLoadingLockers && (lockersData?.data?.length! > 0 || isError)) {
+      setIsFormReady(true)
+    }
+  }, [isLoadingLockers, lockersData, isError])
 
   const violationOptions = [
     { value: "damaged_locker", label: "Damaged Locker" },
@@ -52,49 +68,8 @@ export const EditViolationForm = ({
   const lockerOptions =
     lockersData?.data.map((locker) => ({
       value: locker.id,
-      label: `${locker.lockerName} (${locker.lockerLocation})`,
+      label: `${locker.lockerName}`,
     })) || []
-
-  const form = useForm<UpdateViolation>({
-    resolver: zodResolver(ViolationSchema),
-    defaultValues: {
-      id: violation.id,
-      lockerId: violation.lockerId,
-      studentName: violation.studentName,
-      violations: violation.violations,
-      dateOfInspection: violation.dateOfInspection,
-      totalFine: violation.totalFine,
-      fineStatus: violation.fineStatus,
-    },
-  })
-
-  useEffect(() => {
-    form.setValue("lockerId", selectedLocker)
-
-    const safeViolations = selectedViolations.filter(
-      (v) => typeof v === "string",
-    ) as string[]
-    form.setValue(
-      "violations",
-      safeViolations.length > 0 ? safeViolations : [""],
-    )
-  }, [selectedLocker, selectedViolations, form])
-
-  useEffect(() => {
-    if (violation) {
-      form.reset({
-        id: violation.id,
-        lockerId: violation.lockerId,
-        studentName: violation.studentName,
-        violations: violation.violations,
-        dateOfInspection: violation.dateOfInspection,
-        totalFine: violation.totalFine,
-        fineStatus: violation.fineStatus,
-      })
-      setSelectedLocker(violation.lockerId)
-      setSelectedViolations(violation.violations)
-    }
-  }, [violation, form])
 
   const violationFields: FieldConfig<UpdateViolation>[] = [
     {
@@ -161,7 +136,8 @@ export const EditViolationForm = ({
       toast.error("Please select a locker")
       return
     }
-    if (values.violations.length === 0) {
+
+    if (!values.violations || values.violations.length === 0) {
       toast.error("Please select at least one violation")
       return
     }
@@ -170,26 +146,39 @@ export const EditViolationForm = ({
       ...values,
       dateOfInspection: new Date(values.dateOfInspection).setHours(0, 0, 0, 0),
       totalFine: Number(values.totalFine),
-      violations: values.violations.filter((v: string) => v.trim() !== ""),
+      violations: values.violations,
     }
 
-    await toast.promise(updateViolation.mutateAsync(submissionData), {
-      loading: <span className="animate-pulse">Updating violation...</span>,
-      success: "Violation successfully updated",
-      error: (error: unknown) => catchError(error),
-    })
+    try {
+      await toast.promise(updateViolation.mutateAsync(submissionData), {
+        loading: <span className="animate-pulse">Updating violation...</span>,
+        success: "Violation successfully updated",
+        error: (error: unknown) => catchError(error),
+      })
 
-    if (updateViolation.isSuccess) {
-      onSuccess?.()
-    } else {
-      onError?.()
+      if (updateViolation.isSuccess) {
+        onSuccess?.()
+      } else {
+        onError?.()
+      }
+    } catch (error) {
+      catchError(error)
     }
   }
 
-  if (isLoadingLockers) {
+  if (isLoadingLockers || !isFormReady) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (isError || (!isLoadingLockers && lockerOptions.length === 0)) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+        <h3 className="mb-2 font-semibold">Error Loading Form</h3>
+        <p>There was a problem loading the locker data.</p>
       </div>
     )
   }

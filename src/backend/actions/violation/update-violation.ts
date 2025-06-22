@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next-nprogress-bar"
 import { api } from "@/backend/helpers/api-client"
+import { normalizeViolations } from "@/backend/helpers/violation-helpers"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
 import { Violation, ViolationSchema } from "@/validation/violation"
@@ -26,15 +27,22 @@ export const useUpdateViolation = (id: string) => {
   return useMutation({
     mutationKey: ["update-violation", id],
     mutationFn: async (payload: Partial<Violation>) => {
+      const normalizedViolations = normalizeViolations(payload.violations)
+
       const sanitizedData = sanitizer<Partial<Violation>>(
-        payload,
+        {
+          ...payload,
+          violations: normalizedViolations,
+        },
         ViolationSchema.partial(),
       )
       return await updateViolation(id, sanitizedData)
     },
     onMutate: async (updatedData) => {
-      await queryClient.cancelQueries({ queryKey: ["violations"] })
-      await queryClient.cancelQueries({ queryKey: ["violation", id] })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["violations"] }),
+        queryClient.cancelQueries({ queryKey: ["violation", id] }),
+      ])
 
       const previousViolation = queryClient.getQueryData<Violation>([
         "violation",
@@ -42,18 +50,25 @@ export const useUpdateViolation = (id: string) => {
       ])
       const previousViolations = queryClient.getQueryData(["violations"])
 
+      const normalizedViolations = normalizeViolations(updatedData.violations)
+
       if (previousViolation) {
         queryClient.setQueryData(["violation", id], {
           ...previousViolation,
           ...updatedData,
-          updatedAt: new Date(),
+          violations: normalizedViolations,
         })
       }
 
       return { previousViolation, previousViolations }
     },
     onSuccess: (updatedViolation: Violation) => {
-      queryClient.setQueryData(["violation", id], updatedViolation)
+      const normalizedViolation = {
+        ...updatedViolation,
+        violations: normalizeViolations(updatedViolation.violations),
+      }
+
+      queryClient.setQueryData(["violation", id], normalizedViolation)
 
       queryClient.setQueriesData<PaginatedViolationsResponse>(
         { queryKey: ["violations"] },
@@ -63,11 +78,37 @@ export const useUpdateViolation = (id: string) => {
           return {
             ...oldData,
             data: oldData.data.map((violation) =>
-              violation.id === id ? updatedViolation : violation,
+              violation.id === id ? normalizedViolation : violation,
             ),
           }
         },
       )
+
+      const infiniteQueries = queryClient.getQueriesData({
+        queryKey: ["violations-infinite"],
+      })
+
+      infiniteQueries.forEach(([queryKey, oldData]: [any, any]) => {
+        if (oldData?.pages) {
+          const newPages = oldData.pages.map((page: any) => {
+            if (!page?.data) return page
+
+            const updatedData = page.data.map((violation: Violation) =>
+              violation.id === id ? normalizedViolation : violation,
+            )
+
+            return {
+              ...page,
+              data: updatedData,
+            }
+          })
+
+          queryClient.setQueryData(queryKey, {
+            ...oldData,
+            pages: newPages,
+          })
+        }
+      })
     },
     onError: (error, _variables, context) => {
       if (context?.previousViolation) {

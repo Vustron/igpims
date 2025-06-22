@@ -34,11 +34,13 @@ export const useUpdateRent = (id: string) => {
       return await updateRent(id, sanitizedData)
     },
     onMutate: async (updatedData) => {
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rental", id] })
-      await queryClient.cancelQueries({ queryKey: ["lockers"] })
-      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rental", id] }),
+        queryClient.cancelQueries({ queryKey: ["lockers"] }),
+        queryClient.cancelQueries({ queryKey: ["lockers-infinite"] }),
+      ])
 
       const previousRental = queryClient.getQueryData<LockerRental>([
         "locker-rental",
@@ -61,10 +63,10 @@ export const useUpdateRent = (id: string) => {
         const optimisticRental: LockerRental = {
           ...previousRental,
           ...updatedData,
-          updatedAt: new Date(),
         }
 
         queryClient.setQueryData(["locker-rental", id], optimisticRental)
+
         queryClient.setQueriesData<PaginatedRentalsResponse>(
           { queryKey: ["locker-rentals"] },
           (oldData) => {
@@ -80,6 +82,48 @@ export const useUpdateRent = (id: string) => {
         )
 
         if (isChangingLocker) {
+          if (currentLockerId) {
+            queryClient.setQueryData(
+              ["locker", currentLockerId],
+              (oldData: any) => {
+                if (!oldData) return oldData
+                return {
+                  ...oldData,
+                  lockerStatus: "available",
+                  updatedAt: Date.now(),
+                }
+              },
+            )
+
+            queryClient.setQueriesData(
+              { queryKey: ["lockers"] },
+              (oldData: any) => {
+                if (!oldData?.data) return oldData
+
+                return {
+                  ...oldData,
+                  data: oldData.data.map((locker: any) => {
+                    if (locker.id === currentLockerId) {
+                      return {
+                        ...locker,
+                        lockerStatus: "available",
+                      }
+                    }
+                    return locker
+                  }),
+                }
+              },
+            )
+          }
+
+          queryClient.setQueryData(["locker", newLockerId], (oldData: any) => {
+            if (!oldData) return oldData
+            return {
+              ...oldData,
+              lockerStatus: "occupied",
+            }
+          })
+
           queryClient.setQueriesData(
             { queryKey: ["lockers"] },
             (oldData: any) => {
@@ -89,10 +133,10 @@ export const useUpdateRent = (id: string) => {
                 ...oldData,
                 data: oldData.data.map((locker: any) => {
                   if (locker.id === newLockerId) {
-                    return { ...locker, lockerStatus: "occupied" }
-                  }
-                  if (locker.id === currentLockerId) {
-                    return { ...locker, lockerStatus: "available" }
+                    return {
+                      ...locker,
+                      lockerStatus: "occupied",
+                    }
                   }
                   return locker
                 }),
@@ -111,10 +155,16 @@ export const useUpdateRent = (id: string) => {
                   ...page,
                   data: page.data.map((locker: any) => {
                     if (locker.id === newLockerId) {
-                      return { ...locker, lockerStatus: "occupied" }
+                      return {
+                        ...locker,
+                        lockerStatus: "occupied",
+                      }
                     }
-                    if (locker.id === currentLockerId) {
-                      return { ...locker, lockerStatus: "available" }
+                    if (currentLockerId && locker.id === currentLockerId) {
+                      return {
+                        ...locker,
+                        lockerStatus: "available",
+                      }
                     }
                     return locker
                   }),
@@ -135,8 +185,9 @@ export const useUpdateRent = (id: string) => {
         newLockerId: isChangingLocker ? newLockerId : undefined,
       }
     },
-    onSuccess: async (updatedRental: LockerRental, _variables, context) => {
+    onSuccess: async (updatedRental: LockerRental, _variables, _context) => {
       queryClient.setQueryData(["locker-rental", id], updatedRental)
+
       queryClient.setQueriesData<PaginatedRentalsResponse>(
         { queryKey: ["locker-rentals"] },
         (oldData) => {
@@ -167,50 +218,6 @@ export const useUpdateRent = (id: string) => {
           }
         },
       )
-
-      if (context?.newLockerId) {
-        queryClient.setQueriesData(
-          { queryKey: ["locker", context.newLockerId] },
-          (oldData: any) => {
-            if (!oldData) return oldData
-
-            return {
-              ...oldData,
-              lockerStatus: "occupied",
-              rental: updatedRental,
-            }
-          },
-        )
-
-        if (context.currentLockerId) {
-          queryClient.setQueriesData(
-            { queryKey: ["locker", context.currentLockerId] },
-            (oldData: any) => {
-              if (!oldData) return oldData
-
-              return {
-                ...oldData,
-                lockerStatus: "available",
-                rental: null,
-              }
-            },
-          )
-        }
-      }
-
-      if (context?.currentLockerId) {
-        queryClient.invalidateQueries({
-          queryKey: ["locker", context.currentLockerId],
-          exact: true,
-        })
-      }
-
-      if (context?.newLockerId) {
-        queryClient.invalidateQueries({
-          queryKey: ["locker", context.newLockerId],
-          exact: true,
-        })
-      }
     },
     onError: (error, _variables, context) => {
       if (context?.previousRental) {
@@ -232,6 +239,32 @@ export const useUpdateRent = (id: string) => {
         queryClient.setQueryData(
           ["lockers-infinite"],
           context.previousLockersInfinite,
+        )
+      }
+      if (context?.currentLockerId) {
+        queryClient.setQueryData(
+          ["locker", context.currentLockerId],
+          (oldData: any) => {
+            if (!oldData) return oldData
+            return {
+              ...oldData,
+              lockerStatus: "occupied",
+              updatedAt: context.previousRental?.updatedAt,
+            }
+          },
+        )
+      }
+      if (context?.newLockerId) {
+        queryClient.setQueryData(
+          ["locker", context.newLockerId],
+          (oldData: any) => {
+            if (!oldData) return oldData
+            return {
+              ...oldData,
+              lockerStatus: "available",
+              updatedAt: context.previousRental?.updatedAt,
+            }
+          },
         )
       }
 

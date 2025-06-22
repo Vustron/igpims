@@ -22,8 +22,10 @@ export const useCreateLocker = () => {
       return await createLocker(sanitizedData)
     },
     onMutate: async (newLockerData) => {
-      await queryClient.cancelQueries({ queryKey: ["lockers"] })
-      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["lockers"] }),
+        queryClient.cancelQueries({ queryKey: ["lockers-infinite"] }),
+      ])
 
       const previousLockers =
         queryClient.getQueryData<PaginatedLockersResponse>(["lockers"])
@@ -31,15 +33,13 @@ export const useCreateLocker = () => {
         "lockers-infinite",
       ])
 
-      const optimisticLocker: Partial<Locker> = {
+      const optimisticLocker: any = {
         id: `temp-${Date.now()}`,
-        lockerName: newLockerData.lockerName,
-        lockerType: newLockerData.lockerType,
+        lockerName: newLockerData.lockerName!,
+        lockerType: newLockerData.lockerType!,
         lockerLocation: newLockerData.lockerLocation,
-        lockerStatus: newLockerData.lockerStatus,
-        lockerRentalPrice: Number(newLockerData.lockerRentalPrice),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        lockerStatus: newLockerData.lockerStatus || "available",
+        lockerRentalPrice: Number(newLockerData.lockerRentalPrice) || 0,
       }
 
       if (previousLockers) {
@@ -47,7 +47,7 @@ export const useCreateLocker = () => {
           ["lockers"],
           (old) => ({
             ...old!,
-            data: [optimisticLocker as Locker, ...old!.data],
+            data: [optimisticLocker, ...old!.data],
             meta: {
               ...old!.meta,
               totalItems: old!.meta.totalItems + 1,
@@ -58,6 +58,34 @@ export const useCreateLocker = () => {
           }),
         )
       }
+
+      queryClient.setQueriesData(
+        { queryKey: ["lockers-infinite"] },
+        (oldData: any) => {
+          if (!oldData?.pages) return oldData
+
+          const updatedPages = [...oldData.pages]
+          if (updatedPages.length > 0 && updatedPages[0]?.data) {
+            updatedPages[0] = {
+              ...updatedPages[0],
+              data: [optimisticLocker, ...updatedPages[0].data],
+              meta: {
+                ...updatedPages[0].meta,
+                totalItems: updatedPages[0].meta.totalItems + 1,
+                totalPages: Math.ceil(
+                  (updatedPages[0].meta.totalItems + 1) /
+                    updatedPages[0].meta.limit,
+                ),
+              },
+            }
+          }
+
+          return {
+            ...oldData,
+            pages: updatedPages,
+          }
+        },
+      )
 
       return { previousLockers, previousLockersInfinite }
     },
@@ -76,33 +104,14 @@ export const useCreateLocker = () => {
               newLocker,
               ...filteredData.slice(0, oldData.meta.limit - 1),
             ]
-            const newTotalItems = oldData.meta.totalItems + 1
 
             return {
               ...oldData,
               data: updatedData,
-              meta: {
-                ...oldData.meta,
-                totalItems: newTotalItems,
-                totalPages: Math.ceil(newTotalItems / oldData.meta.limit),
-                hasNextPage:
-                  oldData.meta.page <
-                  Math.ceil(newTotalItems / oldData.meta.limit),
-                hasPrevPage: oldData.meta.page > 1,
-              },
             }
           }
 
-          return {
-            ...oldData,
-            meta: {
-              ...oldData.meta,
-              totalItems: oldData.meta.totalItems + 1,
-              totalPages: Math.ceil(
-                (oldData.meta.totalItems + 1) / oldData.meta.limit,
-              ),
-            },
-          }
+          return oldData
         },
       )
 
@@ -111,32 +120,21 @@ export const useCreateLocker = () => {
         (oldData: any) => {
           if (!oldData?.pages) return oldData
 
-          const updatedPages = [...oldData.pages]
+          const updatedPages = oldData.pages.map(
+            (page: PaginatedLockersResponse) => {
+              const filteredData = page.data.filter(
+                (item) => !item.id.toString().startsWith("temp-"),
+              )
 
-          if (updatedPages.length > 0 && updatedPages[0]?.data) {
-            const firstPage = { ...updatedPages[0] }
-
-            firstPage.data = firstPage.data.filter(
-              (item: { id: { toString: () => string } }) =>
-                !item.id.toString().startsWith("temp-"),
-            )
-
-            const newTotalItems = firstPage.meta.totalItems + 1
-
-            updatedPages[0] = {
-              ...firstPage,
-              data: [newLocker, ...firstPage.data],
-              meta: {
-                ...firstPage.meta,
-                totalItems: newTotalItems,
-                totalPages: Math.ceil(newTotalItems / firstPage.meta.limit),
-                hasNextPage:
-                  firstPage.meta.page <
-                  Math.ceil(newTotalItems / firstPage.meta.limit),
-                hasPrevPage: firstPage.meta.page > 1,
-              },
-            }
-          }
+              return {
+                ...page,
+                data:
+                  page.meta.page === 1
+                    ? [newLocker, ...filteredData]
+                    : filteredData,
+              }
+            },
+          )
 
           return {
             ...oldData,
@@ -144,7 +142,8 @@ export const useCreateLocker = () => {
           }
         },
       )
-      queryClient.invalidateQueries({ queryKey: ["lockers"], exact: false })
+
+      queryClient.setQueryData(["locker", newLocker.id], newLocker)
     },
     onError: (error, _variables, context) => {
       if (context?.previousLockers) {
@@ -156,7 +155,6 @@ export const useCreateLocker = () => {
           context.previousLockersInfinite,
         )
       }
-
       catchError(error)
     },
     onSettled: () => {

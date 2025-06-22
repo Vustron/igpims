@@ -15,16 +15,18 @@ export const useDeleteLockerById = (id: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: [`delete-locker-by-id-${id}`],
+    mutationKey: ["delete-locker", id],
     mutationFn: async () => {
       return await deleteLockerById(id)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["lockers"] })
-      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
-      await queryClient.cancelQueries({ queryKey: ["locker", id] })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["lockers"] }),
+        queryClient.cancelQueries({ queryKey: ["lockers-infinite"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] }),
+        queryClient.cancelQueries({ queryKey: ["locker", id] }),
+      ])
 
       const previousLockers =
         queryClient.getQueryData<PaginatedLockersResponse>(["lockers"])
@@ -55,51 +57,13 @@ export const useDeleteLockerById = (id: string) => {
         )
       }
 
-      return {
-        previousLocker,
-        previousLockers,
-        previousLockersInfinite,
-        previousRentals,
-        previousRentalsInfinite,
-      }
-    },
-    onSuccess: async () => {
-      queryClient.setQueriesData<PaginatedLockersResponse>(
-        { queryKey: ["lockers"] },
-        (oldData) => {
-          if (!oldData || !oldData.data) return oldData
-
-          const filteredData = oldData.data.filter((locker) => locker.id !== id)
-          const newTotalItems = Math.max(0, oldData.meta.totalItems - 1)
-
-          return {
-            ...oldData,
-            data: filteredData,
-            meta: {
-              ...oldData.meta,
-              totalItems: newTotalItems,
-              totalPages: Math.max(
-                1,
-                Math.ceil(newTotalItems / oldData.meta.limit),
-              ),
-              hasNextPage:
-                oldData.meta.page <
-                Math.ceil(newTotalItems / oldData.meta.limit),
-              hasPrevPage: oldData.meta.page > 1,
-            },
-          }
-        },
-      )
-
       queryClient.setQueriesData(
         { queryKey: ["lockers-infinite"] },
         (oldData: any) => {
-          if (!oldData || !oldData.pages) return oldData
+          if (!oldData?.pages) return oldData
 
           const updatedPages = oldData.pages.map(
             (page: PaginatedLockersResponse) => {
-              if (!page || !page.data) return page
-
               const filteredData = page.data.filter(
                 (locker) => locker.id !== id,
               )
@@ -115,9 +79,6 @@ export const useDeleteLockerById = (id: string) => {
                     1,
                     Math.ceil(newTotalItems / page.meta.limit),
                   ),
-                  hasNextPage:
-                    page.meta.page < Math.ceil(newTotalItems / page.meta.limit),
-                  hasPrevPage: page.meta.page > 1,
                 },
               }
             },
@@ -134,7 +95,6 @@ export const useDeleteLockerById = (id: string) => {
         { queryKey: ["locker-rentals"] },
         (oldData: any) => {
           if (!oldData?.data) return oldData
-
           return {
             ...oldData,
             data: oldData.data.filter((rental: any) => rental.lockerId !== id),
@@ -143,9 +103,14 @@ export const useDeleteLockerById = (id: string) => {
       )
 
       queryClient.removeQueries({ queryKey: ["locker", id] })
-      queryClient.invalidateQueries({ queryKey: ["lockers"], exact: false })
 
-      router.push("/locker-rental")
+      return {
+        previousLocker,
+        previousLockers,
+        previousLockersInfinite,
+        previousRentals,
+        previousRentalsInfinite,
+      }
     },
     onError: (error, _variables, context) => {
       if (context?.previousLockers) {

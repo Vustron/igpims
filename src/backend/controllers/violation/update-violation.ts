@@ -8,7 +8,7 @@ import {
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
-import { type Violation, ViolationSchema } from "@/validation/violation"
+import { Violation, ViolationSchema } from "@/validation/violation"
 
 export async function updateViolation(
   request: NextRequest,
@@ -52,7 +52,7 @@ export async function updateViolation(
       )
     }
 
-    const result = await db.transaction(async (_tx) => {
+    await db.transaction(async (_tx) => {
       const existingViolation = await findViolationByIdQuery.execute({ id })
 
       if (!existingViolation.length) {
@@ -62,15 +62,14 @@ export async function updateViolation(
         )
       }
 
-      const result = await updateViolationQuery.execute({
+      return await updateViolationQuery.execute({
         id,
         ...updateData,
+        violations: JSON.stringify(updateData.violations || []),
       })
-
-      return NextResponse.json(result[0])
     })
 
-    return result
+    return NextResponse.json(validationResult.data, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

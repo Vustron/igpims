@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { DynamicForm } from "@/components/ui/forms"
@@ -21,10 +22,11 @@ export const CreateLockerRentForm = ({
 }: CreateLockerRentFormProps) => {
   const createRent = useCreateRent()
 
-  const { data: lockersResponse } = useFindManyLockers({
-    status: "available",
-    limit: 100,
-  })
+  const { data: lockersResponse, isLoading: isLoadingLockers } =
+    useFindManyLockers({
+      status: "available",
+      limit: 100,
+    })
 
   const form = useForm<CreateRentalData>({
     resolver: zodResolver(createRentalSchema),
@@ -144,6 +146,14 @@ export const CreateLockerRentForm = ({
     } else {
       onError?.()
     }
+  }
+
+  if (isLoadingLockers) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
   }
 
   return (

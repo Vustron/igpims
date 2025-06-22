@@ -21,11 +21,13 @@ export const useDeleteRent = (rentalId: string) => {
       return await deleteRent(rentalId)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] })
-      await queryClient.cancelQueries({ queryKey: ["locker-rental", rentalId] })
-      await queryClient.cancelQueries({ queryKey: ["lockers"] })
-      await queryClient.cancelQueries({ queryKey: ["lockers-infinite"] })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rentals-infinite"] }),
+        queryClient.cancelQueries({ queryKey: ["locker-rental", rentalId] }),
+        queryClient.cancelQueries({ queryKey: ["lockers"] }),
+        queryClient.cancelQueries({ queryKey: ["lockers-infinite"] }),
+      ])
 
       const currentRental = queryClient.getQueryData<LockerRental>([
         "locker-rental",
@@ -76,7 +78,11 @@ export const useDeleteRent = (rentalId: string) => {
               ...oldData,
               data: oldData.data.map((locker: any) =>
                 locker.id === lockerId
-                  ? { ...locker, lockerStatus: "available" }
+                  ? {
+                      ...locker,
+                      lockerStatus: "available",
+                      updatedAt: Date.now(),
+                    }
                   : locker,
               ),
             }
@@ -94,13 +100,26 @@ export const useDeleteRent = (rentalId: string) => {
                 ...page,
                 data: page.data.map((locker: any) =>
                   locker.id === lockerId
-                    ? { ...locker, lockerStatus: "available" }
+                    ? {
+                        ...locker,
+                        lockerStatus: "available",
+                        updatedAt: Date.now(),
+                      }
                     : locker,
                 ),
               })),
             }
           },
         )
+
+        queryClient.setQueryData(["locker", lockerId], (oldData: any) => {
+          if (!oldData) return oldData
+          return {
+            ...oldData,
+            lockerStatus: "available",
+            updatedAt: Date.now(),
+          }
+        })
       }
 
       queryClient.removeQueries({ queryKey: ["locker-rental", rentalId] })
@@ -114,7 +133,7 @@ export const useDeleteRent = (rentalId: string) => {
         lockerId,
       }
     },
-    onSuccess: async (_data, _variables, context) => {
+    onSuccess: async (_data, _variables, _context) => {
       queryClient.setQueriesData(
         { queryKey: ["locker-rentals-infinite"] },
         (oldData: any) => {
@@ -139,35 +158,6 @@ export const useDeleteRent = (rentalId: string) => {
           }
         },
       )
-
-      if (context?.lockerId) {
-        queryClient.setQueriesData(
-          { queryKey: ["locker", context.lockerId] },
-          (oldData: any) => {
-            if (!oldData) return oldData
-
-            return {
-              ...oldData,
-              lockerStatus: "available",
-              rental: null,
-            }
-          },
-        )
-      }
-
-      queryClient.removeQueries({ queryKey: ["locker-rental", rentalId] })
-
-      queryClient.invalidateQueries({
-        queryKey: ["locker-rentals"],
-        exact: false,
-      })
-
-      if (context?.lockerId) {
-        queryClient.invalidateQueries({
-          queryKey: ["locker", context.lockerId],
-          exact: true,
-        })
-      }
     },
     onError: (error, _variables, context) => {
       if (context?.previousRentals) {
@@ -192,6 +182,18 @@ export const useDeleteRent = (rentalId: string) => {
         queryClient.setQueryData(
           ["locker-rental", rentalId],
           context.previousRental,
+        )
+      }
+      if (context?.lockerId) {
+        queryClient.setQueryData(
+          ["locker", context.lockerId],
+          (oldData: any) => {
+            if (!oldData) return oldData
+            return {
+              ...oldData,
+              lockerStatus: "occupied",
+            }
+          },
         )
       }
 

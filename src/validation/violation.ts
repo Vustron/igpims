@@ -11,8 +11,8 @@ export const ViolationSchema = z.object({
     .enum(["paid", "unpaid", "partial", "waived", "under_review"])
     .default("unpaid")
     .optional(),
-  createdAt: z.number().optional(),
-  updatedAt: z.number().optional(),
+  createdAt: z.any().optional(),
+  updatedAt: z.any().optional(),
 })
 
 export type Violation = z.infer<typeof ViolationSchema>

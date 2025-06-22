@@ -22,8 +22,20 @@ export const useCreateViolation = () => {
   return useMutation({
     mutationKey: ["create-violation"],
     mutationFn: async (payload: Omit<Violation, "id">) => {
+      const violationsArray = Array.isArray(payload.violations)
+        ? payload.violations
+        : typeof payload.violations === "string"
+          ? payload.violations
+              .split(",")
+              .map((v) => v.trim())
+              .filter((v) => v)
+          : []
+
       const sanitizedData = sanitizer<Omit<Violation, "id">>(
-        payload,
+        {
+          ...payload,
+          violations: violationsArray,
+        },
         ViolationSchema.omit({ id: true }),
       )
       return await createViolation(sanitizedData)
@@ -36,7 +48,6 @@ export const useCreateViolation = () => {
 
       const previousQueriesData = new Map()
 
-      // Store all existing queries data
       queryClient
         .getQueriesData({ queryKey: ["violations"] })
         .forEach(([queryKey, data]) => {
@@ -53,14 +64,23 @@ export const useCreateViolation = () => {
           }
         })
 
+      const violationsArray = Array.isArray(newViolation.violations)
+        ? newViolation.violations
+        : typeof newViolation.violations === "string"
+          ? newViolation.violations
+              .split(",")
+              .map((v) => v.trim())
+              .filter((v) => v)
+          : []
+
       const optimisticViolation: Violation = {
         ...newViolation,
+        violations: violationsArray,
         id: `temp-${Date.now()}`,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       }
 
-      // Update each specific query manually
       const allViolationQueries =
         queryClient.getQueriesData<PaginatedViolationsResponse>({
           queryKey: ["violations"],
@@ -70,7 +90,6 @@ export const useCreateViolation = () => {
         if (oldData?.data) {
           const queryFilters = (queryKey as any)[1] as ViolationFilters
 
-          // Only add to first page queries
           if (queryFilters.page === 1 || !queryFilters.page) {
             const updatedData = [optimisticViolation, ...oldData.data]
             const newTotalItems = oldData.meta.totalItems + 1
@@ -109,7 +128,6 @@ export const useCreateViolation = () => {
         }
       })
 
-      // Update infinite queries
       const allInfiniteQueries = queryClient.getQueriesData({
         queryKey: ["violations-infinite"],
       })
@@ -150,10 +168,23 @@ export const useCreateViolation = () => {
       }
     },
     onSuccess: (newViolation: Violation, _variables, context) => {
-      // Set individual violation cache
-      queryClient.setQueryData(["violation", newViolation.id], newViolation)
+      const normalizedViolation = {
+        ...newViolation,
+        violations: Array.isArray(newViolation.violations)
+          ? newViolation.violations
+          : typeof newViolation.violations === "string"
+            ? newViolation.violations
+                .split(",")
+                .map((v) => v.trim())
+                .filter((v) => v)
+            : [],
+      }
 
-      // Replace optimistic data with real data for paginated queries
+      queryClient.setQueryData(
+        ["violation", normalizedViolation.id],
+        normalizedViolation,
+      )
+
       const allViolationQueries =
         queryClient.getQueriesData<PaginatedViolationsResponse>({
           queryKey: ["violations"],
@@ -163,7 +194,7 @@ export const useCreateViolation = () => {
         if (oldData?.data) {
           const updatedData = oldData.data.map((violation) =>
             violation.id === context?.optimisticViolation?.id
-              ? newViolation
+              ? normalizedViolation
               : violation,
           )
 
@@ -174,7 +205,6 @@ export const useCreateViolation = () => {
         }
       })
 
-      // Replace optimistic data with real data for infinite queries
       const allInfiniteQueries = queryClient.getQueriesData({
         queryKey: ["violations-infinite"],
       })
@@ -186,7 +216,7 @@ export const useCreateViolation = () => {
 
             const updatedData = page.data.map((violation: Violation) =>
               violation.id === context?.optimisticViolation?.id
-                ? newViolation
+                ? normalizedViolation
                 : violation,
             )
 
