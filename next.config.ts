@@ -1,5 +1,4 @@
 import withBundleAnalyzer from "@next/bundle-analyzer"
-import withRspack from 'next-rspack';
 
 const withBundleAnalyzerConfig = withBundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -158,4 +157,4 @@ const nextConfig: import("next").NextConfig = {
   },
 }
 
-export default withRspack(withBundleAnalyzerConfig(nextConfig))
+export default withBundleAnalyzerConfig(nextConfig)
