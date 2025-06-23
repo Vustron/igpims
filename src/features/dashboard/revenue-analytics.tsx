@@ -194,23 +194,39 @@ export const RevenueAnalytics = () => {
                 domain={yDomain}
               />
               <Tooltip
-                content={<ChartTooltipContent />}
-                formatter={(value, name) => {
-                  type ValidKeys =
-                    | "lockerRentals"
-                    | "waterVendo"
-                    | "merchandise"
-                  const labels: Record<ValidKeys, string> = {
-                    lockerRentals: " Locker Rentals",
-                    waterVendo: " Water Vendo",
-                    merchandise: " Merchandise",
-                  }
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null
 
-                  if (name in labels) {
-                    const key = name as ValidKeys
-                    return [`₱${Number(value).toLocaleString()}`, labels[key]]
-                  }
-                  return ["", ""]
+                  const formattedPayload = payload.map((entry) => {
+                    const name = entry.name
+                    const value = entry.value
+
+                    type ValidKeys =
+                      | "lockerRentals"
+                      | "waterVendo"
+                      | "merchandise"
+                    const labels: Record<ValidKeys, string> = {
+                      lockerRentals: "Locker Rentals",
+                      waterVendo: "Water Vendo",
+                      merchandise: "Merchandise",
+                    }
+
+                    const formattedName =
+                      name && name in labels ? labels[name as ValidKeys] : name
+
+                    return {
+                      ...entry,
+                      name: formattedName,
+                      value: `₱${Number(value).toLocaleString()}`,
+                    }
+                  })
+
+                  return (
+                    <ChartTooltipContent
+                      active={active}
+                      payload={formattedPayload}
+                    />
+                  )
                 }}
               />
               <Legend
@@ -239,7 +255,6 @@ export const RevenueAnalytics = () => {
                 }}
               />
 
-              {/* Locker Rentals - now using Area instead of Line and removed dots */}
               <Area
                 type="monotone"
                 dataKey="lockerRentals"
@@ -258,7 +273,6 @@ export const RevenueAnalytics = () => {
                 isAnimationActive={true}
               />
 
-              {/* Water Vendo - now using Area instead of Line and removed dots */}
               <Area
                 type="monotone"
                 dataKey="waterVendo"
@@ -277,7 +291,6 @@ export const RevenueAnalytics = () => {
                 isAnimationActive={true}
               />
 
-              {/* Merchandise - now using Area instead of Line and removed dots */}
               <Area
                 type="monotone"
                 dataKey="merchandise"

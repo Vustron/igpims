@@ -1,3 +1,4 @@
+import { createInspection } from "../controllers/inspection/create-inspection"
 import { createLocker } from "../controllers/locker/create-locker"
 import { createRent } from "../controllers/locker-rental/create-rent"
 import { deleteManyUserById } from "../controllers/user/delete-many-by-id"
@@ -27,5 +28,6 @@ export const postRoutes: Route[] = [
   { path: "/api/v1/lockers/create-locker", handler: createLocker },
   { path: "/api/v1/locker-rentals/create-rent", handler: createRent },
   { path: "/api/v1/violations/create-violation", handler: createViolation },
+  { path: "/api/v1/inspections/create-inspection", handler: createInspection },
   // Add more POST routes here
 ]

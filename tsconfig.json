@@ -41,7 +41,8 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/backend/controllers/inspection"
   ],
   "exclude": ["node_modules"]
 }

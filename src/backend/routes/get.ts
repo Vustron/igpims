@@ -1,3 +1,5 @@
+import { findInspectionById } from "../controllers/inspection/find-by-id"
+import { findManyInspections } from "../controllers/inspection/find-many"
 import { findLockerById } from "../controllers/locker/find-by-id"
 import { findManyLockers } from "../controllers/locker/find-many"
 import { findManyRents } from "../controllers/locker-rental/find-many"
@@ -19,5 +21,7 @@ export const getRoutes: Route[] = [
   { path: "/api/v1/locker-rentals/find-by-id", handler: findRentById },
   { path: "/api/v1/violations/find-many", handler: findManyViolations },
   { path: "/api/v1/violations/find-by-id", handler: findViolationById },
+  { path: "/api/v1/inspections/find-by-id", handler: findInspectionById },
+  { path: "/api/v1/inspections/find-many", handler: findManyInspections },
   // Add more GET routes here
 ]

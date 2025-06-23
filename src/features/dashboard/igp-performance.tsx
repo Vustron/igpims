@@ -127,11 +127,22 @@ export const IgpPerformance = () => {
             />
             <Tooltip
               cursor={{ fill: "rgba(118, 228, 247, 0.1)" }}
-              content={<ChartTooltipContent />}
-              formatter={(value) => [
-                `₱${Number(value).toLocaleString()}`,
-                " Sales Income",
-              ]}
+              content={({ active, payload }) => {
+                if (!active || !payload?.length) return null
+
+                const formattedPayload = payload.map((entry) => ({
+                  ...entry,
+                  value: `₱${Number(entry.value).toLocaleString()}`,
+                  name: "Sales Income",
+                }))
+
+                return (
+                  <ChartTooltipContent
+                    active={active}
+                    payload={formattedPayload}
+                  />
+                )
+              }}
             />
             <Bar dataKey="value" name="Sales Income" radius={[8, 8, 0, 0]}>
               {data.map((_, index) => (

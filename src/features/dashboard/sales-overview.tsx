@@ -45,7 +45,14 @@ export const SalesOverview = () => {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip content={<ChartTooltipContent />} />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null
+                    return (
+                      <ChartTooltipContent active={active} payload={payload} />
+                    )
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </ChartContainer>
