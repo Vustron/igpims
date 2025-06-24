@@ -2,14 +2,9 @@ import z from "zod"
 
 export const InspectionSchema = z.object({
   id: z.string(),
-  dateOfInspection: z.number(),
-  dateSet: z.number(),
-  violators: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string(),
-    }),
-  ),
+  dateOfInspection: z.any(),
+  dateSet: z.any(),
+  violators: z.any(),
   totalFines: z.number(),
 })
 

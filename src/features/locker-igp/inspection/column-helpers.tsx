@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Calendar, ClipboardCopy, Receipt, Users } from "lucide-react"
+import React from "react"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import { Checkbox } from "@/components/ui/checkboxes"
@@ -124,9 +125,51 @@ export const IdCell = ({ value }: { value: string }) => {
 export const ViolatorsCell = ({
   value,
 }: {
-  value: { id: string; name: string }[]
+  value:
+    | { id: string; name?: string; studentName?: string }[]
+    | string[]
+    | string
 }) => {
+  const violators = React.useMemo(() => {
+    if (!value) return []
+
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value)
+        if (Array.isArray(parsed)) {
+          return parsed.map((v) => {
+            if (typeof v === "string") return { id: v, name: v }
+            return {
+              id: v.id || v.violatorId || "N/A",
+              name: v.name || v.studentName || "Unknown",
+            }
+          })
+        }
+        return []
+      } catch (e) {
+        return []
+      }
+    }
+
+    if (Array.isArray(value) && value.every((v) => typeof v === "string")) {
+      return value.map((id) => ({ id, name: id }))
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((v) => {
+        if (typeof v === "string") return { id: v, name: v }
+        return {
+          id: v.id || "N/A",
+          name: v.name || v.studentName || "Unknown",
+        }
+      })
+    }
+
+    return []
+  }, [value])
+
   const getInitials = (name: string) => {
+    if (!name || typeof name !== "string") return "NA"
     return name
       .split(" ")
       .map((part) => part[0])
@@ -140,9 +183,9 @@ export const ViolatorsCell = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="-space-x-2 flex items-center">
-            {value.slice(0, 3).map((violator, index) => (
+            {violators.slice(0, 3).map((violator, index) => (
               <motion.div
-                key={violator.id}
+                key={violator.id || index}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
@@ -155,9 +198,9 @@ export const ViolatorsCell = ({
                 </Avatar>
               </motion.div>
             ))}
-            {value.length > 3 && (
+            {violators.length > 3 && (
               <Badge className="flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-200 p-1 text-[10px] text-slate-700">
-                +{value.length - 3}
+                +{violators.length - 3}
               </Badge>
             )}
           </div>
@@ -169,11 +212,11 @@ export const ViolatorsCell = ({
               <span className="font-medium text-xs">Violators:</span>
             </div>
             <ul className="space-y-1">
-              {value.map((violator) => (
-                <li key={violator.id} className="text-xs">
-                  • {violator.name}{" "}
+              {violators.map((violator, index) => (
+                <li key={violator.id || index} className="text-xs">
+                  • {violator.name || "Unknown"}{" "}
                   <span className="font-mono text-muted-foreground">
-                    ({violator.id})
+                    ({violator.id || "N/A"})
                   </span>
                 </li>
               ))}

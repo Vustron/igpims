@@ -12,19 +12,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/selects"
+import { InspectionFilters } from "@/backend/actions/inspection/find-many"
 import { RentalFilters } from "@/backend/actions/locker-rental/find-many"
 import { UserFilters } from "@/backend/actions/user/find-many"
 import { ViolationFilters } from "@/backend/actions/violation/find-many"
 
 interface DynamicFiltersPanelProps {
-  filters: RentalFilters | UserFilters | ViolationFilters
+  filters: RentalFilters | UserFilters | ViolationFilters | InspectionFilters
   activeFiltersCount: number
   onUpdateFilters: (
-    newFilters: Partial<RentalFilters | UserFilters | ViolationFilters>,
+    newFilters: Partial<
+      RentalFilters | UserFilters | ViolationFilters | InspectionFilters
+    >,
   ) => void
   onResetFilters: () => void
   onClose: () => void
-  filterType?: "rental" | "user" | "violations"
+  filterType?: "rental" | "user" | "violations" | "inspection"
 }
 
 export const DynamicFiltersPanel = ({
@@ -38,6 +41,7 @@ export const DynamicFiltersPanel = ({
   const isRentalFilter = filterType === "rental"
   const isUserFilter = filterType === "user"
   const isViolationsFilter = filterType === "violations"
+  const isInspectionFilter = filterType === "inspection"
 
   return (
     <Card>
@@ -326,6 +330,88 @@ export const DynamicFiltersPanel = ({
                   }
                 />
               </div>
+            </div>
+          </>
+        )}
+
+        {/* Added Inspection Filters */}
+        {isInspectionFilter && (
+          <>
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Date Range</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  placeholder="Start date"
+                  value={
+                    (filters as InspectionFilters).startDate
+                      ? new Date((filters as InspectionFilters).startDate!)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    onUpdateFilters({
+                      startDate: e.target.value || undefined,
+                    })
+                  }
+                />
+                <Input
+                  type="date"
+                  placeholder="End date"
+                  value={
+                    (filters as InspectionFilters).endDate
+                      ? new Date((filters as InspectionFilters).endDate!)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    onUpdateFilters({
+                      endDate: e.target.value || undefined,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Sort By</Label>
+              <Select
+                value={(filters as InspectionFilters).sort || "latest"}
+                onValueChange={(value) =>
+                  onUpdateFilters({
+                    sort: value as
+                      | "latest"
+                      | "oldest"
+                      | "highestFines"
+                      | "lowestFines",
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sort by..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="latest">Latest First</SelectItem>
+                  <SelectItem value="oldest">Oldest First</SelectItem>
+                  <SelectItem value="highestFines">Highest Fines</SelectItem>
+                  <SelectItem value="lowestFines">Lowest Fines</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Violator Search</Label>
+              <Input
+                placeholder="Search by violator name..."
+                value={(filters as InspectionFilters).search || ""}
+                onChange={(e) =>
+                  onUpdateFilters({
+                    search: e.target.value || undefined,
+                  })
+                }
+              />
             </div>
           </>
         )}

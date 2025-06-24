@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Calendar, ClipboardCopy, Receipt, Users } from "lucide-react"
-import { Inspection } from "@/validation/inspection"
+import { Inspection } from "@/backend/db/schemas"
 import { InspectionActions } from "./actions"
 import {
   AmountCell,
@@ -63,6 +63,17 @@ export const inspectionColumn: ColumnDef<Inspection>[] = [
       <ColumnHeader icon={<Users className="h-3.5 w-3.5" />} text="Violators" />
     ),
     cell: ({ row }) => <ViolatorsCell value={row.getValue("violators")} />,
+    accessorFn: (row) => {
+      try {
+        if (!row.violators) return []
+        if (typeof row.violators === "string") {
+          return JSON.parse(row.violators)
+        }
+        return Array.isArray(row.violators) ? row.violators : []
+      } catch (e) {
+        return []
+      }
+    },
     size: 150,
   },
   {

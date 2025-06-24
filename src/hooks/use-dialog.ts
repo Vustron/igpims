@@ -36,6 +36,7 @@ export type DialogType =
   | "deleteFundRequest"
   | "createViolation"
   | "editViolation"
+  | "createInspection"
 
 interface ConfirmDialogData {
   title?: string

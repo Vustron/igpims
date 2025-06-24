@@ -9,7 +9,7 @@ import { PaginatedInspectionsResponse } from "./find-many"
 export async function createInspection(
   payload: Omit<Inspection, "id">,
 ): Promise<Inspection> {
-  return api.post<Omit<Inspection, "id">, Inspection>(
+  return api.post<typeof payload, Inspection>(
     "inspections/create-inspection",
     payload,
   )
@@ -23,7 +23,9 @@ export const useCreateInspection = () => {
     mutationKey: ["create-inspection"],
     mutationFn: async (payload: Omit<Inspection, "id">) => {
       const sanitizedData = sanitizer<Omit<Inspection, "id">>(
-        payload,
+        {
+          ...payload,
+        },
         InspectionSchema.omit({ id: true }),
       )
       return await createInspection(sanitizedData)

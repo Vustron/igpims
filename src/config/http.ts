@@ -45,7 +45,6 @@ async function makeHttpRequest<RequestType = unknown, ResponseType = unknown>(
         ? `${env.NEXT_PUBLIC_APP_URL}/api/v1/${url}${buildQueryString(params)}`
         : customURL
 
-      // Validate URL
       try {
         new URL(fullUrl!)
       } catch {

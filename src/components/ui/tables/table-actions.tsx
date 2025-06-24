@@ -27,6 +27,7 @@ interface TableActionsProps<TData> {
   table: Table<TData>
   isUser?: boolean
   isOnViolations?: boolean
+  isOnInspection?: boolean
 }
 
 export function TableActions<TData>({
@@ -37,6 +38,7 @@ export function TableActions<TData>({
   table,
   isUser,
   isOnViolations,
+  isOnInspection,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
 
@@ -80,7 +82,7 @@ export function TableActions<TData>({
         </Button>
       </motion.div> */}
 
-      {(isLockerRental || isUser || isOnViolations) && (
+      {(isLockerRental || isUser || isOnViolations || isOnInspection) && (
         <motion.div
           key="add-button"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -98,7 +100,9 @@ export function TableActions<TData>({
                   ? "createUser"
                   : isOnViolations
                     ? "createViolation"
-                    : "createRent",
+                    : isOnInspection
+                      ? "createInspection"
+                      : "createRent",
               )
             }
           >
@@ -107,7 +111,9 @@ export function TableActions<TData>({
               ? "Create user"
               : isOnViolations
                 ? "Create violation"
-                : "Create rent"}
+                : isOnInspection
+                  ? "Create inspection"
+                  : "Create rent"}
           </Button>
         </motion.div>
       )}
@@ -124,6 +130,7 @@ export function TableActions<TData>({
           size="sm"
           onClick={onRefetch}
           disabled={isFetching}
+          className="font-normal text-xs"
         >
           <RefreshCw
             className={`mr-1 h-4 w-4 ${isFetching ? "animate-spin" : ""}`}

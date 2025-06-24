@@ -1,14 +1,16 @@
-import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { user } from "./user"
 
 export const locker = sqliteTable(
   "locker",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     lockerStatus: text("lockerStatus", { length: 20 })
       .notNull()
       .default("available")
@@ -19,12 +21,6 @@ export const locker = sqliteTable(
     lockerName: text("lockerName", { length: 255 }).notNull(),
     lockerLocation: text("lockerLocation", { length: 255 }).notNull(),
     lockerRentalPrice: integer("lockerRentalPrice").default(0).notNull(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("locker_type_idx").on(t.lockerType),
@@ -36,9 +32,10 @@ export const locker = sqliteTable(
 export const lockerRental = sqliteTable(
   "lockerRental",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     lockerId: text("lockerId")
       .notNull()
       .references(() => locker.id, { onDelete: "restrict" }),
@@ -50,12 +47,6 @@ export const lockerRental = sqliteTable(
     paymentStatus: text("paymentStatus", { length: 100 }).notNull(),
     dateRented: integer("dateRented", { mode: "timestamp" }).notNull(),
     dateDue: integer("dateDue", { mode: "timestamp" }).notNull(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("lockerRental_locker_id_idx").on(t.lockerId),
@@ -82,4 +73,6 @@ export const lockerRentalRelations = relations(lockerRental, ({ one }) => ({
 }))
 
 export type Locker = InferSelectModel<typeof locker>
+export type NewLocker = InferInsertModel<typeof locker>
 export type LockerRental = InferSelectModel<typeof lockerRental>
+export type NewLockerRental = InferInsertModel<typeof lockerRental>

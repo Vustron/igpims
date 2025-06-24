@@ -1,4 +1,4 @@
-import { InferSelectModel, sql } from "drizzle-orm"
+import { InferInsertModel, InferSelectModel } from "drizzle-orm"
 import {
   integer,
   sqliteTable,
@@ -6,24 +6,21 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 
 export const rateLimit = sqliteTable(
   "rateLimit",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     ipAddress: text("ipAddress", { length: 255 }).notNull(),
     attempts: integer("attempts").notNull().default(0),
     resetAt: integer("resetAt", { mode: "timestamp" }).notNull(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [uniqueIndex("rateLimit_ip_address_idx").on(t.ipAddress)],
 )
 
 export type RateLimit = InferSelectModel<typeof rateLimit>
+export type NewRateLimit = InferInsertModel<typeof rateLimit>

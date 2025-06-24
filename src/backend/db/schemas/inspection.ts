@@ -1,10 +1,12 @@
-import { InferSelectModel, sql } from "drizzle-orm"
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
+import { InferInsertModel, InferSelectModel } from "drizzle-orm"
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 
 export const inspection = sqliteTable(
   "inspection",
   {
+    ...timestamp,
     id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
@@ -16,17 +18,9 @@ export const inspection = sqliteTable(
     }).notNull(),
     violators: text("violators").notNull().$type<string[]>().default([]),
     totalFines: integer("totalFines").notNull(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
-  (t) => [
-    index("inspection_date_of_inspection_idx").on(t.dateOfInspection),
-    index("inspection_date_set_idx").on(t.dateSet),
-  ],
+  (_t) => [],
 )
 
 export type Inspection = InferSelectModel<typeof inspection>
+export type InsertInspection = InferInsertModel<typeof inspection>

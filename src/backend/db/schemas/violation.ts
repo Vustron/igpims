@@ -1,14 +1,16 @@
-import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { locker } from "./locker"
 
 export const violation = sqliteTable(
   "violation",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     lockerId: text("lockerId")
       .notNull()
       .references(() => locker.id, { onDelete: "restrict" }),
@@ -22,12 +24,6 @@ export const violation = sqliteTable(
       .notNull()
       .default("unpaid")
       .$type<"paid" | "unpaid" | "partial" | "waived" | "under_review">(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("violation_student_name_idx").on(t.studentName),
@@ -45,3 +41,4 @@ export const violationRelations = relations(violation, ({ one }) => ({
 }))
 
 export type Violation = InferSelectModel<typeof violation>
+export type NewViolation = InferInsertModel<typeof violation>

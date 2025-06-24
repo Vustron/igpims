@@ -1,14 +1,16 @@
-import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { user } from "./user"
 
 export const account = sqliteTable(
   "account",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     accountId: text("accountId", { length: 255 }).notNull(),
     userId: text("userId")
       .notNull()
@@ -22,12 +24,6 @@ export const account = sqliteTable(
     salt: text("salt", { length: 255 }),
     otpSignIn: integer("otpSignIn", { mode: "boolean" }).notNull(),
     twoFactorSecret: text("twoFactorSecret", { length: 10 }),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("account_user_id_idx").on(t.userId),
@@ -45,3 +41,4 @@ export const accountRelations = relations(account, ({ one }) => ({
 }))
 
 export type Account = InferSelectModel<typeof account>
+export type NewAccount = InferInsertModel<typeof account>

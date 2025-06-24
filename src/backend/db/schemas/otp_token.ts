@@ -1,20 +1,19 @@
-import { InferSelectModel, relations, sql } from "drizzle-orm"
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
+import { sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { user } from "./user"
 
 export const otpToken = sqliteTable("otp_token", {
-  id: text("id")
+  ...timestamp,
+  id: text("id", { length: 15 })
     .primaryKey()
-    .$defaultFn(() => nanoid()),
+    .$defaultFn(() => nanoid(15)),
   userId: text("userId")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   email: text("email", { length: 100 }).notNull(),
   otp: text("otp", { length: 10 }).notNull(),
-  createdAt: integer("createdAt", { mode: "timestamp" })
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
 })
 
 export const otpTokenRelations = relations(otpToken, ({ one }) => ({
@@ -25,3 +24,4 @@ export const otpTokenRelations = relations(otpToken, ({ one }) => ({
 }))
 
 export type OtpToken = InferSelectModel<typeof otpToken>
+export type NewOtpToken = InferInsertModel<typeof otpToken>

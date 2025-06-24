@@ -1,13 +1,15 @@
-import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { InferInsertModel, InferSelectModel, relations, sql } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 
 export const igp = sqliteTable(
   "igp",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     igpName: text("igpName", { length: 255 }).notNull(),
     semesterAndAcademicYear: text("semesterAndAcademicYear", {
       length: 100,
@@ -22,12 +24,6 @@ export const igp = sqliteTable(
       .notNull()
       .default("goods")
       .$type<"goods" | "services" | "rentals" | "events" | "other">(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("igp_name_idx").on(t.igpName),
@@ -45,6 +41,7 @@ export const igpRelations = relations(igp, ({ many }) => ({
 export const igpTransactions = sqliteTable(
   "igpTransactions",
   {
+    ...timestamp,
     id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
@@ -62,12 +59,6 @@ export const igpTransactions = sqliteTable(
       .notNull()
       .default("pending")
       .$type<"pending" | "received" | "cancelled">(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("igTransactions_igp_id_idx").on(t.igpId),
@@ -90,6 +81,7 @@ export const igpTransactionsRelations = relations(
 export const igpSupply = sqliteTable(
   "igpSupply",
   {
+    ...timestamp,
     id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
@@ -102,12 +94,6 @@ export const igpSupply = sqliteTable(
     quantitySold: integer("quantitySold").notNull().default(0),
     unitPrice: integer("unitPrice").notNull(),
     totalRevenue: integer("totalRevenue").notNull().default(0),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("igpSupply_igp_id_idx").on(t.igpId),
@@ -123,5 +109,8 @@ export const igpSupplyRelations = relations(igpSupply, ({ one }) => ({
 }))
 
 export type Igp = InferSelectModel<typeof igp>
+export type NewIgp = InferInsertModel<typeof igp>
 export type IgpSupply = InferSelectModel<typeof igpSupply>
+export type NewIgpSupply = InferInsertModel<typeof igpSupply>
 export type IgpTransaction = InferSelectModel<typeof igpTransactions>
+export type NewIgpTransaction = InferInsertModel<typeof igpTransactions>

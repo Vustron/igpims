@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.147",
+  "version": "1.0.148",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -17,6 +17,7 @@
     "db-push": "bunx drizzle-kit push",
     "db-studio": "bunx drizzle-kit studio --port 6969 --verbose",
     "db-generate-erd": "drizzle-erd --in ./src/schemas/drizzle-schema.ts --out erd.svg",
+    "db-drop": "bunx drizzle-kit drop",
     "outdated-packages": "bun outdated",
     "update-packages": "bun update --latest",
     "seed-admin": "bun run ./src/scripts/seed-admin.ts",

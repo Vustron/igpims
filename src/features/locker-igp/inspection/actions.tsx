@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
-import { Inspection } from "@/validation/inspection"
+import { Inspection } from "@/backend/db/schemas"
 
 export const InspectionActions = ({
   inspection,

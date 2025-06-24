@@ -2,7 +2,8 @@ import { nanoid } from "nanoid"
 import { NextRequest, NextResponse } from "next/server"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { insertInspectionQuery } from "@/backend/queries/inspection"
+import * as inspectionQuery from "@/backend/queries/inspection"
+import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { Inspection, InspectionSchema } from "@/validation/inspection"
@@ -34,25 +35,37 @@ export async function createInspection(
     }
 
     const inspectionData = validationResult.data
-    const inspectionId = nanoid()
-    const now = Date.now()
+    const dateOfInspectionTimestamp = inspectionData.dateOfInspection
+    const dateSetTimestamp = inspectionData.dateSet
 
-    const formattedViolators = Array.isArray(inspectionData.violators)
-      ? JSON.stringify(inspectionData.violators)
-      : inspectionData.violators
+    const newInspection = await db.transaction(async (_tx) => {
+      const inspectionId = nanoid()
+      const now = Date.now()
 
-    const result = await insertInspectionQuery.execute({
-      id: inspectionId,
-      dateOfInspection: inspectionData.dateOfInspection,
-      dateSet: inspectionData.dateSet,
-      violators: formattedViolators,
-      totalFines: inspectionData.totalFines,
-      createdAt: now,
-      updatedAt: now,
+      await inspectionQuery.insertInspectionQuery.execute({
+        id: inspectionId,
+        dateOfInspection: dateOfInspectionTimestamp,
+        dateSet: dateSetTimestamp,
+        violators: JSON.stringify(inspectionData.violators),
+        totalFines: inspectionData.totalFines,
+      })
+
+      return {
+        id: inspectionId,
+        dateOfInspection: dateOfInspectionTimestamp,
+        dateSet: dateSetTimestamp,
+        violators: inspectionData.violators,
+        totalFines: inspectionData.totalFines,
+        createdAt: now,
+        updatedAt: now,
+      }
     })
 
-    return NextResponse.json(result[0], { status: 201 })
+    return NextResponse.json(newInspection, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: catchError(error) }, { status: 500 })
+    return NextResponse.json(
+      { error: catchError(error) || "Failed to create inspection" },
+      { status: 500 },
+    )
   }
 }

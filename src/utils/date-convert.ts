@@ -34,3 +34,24 @@ export const convertDateToEpoch = (date: any) => {
   if (typeof date === "string") return new Date(date).getTime()
   return date
 }
+
+export function convertDatesToTimestamps(obj: any): any {
+  if (obj instanceof Date) {
+    return obj.getTime()
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(convertDatesToTimestamps)
+  }
+
+  if (obj && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key,
+        convertDatesToTimestamps(value),
+      ]),
+    )
+  }
+
+  return obj
+}

@@ -32,12 +32,10 @@ const insertInspectionQuery = db
   .insert(inspection)
   .values({
     id: sql.placeholder("id"),
-    dateOfInspection: sql.placeholder("dateOfInspection"),
-    dateSet: sql.placeholder("dateSet"),
+    dateOfInspection: sql`${sql.placeholder("dateOfInspection")}`,
+    dateSet: sql`${sql.placeholder("dateSet")}`,
     violators: sql.placeholder("violators"),
     totalFines: sql.placeholder("totalFines"),
-    createdAt: sql`CURRENT_TIMESTAMP`,
-    updatedAt: sql`CURRENT_TIMESTAMP`,
   })
   .returning()
   .prepare()

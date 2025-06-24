@@ -26,25 +26,48 @@ export async function findManyInspections(
     const limit = Number(url.searchParams.get("limit")) || 10
     const offset = (page - 1) * limit
 
-    const inspections = await db
+    const inspectionsData = await db
       .select({
         id: inspection.id,
         dateOfInspection: inspection.dateOfInspection,
         dateSet: inspection.dateSet,
-        violators: inspection.violators,
         totalFines: inspection.totalFines,
         createdAt: inspection.createdAt,
         updatedAt: inspection.updatedAt,
-        violatorCount: sql<number>`(
-          SELECT COUNT(*)
-          FROM ${violation}
-          WHERE json_each(${inspection.violators}) LIKE '%' || ${violation.id} || '%'
-        )`.as("violator_count"),
       })
       .from(inspection)
       .orderBy(sql`${inspection.dateOfInspection} DESC`)
       .limit(limit)
       .offset(offset)
+
+    const inspectionIds = inspectionsData.map((i) => i.id)
+
+    const violationsData = await db
+      .select({
+        violatorId: violation.id,
+        violatorName: violation.studentName,
+      })
+      .from(violation)
+      .where(sql`${violation.id} IN (${inspectionIds.join(",")})`)
+
+    const violationsByInspection = violationsData.reduce(
+      (acc, v) => {
+        if (!acc[v.violatorId]) {
+          acc[v.violatorId] = []
+        }
+        acc[v.violatorId]?.push({
+          id: v.violatorId,
+          name: v.violatorName,
+        })
+        return acc
+      },
+      {} as Record<string, { id: string; name: string }[]>,
+    )
+
+    const inspections = inspectionsData.map((insp) => ({
+      ...insp,
+      violators: violationsByInspection[insp.id] || [],
+    }))
 
     const countResult = await countInspectionsQuery.execute()
     const totalItems = countResult[0]?.count || 0

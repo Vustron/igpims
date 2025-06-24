@@ -8,6 +8,7 @@ import {
   ConfirmDialog,
   CreateFundRequestDialog,
   CreateIgpDialog,
+  CreateInspectionDialog,
   CreateLockerDialog,
   CreateLockerRentDialog,
   CreateProjectRequestDialog,
@@ -75,6 +76,7 @@ export const DialogProvider = () => {
       <DeleteFundRequestDialog />
       <CreateViolationDialog />
       <EditViolationDialog />
+      <CreateInspectionDialog />
     </>
   )
 }

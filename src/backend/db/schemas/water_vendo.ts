@@ -1,13 +1,15 @@
-import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 
 export const waterVendo = sqliteTable(
   "waterVendo",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     waterVendoLocation: text("waterVendoLocation", { length: 255 }).notNull(),
     gallonsUsed: integer("gallonsUsed").default(0).notNull(),
     vendoStatus: text("vendoStatus", { length: 20 })
@@ -18,12 +20,6 @@ export const waterVendo = sqliteTable(
       .notNull()
       .default("full")
       .$type<"full" | "medium" | "low" | "empty">(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [
     index("waterVendo_location_idx").on(t.waterVendoLocation),
@@ -35,25 +31,18 @@ export const waterVendo = sqliteTable(
 export const waterSupply = sqliteTable(
   "waterSupply",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     waterVendoId: text("waterVendoId")
       .notNull()
       .references(() => waterVendo.id, { onDelete: "cascade" }),
-    supplyDate: integer("supplyDate", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
+    supplyDate: integer("supplyDate", { mode: "timestamp" }).notNull(),
     suppliedGallons: integer("suppliedGallons").notNull(),
     expenses: integer("expenses").notNull(),
     usedGallons: integer("usedGallons").default(0).notNull(),
     remainingGallons: integer("remainingGallons").notNull(),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (_t) => [],
 )
@@ -99,4 +88,6 @@ export const waterSupplyRelations = relations(waterSupply, ({ one }) => ({
 }))
 
 export type WaterVendo = InferSelectModel<typeof waterVendo>
+export type NewWaterVendo = InferInsertModel<typeof waterVendo>
 export type WaterSupply = InferSelectModel<typeof waterSupply>
+export type NewWaterSupply = InferInsertModel<typeof waterSupply>

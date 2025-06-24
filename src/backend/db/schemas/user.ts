@@ -1,6 +1,7 @@
-import { InferSelectModel, relations, sql } from "drizzle-orm"
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { account } from "./account"
 import { fundRequest } from "./fund_request"
 import { projectRequest } from "./project_request"
@@ -14,9 +15,10 @@ export const UserRole = {
 export const user = sqliteTable(
   "user",
   {
-    id: text("id")
+    ...timestamp,
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     name: text("name", { length: 255 }).notNull(),
     email: text("email", { length: 100 }).notNull().unique(),
     emailVerified: integer("emailVerified", { mode: "boolean" }).notNull(),
@@ -38,12 +40,6 @@ export const user = sqliteTable(
       .notNull()
       .default("user"),
     image: text("image"),
-    createdAt: integer("createdAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer("updatedAt", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
   },
   (t) => [index("user_role_idx").on(t.id)],
 )
@@ -60,4 +56,5 @@ export const userRelations = relations(user, ({ many }) => ({
 }))
 
 export type User = InferSelectModel<typeof user>
+export type NewUser = InferInsertModel<typeof user>
 export type UserRoleType = (typeof UserRole)[keyof typeof UserRole]
