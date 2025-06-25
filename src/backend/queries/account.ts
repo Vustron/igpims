@@ -39,7 +39,6 @@ const updateAccountPasswordQuery = db
   .set({
     password: sql`${sql.placeholder("password")}`,
     salt: sql`${sql.placeholder("salt")}`,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(account.userId, sql.placeholder("userId")))
   .returning()
@@ -50,7 +49,6 @@ const updateAccountSessionQuery = db
   .set({
     accessToken: sql`${sql.placeholder("accessToken")}`,
     accessTokenExpiresAt: sql`${sql.placeholder("accessTokenExpiresAt")}`,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(account.userId, sql.placeholder("userId")))
   .returning()
@@ -61,7 +59,6 @@ const emptyAccountSessionQuery = db
   .set({
     accessToken: null,
     accessTokenExpiresAt: null,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(account.userId, sql.placeholder("userId")))
   .returning()
@@ -77,8 +74,6 @@ const insertAccountQuery = db
     password: sql.placeholder("password"),
     salt: sql.placeholder("salt"),
     otpSignIn: sql.placeholder("otpSignIn"),
-    createdAt: sql.placeholder("accountCreatedAt"),
-    updatedAt: sql.placeholder("accountUpdatedAt"),
   })
   .returning()
   .prepare()
@@ -87,7 +82,6 @@ const updateAccountTwoFactorSecretQuery = db
   .update(account)
   .set({
     twoFactorSecret: sql`${sql.placeholder("twoFactorSecret")}`,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(account.userId, sql.placeholder("userId")))
   .returning()
@@ -97,7 +91,6 @@ const emptyAccountTwoFactorSecretQuery = db
   .update(account)
   .set({
     twoFactorSecret: null,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(account.userId, sql.placeholder("userId")))
   .returning()
@@ -107,7 +100,6 @@ const updateAccountOtpSignInQuery = db
   .update(account)
   .set({
     otpSignIn: sql`${sql.placeholder("otpSignIn")}`,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(account.userId, sql.placeholder("userId")))
   .returning()
@@ -117,7 +109,6 @@ const emptyAccountOtpSignInQuery = db
   .update(account)
   .set({
     otpSignIn: false,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(account.userId, sql.placeholder("userId")))
   .returning()

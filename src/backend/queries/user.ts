@@ -62,8 +62,6 @@ const insertUserQuery = db
     emailVerified: sql.placeholder("emailVerified"),
     sessionExpired: sql`0`,
     role: sql.placeholder("role"),
-    createdAt: sql.placeholder("userCreatedAt"),
-    updatedAt: sql.placeholder("userUpdatedAt"),
   })
   .returning()
   .prepare()
@@ -75,9 +73,8 @@ const updateUserQuery = db
     email: sql`${sql.placeholder("email")}`,
     image: sql`${sql.placeholder("image")}`,
     emailVerified: sql`${sql.placeholder("emailVerified")}`,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
-  .where(eq(user.id, sql.placeholder("updateUserId")))
+  .where(eq(user.id, sql.placeholder("id")))
   .returning()
   .prepare()
 
@@ -85,7 +82,6 @@ const verifyUserEmailQuery = db
   .update(user)
   .set({
     emailVerified: sql`${sql.placeholder("emailVerified")}`,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(user.id, sql.placeholder("userId")))
   .returning()
@@ -95,7 +91,6 @@ const updateUserSessionExpiredQuery = db
   .update(user)
   .set({
     sessionExpired: sql`${sql.placeholder("sessionExpired")}`,
-    updatedAt: sql`${sql.placeholder("updatedAt")}`,
   })
   .where(eq(user.id, sql.placeholder("userId")))
   .returning()

@@ -59,8 +59,6 @@ export async function signInOtpEmail(
           userId: otpData.userId,
           token: sessionToken,
           expiresAt: new Date(expiresAt),
-          createdAt: new Date(timestamp),
-          updatedAt: new Date(timestamp),
           ipAddress: clientIp,
           userAgent: request.headers.get("user-agent") ?? "",
         }),

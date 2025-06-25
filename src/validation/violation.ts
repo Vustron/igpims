@@ -6,7 +6,7 @@ export const ViolationSchema = z.object({
   studentName: z.string().min(1, "Student name is required"),
   violations: z.any(),
   dateOfInspection: z.any(),
-  totalFine: z.number().min(0, "Fine cannot be negative"),
+  totalFine: z.number().min(1, "Fine cannot be negative"),
   fineStatus: z
     .enum(["paid", "unpaid", "partial", "waived", "under_review"])
     .default("unpaid")

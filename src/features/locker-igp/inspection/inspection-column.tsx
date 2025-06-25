@@ -9,19 +9,10 @@ import {
   ColumnHeader,
   DateCell,
   IdCell,
-  SelectCell,
   ViolatorsCell,
 } from "./column-helpers"
 
 export const inspectionColumn: ColumnDef<Inspection>[] = [
-  {
-    id: "select",
-    header: ({ table }) => <SelectCell table={table} />,
-    cell: ({ row }) => <SelectCell row={row} />,
-    enableSorting: false,
-    enableHiding: false,
-    size: 40,
-  },
   {
     accessorKey: "id",
     header: () => (

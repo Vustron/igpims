@@ -53,7 +53,6 @@ export async function signUpUser(
 
     const userId = nanoid()
     const accountId = nanoid()
-    const timestamp = Date.now()
 
     let newUser: User | undefined
 
@@ -64,8 +63,6 @@ export async function signUpUser(
         email: validationResult.data.email,
         emailVerified: false,
         role: validationResult.data.role,
-        userCreatedAt: new Date(timestamp),
-        userUpdatedAt: new Date(timestamp),
       })
       await accountQuery.insertAccountQuery.execute({
         accountId,
@@ -75,8 +72,6 @@ export async function signUpUser(
         password: hashedPassword,
         salt,
         otpSignIn: false,
-        accountCreatedAt: new Date(timestamp),
-        accountUpdatedAt: new Date(timestamp),
       })
 
       const result = await userQuery.findByUserIdQuery.execute({

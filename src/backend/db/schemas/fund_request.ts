@@ -7,7 +7,6 @@ import { user } from "./user"
 export const fundRequest = sqliteTable(
   "fundRequest",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -25,6 +24,7 @@ export const fundRequest = sqliteTable(
     approvedBy: text("approvedBy").references(() => user.id, {
       onDelete: "set null",
     }),
+    ...timestamp,
   },
   (t) => [
     index("fundRequest_status_idx").on(t.status),

@@ -102,8 +102,6 @@ export async function signInOtpAuth(
           userId: userData.id,
           token: sessionToken,
           expiresAt: new Date(expiresAt),
-          createdAt: new Date(timestamp),
-          updatedAt: new Date(timestamp),
           ipAddress: clientIp,
           userAgent: request.headers.get("user-agent") ?? "",
         }),
@@ -111,7 +109,6 @@ export async function signInOtpAuth(
           userId: userData.id,
           accessToken: sessionToken,
           accessTokenExpiresAt: new Date(expiresAt),
-          updatedAt: new Date(timestamp),
         }),
       ])
 

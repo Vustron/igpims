@@ -7,7 +7,6 @@ import { user } from "./user"
 export const session = sqliteTable(
   "session",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -18,6 +17,7 @@ export const session = sqliteTable(
     token: text("token", { length: 255 }).notNull().unique(),
     ipAddress: text("ipAddress", { length: 255 }),
     userAgent: text("userAgent", { length: 255 }),
+    ...timestamp,
   },
   (t) => [
     index("session_user_id_idx").on(t.userId),

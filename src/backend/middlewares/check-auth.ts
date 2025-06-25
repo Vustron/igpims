@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation"
 import { NextResponse } from "next/server"
 import { Account, Session, User } from "@/backend/db/schemas"
 import { cleanupSession } from "@/backend/helpers/cleanup-session"
@@ -12,6 +13,7 @@ export async function checkAuth() {
   try {
     const currentSession = await getSession()
     if (!currentSession?.id) {
+      await cleanupSession()
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -74,7 +76,7 @@ export async function checkAuth() {
 
     if (!userData) {
       await cleanupSession()
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+      return redirect("/sign-in")
     }
 
     return currentSession

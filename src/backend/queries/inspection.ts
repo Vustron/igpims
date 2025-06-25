@@ -47,7 +47,6 @@ const updateInspectionQuery = db
     dateSet: sql`${sql.placeholder("dateSet")}`,
     violators: sql`${sql.placeholder("violators")}`,
     totalFines: sql`${sql.placeholder("totalFines")}`,
-    updatedAt: sql`CURRENT_TIMESTAMP`,
   })
   .where(eq(inspection.id, sql.placeholder("id")))
   .returning()

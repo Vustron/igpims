@@ -159,11 +159,11 @@ export const FileUpload = ({
                   <motion.div
                     key={`file-${idx}`}
                     layoutId={`file-upload-${idx}`}
-                    className="relative z-40 mx-auto flex w-full items-start gap-2 overflow-hidden rounded-md bg-background p-2"
+                    className="relative mx-auto flex w-full items-start gap-2 overflow-hidden rounded-md bg-background p-2"
                   >
                     <motion.button
                       onClick={(e) => handleRemoveFile(idx, e)}
-                      className="absolute top-1 right-1 z-50 rounded-full bg-white/80 p-0.5 backdrop-blur-sm hover:bg-white dark:bg-neutral-800/80 dark:hover:bg-neutral-800"
+                      className="absolute top-1 right-1 rounded-full bg-white/80 p-0.5 backdrop-blur-sm hover:bg-white dark:bg-neutral-800/80 dark:hover:bg-neutral-800"
                     >
                       <XCircleIcon className="size-5 text-neutral-500 hover:text-red-500" />
                     </motion.button>
@@ -174,6 +174,8 @@ export const FileUpload = ({
                           src={getImageUrl(file)}
                           alt={getFileName(file)}
                           className="size-full object-fill"
+                          width={50}
+                          height={50}
                         />
                       </div>
                     ) : (

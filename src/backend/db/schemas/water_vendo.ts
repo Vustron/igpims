@@ -6,7 +6,6 @@ import { timestamp } from "@/backend/helpers/schema-helpers"
 export const waterVendo = sqliteTable(
   "waterVendo",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -20,6 +19,7 @@ export const waterVendo = sqliteTable(
       .notNull()
       .default("full")
       .$type<"full" | "medium" | "low" | "empty">(),
+    ...timestamp,
   },
   (t) => [
     index("waterVendo_location_idx").on(t.waterVendoLocation),
@@ -31,7 +31,6 @@ export const waterVendo = sqliteTable(
 export const waterSupply = sqliteTable(
   "waterSupply",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -43,6 +42,7 @@ export const waterSupply = sqliteTable(
     expenses: integer("expenses").notNull(),
     usedGallons: integer("usedGallons").default(0).notNull(),
     remainingGallons: integer("remainingGallons").notNull(),
+    ...timestamp,
   },
   (_t) => [],
 )

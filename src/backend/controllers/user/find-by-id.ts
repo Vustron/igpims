@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Account, User } from "@/backend/db/schemas"
+import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as userQuery from "@/backend/queries/user"
 import { db } from "@/config/drizzle"
-import { getSession } from "@/config/session"
 import { catchError } from "@/utils/catch-error"
 
 export async function findUserById(
@@ -16,9 +16,9 @@ export async function findUserById(
       return rateLimitCheck
     }
 
-    const currentSession = await getSession()
-    if (!currentSession) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const currentSession = await checkAuth()
+    if (currentSession instanceof NextResponse) {
+      return currentSession
     }
 
     const url = new URL(request.url)

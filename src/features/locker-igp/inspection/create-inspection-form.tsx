@@ -66,21 +66,30 @@ export const CreateInspectionForm = ({
   }, [selectedViolators, form])
 
   useEffect(() => {
-    if (selectedViolators.length > 0 && violationsData?.data) {
-      const selectedViolatorIds = new Set(selectedViolators.map((v) => v.id))
+    const subscription = form.watch((value, { name }) => {
+      if (name === "violators" && value.violators && violationsData?.data) {
+        const selectedViolatorIds = new Set(
+          value.violators.map((v: any) => (typeof v === "string" ? v : v.id)),
+        )
 
-      const totalFines = violationsData.data.reduce((sum, violation) => {
-        if (selectedViolatorIds.has(violation.id!) && violation.totalFine) {
-          return sum + Number(violation.totalFine)
-        }
-        return sum
-      }, 0)
+        const totalFines = violationsData.data.reduce((sum, violation) => {
+          if (selectedViolatorIds.has(violation.id!) && violation.totalFine) {
+            return sum + violation.totalFine
+          }
+          return sum
+        }, 0)
 
-      form.setValue("totalFines", totalFines)
-    } else {
-      form.setValue("totalFines", 0)
-    }
-  }, [selectedViolators, violationsData, form])
+        form.setValue("totalFines", totalFines)
+      } else if (
+        name === "violators" &&
+        (!value.violators || value.violators.length === 0)
+      ) {
+        form.setValue("totalFines", 0)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [violationsData, form])
 
   useEffect(() => {
     if (!isLoadingViolations && violatorOptions.length > 0) {
@@ -130,18 +139,10 @@ export const CreateInspectionForm = ({
       return
     }
 
-    const dateOfInspection =
-      values.dateOfInspection instanceof Date
-        ? values.dateOfInspection.getTime()
-        : values.dateOfInspection
-
-    const dateSet =
-      values.dateSet instanceof Date ? values.dateSet.getTime() : values.dateSet
-
     const submissionData = {
       ...values,
-      dateOfInspection,
-      dateSet,
+      dateOfInspection: new Date(values.dateOfInspection).setHours(0, 0, 0, 0),
+      dateSet: new Date(values.dateSet).setHours(0, 0, 0, 0),
       violators: Array.isArray(values.violators)
         ? values.violators.map((v) => {
             if (typeof v === "string") {

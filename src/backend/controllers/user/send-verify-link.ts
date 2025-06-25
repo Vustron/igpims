@@ -45,15 +45,12 @@ export async function sendVerifyLink(
       token = nanoid()
       const expiryDate = new Date()
       expiryDate.setHours(expiryDate.getHours() + 24)
-      const now = new Date()
 
       await tokenQuery.insertVerificationTokenQuery.execute({
         id: nanoid(),
         token: token,
         email: validationResult.data.email,
         expires: expiryDate,
-        createdAt: now,
-        updatedAt: now,
         userId: existingUser.id,
       })
     })

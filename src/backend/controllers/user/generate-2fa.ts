@@ -63,7 +63,6 @@ export async function generate2fa(
     await accountQuery.updateAccountTwoFactorSecretQuery.execute({
       userId: currentSession.userId,
       twoFactorSecret: secret.base32,
-      updatedAt: new Date(),
     })
 
     const data = await QRCode.toDataURL(secret.otpauth_url as string)

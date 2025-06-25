@@ -58,7 +58,6 @@ export async function resetUserPassword(
         accountQuery.updateAccountPasswordQuery.execute({
           password: hashedPassword,
           salt,
-          updatedAt: new Date(),
           userId: token.userId,
         }),
         tokenQuery.deleteResetPasswordTokenQuery.execute({

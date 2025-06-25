@@ -7,7 +7,6 @@ import { locker } from "./locker"
 export const violation = sqliteTable(
   "violation",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -24,6 +23,7 @@ export const violation = sqliteTable(
       .notNull()
       .default("unpaid")
       .$type<"paid" | "unpaid" | "partial" | "waived" | "under_review">(),
+    ...timestamp,
   },
   (t) => [
     index("violation_student_name_idx").on(t.studentName),

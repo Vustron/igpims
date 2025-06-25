@@ -68,19 +68,16 @@ export async function updateUserInfo(
             accountQuery.updateAccountOtpSignInQuery.execute({
               userId: userId,
               otpSignIn: false,
-              updatedAt: new Date(),
             }),
             accountQuery.emptyAccountTwoFactorSecretQuery.execute({
               userId: userId,
               twoFactorSecret: null,
-              updatedAt: new Date(),
             }),
           ])
         } else {
           await accountQuery.updateAccountOtpSignInQuery.execute({
             userId: userId,
             otpSignIn: true,
-            updatedAt: new Date(),
           })
         }
       }
@@ -101,7 +98,7 @@ export async function updateUserInfo(
           validationResult.data.email !== userData.email
 
         await userQuery.updateUserQuery.execute({
-          updateUserId: userId,
+          id: userId,
           name: validationResult.data.name || userData.name,
           email: validationResult.data.email || userData.email,
           image: imageValue,

@@ -7,7 +7,6 @@ import { user } from "./user"
 export const account = sqliteTable(
   "account",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -24,6 +23,7 @@ export const account = sqliteTable(
     salt: text("salt", { length: 255 }),
     otpSignIn: integer("otpSignIn", { mode: "boolean" }).notNull(),
     twoFactorSecret: text("twoFactorSecret", { length: 10 }),
+    ...timestamp,
   },
   (t) => [
     index("account_user_id_idx").on(t.userId),

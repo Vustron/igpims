@@ -90,16 +90,7 @@ export const UsersClient = () => {
   }, [filters.role, debouncedSearch])
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-bold text-2xl tracking-tight">Users</h2>
-          <p className="text-muted-foreground">
-            Manage system users and their permissions
-          </p>
-        </div>
-      </div>
-
+    <div className="mt-3">
       <DataTable
         columns={usersColumns}
         data={data?.data || []}

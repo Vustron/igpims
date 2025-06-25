@@ -6,7 +6,6 @@ import { timestamp } from "@/backend/helpers/schema-helpers"
 export const inspection = sqliteTable(
   "inspection",
   {
-    ...timestamp,
     id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
@@ -18,6 +17,7 @@ export const inspection = sqliteTable(
     }).notNull(),
     violators: text("violators").notNull().$type<string[]>().default([]),
     totalFines: integer("totalFines").notNull(),
+    ...timestamp,
   },
   (_t) => [],
 )

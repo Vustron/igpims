@@ -6,7 +6,6 @@ import { timestamp } from "@/backend/helpers/schema-helpers"
 export const igp = sqliteTable(
   "igp",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -24,6 +23,7 @@ export const igp = sqliteTable(
       .notNull()
       .default("goods")
       .$type<"goods" | "services" | "rentals" | "events" | "other">(),
+    ...timestamp,
   },
   (t) => [
     index("igp_name_idx").on(t.igpName),
@@ -41,7 +41,6 @@ export const igpRelations = relations(igp, ({ many }) => ({
 export const igpTransactions = sqliteTable(
   "igpTransactions",
   {
-    ...timestamp,
     id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
@@ -59,6 +58,7 @@ export const igpTransactions = sqliteTable(
       .notNull()
       .default("pending")
       .$type<"pending" | "received" | "cancelled">(),
+    ...timestamp,
   },
   (t) => [
     index("igTransactions_igp_id_idx").on(t.igpId),
@@ -81,7 +81,6 @@ export const igpTransactionsRelations = relations(
 export const igpSupply = sqliteTable(
   "igpSupply",
   {
-    ...timestamp,
     id: text("id")
       .primaryKey()
       .$defaultFn(() => nanoid()),
@@ -94,6 +93,7 @@ export const igpSupply = sqliteTable(
     quantitySold: integer("quantitySold").notNull().default(0),
     unitPrice: integer("unitPrice").notNull(),
     totalRevenue: integer("totalRevenue").notNull().default(0),
+    ...timestamp,
   },
   (t) => [
     index("igpSupply_igp_id_idx").on(t.igpId),

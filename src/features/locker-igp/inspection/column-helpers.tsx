@@ -21,7 +21,7 @@ export const ColumnHeader = ({
   icon: React.ReactNode
   text: string
 }) => (
-  <div className="flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
+  <div className="ml-5 flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
     {icon}
     <span>{text}</span>
   </div>
@@ -74,7 +74,9 @@ export const DateCell = ({ value }: { value: number }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="whitespace-nowrap text-xs">{formattedDate}</span>
+          <span className="ml-5 whitespace-nowrap text-xs">
+            {formattedDate}
+          </span>
         </TooltipTrigger>
         <TooltipContent side="top">
           <div className="flex items-center gap-1.5">
@@ -101,7 +103,7 @@ export const IdCell = ({ value }: { value: string }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="font-medium font-mono text-xs">{value}</span>
+          <span className="ml-5 font-medium font-mono text-xs">{value}</span>
         </TooltipTrigger>
         <TooltipContent side="top">
           <div className="flex items-center gap-1.5">
@@ -182,7 +184,7 @@ export const ViolatorsCell = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="-space-x-2 flex items-center">
+          <div className="-space-x-2 ml-5 flex items-center">
             {violators.slice(0, 3).map((violator, index) => (
               <motion.div
                 key={violator.id || index}
@@ -240,7 +242,7 @@ export const AmountCell = ({ value }: { value: number }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="font-medium text-xs">{formatted}</span>
+          <span className="ml-5 font-medium text-xs">{formatted}</span>
         </TooltipTrigger>
         <TooltipContent side="top">
           <div className="flex items-center gap-1.5">

@@ -40,7 +40,6 @@ export async function createInspection(
 
     const newInspection = await db.transaction(async (_tx) => {
       const inspectionId = nanoid()
-      const now = Date.now()
 
       await inspectionQuery.insertInspectionQuery.execute({
         id: inspectionId,
@@ -56,8 +55,6 @@ export async function createInspection(
         dateSet: dateSetTimestamp,
         violators: inspectionData.violators,
         totalFines: inspectionData.totalFines,
-        createdAt: now,
-        updatedAt: now,
       }
     })
 

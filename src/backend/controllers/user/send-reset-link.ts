@@ -45,15 +45,12 @@ export async function sendResetLink(
       resetPasswordToken = nanoid()
       const expiryDate = new Date()
       expiryDate.setHours(expiryDate.getHours() + 24)
-      const now = new Date()
 
       await tokenQuery.insertResetTokenQuery.execute({
         id: nanoid(),
         token: resetPasswordToken,
         email: validationResult.data.email,
         expires: expiryDate,
-        createdAt: now,
-        updatedAt: now,
         userId: existingUser.id,
       })
     })

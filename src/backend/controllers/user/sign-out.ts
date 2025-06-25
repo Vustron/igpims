@@ -27,7 +27,6 @@ export async function signOutUser(
         }),
         accountQuery.emptyAccountSessionQuery.execute({
           userId: currentSession.userId,
-          updatedAt: new Date(),
         }),
       ])
       currentSession.destroy()

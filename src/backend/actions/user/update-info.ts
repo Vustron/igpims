@@ -26,9 +26,11 @@ export const useUpdateUserInfo = (id: string) => {
       return await updateUserInfo(sanitizedData, id)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["user", id] })
-      await queryClient.cancelQueries({ queryKey: ["users"] })
-      await queryClient.cancelQueries({ queryKey: ["users-infinite"] })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["user", id] }),
+        queryClient.cancelQueries({ queryKey: ["users"] }),
+        queryClient.cancelQueries({ queryKey: ["users-infinite"] }),
+      ])
 
       const previousUser = queryClient.getQueryData<User>(["user", id])
       const previousUsers = queryClient.getQueryData(["users"])
@@ -41,7 +43,7 @@ export const useUpdateUserInfo = (id: string) => {
       }
     },
     onSuccess: async (updatedUser: User) => {
-      queryClient.setQueryData(["user", id], updatedUser)
+      queryClient.setQueryData(["user", id], () => updatedUser)
 
       queryClient.setQueriesData({ queryKey: ["users"] }, (oldData: any) => {
         if (!oldData) return oldData

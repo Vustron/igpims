@@ -7,7 +7,6 @@ import { user } from "./user"
 export const projectRequest = sqliteTable(
   "projectRequest",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -32,6 +31,7 @@ export const projectRequest = sqliteTable(
     approvedBy: text("approvedBy").references(() => user.id, {
       onDelete: "set null",
     }),
+    ...timestamp,
   },
   (t) => [
     index("projectRequest_status_idx").on(t.status),

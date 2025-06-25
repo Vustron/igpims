@@ -15,7 +15,6 @@ export const UserRole = {
 export const user = sqliteTable(
   "user",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
@@ -40,6 +39,7 @@ export const user = sqliteTable(
       .notNull()
       .default("user"),
     image: text("image"),
+    ...timestamp,
   },
   (t) => [index("user_role_idx").on(t.id)],
 )

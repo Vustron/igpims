@@ -11,13 +11,13 @@ import { timestamp } from "@/backend/helpers/schema-helpers"
 export const rateLimit = sqliteTable(
   "rateLimit",
   {
-    ...timestamp,
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
     ipAddress: text("ipAddress", { length: 255 }).notNull(),
     attempts: integer("attempts").notNull().default(0),
     resetAt: integer("resetAt", { mode: "timestamp" }).notNull(),
+    ...timestamp,
   },
   (t) => [uniqueIndex("rateLimit_ip_address_idx").on(t.ipAddress)],
 )

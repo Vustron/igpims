@@ -29,7 +29,6 @@ export async function verifyUserEmail(
       const tokens = await tokenQuery.findVerifyEmailTokenQuery.execute({
         token: validationResult.data.token,
         email: validationResult.data.email,
-        now: new Date(),
       })
 
       const token = tokens[0]
@@ -38,7 +37,6 @@ export async function verifyUserEmail(
       await Promise.all([
         userQuery.verifyUserEmailQuery.execute({
           emailVerified: true,
-          updatedAt: new Date(),
           userId: token.userId,
         }),
         tokenQuery.deleteVerifyEmailTokenQuery.execute({
