@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { DynamicForm } from "@/components/ui/forms"
+import { useFindManyInspections } from "@/backend/actions/inspection/find-many"
 import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { useUpdateViolation } from "@/backend/actions/violation/update-violation"
 import { parseViolations } from "@/backend/helpers/violation-helpers"
@@ -22,6 +23,8 @@ interface EditViolationFormProps {
   onError?: () => void
 }
 
+// TODO: fix date of inspection mess
+
 export const EditViolationForm = ({
   violation,
   onSuccess,
@@ -36,6 +39,14 @@ export const EditViolationForm = ({
     limit: 100,
   })
 
+  const {
+    data: inspectionsData,
+    isLoading: isLoadingInspections,
+    isError: isInspectionsError,
+  } = useFindManyInspections({
+    limit: 100,
+  })
+
   const [isFormReady, setIsFormReady] = useState(false)
 
   const form = useForm<UpdateViolation>({
@@ -43,19 +54,33 @@ export const EditViolationForm = ({
     defaultValues: {
       id: violation.id,
       lockerId: violation.lockerId,
+      inspectionId: violation.inspectionId,
       studentName: violation.studentName,
       violations: parseViolations(violation.violations),
       dateOfInspection: violation.dateOfInspection,
+      datePaid: violation.datePaid,
       totalFine: violation.totalFine,
       fineStatus: violation.fineStatus,
     },
   })
 
   useEffect(() => {
-    if (!isLoadingLockers && (lockersData?.data?.length! > 0 || isError)) {
+    if (
+      !isLoadingLockers &&
+      !isLoadingInspections &&
+      (lockersData?.data?.length! > 0 || isError) &&
+      (inspectionsData?.data?.length! > 0 || isInspectionsError)
+    ) {
       setIsFormReady(true)
     }
-  }, [isLoadingLockers, lockersData, isError])
+  }, [
+    isLoadingLockers,
+    isLoadingInspections,
+    lockersData,
+    inspectionsData,
+    isError,
+    isInspectionsError,
+  ])
 
   const violationOptions = [
     { value: "damaged_locker", label: "Damaged Locker" },
@@ -69,6 +94,16 @@ export const EditViolationForm = ({
     lockersData?.data.map((locker) => ({
       value: locker.id,
       label: `${locker.lockerName}`,
+    })) || []
+
+  const inspectionOptions =
+    inspectionsData?.data.map((inspection) => ({
+      value: inspection.id,
+      label: new Date(
+        new Date(inspection.dateOfInspection).getTime() > 1e15
+          ? new Date(inspection.dateOfInspection).getTime() / 1000
+          : inspection.dateOfInspection,
+      ).toLocaleDateString(),
     })) || []
 
   const violationFields: FieldConfig<UpdateViolation>[] = [
@@ -90,12 +125,23 @@ export const EditViolationForm = ({
       options: violationOptions,
     },
     {
-      name: "dateOfInspection",
-      type: "date",
-      label: "Date of Inspection",
-      description: "When the violation was discovered",
-      placeholder: "Select date",
+      name: "inspectionId",
+      type: "select",
+      label: "Inspection Date",
+      placeholder: isLoadingInspections
+        ? "Loading inspections..."
+        : "Select inspection",
+      description: "Select the inspection date",
+      options: inspectionOptions,
       required: true,
+    },
+    {
+      name: "datePaid",
+      type: "date",
+      label: "Paid Date",
+      description: "Date when the fine was paid",
+      placeholder: "Select date",
+      required: false,
     },
     {
       name: "lockerId",
@@ -137,6 +183,11 @@ export const EditViolationForm = ({
       return
     }
 
+    if (!values.inspectionId) {
+      toast.error("Please select an inspection")
+      return
+    }
+
     if (!values.violations || values.violations.length === 0) {
       toast.error("Please select at least one violation")
       return
@@ -144,7 +195,13 @@ export const EditViolationForm = ({
 
     const submissionData = {
       ...values,
-      dateOfInspection: new Date(values.dateOfInspection).setHours(0, 0, 0, 0),
+      dateOfInspection:
+        inspectionsData?.data.find(
+          (inspection) => inspection.id === values.inspectionId,
+        )?.dateOfInspection || values.dateOfInspection,
+      datePaid: values.datePaid
+        ? new Date(values.datePaid).setHours(0, 0, 0, 0)
+        : null,
       totalFine: Number(values.totalFine),
       violations: values.violations,
     }
@@ -166,7 +223,7 @@ export const EditViolationForm = ({
     }
   }
 
-  if (isLoadingLockers || !isFormReady) {
+  if (isLoadingLockers || isLoadingInspections || !isFormReady) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="size-8 animate-spin text-primary" />
@@ -174,11 +231,16 @@ export const EditViolationForm = ({
     )
   }
 
-  if (isError || (!isLoadingLockers && lockerOptions.length === 0)) {
+  if (
+    isError ||
+    isInspectionsError ||
+    (!isLoadingLockers && lockerOptions.length === 0) ||
+    (!isLoadingInspections && inspectionOptions.length === 0)
+  ) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
         <h3 className="mb-2 font-semibold">Error Loading Form</h3>
-        <p>There was a problem loading the locker data.</p>
+        <p>There was a problem loading the locker or inspection data.</p>
       </div>
     )
   }

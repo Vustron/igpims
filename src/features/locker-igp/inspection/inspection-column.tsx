@@ -18,7 +18,7 @@ export const inspectionColumn: ColumnDef<Inspection>[] = [
     header: () => (
       <ColumnHeader
         icon={<ClipboardCopy className="h-3.5 w-3.5" />}
-        text="ID"
+        text="Transaction ID"
       />
     ),
     cell: ({ row }) => <IdCell value={row.getValue("id")} />,
@@ -32,7 +32,10 @@ export const inspectionColumn: ColumnDef<Inspection>[] = [
         text="Inspection Date"
       />
     ),
-    cell: ({ row }) => <DateCell value={row.getValue("dateOfInspection")} />,
+    cell: ({ row }) => {
+      const timestamp = row.getValue("dateOfInspection") as number
+      return <DateCell value={timestamp} />
+    },
     sortingFn: "datetime",
     size: 120,
   },
@@ -44,7 +47,10 @@ export const inspectionColumn: ColumnDef<Inspection>[] = [
         text="Date Set"
       />
     ),
-    cell: ({ row }) => <DateCell value={row.getValue("dateSet")} />,
+    cell: ({ row }) => {
+      const timestamp = row.getValue("dateSet") as number
+      return <DateCell value={timestamp} />
+    },
     sortingFn: "datetime",
     size: 120,
   },

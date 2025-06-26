@@ -1,5 +1,6 @@
 "use client"
 
+import { format } from "date-fns"
 import { motion } from "framer-motion"
 import { Calendar, ClipboardCopy, Receipt, Users } from "lucide-react"
 import React from "react"
@@ -63,34 +64,33 @@ export const SelectCell = ({
 }
 
 export const DateCell = ({ value }: { value: number }) => {
-  const date = new Date(value)
-  const formattedDate = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date)
+  let date: Date
+
+  if (typeof value === "string") {
+    date = new Date(value)
+  } else {
+    const isLikelyMicroseconds = value > 1e15
+    date = new Date(isLikelyMicroseconds ? value / 1000 : value)
+  }
+
+  if (Number.isNaN(date.getTime())) {
+    return (
+      <div className="whitespace-nowrap text-red-500 text-xs">Invalid Date</div>
+    )
+  }
+
+  const formattedDate = format(date, "MMM dd, yyyy")
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="ml-5 whitespace-nowrap text-xs">
-            {formattedDate}
-          </span>
+          <div className="whitespace-nowrap text-xs">{formattedDate}</div>
         </TooltipTrigger>
         <TooltipContent side="top">
-          <div className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5" />
-            <span>
-              {date.toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
+          <div className="flex items-center">
+            <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+            {format(date, "PPP")}
           </div>
         </TooltipContent>
       </Tooltip>
@@ -170,6 +170,12 @@ export const ViolatorsCell = ({
     return []
   }, [value])
 
+  if (violators.length === 0) {
+    return (
+      <div className="ml-5 text-muted-foreground text-xs">No violators yet</div>
+    )
+  }
+
   const getInitials = (name: string) => {
     if (!name || typeof name !== "string") return "NA"
     return name
@@ -229,7 +235,6 @@ export const ViolatorsCell = ({
     </TooltipProvider>
   )
 }
-
 export const AmountCell = ({ value }: { value: number }) => {
   const formatted = new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -237,6 +242,12 @@ export const AmountCell = ({ value }: { value: number }) => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value)
+
+  if (!value || value === 0) {
+    return (
+      <span className="ml-5 text-muted-foreground text-xs">No fines yet</span>
+    )
+  }
 
   return (
     <TooltipProvider>

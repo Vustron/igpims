@@ -50,8 +50,6 @@ const createRentalQuery = db
     paymentStatus: sql`${sql.placeholder("paymentStatus")}`,
     dateRented: sql`${sql.placeholder("dateRented")}`,
     dateDue: sql`${sql.placeholder("dateDue")}`,
-    createdAt: sql`CURRENT_TIMESTAMP`,
-    updatedAt: sql`CURRENT_TIMESTAMP`,
   })
   .prepare()
 
@@ -66,7 +64,6 @@ const updateRentalQuery = db
     paymentStatus: sql`${sql.placeholder("paymentStatus")}`,
     dateRented: sql`${sql.placeholder("dateRented")}`,
     dateDue: sql`${sql.placeholder("dateDue")}`,
-    updatedAt: sql`CURRENT_TIMESTAMP`,
   })
   .where(sql`${lockerRental.id} = ${sql.placeholder("id")}`)
   .prepare()

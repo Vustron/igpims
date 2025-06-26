@@ -33,8 +33,6 @@ const insertSessionQuery = db
     userId: sql.placeholder("userId"),
     token: sql.placeholder("token"),
     expiresAt: sql.placeholder("expiresAt"),
-    createdAt: sql.placeholder("createdAt"),
-    updatedAt: sql.placeholder("updatedAt"),
     ipAddress: sql.placeholder("ipAddress"),
     userAgent: sql.placeholder("userAgent"),
   })

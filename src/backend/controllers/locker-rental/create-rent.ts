@@ -92,8 +92,6 @@ export async function createRent(
         paymentStatus: rentalData.paymentStatus,
         dateRented: dateRentedTimestamp,
         dateDue: dateDueTimestamp,
-        createdAt: now,
-        updatedAt: now,
       })
 
       if (rentalData.rentalStatus === "active") {

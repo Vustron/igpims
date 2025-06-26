@@ -119,7 +119,7 @@ export const useCreateInspection = () => {
     },
     onSuccess: (newInspection: Inspection, _variables, _context) => {
       queryClient.setQueryData(["inspection", newInspection.id], newInspection)
-
+      console.log(newInspection)
       queryClient.setQueriesData<PaginatedInspectionsResponse>(
         { queryKey: ["inspections"] },
         (oldData: any) => {

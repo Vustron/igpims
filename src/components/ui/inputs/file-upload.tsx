@@ -200,7 +200,7 @@ export const FileUpload = ({
                 layoutId="file-upload"
                 variants={mainVariant}
                 transition={{ type: "spring", stiffness: 500, damping: 50 }}
-                className="relative z-40 mx-auto flex h-8 w-full items-center justify-center rounded-md bg-background"
+                className="relative mx-auto flex h-8 w-full items-center justify-center rounded-md bg-background"
               >
                 {isDragActive ? (
                   <motion.p

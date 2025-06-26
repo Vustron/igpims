@@ -77,8 +77,6 @@ export const useCreateViolation = () => {
         ...newViolation,
         violations: violationsArray,
         id: `temp-${Date.now()}`,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
       }
 
       const allViolationQueries =
@@ -109,7 +107,6 @@ export const useCreateViolation = () => {
               },
             })
           } else {
-            // For other pages, just update meta
             const newTotalItems = oldData.meta.totalItems + 1
             queryClient.setQueryData(queryKey, {
               ...oldData,

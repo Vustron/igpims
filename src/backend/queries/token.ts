@@ -33,8 +33,6 @@ const insertResetTokenQuery = db
     token: sql.placeholder("token"),
     email: sql.placeholder("email"),
     expires: sql.placeholder("expires"),
-    createdAt: sql.placeholder("createdAt"),
-    updatedAt: sql.placeholder("updatedAt"),
     userId: sql.placeholder("userId"),
   })
   .returning()
@@ -47,8 +45,6 @@ const insertVerificationTokenQuery = db
     token: sql.placeholder("token"),
     email: sql.placeholder("email"),
     expires: sql.placeholder("expires"),
-    createdAt: sql.placeholder("createdAt"),
-    updatedAt: sql.placeholder("updatedAt"),
     userId: sql.placeholder("userId"),
   })
   .returning()
@@ -67,7 +63,6 @@ const insertOtpTokenQuery = db
     userId: sql.placeholder("userId"),
     email: sql.placeholder("email"),
     otp: sql.placeholder("otp"),
-    createdAt: sql.placeholder("createdAt"),
   })
   .returning()
   .prepare()

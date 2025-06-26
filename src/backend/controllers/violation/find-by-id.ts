@@ -46,6 +46,7 @@ export async function findViolationById(
       dateOfInspection: result.dateOfInspection
         ? new Date(result.dateOfInspection).getTime()
         : null,
+      datePaid: result.datePaid ? new Date(result.datePaid).getTime() : null,
     }
 
     return NextResponse.json(responseData, { status: 200 })

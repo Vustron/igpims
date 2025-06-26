@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
-import { inspection, violation } from "@/backend/db/schemas"
+import { inspection } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { countInspectionsQuery } from "@/backend/queries/inspection"
@@ -34,39 +34,31 @@ export async function findManyInspections(
         totalFines: inspection.totalFines,
         createdAt: inspection.createdAt,
         updatedAt: inspection.updatedAt,
+        violators: inspection.violators,
       })
       .from(inspection)
       .orderBy(sql`${inspection.dateOfInspection} DESC`)
       .limit(limit)
       .offset(offset)
 
-    const inspectionIds = inspectionsData.map((i) => i.id)
-
-    const violationsData = await db
-      .select({
-        violatorId: violation.id,
-        violatorName: violation.studentName,
-      })
-      .from(violation)
-      .where(sql`${violation.id} IN (${inspectionIds.join(",")})`)
-
-    const violationsByInspection = violationsData.reduce(
-      (acc, v) => {
-        if (!acc[v.violatorId]) {
-          acc[v.violatorId] = []
-        }
-        acc[v.violatorId]?.push({
-          id: v.violatorId,
-          name: v.violatorName,
-        })
-        return acc
-      },
-      {} as Record<string, { id: string; name: string }[]>,
-    )
-
     const inspections = inspectionsData.map((insp) => ({
       ...insp,
-      violators: violationsByInspection[insp.id] || [],
+      dateOfInspection: new Date(insp.dateOfInspection).getTime(),
+      dateSet: insp.dateSet ? new Date(insp.dateSet).getTime() : null,
+      createdAt: Math.floor(new Date(insp.createdAt).getTime() / 1000),
+      updatedAt: Math.floor(new Date(insp.updatedAt).getTime() / 1000),
+      violators: (() => {
+        try {
+          return typeof insp.violators === "string"
+            ? JSON.parse(insp.violators).map((v: any) => ({
+                id: v.id,
+                studentName: v.studentName,
+              }))
+            : []
+        } catch {
+          return []
+        }
+      })(),
     }))
 
     const countResult = await countInspectionsQuery.execute()

@@ -69,7 +69,7 @@ export async function updateInspection(
       )
     }
 
-    return NextResponse.json(result[0], { status: 200 })
+    return NextResponse.json(validationResult.data, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

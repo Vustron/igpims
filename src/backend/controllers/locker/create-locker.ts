@@ -57,8 +57,6 @@ export async function createLocker(
         lockerName: validationResult.data.lockerName,
         lockerLocation: validationResult.data.lockerLocation,
         lockerRentalPrice: validationResult.data.lockerRentalPrice || 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       })
 
       const result = await lockerQuery.getLockerByIdQuery.execute({

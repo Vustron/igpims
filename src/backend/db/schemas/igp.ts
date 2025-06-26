@@ -41,9 +41,9 @@ export const igpRelations = relations(igp, ({ many }) => ({
 export const igpTransactions = sqliteTable(
   "igpTransactions",
   {
-    id: text("id")
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     igpId: text("igpId")
       .notNull()
       .references(() => igp.id, { onDelete: "cascade" }),
@@ -81,9 +81,9 @@ export const igpTransactionsRelations = relations(
 export const igpSupply = sqliteTable(
   "igpSupply",
   {
-    id: text("id")
+    id: text("id", { length: 15 })
       .primaryKey()
-      .$defaultFn(() => nanoid()),
+      .$defaultFn(() => nanoid(15)),
     igpId: text("igpId")
       .notNull()
       .references(() => igp.id, { onDelete: "cascade" }),

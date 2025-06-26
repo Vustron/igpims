@@ -124,9 +124,11 @@ export async function findManyViolations(
         .select({
           id: violation.id,
           lockerId: violation.lockerId,
+          inspectionId: violation.inspectionId,
           studentName: violation.studentName,
           violations: violation.violations,
           dateOfInspection: sql<number>`${violation.dateOfInspection}`,
+          datePaid: sql<number>`${violation.datePaid}`,
           totalFine: violation.totalFine,
           fineStatus: violation.fineStatus,
           createdAt: sql<number>`${violation.createdAt}`,

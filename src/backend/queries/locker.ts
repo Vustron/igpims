@@ -11,8 +11,6 @@ const createLockerQuery = db
     lockerName: sql.placeholder("lockerName"),
     lockerLocation: sql.placeholder("lockerLocation"),
     lockerRentalPrice: sql.placeholder("lockerRentalPrice"),
-    createdAt: sql.placeholder("createdAt"),
-    updatedAt: sql.placeholder("updatedAt"),
   })
   .prepare()
 

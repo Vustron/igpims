@@ -1,5 +1,10 @@
 import { create } from "zustand"
-import { Locker, LockerRental, Violation } from "@/backend/db/schemas"
+import {
+  Inspection,
+  Locker,
+  LockerRental,
+  Violation,
+} from "@/backend/db/schemas"
 
 export type DialogType =
   | "confirm"
@@ -37,6 +42,7 @@ export type DialogType =
   | "createViolation"
   | "editViolation"
   | "createInspection"
+  | "editInspection"
 
 interface ConfirmDialogData {
   title?: string
@@ -62,6 +68,10 @@ interface ViolationData {
   violation?: Violation
 }
 
+interface InspectionData {
+  inspection?: Inspection
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -76,6 +86,7 @@ export type DialogData =
   | ProjectRequestData
   | RentalReceiptData
   | ViolationData
+  | InspectionData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -99,6 +110,10 @@ export const isRentalReceiptData = (data: any): data is RentalReceiptData => {
 
 export const isViolationData = (data: any): data is ViolationData => {
   return data && data.violation !== undefined
+}
+
+export const isInspectionData = (data: any): data is InspectionData => {
+  return data && data.inspection !== undefined
 }
 
 export const useDialog = create<DialogStore>((set) => ({

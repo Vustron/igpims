@@ -21,6 +21,7 @@ import {
   DeleteProjectRequestDialog,
   DisburseFundsDialog,
   DueOverduePaymentsDialog,
+  EditInspectionDialog,
   EditViolationDialog,
   IgpFinancialReportDialog,
   PrintIgpStatusDialog,
@@ -77,6 +78,7 @@ export const DialogProvider = () => {
       <CreateViolationDialog />
       <EditViolationDialog />
       <CreateInspectionDialog />
+      <EditInspectionDialog />
     </>
   )
 }

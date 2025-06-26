@@ -92,7 +92,7 @@ export const CreateInspectionForm = ({
   }, [violationsData, form])
 
   useEffect(() => {
-    if (!isLoadingViolations && violatorOptions.length > 0) {
+    if (!isLoadingViolations) {
       setIsFormReady(true)
     }
   }, [isLoadingViolations, violatorOptions])
@@ -134,10 +134,10 @@ export const CreateInspectionForm = ({
   ]
 
   const onSubmit = async (values: Omit<Inspection, "id">) => {
-    if (!values.violators || values.violators.length === 0) {
-      toast.error("Please select at least one violator")
-      return
-    }
+    // if (!values.violators || values.violators.length === 0) {
+    //   toast.error("Please select at least one violator")
+    //   return
+    // }
 
     const submissionData = {
       ...values,
@@ -160,8 +160,6 @@ export const CreateInspectionForm = ({
         : values.violators,
       totalFines: Number(values.totalFines),
     }
-
-    console.log(submissionData)
 
     await toast.promise(createInspection.mutateAsync(submissionData), {
       loading: <span className="animate-pulse">Creating inspection...</span>,

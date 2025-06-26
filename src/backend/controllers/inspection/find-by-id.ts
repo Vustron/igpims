@@ -39,19 +39,34 @@ export async function findInspectionById(
 
     const inspection = result[0]
 
-    let violatorDetails = []
-    if (inspection?.violatorDetails) {
-      try {
-        violatorDetails = JSON.parse(inspection.violatorDetails)
-      } catch (e) {
-        console.error("Error parsing violator details:", e)
-      }
+    if (!inspection) {
+      return NextResponse.json(
+        { error: "Inspection not found" },
+        { status: 404 },
+      )
     }
 
     return NextResponse.json(
       {
         ...inspection,
-        violatorDetails,
+        dateOfInspection: new Date(inspection.dateOfInspection).getTime(),
+        dateSet: inspection.dateSet
+          ? new Date(inspection.dateSet).getTime()
+          : null,
+        createdAt: Math.floor(new Date(inspection.createdAt).getTime() / 1000),
+        updatedAt: Math.floor(new Date(inspection.updatedAt).getTime() / 1000),
+        violators: (() => {
+          try {
+            return typeof inspection.violators === "string"
+              ? JSON.parse(inspection.violators).map((v: any) => ({
+                  id: v.id,
+                  studentName: v.studentName,
+                }))
+              : []
+          } catch {
+            return []
+          }
+        })(),
       },
       { status: 200 },
     )

@@ -41,6 +41,12 @@ export async function createViolation(
         ? new Date(violationData.dateOfInspection).getTime()
         : violationData.dateOfInspection
 
+    const datePaidTimestamp = violationData.datePaid
+      ? typeof violationData.datePaid === "string"
+        ? new Date(violationData.datePaid).getTime()
+        : violationData.datePaid
+      : null
+
     const newViolation = await db.transaction(async (_tx) => {
       const violationId = nanoid()
       const now = Date.now()
@@ -48,21 +54,23 @@ export async function createViolation(
       await violationQuery.insertViolationQuery.execute({
         id: violationId,
         lockerId: violationData.lockerId,
+        inspectionId: violationData.inspectionId,
         studentName: violationData.studentName,
         violations: JSON.stringify(violationData.violations),
         dateOfInspection: dateOfInspectionTimestamp,
+        datePaid: datePaidTimestamp,
         totalFine: violationData.totalFine,
         fineStatus: violationData.fineStatus || "unpaid",
-        createdAt: now,
-        updatedAt: now,
       })
 
       return {
         id: violationId,
         lockerId: violationData.lockerId,
+        inspectionId: violationData.inspectionId,
         studentName: violationData.studentName,
         violations: violationData.violations,
         dateOfInspection: dateOfInspectionTimestamp,
+        datePaid: datePaidTimestamp || null,
         totalFine: violationData.totalFine,
         fineStatus: violationData.fineStatus || "unpaid",
         createdAt: now,

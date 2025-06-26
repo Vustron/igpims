@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { DynamicForm } from "@/components/ui/forms"
+import { useFindManyInspections } from "@/backend/actions/inspection/find-many"
 import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { useCreateViolation } from "@/backend/actions/violation/create-violation"
 import { FieldConfig } from "@/interfaces/form"
@@ -27,6 +28,9 @@ export const ViolationForm = ({
   const [selectedLocker, setSelectedLocker] = useState(
     violation?.lockerId || "",
   )
+  const [selectedInspection, setSelectedInspection] = useState(
+    violation?.inspectionId || "",
+  )
   const [selectedViolations, setSelectedViolations] = useState<string[]>(
     Array.isArray(violation?.violations)
       ? violation.violations.map((v) => String(v).trim()).filter((v) => v)
@@ -38,6 +42,14 @@ export const ViolationForm = ({
     isLoading: isLoadingLockers,
     isError,
   } = useFindManyLockers({
+    limit: 100,
+  })
+
+  const {
+    data: inspectionsData,
+    isLoading: isLoadingInspections,
+    isError: isInspectionsError,
+  } = useFindManyInspections({
     limit: 100,
   })
 
@@ -57,10 +69,21 @@ export const ViolationForm = ({
       label: `${locker.lockerName}`,
     })) || []
 
+  const inspectionOptions =
+    inspectionsData?.data.map((inspection) => ({
+      value: inspection.id,
+      label: new Date(
+        new Date(inspection.dateOfInspection).getTime() > 1e15
+          ? new Date(inspection.dateOfInspection).getTime() / 1000
+          : inspection.dateOfInspection,
+      ).toLocaleDateString(),
+    })) || []
+
   const form = useForm<Omit<Violation, "id">>({
     resolver: zodResolver(ViolationSchema.omit({ id: true })),
     defaultValues: {
       lockerId: "",
+      inspectionId: "",
       studentName: "",
       violations: [],
       dateOfInspection: Date.now(),
@@ -71,14 +94,45 @@ export const ViolationForm = ({
 
   useEffect(() => {
     form.setValue("lockerId", selectedLocker)
+    form.setValue("inspectionId", selectedInspection)
     form.setValue("violations", selectedViolations)
-  }, [selectedLocker, selectedViolations, form])
+
+    if (selectedInspection && inspectionsData?.data) {
+      const selectedInspectionData = inspectionsData.data.find(
+        (inspection) => inspection.id === selectedInspection,
+      )
+      if (selectedInspectionData) {
+        form.setValue(
+          "dateOfInspection",
+          selectedInspectionData.dateOfInspection,
+        )
+      }
+    }
+  }, [
+    selectedLocker,
+    selectedInspection,
+    selectedViolations,
+    form,
+    inspectionsData,
+  ])
 
   useEffect(() => {
-    if (!isLoadingLockers && (lockersData?.data?.length! > 0 || isError)) {
+    if (
+      !isLoadingLockers &&
+      !isLoadingInspections &&
+      (lockersData?.data?.length! > 0 || isError) &&
+      (inspectionsData?.data?.length! > 0 || isInspectionsError)
+    ) {
       setIsFormReady(true)
     }
-  }, [isLoadingLockers, lockersData, isError])
+  }, [
+    isLoadingLockers,
+    isLoadingInspections,
+    lockersData,
+    inspectionsData,
+    isError,
+    isInspectionsError,
+  ])
 
   const violationFields: FieldConfig<Omit<Violation, "id">>[] = [
     {
@@ -99,10 +153,21 @@ export const ViolationForm = ({
       options: violationOptions,
     },
     {
-      name: "dateOfInspection",
+      name: "inspectionId",
+      type: "select",
+      label: "Inspection Date",
+      placeholder: isLoadingInspections
+        ? "Loading inspections..."
+        : "Select inspection",
+      description: "Select the inspection date",
+      options: inspectionOptions,
+      required: true,
+    },
+    {
+      name: "datePaid",
       type: "date",
-      label: "Date of Inspection",
-      description: "When the violation was discovered",
+      label: "Paid Date",
+      description: "",
       placeholder: "Select date",
       required: true,
     },
@@ -145,6 +210,10 @@ export const ViolationForm = ({
       toast.error("Please select a locker")
       return
     }
+    if (!values.inspectionId) {
+      toast.error("Please select an inspection")
+      return
+    }
     if (!values.violations || values.violations.length === 0) {
       toast.error("Please select at least one violation")
       return
@@ -167,6 +236,7 @@ export const ViolationForm = ({
     const submissionData = {
       ...values,
       dateOfInspection: new Date(values.dateOfInspection).setHours(0, 0, 0, 0),
+      datePaid: new Date(values.datePaid).setHours(0, 0, 0, 0),
       totalFine: Number(values.totalFine),
       violations: violationsArray,
     }
@@ -179,6 +249,7 @@ export const ViolationForm = ({
 
     form.reset()
     setSelectedLocker("")
+    setSelectedInspection("")
     setSelectedViolations([])
 
     if (createViolation.isSuccess) {
@@ -188,7 +259,7 @@ export const ViolationForm = ({
     }
   }
 
-  if (isLoadingLockers || !isFormReady) {
+  if (isLoadingLockers || isLoadingInspections || !isFormReady) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="size-8 animate-spin text-primary" />
@@ -196,11 +267,16 @@ export const ViolationForm = ({
     )
   }
 
-  if (isError || (!isLoadingLockers && lockerOptions.length === 0)) {
+  if (
+    isError ||
+    isInspectionsError ||
+    (!isLoadingLockers && lockerOptions.length === 0) ||
+    (!isLoadingInspections && inspectionOptions.length === 0)
+  ) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
         <h3 className="mb-2 font-semibold">Error Loading Form</h3>
-        <p>There was a problem loading the locker data.</p>
+        <p>There was a problem loading the locker or inspection data.</p>
       </div>
     )
   }

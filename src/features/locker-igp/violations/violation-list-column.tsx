@@ -2,12 +2,14 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { AlertCircle, Calendar, Package, Receipt, User } from "lucide-react"
+import { BiCard } from "react-icons/bi"
 import { Violation } from "@/backend/db/schemas"
 import { ViolationActions } from "./actions"
 import {
   AmountCell,
   ColumnHeader,
   DateCell,
+  IdCell,
   LockerCell,
   PaymentStatusCell,
   RenterNameCell,
@@ -15,6 +17,23 @@ import {
 } from "./column-helpers"
 
 export const violationListColumns: ColumnDef<Violation>[] = [
+  {
+    accessorKey: "id",
+    header: () => (
+      <div className="ml-5">
+        <ColumnHeader
+          icon={<BiCard className="h-3.5 w-3.5" />}
+          text="Transaction Id"
+        />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className="ml-5">
+        <IdCell value={row.getValue("id")} />
+      </div>
+    ),
+    size: 140,
+  },
   {
     accessorKey: "studentName",
     header: () => (
@@ -58,9 +77,26 @@ export const violationListColumns: ColumnDef<Violation>[] = [
     size: 120,
   },
   {
+    accessorKey: "datePaid",
+    header: () => (
+      <ColumnHeader
+        icon={<Calendar className="h-3.5 w-3.5" />}
+        text="Date Paid"
+      />
+    ),
+    cell: ({ row }) => {
+      const timestamp = row.getValue("datePaid") as number
+      return <DateCell value={timestamp} />
+    },
+    sortingFn: "datetime",
+    size: 120,
+  },
+  {
     accessorKey: "totalFine",
     header: () => (
-      <ColumnHeader icon={<Receipt className="h-3.5 w-3.5" />} text="Fine" />
+      <div className="text-right">
+        <ColumnHeader icon={<Receipt className="h-3.5 w-3.5" />} text="Fine" />
+      </div>
     ),
     cell: ({ row }) => <AmountCell value={row.getValue("totalFine")} />,
     size: 80,
@@ -68,9 +104,18 @@ export const violationListColumns: ColumnDef<Violation>[] = [
   {
     accessorKey: "fineStatus",
     header: () => (
-      <ColumnHeader icon={<Receipt className="h-3.5 w-3.5" />} text="Status" />
+      <div className="text-center">
+        <ColumnHeader
+          icon={<Receipt className="h-3.5 w-3.5" />}
+          text="Status"
+        />
+      </div>
     ),
-    cell: ({ row }) => <PaymentStatusCell value={row.getValue("fineStatus")} />,
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        <PaymentStatusCell value={row.getValue("fineStatus")} />
+      </div>
+    ),
     size: 100,
   },
   {

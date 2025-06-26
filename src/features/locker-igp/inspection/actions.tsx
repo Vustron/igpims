@@ -1,12 +1,7 @@
 "use client"
 
-import {
-  ClipboardCopy,
-  Eye,
-  FilePen,
-  MoreHorizontal,
-  Printer,
-} from "lucide-react"
+import { FilePen, MoreHorizontal, Trash2 } from "lucide-react"
+import toast from "react-hot-toast"
 import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
@@ -16,23 +11,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
+import { useDeleteInspection } from "@/backend/actions/inspection/delete-inspection"
 import { Inspection } from "@/backend/db/schemas"
+import { useConfirm } from "@/hooks/use-confirm"
+import { useDialog } from "@/hooks/use-dialog"
+import { catchError } from "@/utils/catch-error"
 
 export const InspectionActions = ({
   inspection,
 }: {
   inspection: Inspection
 }) => {
-  const handleView = () => {
-    console.log("View inspection:", inspection.id)
-  }
+  const { onOpen } = useDialog()
+  const deleteInspection = useDeleteInspection(inspection.id!)
+  const confirm = useConfirm()
 
   const handleEdit = () => {
-    console.log("Edit inspection:", inspection.id)
+    onOpen("editInspection", { inspection })
   }
 
-  const handlePrint = () => {
-    console.log("Print inspection:", inspection.id)
+  const handleDelete = async () => {
+    const confirmed = confirm(
+      "Delete Inspection",
+      "Are you sure you want to delete this inspection? This action cannot be undone.",
+    )
+
+    if (await confirmed) {
+      await toast.promise(deleteInspection.mutateAsync(), {
+        loading: <span className="animate-pulse">Deleting inspection...</span>,
+        success: "Inspection deleted",
+        error: (error: unknown) => catchError(error),
+      })
+    }
   }
 
   return (
@@ -46,34 +56,20 @@ export const InspectionActions = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuLabel className="text-xs">Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            className="cursor-pointer text-xs"
-            onClick={() => navigator.clipboard.writeText(inspection.id)}
-          >
-            <ClipboardCopy className="mr-2 h-3.5 w-3.5" />
-            Copy ID
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="cursor-pointer text-xs"
-            onClick={handleView}
-          >
-            <Eye className="mr-2 h-3.5 w-3.5" />
-            View Details
-          </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer text-xs"
             onClick={handleEdit}
           >
             <FilePen className="mr-2 h-3.5 w-3.5" />
-            Edit Violation
+            Edit Inspection
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer text-xs"
-            onClick={handlePrint}
+            onClick={handleDelete}
           >
-            <Printer className="mr-2 h-3.5 w-3.5" />
-            Print Report
+            <Trash2 className="mr-2 h-3.5 w-3.5" />
+            Delete Inspection
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

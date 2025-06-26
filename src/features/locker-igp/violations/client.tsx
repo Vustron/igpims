@@ -48,6 +48,7 @@ export const ViolationClient = () => {
         (violation): Violation => ({
           id: violation.id!,
           lockerId: violation.lockerId,
+          inspectionId: violation.inspectionId,
           studentName: violation.studentName,
           violations: Array.isArray(violation.violations)
             ? violation.violations
@@ -56,6 +57,9 @@ export const ViolationClient = () => {
               : [],
           dateOfInspection: violation.dateOfInspection
             ? new Date(violation.dateOfInspection)
+            : new Date(),
+          datePaid: violation.datePaid
+            ? new Date(violation.datePaid)
             : new Date(),
           totalFine: violation.totalFine,
           fineStatus: violation.fineStatus || "unpaid",

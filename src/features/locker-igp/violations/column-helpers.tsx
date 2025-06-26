@@ -26,7 +26,7 @@ export const ColumnHeader = ({
   icon: React.ReactNode
   text: string
 }) => (
-  <div className="ml-5 flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
+  <div className="flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
     {icon}
     <span>{text}</span>
   </div>
@@ -178,6 +178,14 @@ export const ViolationCell = ({ value }: { value: string[] | string }) => {
 }
 
 export const DateCell = ({ value }: { value: number }) => {
+  if (!value || value === null) {
+    return (
+      <div className="whitespace-nowrap text-muted-foreground text-xs">
+        Not paid yet
+      </div>
+    )
+  }
+
   const date = typeof value === "string" ? new Date(value) : new Date(value)
 
   if (Number.isNaN(date.getTime())) {
@@ -274,7 +282,7 @@ export const RenterNameCell = ({ value }: { value: string }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="ml-5 flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
             <span className="max-w-[120px] truncate font-medium text-xs">
               {value}
             </span>
