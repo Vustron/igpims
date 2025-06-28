@@ -139,7 +139,7 @@ export const EditViolationForm = ({
       name: "datePaid",
       type: "date",
       label: "Paid Date",
-      description: "Date when the fine was paid",
+      description: "",
       placeholder: "Select date",
       required: false,
     },

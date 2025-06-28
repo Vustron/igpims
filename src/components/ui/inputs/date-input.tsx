@@ -16,7 +16,7 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
     const d = value ? new Date(value) : new Date()
     return {
       day: d.getDate(),
-      month: d.getMonth() + 1, // JavaScript months are 0-indexed
+      month: d.getMonth() + 1,
       year: d.getFullYear(),
     }
   })

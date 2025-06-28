@@ -20,7 +20,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popovers"
-import { FloatingSelect, Multiselect } from "@/components/ui/selects"
+import {
+  FloatingSelect,
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectItem,
+  MultiSelectTrigger,
+  MultiSelectValue,
+} from "@/components/ui/selects"
 import { useOtpStore } from "@/hooks/use-otp-store"
 import { FieldConfig, Mutation } from "@/interfaces/form"
 import { cn } from "@/utils/cn"
@@ -164,6 +171,18 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
                     <span className="opacity-0">placeholder</span>
                   )}
                 </Button>
+                {formField.value && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="-translate-y-1/2 absolute top-1/2 right-2 h-6 w-6"
+                    onClick={() => formField.onChange(null)}
+                    disabled={mutation?.isPending || disabled}
+                  >
+                    ×
+                  </Button>
+                )}
                 <FloatingLabel
                   htmlFor={field.name}
                   hasErrors={!!form.formState.errors[field.name]}
@@ -196,11 +215,6 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
               />
             </PopoverContent>
           </Popover>
-          {field.description && (
-            <p className="mt-1 text-muted-foreground text-xs">
-              {field.description}
-            </p>
-          )}
         </div>
       )
 
@@ -386,15 +400,33 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
     case "multiselect":
       return (
         <div className="relative">
-          <Multiselect
-            options={field.options || []}
-            value={formField.value || []}
-            onChange={formField.onChange}
-            placeholder={field.placeholder}
-            hasErrors={!!form.formState.errors[field.name]}
-            disabled={mutation?.isPending || disabled}
-            className={cn("peer pt-5", field.className)}
-          />
+          <MultiSelect
+            values={formField.value || []}
+            onValuesChange={formField.onChange}
+            defaultValues={field.defaultValues}
+          >
+            <MultiSelectTrigger
+              className={cn("peer w-full pt-5", field.className)}
+            >
+              <MultiSelectValue
+                placeholder={field.placeholder}
+                className={cn(
+                  form.formState.errors[field.name] ? "border-red-600" : "",
+                )}
+                overflowBehavior="wrap"
+                overflowContent={(overflowAmount: number) =>
+                  `+${overflowAmount}`
+                }
+              />
+            </MultiSelectTrigger>
+            <MultiSelectContent>
+              {field.options?.map((option) => (
+                <MultiSelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </MultiSelectItem>
+              ))}
+            </MultiSelectContent>
+          </MultiSelect>
           <FloatingLabel
             htmlFor={field.name}
             hasErrors={!!form.formState.errors[field.name]}

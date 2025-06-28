@@ -40,6 +40,7 @@ export interface FieldConfig<TFieldValues> {
   placeholder: string
   className?: string
   options?: SelectOption[]
+  defaultValues?: string[]
   description?: string
   hidden?: boolean
   required?: boolean

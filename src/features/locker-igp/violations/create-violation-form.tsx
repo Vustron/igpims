@@ -87,6 +87,7 @@ export const ViolationForm = ({
       studentName: "",
       violations: [],
       dateOfInspection: Date.now(),
+      datePaid: null,
       totalFine: 0,
       fineStatus: "unpaid",
     },
@@ -236,7 +237,9 @@ export const ViolationForm = ({
     const submissionData = {
       ...values,
       dateOfInspection: new Date(values.dateOfInspection).setHours(0, 0, 0, 0),
-      datePaid: new Date(values.datePaid).setHours(0, 0, 0, 0),
+      datePaid: values.datePaid
+        ? new Date(values.datePaid).setHours(0, 0, 0, 0)
+        : null,
       totalFine: Number(values.totalFine),
       violations: violationsArray,
     }

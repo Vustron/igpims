@@ -178,7 +178,7 @@ export const ViolationCell = ({ value }: { value: string[] | string }) => {
 }
 
 export const DateCell = ({ value }: { value: number }) => {
-  if (!value || value === null) {
+  if (!value || value === null || value === 0) {
     return (
       <div className="whitespace-nowrap text-muted-foreground text-xs">
         Not paid yet
@@ -186,7 +186,13 @@ export const DateCell = ({ value }: { value: number }) => {
     )
   }
 
-  const date = typeof value === "string" ? new Date(value) : new Date(value)
+  let date: Date
+  if (typeof value === "string") {
+    date = new Date(value)
+  } else {
+    const timestamp = value > 1e15 ? value / 1000 : value
+    date = new Date(timestamp)
+  }
 
   if (Number.isNaN(date.getTime())) {
     return (

@@ -182,7 +182,6 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
             </div>
           ))}
 
-          {/* Render fields without a section */}
           <div
             className={cn(
               "grid gap-5",
@@ -220,7 +219,6 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
       )
     }
 
-    // If no sections are provided, render all fields in a traditional layout
     return (
       <div
         className={cn(

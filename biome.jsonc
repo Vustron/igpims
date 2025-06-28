@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
   "files": {
     "maxSize": 1572864
   },
@@ -122,7 +122,9 @@
         "noSvgWithoutTitle": "off",
         "useKeyWithClickEvents": "off",
         "useFocusableInteractive": "off",
-        "useSemanticElements": "off"
+        "useSemanticElements": "off",
+        "noAutofocus": "off",
+        "noAriaHiddenOnFocusable": "off"
       }
     },
     "includes": ["**", "!**/node_modules", "!**/.next", "!**/out"]
