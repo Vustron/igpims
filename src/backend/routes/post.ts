@@ -1,3 +1,4 @@
+import { sendRentLockerConfirm } from "../controllers/email/send-rent-locker-confirm.ts"
 import { createInspection } from "../controllers/inspection/create-inspection"
 import { createLocker } from "../controllers/locker/create-locker"
 import { createRent } from "../controllers/locker-rental/create-rent"
@@ -29,5 +30,9 @@ export const postRoutes: Route[] = [
   { path: "/api/v1/locker-rentals/create-rent", handler: createRent },
   { path: "/api/v1/violations/create-violation", handler: createViolation },
   { path: "/api/v1/inspections/create-inspection", handler: createInspection },
+  {
+    path: "/api/v1/email/send-rent-locker-confirm",
+    handler: sendRentLockerConfirm,
+  },
   // Add more POST routes here
 ]

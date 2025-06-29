@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/drawers"
 import { isRentalReceiptData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import type { LockerRentalWithLocker } from "@/interfaces/locker"
+import { LockerRentalWithLocker } from "@/interfaces/locker"
 
 const styles = StyleSheet.create({
   page: {
@@ -189,17 +189,20 @@ const styles = StyleSheet.create({
     width: "45%",
     textAlign: "center",
   },
-  signatureLine: {
-    borderBottom: "2px solid #000000",
-    marginBottom: 8,
-    height: 30,
-  },
   signatureLabel: {
     fontSize: 9,
     color: "#000000",
     textTransform: "uppercase",
     letterSpacing: 0.5,
     fontWeight: "bold",
+    marginBottom: 0,
+    paddingBottom: 0,
+    lineHeight: 1,
+  },
+  signatureLine: {
+    borderBottom: "2px solid #000000",
+    marginBottom: 8,
+    marginTop: 0,
   },
   footer: {
     marginTop: 15,
@@ -212,7 +215,23 @@ const styles = StyleSheet.create({
   },
 })
 
-const ReceiptDocument = ({ receiptData }: { receiptData: any }) => (
+interface ReceiptData {
+  receiptNo: string
+  dateIssued: string
+  studentName: string
+  studentId: string
+  course: string
+  lockerId: string
+  location: string
+  dateRented: string
+  dateDue: string
+  rentalFee: string
+  totalPaid: string
+  paymentMethod: string
+  sscOfficer: string
+}
+
+const ReceiptDocument = ({ receiptData }: { receiptData: ReceiptData }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.receipt}>
@@ -273,18 +292,24 @@ const ReceiptDocument = ({ receiptData }: { receiptData: any }) => (
           </View>
 
           <Text style={styles.paymentMethod}>
-            Payment Method: {receiptData.paymentStatus}
+            Payment Method: {receiptData.paymentMethod}
           </Text>
         </View>
 
         <View style={styles.signatureSection}>
           <View style={styles.signatureBox}>
+            <Text style={styles.signatureLabel}>
+              {receiptData.studentName || "Student Signature"}
+            </Text>
             <View style={styles.signatureLine} />
-            <Text style={styles.signatureLabel}>Student Signature</Text>
+            <Text style={styles.signatureLabel}>{"Student Signature"}</Text>
           </View>
           <View style={styles.signatureBox}>
+            <Text style={styles.signatureLabel}>
+              {receiptData.sscOfficer || "SSC Officer"}
+            </Text>
             <View style={styles.signatureLine} />
-            <Text style={styles.signatureLabel}>SSC Officer</Text>
+            <Text style={styles.signatureLabel}>{"SSC Officer"}</Text>
           </View>
         </View>
 
@@ -302,8 +327,7 @@ export const RentalAgreementReceiptDialog = () => {
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "printRentalAgreementReceipt"
 
-  // Default fallback in case no rental is provided
-  const defaultReceipt = {
+  const defaultReceipt: ReceiptData = {
     receiptNo: "N/A",
     dateIssued: format(new Date(), "MMMM d, yyyy"),
     studentName: "N/A",
@@ -316,6 +340,7 @@ export const RentalAgreementReceiptDialog = () => {
     rentalFee: "150.00",
     totalPaid: "PHP 150.00",
     paymentMethod: "N/A",
+    sscOfficer: "N/A",
   }
 
   let receipt = defaultReceipt
@@ -324,7 +349,6 @@ export const RentalAgreementReceiptDialog = () => {
     const rental = data.rental as LockerRentalWithLocker
     const locker = rental.locker
 
-    // For dateRented, default to today if it's an invalid date
     let rentedDate = new Date()
     try {
       const parsedDate = new Date(rental.dateRented)
@@ -336,9 +360,8 @@ export const RentalAgreementReceiptDialog = () => {
       }
     } catch (e) {}
 
-    // For dateDue, default to tomorrow if it's an invalid date
     let dueDate = new Date()
-    dueDate.setDate(dueDate.getDate() + 1) // Tomorrow by default
+    dueDate.setDate(dueDate.getDate() + 1)
     try {
       const parsedDate = new Date(rental.dateDue)
       if (
@@ -362,6 +385,7 @@ export const RentalAgreementReceiptDialog = () => {
       rentalFee: `${locker?.lockerRentalPrice || 150}.00`,
       totalPaid: `PHP ${locker?.lockerRentalPrice || 150}.00`,
       paymentMethod: rental.paymentStatus === "paid" ? "Cash" : "Pending",
+      sscOfficer: data.currentUser?.name || "SSC Officer",
     }
   }
 
@@ -406,7 +430,7 @@ export const RentalAgreementReceiptDialog = () => {
 
       toast.success("Print dialog opened successfully")
     } catch (error) {
-      toast.error("Failed to open print dialog")
+      toast.error(`Failed to open print dialog: ${error}`)
     }
   }
 
@@ -509,12 +533,18 @@ export const RentalAgreementReceiptDialog = () => {
             <div className="border-black border-t-2 pt-4">
               <div className="flex justify-between">
                 <div className="text-center">
-                  <div className="mb-2 h-8 w-20 border-black border-b-2" />
-                  <p className="font-bold text-xs uppercase">Student</p>
+                  <p className="font-bold text-xs uppercase">
+                    {receipt.studentName || "Student"}
+                  </p>
+                  <div className="mb-2 w-20 border-black border-b-2" />
+                  <p className="font-bold text-xs uppercase">{"Student"}</p>
                 </div>
                 <div className="text-center">
-                  <div className="mb-2 h-8 w-20 border-black border-b-2" />
-                  <p className="font-bold text-xs uppercase">SSC Officer</p>
+                  <p className="font-bold text-xs uppercase">
+                    {receipt.sscOfficer || "SSC Officer"}
+                  </p>
+                  <div className="mb-2 w-20 border-black border-b-2" />
+                  <p className="font-bold text-xs uppercase">{"SSC Officer"}</p>
                 </div>
               </div>
             </div>

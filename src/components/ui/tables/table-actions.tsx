@@ -56,7 +56,7 @@ export function TableActions<TData>({
             size="sm"
             variant="outline"
             className="font-normal text-xs shadow-xs"
-            onClick={() => onOpen("sendEmailLockerViolation")}
+            onClick={() => onOpen("sendEmailLockerRent")}
           >
             <Mail className="mr-2 h-4 w-4" />
             {isLockerRental ? "Send email" : "Send locker violations"}

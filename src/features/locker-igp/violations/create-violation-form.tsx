@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import toast from "react-hot-toast"
 import { DynamicForm } from "@/components/ui/forms"
 import { useFindManyInspections } from "@/backend/actions/inspection/find-many"
@@ -19,23 +19,31 @@ interface ViolationFormProps {
   onError?: () => void
 }
 
+export const VIOLATION_FINES: Record<string, number> = {
+  scratches: 5,
+  dents: 50,
+  prohibited_single_use_plastics: 70,
+  lost_locker_key: 150,
+  spoiled_food: 100,
+  graffiti: 200,
+  broken_locks: 300,
+  broken_hinges: 300,
+}
+
 export const ViolationForm = ({
   violation,
   onSuccess,
   onError,
 }: ViolationFormProps) => {
   const createViolation = useCreateViolation()
-  const [selectedLocker, setSelectedLocker] = useState(
-    violation?.lockerId || "",
-  )
-  const [selectedInspection, setSelectedInspection] = useState(
-    violation?.inspectionId || "",
-  )
-  const [selectedViolations, setSelectedViolations] = useState<string[]>(
-    Array.isArray(violation?.violations)
-      ? violation.violations.map((v) => String(v).trim()).filter((v) => v)
-      : [],
-  )
+  const [isFormReady, setIsFormReady] = useState(false)
+
+  const calculateTotalFine = (violations: string[]): number => {
+    return violations.reduce(
+      (sum, violation) => sum + (VIOLATION_FINES[violation] || 0),
+      0,
+    )
+  }
 
   const {
     data: lockersData,
@@ -53,69 +61,48 @@ export const ViolationForm = ({
     limit: 100,
   })
 
-  const [isFormReady, setIsFormReady] = useState(false)
-
-  const violationOptions = [
-    { value: "damaged_locker", label: "Damaged Locker" },
-    { value: "lost_key", label: "Lost Key" },
-    { value: "unauthorized_use", label: "Unauthorized Use" },
-    { value: "prohibited_items", label: "Prohibited Items" },
-    { value: "other", label: "Other" },
-  ]
-
-  const lockerOptions =
-    lockersData?.data.map((locker) => ({
-      value: locker.id,
-      label: `${locker.lockerName}`,
-    })) || []
-
-  const inspectionOptions =
-    inspectionsData?.data.map((inspection) => ({
-      value: inspection.id,
-      label: new Date(
-        new Date(inspection.dateOfInspection).getTime() > 1e15
-          ? new Date(inspection.dateOfInspection).getTime() / 1000
-          : inspection.dateOfInspection,
-      ).toLocaleDateString(),
-    })) || []
-
   const form = useForm<Omit<Violation, "id">>({
     resolver: zodResolver(ViolationSchema.omit({ id: true })),
     defaultValues: {
-      lockerId: "",
-      inspectionId: "",
-      studentName: "",
-      violations: [],
-      dateOfInspection: Date.now(),
-      datePaid: null,
-      totalFine: 0,
-      fineStatus: "unpaid",
+      lockerId: violation?.lockerId || "",
+      inspectionId: violation?.inspectionId || "",
+      studentName: violation?.studentName || "",
+      violations: violation?.violations || [],
+      dateOfInspection: violation?.dateOfInspection || Date.now(),
+      datePaid: violation?.datePaid || null,
+      totalFine: calculateTotalFine(violation?.violations || []),
+      fineStatus: violation?.fineStatus || "unpaid",
     },
   })
 
-  useEffect(() => {
-    form.setValue("lockerId", selectedLocker)
-    form.setValue("inspectionId", selectedInspection)
-    form.setValue("violations", selectedViolations)
+  const currentViolations = useWatch({
+    control: form.control,
+    name: "violations",
+    defaultValue: form.getValues("violations"),
+  })
 
-    if (selectedInspection && inspectionsData?.data) {
-      const selectedInspectionData = inspectionsData.data.find(
-        (inspection) => inspection.id === selectedInspection,
-      )
-      if (selectedInspectionData) {
-        form.setValue(
-          "dateOfInspection",
-          selectedInspectionData.dateOfInspection,
+  useEffect(() => {
+    const totalFine = calculateTotalFine(currentViolations || [])
+    form.setValue("totalFine", totalFine, { shouldValidate: true })
+  }, [currentViolations, form])
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (
+        name === "inspectionId" &&
+        value.inspectionId &&
+        inspectionsData?.data
+      ) {
+        const selectedInspection = inspectionsData.data.find(
+          (inspection) => inspection.id === value.inspectionId,
         )
+        if (selectedInspection) {
+          form.setValue("dateOfInspection", selectedInspection.dateOfInspection)
+        }
       }
-    }
-  }, [
-    selectedLocker,
-    selectedInspection,
-    selectedViolations,
-    form,
-    inspectionsData,
-  ])
+    })
+    return () => subscription.unsubscribe()
+  }, [form, inspectionsData])
 
   useEffect(() => {
     if (
@@ -134,6 +121,36 @@ export const ViolationForm = ({
     isError,
     isInspectionsError,
   ])
+
+  const violationOptions = [
+    { value: "scratches", label: "Scratches" },
+    { value: "dents", label: "Dents" },
+    {
+      value: "prohibited_single_use_plastics",
+      label: "Prohibited Single Use Plastics",
+    },
+    { value: "lost_locker_key", label: "Lost Locker Key" },
+    { value: "spoiled_food", label: "Spoiled Food" },
+    { value: "graffiti", label: "Graffiti" },
+    { value: "broken_locks", label: "Broken Locks" },
+    { value: "broken_hinges", label: "Broken Hinges" },
+  ]
+
+  const lockerOptions =
+    lockersData?.data.map((locker) => ({
+      value: locker.id,
+      label: `${locker.lockerName}`,
+    })) || []
+
+  const inspectionOptions =
+    inspectionsData?.data.map((inspection) => ({
+      value: inspection.id,
+      label: new Date(
+        new Date(inspection.dateOfInspection).getTime() > 1e15
+          ? new Date(inspection.dateOfInspection).getTime() / 1000
+          : inspection.dateOfInspection,
+      ).toLocaleDateString(),
+    })) || []
 
   const violationFields: FieldConfig<Omit<Violation, "id">>[] = [
     {
@@ -170,7 +187,6 @@ export const ViolationForm = ({
       label: "Paid Date",
       description: "",
       placeholder: "Select date",
-      required: true,
     },
     {
       name: "lockerId",
@@ -220,28 +236,13 @@ export const ViolationForm = ({
       return
     }
 
-    const violationsArray = Array.isArray(values.violations)
-      ? values.violations
-      : typeof values.violations === "string"
-        ? values.violations
-            .split(",")
-            .map((v) => v.trim())
-            .filter((v) => v)
-        : []
-
-    if (violationsArray.length === 0) {
-      toast.error("Please select at least one violation")
-      return
-    }
-
     const submissionData = {
       ...values,
       dateOfInspection: new Date(values.dateOfInspection).setHours(0, 0, 0, 0),
       datePaid: values.datePaid
         ? new Date(values.datePaid).setHours(0, 0, 0, 0)
         : null,
-      totalFine: Number(values.totalFine),
-      violations: violationsArray,
+      totalFine: calculateTotalFine(values.violations),
     }
 
     await toast.promise(createViolation.mutateAsync(submissionData), {
@@ -250,12 +251,8 @@ export const ViolationForm = ({
       error: (error: unknown) => catchError(error),
     })
 
-    form.reset()
-    setSelectedLocker("")
-    setSelectedInspection("")
-    setSelectedViolations([])
-
     if (createViolation.isSuccess) {
+      form.reset()
       onSuccess?.()
     } else {
       onError?.()

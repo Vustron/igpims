@@ -26,8 +26,10 @@ export const useSignUpUser = ({ isSignIn }: SignUpUserProps = {}) => {
       return await signUp(sanitizedData)
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["users"] })
-      await queryClient.cancelQueries({ queryKey: ["users-infinite"] })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["users"] }),
+        queryClient.cancelQueries({ queryKey: ["users-infinite"] }),
+      ])
 
       const previousUsers = queryClient.getQueryData(["users"])
       const previousUsersInfinite = queryClient.getQueryData(["users-infinite"])

@@ -401,9 +401,9 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
       return (
         <div className="relative">
           <MultiSelect
-            values={formField.value || []}
+            values={formField.value || field.defaultValues || []}
             onValuesChange={formField.onChange}
-            defaultValues={field.defaultValues}
+            defaultValues={field.defaultValues || []}
           >
             <MultiSelectTrigger
               className={cn("peer w-full pt-5", field.className)}
@@ -413,15 +413,15 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
                 className={cn(
                   form.formState.errors[field.name] ? "border-red-600" : "",
                 )}
-                overflowBehavior="wrap"
-                overflowContent={(overflowAmount: number) =>
-                  `+${overflowAmount}`
-                }
               />
             </MultiSelectTrigger>
             <MultiSelectContent>
               {field.options?.map((option) => (
-                <MultiSelectItem key={option.value} value={option.value}>
+                <MultiSelectItem
+                  key={option.value}
+                  value={option.value}
+                  badgeLabel={option.label}
+                >
                   {option.label}
                 </MultiSelectItem>
               ))}
@@ -432,7 +432,8 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
             hasErrors={!!form.formState.errors[field.name]}
             className={cn(
               "z-10",
-              formField.value && formField.value.length > 0
+              (formField.value && formField.value.length > 0) ||
+                (field.defaultValues && field.defaultValues.length > 0)
                 ? "-translate-y-3 scale-75"
                 : "",
             )}

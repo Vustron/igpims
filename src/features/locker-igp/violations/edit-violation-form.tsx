@@ -3,27 +3,25 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import toast from "react-hot-toast"
 import { DynamicForm } from "@/components/ui/forms"
 import { useFindManyInspections } from "@/backend/actions/inspection/find-many"
 import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { useUpdateViolation } from "@/backend/actions/violation/update-violation"
-import { parseViolations } from "@/backend/helpers/violation-helpers"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import {
   Violation as UpdateViolation,
   ViolationSchema,
 } from "@/validation/violation"
+import { VIOLATION_FINES } from "./create-violation-form"
 
 interface EditViolationFormProps {
   violation: UpdateViolation
   onSuccess?: () => void
   onError?: () => void
 }
-
-// TODO: fix date of inspection mess
 
 export const EditViolationForm = ({
   violation,
@@ -49,6 +47,51 @@ export const EditViolationForm = ({
 
   const [isFormReady, setIsFormReady] = useState(false)
 
+  const calculateTotalFine = (violations: string[]): number => {
+    return violations.reduce(
+      (sum, violation) => sum + (VIOLATION_FINES[violation] || 0),
+      0,
+    )
+  }
+
+  const parseViolations = (violations: string | string[]): string[] => {
+    if (!violations) return []
+
+    if (
+      Array.isArray(violations) &&
+      violations.length === 1 &&
+      typeof violations[0] === "string"
+    ) {
+      try {
+        const parsed = JSON.parse(violations[0])
+        return Array.isArray(parsed) ? parsed : [parsed]
+      } catch {
+        return violations[0]
+          .split(",")
+          .map((v) => v.trim().replace(/^"(.*)"$/, "$1"))
+          .filter((v) => v)
+      }
+    }
+
+    if (Array.isArray(violations)) return violations
+    if (typeof violations === "string") {
+      try {
+        const parsed = JSON.parse(violations)
+        return Array.isArray(parsed) ? parsed : [parsed]
+      } catch {
+        return violations
+          .split(",")
+          .map((v) => v.trim().replace(/^"(.*)"$/, "$1"))
+          .filter((v) => v)
+      }
+    }
+
+    return []
+  }
+
+  const initialViolations = parseViolations(violation.violations)
+  const initialTotalFine = calculateTotalFine(initialViolations)
+
   const form = useForm<UpdateViolation>({
     resolver: zodResolver(ViolationSchema),
     defaultValues: {
@@ -56,13 +99,54 @@ export const EditViolationForm = ({
       lockerId: violation.lockerId,
       inspectionId: violation.inspectionId,
       studentName: violation.studentName,
-      violations: parseViolations(violation.violations),
+      violations: initialViolations,
       dateOfInspection: violation.dateOfInspection,
       datePaid: violation.datePaid,
-      totalFine: violation.totalFine,
+      totalFine: initialTotalFine,
       fineStatus: violation.fineStatus,
     },
   })
+
+  useEffect(() => {
+    if (violation && isFormReady) {
+      const parsedViolations = parseViolations(violation.violations)
+      form.reset({
+        ...violation,
+        violations: parsedViolations,
+        totalFine: calculateTotalFine(parsedViolations),
+      })
+    }
+  }, [violation, form, isFormReady])
+
+  const currentViolations = useWatch({
+    control: form.control,
+    name: "violations",
+  })
+
+  useEffect(() => {
+    if (currentViolations) {
+      const totalFine = calculateTotalFine(currentViolations)
+      form.setValue("totalFine", totalFine, { shouldValidate: true })
+    }
+  }, [currentViolations, form])
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (
+        name === "inspectionId" &&
+        value.inspectionId &&
+        inspectionsData?.data
+      ) {
+        const selectedInspection = inspectionsData.data.find(
+          (inspection) => inspection.id === value.inspectionId,
+        )
+        if (selectedInspection) {
+          form.setValue("dateOfInspection", selectedInspection.dateOfInspection)
+        }
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form, inspectionsData])
 
   useEffect(() => {
     if (
@@ -83,11 +167,17 @@ export const EditViolationForm = ({
   ])
 
   const violationOptions = [
-    { value: "damaged_locker", label: "Damaged Locker" },
-    { value: "lost_key", label: "Lost Key" },
-    { value: "unauthorized_use", label: "Unauthorized Use" },
-    { value: "prohibited_items", label: "Prohibited Items" },
-    { value: "other", label: "Other" },
+    { value: "scratches", label: "Scratches" },
+    { value: "dents", label: "Dents" },
+    {
+      value: "prohibited_single_use_plastics",
+      label: "Prohibited Single Use Plastics",
+    },
+    { value: "lost_locker_key", label: "Lost Locker Key" },
+    { value: "spoiled_food", label: "Spoiled Food" },
+    { value: "graffiti", label: "Graffiti" },
+    { value: "broken_locks", label: "Broken Locks" },
+    { value: "broken_hinges", label: "Broken Hinges" },
   ]
 
   const lockerOptions =
@@ -106,6 +196,12 @@ export const EditViolationForm = ({
       ).toLocaleDateString(),
     })) || []
 
+  useEffect(() => {
+    console.log("Original violations:", violation.violations)
+    console.log("Parsed violations:", initialViolations)
+    console.log("Form violations value:", form.watch("violations"))
+  }, [violation.violations, initialViolations, form])
+
   const violationFields: FieldConfig<UpdateViolation>[] = [
     {
       name: "studentName",
@@ -123,6 +219,7 @@ export const EditViolationForm = ({
       description: "Select all applicable violations",
       required: true,
       options: violationOptions,
+      defaultValues: initialViolations,
     },
     {
       name: "inspectionId",
@@ -202,7 +299,7 @@ export const EditViolationForm = ({
       datePaid: values.datePaid
         ? new Date(values.datePaid).setHours(0, 0, 0, 0)
         : null,
-      totalFine: Number(values.totalFine),
+      totalFine: calculateTotalFine(values.violations),
       violations: values.violations,
     }
 

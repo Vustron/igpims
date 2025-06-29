@@ -8,7 +8,7 @@ export const ViolationSchema = z.object({
   violations: z.any(),
   dateOfInspection: z.any(),
   datePaid: z.any(),
-  totalFine: z.number().min(1, "Fine cannot be negative"),
+  totalFine: z.number().min(0, "Fine cannot be negative"),
   fineStatus: z
     .enum(["paid", "unpaid", "partial", "waived", "under_review"])
     .default("unpaid")

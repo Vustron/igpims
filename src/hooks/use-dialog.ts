@@ -3,6 +3,7 @@ import {
   Inspection,
   Locker,
   LockerRental,
+  User,
   Violation,
 } from "@/backend/db/schemas"
 
@@ -43,6 +44,7 @@ export type DialogType =
   | "editViolation"
   | "createInspection"
   | "editInspection"
+  | "sendEmailLockerRent"
 
 interface ConfirmDialogData {
   title?: string
@@ -62,6 +64,7 @@ export interface ProjectRequestData {
 interface RentalReceiptData {
   rental?: LockerRental
   locker?: Locker
+  currentUser?: User
 }
 
 interface ViolationData {

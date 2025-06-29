@@ -30,6 +30,7 @@ import {
   RentalAgreementReceiptDialog,
   ReviewFundRequestDialog,
   ReviewProjectRequestDialog,
+  SendEmailLockerRentDialog,
   SendEmailLockerViolationDialog,
   SessionExpiredDialog,
   StartImplementationDialog,
@@ -79,6 +80,7 @@ export const DialogProvider = () => {
       <EditViolationDialog />
       <CreateInspectionDialog />
       <EditInspectionDialog />
+      <SendEmailLockerRentDialog />
     </>
   )
 }

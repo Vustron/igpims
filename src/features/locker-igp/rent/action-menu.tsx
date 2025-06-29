@@ -3,6 +3,7 @@
 import { Edit, Eye, MoreHorizontal, Printer, Trash2 } from "lucide-react"
 import { useRouter } from "next-nprogress-bar"
 import toast from "react-hot-toast"
+import { useSession } from "@/components/context/session"
 import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dropdowns"
 import { useDeleteRent } from "@/backend/actions/locker-rental/delete-rent"
 import { useFindRentById } from "@/backend/actions/locker-rental/find-by-id"
+import { useFindAccountById } from "@/backend/actions/user/find-by-id"
 import { LockerRental } from "@/backend/db/schemas"
 import { useConfirm } from "@/hooks/use-confirm"
 import { useDialog } from "@/hooks/use-dialog"
@@ -26,9 +28,11 @@ interface ActionMenuProps {
 export const ActionMenu = ({ rental }: ActionMenuProps) => {
   const router = useRouter()
   const deleteRental = useDeleteRent(rental.id)
+  const session = useSession()
   const confirm = useConfirm()
   const { onOpen } = useDialog()
   const { data: completeRental, isLoading } = useFindRentById(rental.id)
+  const currentUser = useFindAccountById(session.userId)
 
   const handleViewDetails = () => {
     router.push(`/locker-rental/${rental.lockerId}`)
@@ -41,7 +45,10 @@ export const ActionMenu = ({ rental }: ActionMenuProps) => {
   const handlePrintReceipt = () => {
     const rentalWithLocker =
       completeRental || (rental as LockerRentalWithLocker)
-    onOpen("printRentalAgreementReceipt", { rental: rentalWithLocker })
+    onOpen("printRentalAgreementReceipt", {
+      rental: rentalWithLocker,
+      currentUser: currentUser.data,
+    })
   }
 
   const handleDelete = async () => {
