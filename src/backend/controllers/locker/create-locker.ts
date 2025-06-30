@@ -70,11 +70,8 @@ export async function createLocker(
       return result[0]
     })
 
-    return NextResponse.json(newLocker, { status: 201 })
+    return NextResponse.json(newLocker, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: catchError(error) || "Failed to create locker" },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

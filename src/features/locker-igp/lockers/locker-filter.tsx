@@ -64,7 +64,7 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
   }
 
   return (
-    <div className="mb-5 space-y-4 sm:p-4">
+    <div className="mb-1 space-y-4 sm:p-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

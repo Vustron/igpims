@@ -15,6 +15,7 @@ export const protectedRoutes: string[] = [
   "/report",
   "/users",
   "/users/*",
+  "/email",
 ]
 export const authRoutes: string[] = [
   "/sign-in",

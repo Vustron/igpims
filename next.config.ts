@@ -137,6 +137,10 @@ const nextConfig: import("next").NextConfig = {
           key: "Access-Control-Allow-Headers",
           value: "Content-Type, Authorization",
         },
+        {
+          key: "Access-Control-Allow-Headers",
+          value: "Content-Type, Authorization, X-App-API-Key",
+        },
       ],
     },
   ],

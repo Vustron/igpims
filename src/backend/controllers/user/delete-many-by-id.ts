@@ -54,7 +54,7 @@ export async function deleteManyUserById(
       ])
     })
 
-    return NextResponse.json({ deletedIds: userIds }, { status: 201 })
+    return NextResponse.json({ deletedIds: userIds }, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

@@ -84,7 +84,7 @@ export async function signUpUser(
       }
     })
 
-    return NextResponse.json(newUser, { status: 201 })
+    return NextResponse.json(newUser, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

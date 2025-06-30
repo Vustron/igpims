@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { Button } from "@/components/ui/buttons"
@@ -80,35 +80,55 @@ export const SendEmailLockerRentDialog = () => {
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "sendEmailLockerRent"
 
-  const { data: renters, isLoading: isLoadingRenters } = useFindManyRenterInfo()
+  const { data: renters, isLoading: isLoadingRenters } = useFindManyRenterInfo({
+    enabled: isDialogOpen,
+  })
+
   const sendRentLockerConfirm = useSendRentLockerConfirm()
 
-  const renterOptions = Array.isArray(renters)
-    ? renters.map((renter) => ({
-        value: renter.renterEmail,
-        label: `${renter.renterName} (${renter.courseAndSet})`,
-        name: renter.renterName,
-        course: renter.courseAndSet,
-        lockerName: renter.lockerName,
-        lockerLocation: renter.lockerLocation,
-        dueDate: renter.dueDate,
-        amount: renter.amount,
-      }))
-    : []
+  const [renterOptions, setRenterOptions] = useState<
+    Array<{
+      value: string
+      label: string
+      name: string
+      course: string
+      lockerName: string
+      lockerLocation: string
+      dueDate: Date
+      amount: number
+    }>
+  >([])
 
-  const allRenterOptions = [
-    {
-      value: "all-renters",
-      label: "Select All Renters",
-      name: "All Renters",
-      course: "Multiple",
-      lockerName: "Multiple",
-      lockerLocation: "Multiple",
-      dueDate: new Date(),
-      amount: 0,
-    },
-    ...renterOptions,
-  ]
+  useEffect(() => {
+    if (renters && isDialogOpen) {
+      const options = Array.isArray(renters)
+        ? renters.map((renter) => ({
+            value: renter.renterEmail,
+            label: `${renter.renterName} (${renter.courseAndSet})`,
+            name: renter.renterName,
+            course: renter.courseAndSet,
+            lockerName: renter.lockerName,
+            lockerLocation: renter.lockerLocation,
+            dueDate: renter.dueDate,
+            amount: renter.amount,
+          }))
+        : []
+
+      setRenterOptions([
+        {
+          value: "all-renters",
+          label: "Select All Renters",
+          name: "All Renters",
+          course: "Multiple",
+          lockerName: "Multiple",
+          lockerLocation: "Multiple",
+          dueDate: new Date(),
+          amount: 0,
+        },
+        ...options,
+      ])
+    }
+  }, [renters, isDialogOpen])
 
   const form = useForm<RecipientPayload>({
     resolver: zodResolver(recipientSchema),
@@ -127,7 +147,9 @@ export const SendEmailLockerRentDialog = () => {
   }
 
   const handleSelectAll = () => {
-    const allUserEmails = renterOptions.map((user) => user.value)
+    const allUserEmails = renterOptions
+      .filter((option) => option.value !== "all-renters")
+      .map((user) => user.value)
     form.setValue("recipients", allUserEmails)
   }
 
@@ -194,7 +216,7 @@ export const SendEmailLockerRentDialog = () => {
       placeholder: "Search or select renters...",
       description: "Select recipients for the email confirmation",
       required: true,
-      options: allRenterOptions,
+      options: renterOptions,
     },
   ]
 

@@ -1,8 +1,4 @@
-import {
-  QueryClient,
-  queryOptions,
-  useSuspenseQuery,
-} from "@tanstack/react-query"
+import { QueryClient, queryOptions, useQuery } from "@tanstack/react-query"
 import { api } from "@/backend/helpers/api-client"
 
 export interface RenterInfo {
@@ -16,8 +12,8 @@ export interface RenterInfo {
   amount: number
 }
 
-export async function findManyRenterInfo(): Promise<RenterInfo> {
-  return await api.get<RenterInfo>("users/find-many-renter-info")
+export async function findManyRenterInfo(): Promise<RenterInfo[]> {
+  return await api.get<RenterInfo[]>("users/find-many-renter-info")
 }
 
 export async function prefindManyRenterInfo() {
@@ -29,9 +25,10 @@ export async function prefindManyRenterInfo() {
   }
 }
 
-export const useFindManyRenterInfo = () => {
-  return useSuspenseQuery<RenterInfo>({
+export const useFindManyRenterInfo = (options?: { enabled?: boolean }) => {
+  return useQuery<RenterInfo[]>({
     queryKey: ["renter-info"],
     queryFn: async () => await findManyRenterInfo(),
+    ...options,
   })
 }

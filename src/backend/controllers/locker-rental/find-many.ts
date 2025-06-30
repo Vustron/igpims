@@ -156,21 +156,21 @@ export async function findManyRents(
     const hasNextPage = page < totalPages
     const hasPrevPage = page > 1
 
-    return NextResponse.json({
-      data: rentals,
-      meta: {
-        page,
-        limit,
-        totalItems,
-        totalPages,
-        hasNextPage,
-        hasPrevPage,
-      },
-    })
-  } catch (error) {
     return NextResponse.json(
-      { error: catchError(error) || "Failed to retrieve rentals" },
-      { status: 500 },
+      {
+        data: rentals,
+        meta: {
+          page,
+          limit,
+          totalItems,
+          totalPages,
+          hasNextPage,
+          hasPrevPage,
+        },
+      },
+      { status: 200 },
     )
+  } catch (error) {
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

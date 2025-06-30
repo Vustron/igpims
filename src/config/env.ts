@@ -16,12 +16,14 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
     NEXT_PUBLIC_LOGO_URL: z.string().url(),
+    NEXT_PUBLIC_APP_API_KEY: z.string().min(1, "API key cannot be empty"),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     SECRET_KEY: process.env.SECRET_KEY,
     EMAIL: process.env.EMAIL,
     PASS: process.env.PASS,
+    NEXT_PUBLIC_APP_API_KEY: process.env.NEXT_PUBLIC_APP_API_KEY,
     TWO_FACTOR_SECRET: process.env.TWO_FACTOR_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_LOGO_URL: process.env.NEXT_PUBLIC_LOGO_URL,

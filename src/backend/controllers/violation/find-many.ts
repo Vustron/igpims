@@ -148,21 +148,21 @@ export async function findManyViolations(
     const hasNextPage = page < totalPages
     const hasPrevPage = page > 1
 
-    return NextResponse.json({
-      data: violationsData,
-      meta: {
-        page,
-        limit,
-        totalItems,
-        totalPages,
-        hasNextPage,
-        hasPrevPage,
-      },
-    })
-  } catch (error) {
     return NextResponse.json(
-      { error: catchError(error) || "Failed to retrieve violations" },
-      { status: 500 },
+      {
+        data: violationsData,
+        meta: {
+          page,
+          limit,
+          totalItems,
+          totalPages,
+          hasNextPage,
+          hasPrevPage,
+        },
+      },
+      { status: 200 },
     )
+  } catch (error) {
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

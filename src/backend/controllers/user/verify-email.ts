@@ -48,7 +48,7 @@ export async function verifyUserEmail(
     })
 
     if (success) {
-      return NextResponse.json("Email verified successfully", { status: 201 })
+      return NextResponse.json({ status: 201 })
     }
 
     return NextResponse.json(

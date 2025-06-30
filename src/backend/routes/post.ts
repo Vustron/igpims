@@ -13,6 +13,7 @@ import { signOutUser } from "../controllers/user/sign-out"
 import { signUpUser } from "../controllers/user/sign-up"
 import { verifyUserEmail } from "../controllers/user/verify-email"
 import { createViolation } from "../controllers/violation/create-violation"
+import { createWaterVendo } from "../controllers/water-vendo/create-water-vendo"
 import { Route } from "../routes/api-routes"
 
 export const postRoutes: Route[] = [
@@ -33,6 +34,10 @@ export const postRoutes: Route[] = [
   {
     path: "/api/v1/email/send-rent-locker-confirm",
     handler: sendRentLockerConfirm,
+  },
+  {
+    path: "/api/v1/water-vendos/create-water-vendo",
+    handler: createWaterVendo,
   },
   // Add more POST routes here
 ]

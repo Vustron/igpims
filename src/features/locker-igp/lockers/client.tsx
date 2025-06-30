@@ -105,7 +105,9 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
     : "p-2 sm:p-3 md:p-4 lg:p-6"
 
   return (
-    <div className={`flex min-h-screen w-full flex-col ${containerPadding}`}>
+    <div
+      className={`-mt-12 flex min-h-screen w-full flex-col ${containerPadding}`}
+    >
       <LockerFilter
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}

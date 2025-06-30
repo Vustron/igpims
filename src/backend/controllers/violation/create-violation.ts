@@ -78,11 +78,8 @@ export async function createViolation(
       }
     })
 
-    return NextResponse.json(newViolation, { status: 201 })
+    return NextResponse.json(newViolation, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: catchError(error) || "Failed to create violation" },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

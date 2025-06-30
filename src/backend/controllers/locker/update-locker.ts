@@ -205,10 +205,6 @@ export async function updateLocker(
 
     return NextResponse.json(updatedLocker, { status: 200 })
   } catch (error) {
-    console.error("Update locker error:", error)
-    return NextResponse.json(
-      { error: catchError(error) || "Failed to update locker" },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

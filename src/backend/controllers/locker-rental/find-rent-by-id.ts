@@ -50,9 +50,6 @@ export async function findRentById(
 
     return NextResponse.json(rentalWithLocker, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: catchError(error) || "Failed to fetch rental" },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

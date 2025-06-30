@@ -53,10 +53,7 @@ export async function deleteUserById(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    return NextResponse.json(
-      { message: "User deleted successfully" },
-      { status: 201 },
-    )
+    return NextResponse.json({ status: 201 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

@@ -89,16 +89,8 @@ export async function sendRentLockerConfirm(
 
     await Promise.all(emailPromises)
 
-    return NextResponse.json(
-      {
-        message: `${validPayloads.length} locker notification email(s) sent successfully`,
-      },
-      { status: 200 },
-    )
+    return NextResponse.json({ status: 201 })
   } catch (error) {
-    return NextResponse.json(
-      { error: catchError(error) || "Failed to send locker notification" },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

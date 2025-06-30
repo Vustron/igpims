@@ -69,7 +69,7 @@ export async function resetUserPassword(
     })
 
     if (success) {
-      return NextResponse.json("Password reset successfully", { status: 201 })
+      return NextResponse.json({ status: 201 })
     }
 
     return NextResponse.json(

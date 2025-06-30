@@ -66,7 +66,7 @@ export async function generate2fa(
     })
 
     const data = await QRCode.toDataURL(secret.otpauth_url as string)
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json(data, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

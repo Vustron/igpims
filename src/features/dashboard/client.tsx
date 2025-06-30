@@ -1,10 +1,48 @@
 "use client"
 
+import dynamic from "next/dynamic"
+import { Suspense } from "react"
 import { GiClothes, GiDroplets, GiLockers } from "react-icons/gi"
-import { DashboardCard } from "./dashboard-card"
-import { IgpPerformance } from "./igp-performance"
-import { RevenueAnalytics } from "./revenue-analytics"
-import { SalesOverview } from "./sales-overview"
+
+const DashboardCard = dynamic(
+  () => import("./dashboard-card").then((mod) => mod.DashboardCard),
+  {
+    loading: () => (
+      <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
+    ),
+    ssr: false,
+  },
+)
+
+const IgpPerformance = dynamic(
+  () => import("./igp-performance").then((mod) => mod.IgpPerformance),
+  {
+    loading: () => (
+      <div className="h-[400px] animate-pulse rounded-lg bg-muted/50" />
+    ),
+    ssr: false,
+  },
+)
+
+const RevenueAnalytics = dynamic(
+  () => import("./revenue-analytics").then((mod) => mod.RevenueAnalytics),
+  {
+    loading: () => (
+      <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
+    ),
+    ssr: false,
+  },
+)
+
+const SalesOverview = dynamic(
+  () => import("./sales-overview").then((mod) => mod.SalesOverview),
+  {
+    loading: () => (
+      <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
+    ),
+    ssr: false,
+  },
+)
 
 export const DashboardClient = () => {
   const dashboardItems = [
@@ -20,7 +58,6 @@ export const DashboardClient = () => {
     {
       id: "2",
       title: "Water Vendo",
-
       amount: "₱4,500",
       metric: "4 Active Machines",
       percentageChange: "+3.8%",
@@ -37,22 +74,50 @@ export const DashboardClient = () => {
       icon: <GiClothes className="size-8 text-muted-foreground" />,
     },
   ]
+
   return (
     <div className="p-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <DashboardCard items={dashboardItems} />
+        <Suspense
+          fallback={[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="h-[200px] animate-pulse rounded-lg bg-muted/50"
+            />
+          ))}
+        >
+          <DashboardCard items={dashboardItems} />
+        </Suspense>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-5">
         <div className="md:col-span-3">
-          <IgpPerformance />
+          <Suspense
+            fallback={
+              <div className="h-[400px] animate-pulse rounded-lg bg-muted/50" />
+            }
+          >
+            <IgpPerformance />
+          </Suspense>
         </div>
         <div className="md:col-span-2">
           <div className="mb-2">
-            <RevenueAnalytics />
+            <Suspense
+              fallback={
+                <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
+              }
+            >
+              <RevenueAnalytics />
+            </Suspense>
           </div>
           <div className="mb-2">
-            <SalesOverview />
+            <Suspense
+              fallback={
+                <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
+              }
+            >
+              <SalesOverview />
+            </Suspense>
           </div>
         </div>
       </div>

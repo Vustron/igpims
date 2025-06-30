@@ -7,6 +7,7 @@ import * as accountQuery from "@/backend/queries/account"
 import * as userQuery from "@/backend/queries/user"
 import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
+import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { UpdateUserPayload, updateUserSchema } from "@/validation/user"
 
@@ -162,9 +163,8 @@ export async function updateUserInfo(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    return NextResponse.json(userData, { status: 201 })
+    return NextResponse.json(userData, { status: 200 })
   } catch (error) {
-    const message = error instanceof Error ? error.message : "An error occurred"
-    return NextResponse.json({ error: message }, { status: 400 })
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

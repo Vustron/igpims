@@ -174,9 +174,6 @@ export async function updateRental(
 
     return NextResponse.json(updatedRental, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: catchError(error) || "Failed to update rental" },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

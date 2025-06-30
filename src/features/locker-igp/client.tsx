@@ -1,7 +1,8 @@
 "use client"
 
 import { ClipboardList, FileX } from "lucide-react"
-import { useEffect, useState } from "react"
+import dynamic from "next/dynamic"
+import { Suspense, useEffect, useState } from "react"
 import { GiMagnifyingGlass } from "react-icons/gi"
 import { PiLockers } from "react-icons/pi"
 import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
@@ -13,10 +14,46 @@ import {
 } from "@/components/ui/separators/tabs"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { cn } from "@/utils/cn"
-import { InspectionClient } from "./inspection/client"
-import { LockersClient } from "./lockers/client"
-import { LockerRentClient } from "./rent/client"
-import { ViolationClient } from "./violations/client"
+
+const LockersClient = dynamic(
+  () => import("./lockers/client").then((mod) => mod.LockersClient),
+  {
+    loading: () => (
+      <div className="flex justify-center py-8">Loading lockers...</div>
+    ),
+    ssr: false,
+  },
+)
+
+const LockerRentClient = dynamic(
+  () => import("./rent/client").then((mod) => mod.LockerRentClient),
+  {
+    loading: () => (
+      <div className="flex justify-center py-8">Loading rental list...</div>
+    ),
+    ssr: false,
+  },
+)
+
+const InspectionClient = dynamic(
+  () => import("./inspection/client").then((mod) => mod.InspectionClient),
+  {
+    loading: () => (
+      <div className="flex justify-center py-8">Loading inspections...</div>
+    ),
+    ssr: false,
+  },
+)
+
+const ViolationClient = dynamic(
+  () => import("./violations/client").then((mod) => mod.ViolationClient),
+  {
+    loading: () => (
+      <div className="flex justify-center py-8">Loading violations...</div>
+    ),
+    ssr: false,
+  },
+)
 
 interface TabItem {
   id: string
@@ -104,32 +141,62 @@ export const LockerIgpClient = () => {
         isSmallScreen={isSmallScreen}
       />
 
-      {/* Content sections */}
       <TabsContent
         value="locker_rental_management"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <LockersClient />
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-8">Loading lockers...</div>
+          }
+        >
+          <LockersClient />
+        </Suspense>
       </TabsContent>
 
       <TabsContent
         value="locker_rental_list"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <LockerRentClient />
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-8">
+              Loading rental list...
+            </div>
+          }
+        >
+          <LockerRentClient />
+        </Suspense>
       </TabsContent>
 
       <TabsContent
         value="locker_inspection_schedule"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <InspectionClient />
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-8">
+              Loading inspections...
+            </div>
+          }
+        >
+          <InspectionClient />
+        </Suspense>
       </TabsContent>
+
       <TabsContent
         value="violator_list"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <ViolationClient />
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-8">
+              Loading violations...
+            </div>
+          }
+        >
+          <ViolationClient />
+        </Suspense>
       </TabsContent>
     </Tabs>
   )

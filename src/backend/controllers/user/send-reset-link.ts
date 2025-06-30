@@ -72,7 +72,7 @@ export async function sendResetLink(
 
     await transporter.sendMail(mailOptions)
 
-    return NextResponse.json("Reset password link sent", { status: 201 })
+    return NextResponse.json({ status: 201 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

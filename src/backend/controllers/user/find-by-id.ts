@@ -56,7 +56,7 @@ export async function findUserById(
         ...userData,
         otpSignIn: accountData.otpSignIn,
       },
-      { status: 201 },
+      { status: 200 },
     )
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })

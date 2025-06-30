@@ -32,7 +32,7 @@ export async function signOutUser(
       currentSession.destroy()
     })
 
-    return NextResponse.json("Signed out successfully", { status: 201 })
+    return NextResponse.json({ status: 201 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

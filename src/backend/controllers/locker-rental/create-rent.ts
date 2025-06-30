@@ -117,11 +117,8 @@ export async function createRent(
       }
     })
 
-    return NextResponse.json(newRental, { status: 201 })
+    return NextResponse.json(newRental, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: catchError(error) || "Failed to create rental" },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

@@ -62,12 +62,8 @@ export async function deleteLockerById(
       return NextResponse.json({ error: "Locker not found" }, { status: 404 })
     }
 
-    return NextResponse.json(
-      "Locker and associated rentals deleted successfully",
-      { status: 200 },
-    )
+    return NextResponse.json({ status: 201 })
   } catch (error) {
-    console.error("Delete locker error:", error)
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }
