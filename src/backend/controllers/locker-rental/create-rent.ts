@@ -78,7 +78,7 @@ export async function createRent(
         throw new Error("Locker is already rented by another student")
       }
 
-      const rentalId = nanoid()
+      const rentalId = nanoid(15)
       const now = Date.now()
 
       await rentalQuery.createRentalQuery.execute({

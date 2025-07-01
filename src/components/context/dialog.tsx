@@ -172,6 +172,11 @@ const SendEmailLockerRentDialog = dynamic(() =>
     (mod) => mod.SendEmailLockerRentDialog,
   ),
 )
+const EditWaterVendoDialog = dynamic(() =>
+  import("@/components/ui/dialogs/edit-water-vendo-dialog").then(
+    (mod) => mod.EditWaterVendoDialog,
+  ),
+)
 
 export const DialogProvider = () => {
   const isMounted = useMounted()
@@ -217,6 +222,7 @@ export const DialogProvider = () => {
         <CreateInspectionDialog />
         <EditInspectionDialog />
         <SendEmailLockerRentDialog />
+        <EditWaterVendoDialog />
       </Suspense>
     </>
   )

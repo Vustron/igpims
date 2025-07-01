@@ -1,8 +1,8 @@
+import { nanoid } from "nanoid"
 import { NextRequest, NextResponse } from "next/server"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as waterVendoQuery from "@/backend/queries/water-vendo"
-import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import {
@@ -10,9 +10,7 @@ import {
   createWaterVendoSchema,
 } from "@/validation/water-vendo"
 
-export async function createWaterVendo(
-  request: NextRequest,
-): Promise<NextResponse<unknown>> {
+export async function createWaterVendo(request: NextRequest) {
   try {
     const rateLimitCheck = await httpRequestLimit(request)
     if (rateLimitCheck instanceof NextResponse) return rateLimitCheck
@@ -44,17 +42,16 @@ export async function createWaterVendo(
       )
     }
 
-    await db.transaction(async (_tx) => {
-      return await waterVendoQuery.createWaterVendoQuery.execute({
-        waterVendoLocation: vendoData.waterVendoLocation,
-        gallonsUsed: vendoData.gallonsUsed,
-        vendoStatus: vendoData.vendoStatus,
-        waterRefillStatus: vendoData.waterRefillStatus,
-      })
+    const result = await waterVendoQuery.createWaterVendoQuery.execute({
+      id: nanoid(15),
+      waterVendoLocation: vendoData.waterVendoLocation,
+      gallonsUsed: vendoData.gallonsUsed,
+      vendoStatus: vendoData.vendoStatus,
+      waterRefillStatus: vendoData.waterRefillStatus,
     })
 
-    return NextResponse.json("Water vendo created successfully", {
-      status: 201,
+    return NextResponse.json(result[0], {
+      status: 200,
     })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })

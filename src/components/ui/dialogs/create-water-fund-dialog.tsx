@@ -14,7 +14,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
-import { CreateWaterFundForm } from "@/features/water-vendo/create-water-fund-form"
+import { CreateWaterFundForm } from "@/features/water-vendo-igp/funds/create-water-fund-form"
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 

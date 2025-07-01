@@ -26,11 +26,13 @@ const getWaterVendoByLocationQuery = db.query.waterVendo
 const createWaterVendoQuery = db
   .insert(waterVendo)
   .values({
-    waterVendoLocation: sql.placeholder("waterVendoLocation"),
-    gallonsUsed: sql.placeholder("gallonsUsed"),
-    vendoStatus: sql.placeholder("vendoStatus"),
-    waterRefillStatus: sql.placeholder("waterRefillStatus"),
+    id: sql`${sql.placeholder("id")}`,
+    waterVendoLocation: sql`${sql.placeholder("waterVendoLocation")}`,
+    gallonsUsed: sql`${sql.placeholder("gallonsUsed")}`,
+    vendoStatus: sql`${sql.placeholder("vendoStatus")}`,
+    waterRefillStatus: sql`${sql.placeholder("waterRefillStatus")}`,
   })
+  .returning()
   .prepare()
 
 export {

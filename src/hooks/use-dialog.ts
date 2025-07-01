@@ -5,6 +5,7 @@ import {
   LockerRental,
   User,
   Violation,
+  WaterVendo,
 } from "@/backend/db/schemas"
 
 export type DialogType =
@@ -45,6 +46,7 @@ export type DialogType =
   | "createInspection"
   | "editInspection"
   | "sendEmailLockerRent"
+  | "editWaterVendo"
 
 interface ConfirmDialogData {
   title?: string
@@ -75,6 +77,10 @@ interface InspectionData {
   inspection?: Inspection
 }
 
+interface WaterVendoData {
+  waterVendo?: WaterVendo
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -90,6 +96,7 @@ export type DialogData =
   | RentalReceiptData
   | ViolationData
   | InspectionData
+  | WaterVendoData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -117,6 +124,10 @@ export const isViolationData = (data: any): data is ViolationData => {
 
 export const isInspectionData = (data: any): data is InspectionData => {
   return data && data.inspection !== undefined
+}
+
+export const isWaterVendoData = (data: any): data is WaterVendoData => {
+  return data && data.waterVendo !== undefined
 }
 
 export const useDialog = create<DialogStore>((set) => ({

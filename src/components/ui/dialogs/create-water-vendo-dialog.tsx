@@ -14,7 +14,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
-import { CreateWaterVendoForm } from "@/features/water-vendo/create-water-vendo-form"
+import { CreateWaterVendoForm } from "@/features/water-vendo-igp/vendo/create-water-vendo-form"
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
@@ -37,7 +37,7 @@ export const CreateWaterVendoDialog = () => {
               Fill in the details below to create a new water vendo.
             </DialogDescription>
           </DialogHeader>
-          <CreateWaterVendoForm />
+          <CreateWaterVendoForm onSuccess={handleClose} onError={handleClose} />
         </DialogContent>
       </Dialog>
     )
@@ -52,7 +52,7 @@ export const CreateWaterVendoDialog = () => {
             Fill in the details below to create a water vendo.
           </DrawerDescription>
         </DrawerHeader>
-        <CreateWaterVendoForm />
+        <CreateWaterVendoForm onSuccess={handleClose} onError={handleClose} />
       </DrawerContent>
     </Drawer>
   )

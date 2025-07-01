@@ -48,7 +48,7 @@ export async function createLocker(
     }
 
     const newLocker = await db.transaction(async (_tx) => {
-      const lockerId = nanoid()
+      const lockerId = nanoid(15)
 
       await lockerQuery.createLockerQuery.execute({
         id: lockerId,

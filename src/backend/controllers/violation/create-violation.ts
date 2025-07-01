@@ -48,7 +48,7 @@ export async function createViolation(
       : null
 
     const newViolation = await db.transaction(async (_tx) => {
-      const violationId = nanoid()
+      const violationId = nanoid(15)
       const now = Date.now()
 
       await violationQuery.insertViolationQuery.execute({
