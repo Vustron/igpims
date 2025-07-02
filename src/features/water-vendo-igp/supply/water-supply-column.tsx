@@ -1,6 +1,6 @@
 "use client"
 
-import type { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { CalendarIcon, Droplet, MoreHorizontal } from "lucide-react"
 import { z } from "zod"

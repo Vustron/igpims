@@ -21,7 +21,7 @@ import { cn } from "@/utils/cn"
 import { WaterVendoCard } from "./water-vendo-card"
 import { FilterState, WaterVendoFilters } from "./water-vendo-filter"
 import { WaterFunds } from "../funds/client"
-import { WaterSupply } from "../supply/water-supply-list"
+import { WaterSupply } from "../supply/client"
 
 const isVendoStatus = (
   status: string,

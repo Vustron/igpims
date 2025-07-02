@@ -4,6 +4,7 @@ import { updateLocker } from "../controllers/locker/update-locker"
 import { updateRental } from "../controllers/locker-rental/update-rental"
 import { updateUserInfo } from "../controllers/user/update-info"
 import { updateViolation } from "../controllers/violation/update-violation"
+import { updateWaterSupply } from "../controllers/water-supply/update-water-supply"
 import { updateWaterVendo } from "../controllers/water-vendo/update-water-vendo"
 
 export const patchRoutes: Route[] = [
@@ -15,6 +16,10 @@ export const patchRoutes: Route[] = [
   {
     path: "/api/v1/water-vendos/update-water-vendo",
     handler: updateWaterVendo,
+  },
+  {
+    path: "/api/v1/water-supply/update-water-supply",
+    handler: updateWaterSupply,
   },
   // Add more PATCH routes here
 ]
