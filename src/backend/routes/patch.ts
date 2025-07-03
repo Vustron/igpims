@@ -18,7 +18,7 @@ export const patchRoutes: Route[] = [
     handler: updateWaterVendo,
   },
   {
-    path: "/api/v1/water-supply/update-water-supply",
+    path: "/api/v1/water-supplies/update-water-supply",
     handler: updateWaterSupply,
   },
   // Add more PATCH routes here

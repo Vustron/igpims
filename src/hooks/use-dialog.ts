@@ -47,6 +47,7 @@ export type DialogType =
   | "editInspection"
   | "sendEmailLockerRent"
   | "editWaterVendo"
+  | "createWaterSupply"
 
 interface ConfirmDialogData {
   title?: string

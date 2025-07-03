@@ -21,7 +21,7 @@ import { cn } from "@/utils/cn"
 import { WaterVendoCard } from "./water-vendo-card"
 import { FilterState, WaterVendoFilters } from "./water-vendo-filter"
 import { WaterFunds } from "../funds/client"
-import { WaterSupply } from "../supply/client"
+import { WaterSupplyClient } from "../supply/client"
 
 const isVendoStatus = (
   status: string,
@@ -321,7 +321,7 @@ export const WaterVendoClient = () => {
         value="water_supply"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <WaterSupply />
+        <WaterSupplyClient />
       </TabsContent>
 
       <TabsContent

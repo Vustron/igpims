@@ -41,7 +41,7 @@ export const postRoutes: Route[] = [
     handler: createWaterVendo,
   },
   {
-    path: "/api/v1/water-supply/create-water-supply",
+    path: "/api/v1/water-supplies/create-water-supply",
     handler: createWaterSupply,
   },
   // Add more POST routes here

@@ -18,6 +18,7 @@ interface DynamicSearchHeaderProps {
   isUser?: boolean
   isOnViolations?: boolean
   isOnInspection?: boolean
+  isOnWaterSupply?: boolean
 }
 
 export const DynamicSearchHeader = ({
@@ -32,6 +33,7 @@ export const DynamicSearchHeader = ({
   isUser,
   isOnViolations,
   isOnInspection,
+  isOnWaterSupply,
 }: DynamicSearchHeaderProps) => {
   return (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -56,6 +58,7 @@ export const DynamicSearchHeader = ({
         table={table}
         isOnViolations={isOnViolations}
         isOnInspection={isOnInspection}
+        isOnWaterSupply={isOnWaterSupply}
       />
     </div>
   )

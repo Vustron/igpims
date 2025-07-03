@@ -16,18 +16,33 @@ import { InspectionFilters } from "@/backend/actions/inspection/find-many"
 import { RentalFilters } from "@/backend/actions/locker-rental/find-many"
 import { UserFilters } from "@/backend/actions/user/find-many"
 import { ViolationFilters } from "@/backend/actions/violation/find-many"
+import { WaterSupplyFilters } from "@/backend/actions/water-supply/find-many"
 
 interface DynamicFiltersPanelProps {
-  filters: RentalFilters | UserFilters | ViolationFilters | InspectionFilters
+  filters:
+    | RentalFilters
+    | UserFilters
+    | ViolationFilters
+    | InspectionFilters
+    | WaterSupplyFilters
   activeFiltersCount: number
   onUpdateFilters: (
     newFilters: Partial<
-      RentalFilters | UserFilters | ViolationFilters | InspectionFilters
+      | RentalFilters
+      | UserFilters
+      | ViolationFilters
+      | InspectionFilters
+      | WaterSupplyFilters
     >,
   ) => void
   onResetFilters: () => void
   onClose: () => void
-  filterType?: "rental" | "user" | "violations" | "inspection"
+  filterType?:
+    | "rental"
+    | "user"
+    | "violations"
+    | "inspection"
+    | "water-supplies"
 }
 
 export const DynamicFiltersPanel = ({
@@ -42,6 +57,7 @@ export const DynamicFiltersPanel = ({
   const isUserFilter = filterType === "user"
   const isViolationsFilter = filterType === "violations"
   const isInspectionFilter = filterType === "inspection"
+  const isWaterSupplyFilter = filterType === "water-supplies"
 
   return (
     <Card>
@@ -334,7 +350,6 @@ export const DynamicFiltersPanel = ({
           </>
         )}
 
-        {/* Added Inspection Filters */}
         {isInspectionFilter && (
           <>
             <div className="space-y-2">
@@ -410,6 +425,70 @@ export const DynamicFiltersPanel = ({
                   onUpdateFilters({
                     search: e.target.value || undefined,
                   })
+                }
+              />
+            </div>
+          </>
+        )}
+
+        {isWaterSupplyFilter && (
+          <>
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Date Range</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  placeholder="Start date"
+                  value={
+                    (filters as WaterSupplyFilters).startDate
+                      ? new Date((filters as WaterSupplyFilters).startDate!)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    onUpdateFilters({
+                      startDate: e.target.value || undefined,
+                    })
+                  }
+                />
+                <Input
+                  type="date"
+                  placeholder="End date"
+                  value={
+                    (filters as WaterSupplyFilters).endDate
+                      ? new Date((filters as WaterSupplyFilters).endDate!)
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    onUpdateFilters({
+                      endDate: e.target.value || undefined,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Vendo Location</Label>
+              <Input
+                placeholder="Filter by location..."
+                value={(filters as WaterSupplyFilters).vendoId || ""}
+                onChange={(e) =>
+                  onUpdateFilters({ vendoId: e.target.value || undefined })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="font-medium text-sm">Search</Label>
+              <Input
+                placeholder="Search supplies..."
+                value={(filters as WaterSupplyFilters).search || ""}
+                onChange={(e) =>
+                  onUpdateFilters({ search: e.target.value || undefined })
                 }
               />
             </div>

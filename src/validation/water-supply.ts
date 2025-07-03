@@ -2,16 +2,16 @@ import z from "zod"
 
 export const createWaterSupplySchema = z.object({
   waterVendoId: z.string().length(15),
-  supplyDate: z.number(),
-  suppliedGallons: z.number().positive(),
-  expenses: z.number().nonnegative(),
+  supplyDate: z.any().optional(),
+  suppliedGallons: z.any().optional(),
+  expenses: z.any().optional(),
 })
 
 export const updateWaterSupplySchema = z.object({
   waterVendoId: z.string().length(15).optional(),
   supplyDate: z.number().optional(),
-  suppliedGallons: z.number().positive().optional(),
-  expenses: z.number().nonnegative().optional(),
+  suppliedGallons: z.any().optional(),
+  expenses: z.any().optional(),
 })
 
 export type CreateWaterSupplyData = z.infer<typeof createWaterSupplySchema>

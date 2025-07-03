@@ -10,3 +10,4 @@ Use latest and proven methods and techniques, avoid nested if else and for loops
 Do not make up files that do not exist and does not make any sense on the logic.
 Always follow the selected line codes or files. Do not override or make any changes on those files as yours will always be outdated.
 Always add a comment of the file name on which file did you changed.
+Always analyze the files that I've given you as context.

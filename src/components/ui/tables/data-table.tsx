@@ -69,10 +69,16 @@ interface DataTableProps<TData, TValue> {
   onGoToLastPage?: () => void
   onGoToPage?: (page: number) => void
   isOnUsers?: boolean
-  filterType?: "rental" | "user" | "violations" | "inspection"
+  filterType?:
+    | "rental"
+    | "user"
+    | "violations"
+    | "inspection"
+    | "water-supplies"
   resultLabel?: string
   isOnViolations?: boolean
   isOnInspection?: boolean
+  isOnWaterSupply?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -114,6 +120,7 @@ export function DataTable<TData, TValue>({
   isOnUsers,
   isOnViolations,
   isOnInspection,
+  isOnWaterSupply,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -170,6 +177,7 @@ export function DataTable<TData, TValue>({
             isUser={isOnUsers}
             isOnViolations={isOnViolations}
             isOnInspection={isOnInspection}
+            isOnWaterSupply={isOnWaterSupply}
           />
         )}
 

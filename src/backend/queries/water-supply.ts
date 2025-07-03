@@ -39,6 +39,20 @@ const getWaterSupplyByDateQuery = db
   .limit(1)
   .prepare()
 
+const getWaterSupplyByDateRangeQuery = db
+  .select({
+    id: waterSupply.id,
+    waterVendoId: waterSupply.waterVendoId,
+    supplyDate: waterSupply.supplyDate,
+  })
+  .from(waterSupply)
+  .where(
+    sql`${waterSupply.waterVendoId} = ${sql.placeholder("waterVendoId")} 
+    AND DATE(${waterSupply.supplyDate}/1000, 'unixepoch') = DATE(${sql.placeholder("date")}/1000, 'unixepoch')`,
+  )
+  .limit(1)
+  .prepare()
+
 const getWaterSupplyByIdQuery = db
   .select({
     id: waterSupply.id,
@@ -63,4 +77,5 @@ export {
   getWaterVendoByIdQuery,
   getWaterSupplyByDateQuery,
   getWaterSupplyByIdQuery,
+  getWaterSupplyByDateRangeQuery,
 }

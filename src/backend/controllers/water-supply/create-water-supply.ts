@@ -11,7 +11,9 @@ import {
   createWaterSupplySchema,
 } from "@/validation/water-supply"
 
-export async function createWaterSupply(request: NextRequest) {
+export async function createWaterSupply(
+  request: NextRequest,
+): Promise<NextResponse<unknown>> {
   try {
     const rateLimitCheck = await httpRequestLimit(request)
     if (rateLimitCheck instanceof NextResponse) return rateLimitCheck
@@ -43,9 +45,9 @@ export async function createWaterSupply(request: NextRequest) {
     }
 
     const existingSupply =
-      await waterSupplyQuery.getWaterSupplyByDateQuery.execute({
+      await waterSupplyQuery.getWaterSupplyByDateRangeQuery.execute({
         waterVendoId: supplyData.waterVendoId,
-        supplyDate: supplyData.supplyDate,
+        date: supplyData.supplyDate,
       })
 
     if (existingSupply[0]) {
@@ -65,7 +67,20 @@ export async function createWaterSupply(request: NextRequest) {
       remainingGallons: supplyData.suppliedGallons,
     })
 
-    return NextResponse.json(result[0], {
+    const supplyResult = await waterSupplyQuery.getWaterSupplyByIdQuery.execute(
+      {
+        id: result[0]?.id,
+      },
+    )
+
+    if (!supplyResult || supplyResult.length === 0) {
+      return NextResponse.json(
+        { error: "Water supply not found" },
+        { status: 404 },
+      )
+    }
+
+    return NextResponse.json(supplyResult[0], {
       status: 200,
     })
   } catch (error) {

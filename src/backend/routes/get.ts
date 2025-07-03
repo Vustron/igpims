@@ -31,7 +31,7 @@ export const getRoutes: Route[] = [
   { path: "/api/v1/users/find-many-renter-info", handler: findManyRenterInfo },
   { path: "/api/v1/water-vendos/find-many", handler: findManyWaterVendo },
   { path: "/api/v1/water-vendos/find-by-id", handler: findWaterVendoById },
-  { path: "/api/v1/water-supply/find-many", handler: findManyWaterSupply },
-  { path: "/api/v1/water-supply/find-by-id", handler: findWaterSupplyById },
+  { path: "/api/v1/water-supplies/find-many", handler: findManyWaterSupply },
+  { path: "/api/v1/water-supplies/find-by-id", handler: findWaterSupplyById },
   // Add more GET routes here
 ]

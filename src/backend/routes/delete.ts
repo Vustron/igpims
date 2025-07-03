@@ -18,7 +18,7 @@ export const deleteRoutes: Route[] = [
     handler: deleteWaterVendo,
   },
   {
-    path: "/api/v1/water-supply/delete-water-supply",
+    path: "/api/v1/water-supplies/delete-water-supply",
     handler: deleteWaterSupply,
   },
   // Add more DELETE routes here

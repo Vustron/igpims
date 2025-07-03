@@ -28,6 +28,7 @@ interface TableActionsProps<TData> {
   isUser?: boolean
   isOnViolations?: boolean
   isOnInspection?: boolean
+  isOnWaterSupply?: boolean
 }
 
 export function TableActions<TData>({
@@ -39,6 +40,7 @@ export function TableActions<TData>({
   isUser,
   isOnViolations,
   isOnInspection,
+  isOnWaterSupply,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
 
@@ -82,7 +84,11 @@ export function TableActions<TData>({
         </Button>
       </motion.div> */}
 
-      {(isLockerRental || isUser || isOnViolations || isOnInspection) && (
+      {(isLockerRental ||
+        isUser ||
+        isOnViolations ||
+        isOnInspection ||
+        isOnWaterSupply) && (
         <motion.div
           key="add-button"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -102,7 +108,9 @@ export function TableActions<TData>({
                     ? "createViolation"
                     : isOnInspection
                       ? "createInspection"
-                      : "createRent",
+                      : isOnWaterSupply
+                        ? "createWaterSupply"
+                        : "createRent",
               )
             }
           >
@@ -113,7 +121,9 @@ export function TableActions<TData>({
                 ? "Create violation"
                 : isOnInspection
                   ? "Create inspection"
-                  : "Create rent"}
+                  : isOnWaterSupply
+                    ? "Create water supply"
+                    : "Create rent"}
           </Button>
         </motion.div>
       )}
