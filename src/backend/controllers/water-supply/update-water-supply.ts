@@ -161,9 +161,9 @@ export async function updateWaterSupply(
 
     const responseSupply = {
       ...updatedSupply,
-      supplyDate: updatedSupply.supplyDate.getTime(),
-      createdAt: updatedSupply.createdAt.getTime(),
-      updatedAt: updatedSupply.updatedAt.getTime(),
+      supplyDate: Number(updatedSupply?.supplyDate ?? 0),
+      createdAt: Number(updatedSupply?.createdAt ?? 0),
+      updatedAt: Number(updatedSupply?.updatedAt ?? 0),
     }
 
     return NextResponse.json(responseSupply, { status: 200 })

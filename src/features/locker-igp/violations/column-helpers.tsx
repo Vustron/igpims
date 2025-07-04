@@ -181,42 +181,61 @@ export const DateCell = ({ value }: { value: number }) => {
   if (!value || value === null || value === 0) {
     return (
       <div className="whitespace-nowrap text-muted-foreground text-xs">
-        Not paid yet
+        Not available
       </div>
     )
   }
 
-  let date: Date
-  if (typeof value === "string") {
-    date = new Date(value)
-  } else {
-    const timestamp = value > 1e15 ? value / 1000 : value
-    date = new Date(timestamp)
-  }
+  try {
+    const timestamp = (() => {
+      const str = value.toString()
 
-  if (Number.isNaN(date.getTime())) {
+      // Nanoseconds (19 digits) -> milliseconds
+      if (str.length >= 19) return Math.floor(value / 1000000)
+
+      // Microseconds (16 digits) -> milliseconds
+      if (str.length >= 16) return Math.floor(value / 1000)
+
+      // Milliseconds (13 digits) -> already correct
+      if (str.length >= 13) return value
+
+      // Seconds (10 digits) -> milliseconds
+      return value * 1000
+    })()
+
+    const date = new Date(timestamp)
+
+    if (Number.isNaN(date.getTime())) {
+      throw new Error("Invalid date")
+    }
+
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="whitespace-nowrap font-medium text-xs">
+                {format(date, "MMM d, yyyy")}
+              </span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 font-medium">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                {format(date, "PPPP")}
+              </div>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    )
+  } catch (error) {
     return (
       <div className="whitespace-nowrap text-red-500 text-xs">Invalid Date</div>
     )
   }
-
-  const formattedDate = format(date, "MMM dd, yyyy")
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="whitespace-nowrap text-xs">{formattedDate}</div>
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          <div className="flex items-center">
-            <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-            {format(date, "PPP")}
-          </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  )
 }
 
 export const IdCell = ({ value }: { value: string }) => {

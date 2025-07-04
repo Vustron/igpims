@@ -3,12 +3,12 @@
 import { motion } from "framer-motion"
 import {
   Activity,
-  DeleteIcon,
   DropletIcon,
   EditIcon,
   MoreVertical,
   Power,
   Settings,
+  TrashIcon,
 } from "lucide-react"
 import { useState } from "react"
 import toast from "react-hot-toast"
@@ -214,7 +214,7 @@ export const WaterVendoCard = ({
                 className="cursor-pointer text-xs"
                 onClick={handleDelete}
               >
-                <DeleteIcon className="mr-2 h-3.5 w-3.5" />
+                <TrashIcon className="mr-2 h-3.5 w-3.5" />
                 Delete water vendo
               </DropdownMenuItem>
             </DropdownMenuContent>

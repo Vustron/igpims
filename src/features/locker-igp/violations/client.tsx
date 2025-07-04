@@ -55,16 +55,13 @@ export const ViolationClient = () => {
             : violation.violations
               ? [violation.violations]
               : [],
-          dateOfInspection: new Date(violation.dateOfInspection),
-          datePaid: violation.datePaid ? new Date(violation.datePaid) : null,
+          dateOfInspection: violation.dateOfInspection,
+          datePaid: violation.datePaid,
           totalFine: violation.totalFine,
           fineStatus: violation.fineStatus || "unpaid",
-          createdAt: violation.createdAt
-            ? new Date(violation.createdAt)
-            : new Date(),
-          updatedAt: violation.updatedAt
-            ? new Date(violation.updatedAt)
-            : new Date(),
+          createdAt: violation.createdAt,
+
+          updatedAt: violation.updatedAt,
         }),
       )
   }, [violationsResponse?.data])

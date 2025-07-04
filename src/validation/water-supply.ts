@@ -9,7 +9,7 @@ export const createWaterSupplySchema = z.object({
 
 export const updateWaterSupplySchema = z.object({
   waterVendoId: z.string().length(15).optional(),
-  supplyDate: z.number().optional(),
+  supplyDate: z.any().optional(),
   suppliedGallons: z.any().optional(),
   expenses: z.any().optional(),
 })

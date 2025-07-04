@@ -14,7 +14,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
-import { EditWaterVendoForm } from "@/features/water-vendo-igp/vendo/update-water-vendo-form"
+import { EditWaterVendoForm } from "@/features/water-vendo-igp/vendo/edit-water-vendo-form"
 import { isWaterVendoData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 

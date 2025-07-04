@@ -25,7 +25,7 @@ export const CreateWaterSupplyForm = ({
 }: CreateWaterSupplyFormProps) => {
   const createWaterSupply = useCreateWaterSupply()
 
-  const { data: vendosResponse, isLoading: isLoadingVendos } =
+  const { data: vendosResponse, isLoading: isLoadingForm } =
     useFindManyWaterVendos({
       limit: 100,
     })
@@ -99,7 +99,7 @@ export const CreateWaterSupplyForm = ({
     }
   }
 
-  if (isLoadingVendos) {
+  if (isLoadingForm) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="size-8 animate-spin text-primary" />
@@ -114,7 +114,7 @@ export const CreateWaterSupplyForm = ({
       fields={createWaterSupplyFields}
       mutation={createWaterSupply}
       submitButtonTitle="Create Water Supply"
-      disabled={isLoadingVendos}
+      disabled={isLoadingForm}
     />
   )
 }

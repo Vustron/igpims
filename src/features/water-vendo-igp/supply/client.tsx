@@ -43,9 +43,9 @@ export const WaterSupplyClient = () => {
 
     return suppliesResponse.data.map((supply) => ({
       ...supply,
-      supplyDate: new Date(supply.supplyDate),
-      createdAt: new Date(supply.createdAt),
-      updatedAt: new Date(supply.updatedAt),
+      supplyDate: supply.supplyDate,
+      createdAt: supply.createdAt,
+      updatedAt: supply.updatedAt,
     }))
   }, [suppliesResponse?.data])
 

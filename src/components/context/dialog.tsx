@@ -182,6 +182,11 @@ const CreateWaterSupplyDialog = dynamic(() =>
     (mod) => mod.CreateWaterSupplyDialog,
   ),
 )
+const EditWaterSupplyDialog = dynamic(() =>
+  import("@/components/ui/dialogs/edit-water-supply-dialog").then(
+    (mod) => mod.EditWaterSupplyDialog,
+  ),
+)
 
 export const DialogProvider = () => {
   const isMounted = useMounted()
@@ -229,6 +234,7 @@ export const DialogProvider = () => {
         <SendEmailLockerRentDialog />
         <EditWaterVendoDialog />
         <CreateWaterSupplyDialog />
+        <EditWaterSupplyDialog />
       </Suspense>
     </>
   )

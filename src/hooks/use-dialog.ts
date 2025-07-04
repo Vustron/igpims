@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { WaterSupplyWithVendoLocation } from "@/backend/actions/water-supply/find-by-id"
 import {
   Inspection,
   Locker,
@@ -48,6 +49,7 @@ export type DialogType =
   | "sendEmailLockerRent"
   | "editWaterVendo"
   | "createWaterSupply"
+  | "editWaterSupply"
 
 interface ConfirmDialogData {
   title?: string
@@ -82,6 +84,10 @@ interface WaterVendoData {
   waterVendo?: WaterVendo
 }
 
+interface WaterSupplyData {
+  waterSupply?: WaterSupplyWithVendoLocation
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -98,6 +104,7 @@ export type DialogData =
   | ViolationData
   | InspectionData
   | WaterVendoData
+  | WaterSupplyData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -129,6 +136,10 @@ export const isInspectionData = (data: any): data is InspectionData => {
 
 export const isWaterVendoData = (data: any): data is WaterVendoData => {
   return data && data.waterVendo !== undefined
+}
+
+export const isWaterSupplyData = (data: any): data is WaterSupplyData => {
+  return data && data.waterSupply !== undefined
 }
 
 export const useDialog = create<DialogStore>((set) => ({

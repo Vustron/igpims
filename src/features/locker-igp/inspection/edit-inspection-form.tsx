@@ -143,10 +143,10 @@ export const EditInspectionForm = ({
   ]
 
   const onSubmit = async (values: Inspection) => {
-    if (!values.violators || values.violators.length === 0) {
-      toast.error("Please select at least one violator")
-      return
-    }
+    // if (!values.violators || values.violators.length === 0) {
+    //   toast.error("Please select at least one violator")
+    //   return
+    // }
 
     const submissionData = {
       ...values,
