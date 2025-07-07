@@ -1,11 +1,11 @@
 import { create } from "zustand"
+import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { WaterSupplyWithVendoLocation } from "@/backend/actions/water-supply/find-by-id"
 import {
   Inspection,
   Locker,
   LockerRental,
   User,
-  Violation,
   WaterVendo,
 } from "@/backend/db/schemas"
 
@@ -73,7 +73,7 @@ interface RentalReceiptData {
 }
 
 interface ViolationData {
-  violation?: Violation
+  violation?: ViolationWithRenters
 }
 
 interface InspectionData {

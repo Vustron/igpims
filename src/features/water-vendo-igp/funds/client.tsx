@@ -1,13 +1,12 @@
 "use client"
 
 import { AnimatePresence, motion } from "framer-motion"
-import { Calendar, ChevronDown, ChevronUp, Edit } from "lucide-react"
+import { Calendar, ChevronDown, ChevronUp } from "lucide-react"
 import { useState } from "react"
 import { z } from "zod"
 import { Button } from "@/components/ui/buttons"
-import { Separator } from "@/components/ui/separators"
+import { Card, CardContent } from "@/components/ui/cards"
 import { DataTable } from "@/components/ui/tables"
-import { WaterFundsControls } from "./control"
 import {
   waterVendoEntries,
   waterVendoEntryColumn,
@@ -41,9 +40,7 @@ export type WeekSummary = z.infer<typeof WeekSummarySchema>
 export const WaterFunds = () => {
   const [weekData, setWeekData] = useState<WeekSummary[]>(weekSummaries)
   const [entries] = useState<WaterVendoEntry[]>(waterVendoEntries)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [timeRange, setTimeRange] = useState("ALL")
+  const [searchTerm] = useState("")
 
   const toggleWeekExpanded = (weekId: string) => {
     setWeekData((prev) =>
@@ -53,13 +50,12 @@ export const WaterFunds = () => {
     )
   }
 
-  const handlePrint = () => {
-    console.log("Printing report...")
-    window.print()
-  }
-
-  const handleAddCollection = () => {
-    console.log("Adding new collection...")
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+      minimumFractionDigits: 2,
+    }).format(amount)
   }
 
   const itemVariants = {
@@ -67,114 +63,94 @@ export const WaterFunds = () => {
     show: { opacity: 1, y: 0 },
   }
 
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  }
+
   return (
-    <div className="mx-auto max-w-[1200px] space-y-6">
-      {/* Controls */}
-      <WaterFundsControls
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        isSheetOpen={isSheetOpen}
-        setIsSheetOpen={setIsSheetOpen}
-        timeRange={timeRange}
-        setTimeRange={setTimeRange}
-        onPrint={handlePrint}
-        onAddCollection={handleAddCollection}
-      />
-
-      <Separator className="my-6" />
-
-      {/* Collapsible sections */}
+    <div className="mx-auto w-full max-w-[1400px] space-y-6 p-4 sm:p-6 lg:p-8">
       <motion.div
         className="space-y-4"
         initial="hidden"
         animate="show"
-        variants={{
-          hidden: {},
-          show: {
-            transition: {
-              staggerChildren: 0.1,
-            },
-          },
-        }}
+        variants={containerVariants}
       >
         {weekData.map((week) => (
           <motion.div
             key={week.id}
             variants={itemVariants}
             layout
-            className="overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md"
+            className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-gray-300 hover:shadow-md"
           >
             <Button
               variant="ghost"
-              className="flex cursor-pointer items-center justify-between bg-gradient-to-r from-yellow-50 to-yellow-100/50 p-4"
+              className="w-full cursor-pointer justify-between bg-gradient-to-r from-slate-50 via-white to-slate-50 p-4 transition-all duration-200 hover:from-slate-100 hover:to-slate-100 sm:p-6"
               onClick={() => toggleWeekExpanded(week.id)}
             >
-              <div>
-                <span className="font-medium text-sm">{week.week}</span>
-                <div className="flex items-center text-muted-foreground text-xs">
-                  <Calendar className="mr-1 h-3.5 w-3.5 text-muted-foreground" />
-                  {week.dateRange}
+              <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-gray-900 text-xs">
+                    {week.week}
+                  </span>
+                </div>
+                <div className="-mt-2 flex items-center text-muted-foreground text-xs">
+                  <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">{week.dateRange}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-4 md:gap-8">
-                <div className="hidden md:block">
-                  <div className="flex flex-col text-right">
-                    <span className="text-muted-foreground text-xs">
-                      Revenue
-                    </span>
-                    <span className="font-medium text-sm">
-                      ₱
-                      {week.totalRevenue.toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </span>
+
+              <div className="flex flex-col items-end gap-2 sm:hidden">
+                <div className="text-right">
+                  <span className="text-xs">
+                    {formatCurrency(week.totalProfit)}
+                  </span>
+                </div>
+                <div className="text-muted-foreground text-xs">Net Profit</div>
+                <div className="flex items-center rounded-full bg-gray-100 p-1">
+                  {week.expanded ? (
+                    <ChevronUp className="h-4 w-4 text-gray-600" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-gray-600" />
+                  )}
+                </div>
+              </div>
+
+              <div className="hidden items-center gap-6 sm:flex lg:gap-8">
+                <div className="text-right">
+                  <div className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                    Revenue
+                  </div>
+                  <div className="font-bold text-xs">
+                    {formatCurrency(week.totalRevenue)}
                   </div>
                 </div>
-                <div className="hidden md:block">
-                  <div className="flex flex-col text-right">
-                    <span className="text-muted-foreground text-xs">
-                      Expenses
-                    </span>
-                    <span className="font-medium text-sm">
-                      ₱
-                      {week.totalExpenses.toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </span>
+                <div className="text-right">
+                  <div className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                    Expenses
+                  </div>
+                  <div className="font-bold text-xs">
+                    {formatCurrency(week.totalExpenses)}
                   </div>
                 </div>
-                <div>
-                  <div className="flex flex-col text-right">
-                    <span className="text-muted-foreground text-xs">
-                      Profit
-                    </span>
-                    <span className="font-medium text-green-600 text-sm">
-                      ₱
-                      {week.totalProfit.toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </span>
+                <div className="text-right">
+                  <div className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                    Net Profit
+                  </div>
+                  <div className="font-bold text-xs">
+                    {formatCurrency(week.totalProfit)}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                  >
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Edit</span>
-                  </Button>
-                  <div className="flex h-8 w-8 items-center justify-center">
-                    {week.expanded ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 transition-colors group-hover:bg-gray-200">
+                  {week.expanded ? (
+                    <ChevronUp className="h-5 w-5 text-gray-600" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-gray-600" />
+                  )}
                 </div>
               </div>
             </Button>
@@ -185,21 +161,51 @@ export const WaterFunds = () => {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="overflow-hidden"
                 >
-                  <div className="overflow-hidden p-5 print:overflow-visible">
-                    <DataTable
-                      columns={waterVendoEntryColumn}
-                      data={entries.filter(
-                        (entry) =>
-                          entry.week === week.week &&
-                          (searchTerm === "" ||
-                            entry.location
-                              .toLowerCase()
-                              .includes(searchTerm.toLowerCase())),
-                      )}
-                      placeholder="No entries found"
-                    />
+                  <div className="border-t bg-gradient-to-r from-gray-50 to-gray-100/50 p-4 sm:hidden">
+                    <div className="grid grid-cols-2 gap-3">
+                      <Card className="border-0 shadow-sm">
+                        <CardContent className="p-3 text-center">
+                          <div className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                            Revenue
+                          </div>
+                          <div className="font-bold text-blue-600 text-sm">
+                            {formatCurrency(week.totalRevenue)}
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card className="border-0 shadow-sm">
+                        <CardContent className="p-3 text-center">
+                          <div className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+                            Expenses
+                          </div>
+                          <div className="font-bold text-red-600 text-sm">
+                            {formatCurrency(week.totalExpenses)}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50/30 p-4 sm:p-6 print:overflow-visible print:bg-white">
+                    <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+                      <div className="p-10">
+                        <DataTable
+                          columns={waterVendoEntryColumn}
+                          data={entries.filter(
+                            (entry) =>
+                              entry.week === week.week &&
+                              (searchTerm === "" ||
+                                entry.location
+                                  .toLowerCase()
+                                  .includes(searchTerm.toLowerCase())),
+                          )}
+                          placeholder=""
+                        />
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               )}

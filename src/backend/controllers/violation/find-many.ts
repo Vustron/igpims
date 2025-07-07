@@ -1,6 +1,6 @@
 import { and, between, eq, like, or, sql } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
-import { violation } from "@/backend/db/schemas"
+import { lockerRental, violation } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
@@ -90,7 +90,7 @@ export async function findManyViolations(
       return result[0]?.count || 0
     })
 
-    const violationsData = await db.transaction(async (_tx) => {
+    const violations = await db.transaction(async (_tx) => {
       const conditions = []
 
       if (fineStatus) {
@@ -120,7 +120,7 @@ export async function findManyViolations(
         )
       }
 
-      const query = db
+      return await db
         .select({
           id: violation.id,
           lockerId: violation.lockerId,
@@ -139,9 +139,24 @@ export async function findManyViolations(
         .limit(limit)
         .offset(offset)
         .orderBy(sql`${violation.dateOfInspection} DESC`)
-
-      return await query
     })
+
+    const violationsWithRenters = await Promise.all(
+      violations.map(async (violation) => {
+        const renters = await db
+          .select({
+            renterId: lockerRental.renterId,
+            renterName: lockerRental.renterName,
+            courseAndSet: lockerRental.courseAndSet,
+          })
+          .from(lockerRental)
+
+        return {
+          ...violation,
+          renters,
+        }
+      }),
+    )
 
     const totalItems = countResult
     const totalPages = Math.ceil(totalItems / limit)
@@ -150,7 +165,7 @@ export async function findManyViolations(
 
     return NextResponse.json(
       {
-        data: violationsData,
+        data: violationsWithRenters,
         meta: {
           page,
           limit,

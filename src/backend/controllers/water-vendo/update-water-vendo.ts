@@ -1,6 +1,6 @@
 import { and, eq, not, sql } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
-import { waterVendo } from "@/backend/db/schemas"
+import { waterSupply, waterVendo } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
@@ -87,6 +87,8 @@ export async function updateWaterVendo(
       }
     }
 
+    const newGallonsUsed = vendoData.gallonsUsed ?? existingVendo.gallonsUsed
+
     const updateData = {
       ...vendoData,
     }
@@ -95,6 +97,19 @@ export async function updateWaterVendo(
       .update(waterVendo)
       .set(updateData)
       .where(eq(waterVendo.id, vendoId))
+
+    if (
+      vendoData.gallonsUsed !== undefined &&
+      vendoData.gallonsUsed !== existingVendo.gallonsUsed
+    ) {
+      await db
+        .update(waterSupply)
+        .set({
+          usedGallons: newGallonsUsed,
+          remainingGallons: sql`${waterSupply.suppliedGallons} - ${newGallonsUsed}`,
+        })
+        .where(eq(waterSupply.waterVendoId, vendoId))
+    }
 
     const updatedVendo = await db
       .select({

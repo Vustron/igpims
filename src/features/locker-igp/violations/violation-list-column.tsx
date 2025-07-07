@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { AlertCircle, Calendar, Package, Receipt, User } from "lucide-react"
 import { BiCard } from "react-icons/bi"
-import { Violation } from "@/backend/db/schemas"
+import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { ViolationActions } from "./actions"
 import {
   AmountCell,
@@ -16,7 +16,7 @@ import {
   ViolationCell,
 } from "./column-helpers"
 
-export const violationListColumns: ColumnDef<Violation>[] = [
+export const violationListColumns: ColumnDef<ViolationWithRenters>[] = [
   {
     accessorKey: "id",
     header: () => (

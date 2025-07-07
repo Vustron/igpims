@@ -9,12 +9,13 @@ import { DynamicForm } from "@/components/ui/forms"
 import { useFindManyInspections } from "@/backend/actions/inspection/find-many"
 import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { useCreateViolation } from "@/backend/actions/violation/create-violation"
+import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import { Violation, ViolationSchema } from "@/validation/violation"
 
 interface ViolationFormProps {
-  violation?: Violation
+  violation?: ViolationWithRenters
   onSuccess?: () => void
   onError?: () => void
 }
@@ -136,6 +137,12 @@ export const ViolationForm = ({
     { value: "broken_hinges", label: "Broken Hinges" },
   ]
 
+  const studentOptions =
+    violation?.renters?.map((renter) => ({
+      value: renter.renterName,
+      label: `${renter.renterName}`,
+    })) || []
+
   const lockerOptions =
     lockersData?.data.map((locker) => ({
       value: locker.id,
@@ -155,10 +162,11 @@ export const ViolationForm = ({
   const violationFields: FieldConfig<Omit<Violation, "id">>[] = [
     {
       name: "studentName",
-      type: "text",
+      type: "select",
       label: "Student Name",
       placeholder: "Enter student name",
       description: "Full name of the student",
+      options: studentOptions,
       required: true,
     },
     {

@@ -174,6 +174,7 @@ export function DataTable<TData, TValue>({
             isIgp={isIgp}
             isLockerRental={isLockerRental}
             table={table}
+            tableData={filteredData}
             isUser={isOnUsers}
             isOnViolations={isOnViolations}
             isOnInspection={isOnInspection}
@@ -329,6 +330,7 @@ export function DataTable<TData, TValue>({
           onRefetch={onRefetch!}
           isFetching={isFetching!}
           table={table}
+          tableData={filteredData}
         />
       </div>
 

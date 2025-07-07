@@ -17,6 +17,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
+import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { useDialog } from "@/hooks/use-dialog"
 
 interface TableActionsProps<TData> {
@@ -25,6 +26,7 @@ interface TableActionsProps<TData> {
   onRefetch: () => void
   isFetching: boolean
   table: Table<TData>
+  tableData: TData[]
   isUser?: boolean
   isOnViolations?: boolean
   isOnInspection?: boolean
@@ -37,6 +39,7 @@ export function TableActions<TData>({
   onRefetch,
   isFetching,
   table,
+  tableData,
   isUser,
   isOnViolations,
   isOnInspection,
@@ -111,6 +114,11 @@ export function TableActions<TData>({
                       : isOnWaterSupply
                         ? "createWaterSupply"
                         : "createRent",
+                isOnViolations
+                  ? {
+                      violation: tableData[0] as ViolationWithRenters,
+                    }
+                  : undefined,
               )
             }
           >

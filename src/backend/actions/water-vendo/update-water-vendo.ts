@@ -39,6 +39,14 @@ export const useUpdateWaterVendo = (id: string) => {
         queryClient.cancelQueries({ queryKey: ["water-vendos"] }),
         queryClient.cancelQueries({ queryKey: ["water-vendos-infinite"] }),
         queryClient.cancelQueries({ queryKey: ["water-vendo", id] }),
+        ...(updatedData.gallonsUsed !== undefined
+          ? [
+              queryClient.cancelQueries({ queryKey: ["water-supplies"] }),
+              queryClient.cancelQueries({
+                queryKey: ["water-supplies-infinite"],
+              }),
+            ]
+          : []),
       ])
 
       const previousVendo = queryClient.getQueryData<WaterVendo>([
@@ -54,7 +62,6 @@ export const useUpdateWaterVendo = (id: string) => {
         const optimisticVendo: WaterVendo = {
           ...previousVendo,
           ...updatedData,
-          updatedAt: new Date(),
         }
 
         queryClient.setQueryData(["water-vendo", id], optimisticVendo)
@@ -97,7 +104,7 @@ export const useUpdateWaterVendo = (id: string) => {
         previousVendosInfinite,
       }
     },
-    onSuccess: (updatedVendo: WaterVendo, _variables, _context) => {
+    onSuccess: (updatedVendo: WaterVendo, variables, _context) => {
       queryClient.setQueryData(["water-vendo", id], updatedVendo)
 
       queryClient.setQueriesData<PaginatedWaterVendosResponse>(
@@ -130,6 +137,15 @@ export const useUpdateWaterVendo = (id: string) => {
           }
         },
       )
+
+      if (variables.gallonsUsed !== undefined) {
+        queryClient.invalidateQueries({
+          queryKey: ["water-supplies"],
+        })
+        queryClient.invalidateQueries({
+          queryKey: ["water-supplies-infinite"],
+        })
+      }
     },
     onError: (error, _variables, context) => {
       if (context?.previousVendo) {

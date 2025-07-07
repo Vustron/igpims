@@ -17,8 +17,17 @@ export interface ViolationFilters {
   toDate?: number
 }
 
+export type ViolationWithRenters = Violation & {
+  renters: Renter[]
+}
+
+export interface Renter {
+  renterId: string
+  renterName: string
+  courseAndSet: string
+}
 export interface PaginatedViolationsResponse {
-  data: Violation[]
+  data: ViolationWithRenters[]
   meta: {
     currentPage: number
     itemsPerPage: number

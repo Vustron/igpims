@@ -2,7 +2,7 @@ import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
 import { timestamp } from "@/backend/helpers/schema-helpers"
-import { inspection } from "./inspection" // Added import for inspection
+import { inspection } from "./inspection"
 import { locker } from "./locker"
 
 export const violation = sqliteTable(

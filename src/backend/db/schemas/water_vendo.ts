@@ -25,6 +25,8 @@ export const waterVendo = sqliteTable(
     index("waterVendo_location_idx").on(t.waterVendoLocation),
     index("waterVendo_status_idx").on(t.vendoStatus),
     index("waterRefill_status_idx").on(t.waterRefillStatus),
+    index("waterVendo_gallons_idx").on(t.gallonsUsed),
+    index("waterVendo_created_idx").on(t.createdAt),
   ],
 )
 
@@ -44,40 +46,45 @@ export const waterSupply = sqliteTable(
     remainingGallons: integer("remainingGallons").notNull(),
     ...timestamp,
   },
-  (_t) => [],
+  (t) => [
+    index("waterSupply_vendo_idx").on(t.waterVendoId),
+    index("waterSupply_date_idx").on(t.supplyDate),
+    index("waterSupply_remaining_idx").on(t.remainingGallons),
+    index("waterSupply_vendo_date_idx").on(t.waterVendoId, t.supplyDate),
+  ],
 )
 
-// export const waterFunds = sqliteView("water_funds", {
-//   id: text("id"),
-//   waterVendoId: text("waterVendoId"),
-//   waterVendoLocation: text("waterVendoLocation"),
-//   gallonsUsed: integer("gallonsUsed"),
-//   expenses: integer("expenses"),
-//   revenue: integer("revenue"),
-//   profit: integer("profit"),
-//   createdAt: integer("createdAt", { mode: "timestamp" }),
-//   updatedAt: integer("updatedAt", { mode: "timestamp" }),
-// }).as(sql`
-//   SELECT
-//     hex(randomblob(4)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(2)) || '-' || hex(randomblob(6)) as id,
-//     wv.id as waterVendoId,
-//     wv.waterVendoLocation,
-//     wv.gallonsUsed,
-//     COALESCE(SUM(ws.expenses), 0) as expenses,
-//     (wv.gallonsUsed * 10) as revenue,
-//     ((wv.gallonsUsed * 10) - COALESCE(SUM(ws.expenses), 0)) as profit,
-//     wv.createdAt,
-//     wv.updatedAt
-//   FROM
-//     water_vendo wv
-//   LEFT JOIN
-//     water_supply ws ON wv.id = ws.waterVendoId
-//   GROUP BY
-//     wv.id
-// `)
+export const waterFunds = sqliteTable(
+  "waterFunds",
+  {
+    id: text("id", { length: 15 })
+      .primaryKey()
+      .$defaultFn(() => nanoid(15)),
+    waterVendoId: text("waterVendoId")
+      .notNull()
+      .references(() => waterVendo.id, { onDelete: "cascade" }),
+    waterVendoLocation: text("waterVendoLocation", { length: 255 }).notNull(),
+    usedGallons: integer("usedGallons").default(0).notNull(),
+    waterFundsExpenses: integer("waterFundsExpenses").default(0).notNull(),
+    waterFundsRevenue: integer("waterFundsRevenue").default(0).notNull(),
+    waterFundsProfit: integer("waterFundsProfit").default(0).notNull(),
+    weekFund: integer("weekFund", { mode: "timestamp" }).notNull(),
+    dateFund: integer("dateFund", { mode: "timestamp" }).notNull(),
+    ...timestamp,
+  },
+  (t) => [
+    index("waterFunds_vendo_idx").on(t.waterVendoId),
+    index("waterFunds_week_idx").on(t.weekFund),
+    index("waterFunds_date_idx").on(t.dateFund),
+    index("waterFunds_location_idx").on(t.waterVendoLocation),
+    index("waterFunds_vendo_week_idx").on(t.waterVendoId, t.weekFund),
+    index("waterFunds_profit_idx").on(t.waterFundsProfit),
+  ],
+)
 
 export const waterVendoRelations = relations(waterVendo, ({ many }) => ({
   supplies: many(waterSupply),
+  funds: many(waterFunds),
 }))
 
 export const waterSupplyRelations = relations(waterSupply, ({ one }) => ({
@@ -87,7 +94,16 @@ export const waterSupplyRelations = relations(waterSupply, ({ one }) => ({
   }),
 }))
 
+export const waterFundsRelations = relations(waterFunds, ({ one }) => ({
+  vendo: one(waterVendo, {
+    fields: [waterFunds.waterVendoId],
+    references: [waterVendo.id],
+  }),
+}))
+
 export type WaterVendo = InferSelectModel<typeof waterVendo>
 export type NewWaterVendo = InferInsertModel<typeof waterVendo>
 export type WaterSupply = InferSelectModel<typeof waterSupply>
 export type NewWaterSupply = InferInsertModel<typeof waterSupply>
+export type WaterFunds = InferSelectModel<typeof waterFunds>
+export type NewWaterFunds = InferInsertModel<typeof waterFunds>

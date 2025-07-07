@@ -10,6 +10,8 @@ import { findManyRenterInfo } from "../controllers/user/find-many-renter-info"
 import { generate2fa } from "../controllers/user/generate-2fa"
 import { findViolationById } from "../controllers/violation/find-by-id"
 import { findManyViolations } from "../controllers/violation/find-many"
+import { findWaterFundById } from "../controllers/water-funds/find-by-id"
+import { findManyWaterFunds } from "../controllers/water-funds/find-many"
 import { findWaterSupplyById } from "../controllers/water-supply/find-by-id"
 import { findManyWaterSupply } from "../controllers/water-supply/find-many"
 import { findManyWaterVendo } from "../controllers/water-vendo/find-many-water-vendo"
@@ -33,5 +35,7 @@ export const getRoutes: Route[] = [
   { path: "/api/v1/water-vendos/find-by-id", handler: findWaterVendoById },
   { path: "/api/v1/water-supplies/find-many", handler: findManyWaterSupply },
   { path: "/api/v1/water-supplies/find-by-id", handler: findWaterSupplyById },
+  { path: "/api/v1/water-funds/find-many", handler: findManyWaterFunds },
+  { path: "/api/v1/water-funds/find-by-id", handler: findWaterFundById },
   // Add more GET routes here
 ]

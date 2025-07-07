@@ -6,8 +6,8 @@ import { DataTable } from "@/components/ui/tables"
 import {
   useFindManyViolations,
   ViolationFilters,
+  ViolationWithRenters,
 } from "@/backend/actions/violation/find-many"
-import { Violation } from "@/backend/db/schemas"
 import { useDebounce } from "@/hooks/use-debounce"
 import { violationListColumns } from "./violation-list-column"
 
@@ -45,7 +45,7 @@ export const ViolationClient = () => {
     return violationsResponse.data
       .filter((violation) => violation.id)
       .map(
-        (violation): Violation => ({
+        (violation): ViolationWithRenters => ({
           id: violation.id!,
           lockerId: violation.lockerId,
           inspectionId: violation.inspectionId,
@@ -60,8 +60,8 @@ export const ViolationClient = () => {
           totalFine: violation.totalFine,
           fineStatus: violation.fineStatus || "unpaid",
           createdAt: violation.createdAt,
-
           updatedAt: violation.updatedAt,
+          renters: violation.renters,
         }),
       )
   }, [violationsResponse?.data])

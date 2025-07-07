@@ -15,16 +15,20 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawers"
 import { ViolationForm } from "@/features/locker-igp/violations/create-violation-form"
-import { useDialog } from "@/hooks/use-dialog"
+import { isViolationData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
 export const CreateViolationDialog = () => {
-  const { isOpen, onClose, type } = useDialog()
+  const { isOpen, onClose, type, data } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "createViolation"
 
   const handleClose = () => {
     onClose()
+  }
+
+  if (!isDialogOpen || !isViolationData(data) || !data.violation) {
+    return null
   }
 
   if (isDesktop) {
@@ -37,7 +41,11 @@ export const CreateViolationDialog = () => {
               Fill in the details below to create a new violation.
             </DialogDescription>
           </DialogHeader>
-          <ViolationForm onSuccess={handleClose} onError={handleClose} />
+          <ViolationForm
+            violation={data.violation || undefined}
+            onSuccess={handleClose}
+            onError={handleClose}
+          />
         </DialogContent>
       </Dialog>
     )
@@ -53,7 +61,11 @@ export const CreateViolationDialog = () => {
           </DrawerDescription>
         </DrawerHeader>
         <div className="px-6 pb-6">
-          <ViolationForm onSuccess={handleClose} onError={handleClose} />
+          <ViolationForm
+            violation={data.violation || undefined}
+            onSuccess={handleClose}
+            onError={handleClose}
+          />
         </div>
       </DrawerContent>
     </Drawer>

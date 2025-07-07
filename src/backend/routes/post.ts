@@ -13,6 +13,7 @@ import { signOutUser } from "../controllers/user/sign-out"
 import { signUpUser } from "../controllers/user/sign-up"
 import { verifyUserEmail } from "../controllers/user/verify-email"
 import { createViolation } from "../controllers/violation/create-violation"
+import { createWaterFund } from "../controllers/water-funds/create-fund"
 import { createWaterSupply } from "../controllers/water-supply/create-water-supply"
 import { createWaterVendo } from "../controllers/water-vendo/create-water-vendo"
 import { Route } from "../routes/api-routes"
@@ -44,5 +45,6 @@ export const postRoutes: Route[] = [
     path: "/api/v1/water-supplies/create-water-supply",
     handler: createWaterSupply,
   },
+  { path: "/api/v1/water-funds/create-fund", handler: createWaterFund },
   // Add more POST routes here
 ]

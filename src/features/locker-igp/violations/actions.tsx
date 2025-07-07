@@ -12,11 +12,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
 import { useDeleteViolation } from "@/backend/actions/violation/delete-violation"
-import { Violation } from "@/backend/db/schemas"
+import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { useDialog } from "@/hooks/use-dialog"
 import { catchError } from "@/utils/catch-error"
 
-export const ViolationActions = ({ violation }: { violation: Violation }) => {
+export const ViolationActions = ({
+  violation,
+}: {
+  violation: ViolationWithRenters
+}) => {
   const deleteViolation = useDeleteViolation(violation?.id!)
   const { onOpen } = useDialog()
 

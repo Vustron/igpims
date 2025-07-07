@@ -109,6 +109,15 @@ export const WaterVendoFilters = ({
     })
   }
 
+  const handleBadgeClose = (
+    e: React.MouseEvent,
+    category: "status" | "refill",
+    key: string,
+  ) => {
+    e.stopPropagation()
+    toggleFilter(category, key, false)
+  }
+
   return (
     <>
       <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
@@ -342,10 +351,13 @@ export const WaterVendoFilters = ({
                     {key === "out-of-service"
                       ? "Out of Service"
                       : key.charAt(0).toUpperCase() + key.slice(1)}
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() => toggleFilter("status", key, false)}
-                    />
+                    <button
+                      type="button"
+                      onClick={(e) => handleBadgeClose(e, "status", key)}
+                      className="flex items-center justify-center"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </Badge>
                 ),
             )}
@@ -359,12 +371,36 @@ export const WaterVendoFilters = ({
                     className="flex items-center gap-1 px-2 py-1"
                   >
                     {key.charAt(0).toUpperCase() + key.slice(1)}
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() => toggleFilter("refill", key, false)}
-                    />
+                    <button
+                      type="button"
+                      onClick={(e) => handleBadgeClose(e, "refill", key)}
+                      className="flex items-center justify-center"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </Badge>
                 ),
+            )}
+
+            {filters.lastRefilled && (
+              <Badge
+                variant="secondary"
+                className="flex items-center gap-1 px-2 py-1"
+              >
+                {filters.lastRefilled === "today" && "Refilled Today"}
+                {filters.lastRefilled === "week" && "Refilled This Week"}
+                {filters.lastRefilled === "month" && "Refilled This Month"}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setLastRefilledFilter(null)
+                  }}
+                  className="flex items-center justify-center"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
             )}
 
             {isFilterActive() && (

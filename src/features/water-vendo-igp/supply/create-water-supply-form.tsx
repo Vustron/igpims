@@ -81,6 +81,7 @@ export const CreateWaterSupplyForm = ({
   const onSubmit = async (values: CreateWaterSupplyData) => {
     const submissionData = {
       ...values,
+      supplyDate: new Date(values.supplyDate).setHours(0, 0, 0, 0),
       suppliedGallons: Number(values.suppliedGallons),
       expenses: Number(values.expenses),
     }
