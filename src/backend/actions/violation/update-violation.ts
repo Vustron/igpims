@@ -25,7 +25,7 @@ export const useUpdateViolation = (id: string) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: [ "update-violation", id ],
+    mutationKey: ["update-violation", id],
     mutationFn: async (payload: Partial<ViolationWithRenters>) => {
       const normalizedViolations = normalizeViolations(payload.violations)
 
@@ -40,20 +40,20 @@ export const useUpdateViolation = (id: string) => {
     },
     onMutate: async (updatedData) => {
       await Promise.all([
-        queryClient.cancelQueries({ queryKey: [ "violations" ] }),
-        queryClient.cancelQueries({ queryKey: [ "violation", id ] }),
+        queryClient.cancelQueries({ queryKey: ["violations"] }),
+        queryClient.cancelQueries({ queryKey: ["violation", id] }),
       ])
 
       const previousViolation = queryClient.getQueryData<Violation>([
         "violation",
         id,
       ])
-      const previousViolations = queryClient.getQueryData([ "violations" ])
+      const previousViolations = queryClient.getQueryData(["violations"])
 
       const normalizedViolations = normalizeViolations(updatedData.violations)
 
       if (previousViolation) {
-        queryClient.setQueryData([ "violation", id ], {
+        queryClient.setQueryData(["violation", id], {
           ...previousViolation,
           ...updatedData,
           violations: normalizedViolations,
@@ -68,10 +68,10 @@ export const useUpdateViolation = (id: string) => {
         violations: normalizeViolations(updatedViolation.violations),
       }
 
-      queryClient.setQueryData([ "violation", id ], normalizedViolation)
+      queryClient.setQueryData(["violation", id], normalizedViolation)
 
       queryClient.setQueriesData<PaginatedViolationsResponse>(
-        { queryKey: [ "violations" ] },
+        { queryKey: ["violations"] },
         (oldData) => {
           if (!oldData?.data) return oldData
 
@@ -85,10 +85,10 @@ export const useUpdateViolation = (id: string) => {
       )
 
       const infiniteQueries = queryClient.getQueriesData({
-        queryKey: [ "violations-infinite" ],
+        queryKey: ["violations-infinite"],
       })
 
-      infiniteQueries.forEach(([ queryKey, oldData ]: [ any, any ]) => {
+      infiniteQueries.forEach(([queryKey, oldData]: [any, any]) => {
         if (oldData?.pages) {
           const newPages = oldData.pages.map((page: any) => {
             if (!page?.data) return page
@@ -112,10 +112,10 @@ export const useUpdateViolation = (id: string) => {
     },
     onError: (error, _variables, context) => {
       if (context?.previousViolation) {
-        queryClient.setQueryData([ "violation", id ], context.previousViolation)
+        queryClient.setQueryData(["violation", id], context.previousViolation)
       }
       if (context?.previousViolations) {
-        queryClient.setQueryData([ "violations" ], context.previousViolations)
+        queryClient.setQueryData(["violations"], context.previousViolations)
       }
       catchError(error)
     },

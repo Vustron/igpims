@@ -1,12 +1,24 @@
 "use client"
 
+import useMounted from "@/hooks/use-mounted"
 import dynamic from "next/dynamic"
 import { Suspense } from "react"
-import { ConfirmDialog } from "@/components/ui/dialogs/confirm-dialog"
-import { SessionExpiredDialog } from "@/components/ui/dialogs/session-expired-dialog"
-import { VerifyUserDialog } from "@/components/ui/dialogs/verify-user-dialog"
-import useMounted from "@/hooks/use-mounted"
 
+const ConfirmDialog = dynamic(() =>
+  import("@/components/ui/dialogs/confirm-dialog").then(
+    (mod) => mod.ConfirmDialog,
+  ),
+)
+const VerifyUserDialog = dynamic(() =>
+  import("@/components/ui/dialogs/verify-user-dialog").then(
+    (mod) => mod.VerifyUserDialog,
+  ),
+)
+const SessionExpiredDialog = dynamic(() =>
+  import("@/components/ui/dialogs/session-expired-dialog").then(
+    (mod) => mod.SessionExpiredDialog,
+  ),
+)
 const CreateLockerDialog = dynamic(() =>
   import("@/components/ui/dialogs/create-locker-dialog").then(
     (mod) => mod.CreateLockerDialog,
@@ -187,6 +199,11 @@ const EditWaterSupplyDialog = dynamic(() =>
     (mod) => mod.EditWaterSupplyDialog,
   ),
 )
+const EditWaterFundDialog = dynamic(() =>
+  import("@/components/ui/dialogs/edit-water-fund-dialog").then(
+    (mod) => mod.EditWaterFundDialog,
+  ),
+)
 
 export const DialogProvider = () => {
   const isMounted = useMounted()
@@ -194,11 +211,10 @@ export const DialogProvider = () => {
 
   return (
     <>
-      <ConfirmDialog />
-      <VerifyUserDialog />
-      <SessionExpiredDialog />
-
       <Suspense fallback={null}>
+        <ConfirmDialog />
+        <VerifyUserDialog />
+        <SessionExpiredDialog />
         <CreateLockerDialog />
         <RentalAgreementReceiptDialog />
         <CreateWaterVendoDialog />
@@ -235,6 +251,7 @@ export const DialogProvider = () => {
         <EditWaterVendoDialog />
         <CreateWaterSupplyDialog />
         <EditWaterSupplyDialog />
+        <EditWaterFundDialog />
       </Suspense>
     </>
   )

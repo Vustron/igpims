@@ -1,8 +1,7 @@
-import { and, eq, not } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 import { waterFunds, waterVendo } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import * as waterFundQuery from "@/backend/queries/water-funds"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
@@ -10,6 +9,8 @@ import {
   UpdateWaterFundData,
   updateWaterFundSchema,
 } from "@/validation/water-fund"
+import { and, eq, not } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function updateWaterFund(
   request: NextRequest,
@@ -184,15 +185,20 @@ export async function updateWaterFund(
       )
     }
 
-    const responseFund = {
-      ...updatedFund,
-      weekFund: Number(updatedFund?.weekFund ?? 0),
-      dateFund: Number(updatedFund?.dateFund ?? 0),
-      createdAt: Number(updatedFund?.createdAt ?? 0),
-      updatedAt: Number(updatedFund?.updatedAt ?? 0),
+    const fundResult = await waterFundQuery.getWaterFundByIdQuery.execute({
+      id: existingFund.id,
+    })
+
+    if (!fundResult || fundResult.length === 0) {
+      return NextResponse.json(
+        { error: "Water fund not found" },
+        { status: 404 },
+      )
     }
 
-    return NextResponse.json(responseFund, { status: 200 })
+    return NextResponse.json(fundResult[0], {
+      status: 200,
+    })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

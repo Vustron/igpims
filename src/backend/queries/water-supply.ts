@@ -1,5 +1,5 @@
-import { eq, sql } from "drizzle-orm"
 import { db } from "@/config/drizzle"
+import { eq, sql } from "drizzle-orm"
 import { waterSupply, waterVendo } from "../db/schemas"
 
 const createWaterSupplyQuery = db
@@ -19,9 +19,11 @@ const createWaterSupplyQuery = db
 const getWaterVendoByIdQuery = db
   .select({
     id: waterVendo.id,
+    gallonsUsed: waterVendo.gallonsUsed,
+    waterVendoLocation: waterVendo.waterVendoLocation,
   })
   .from(waterVendo)
-  .where(sql`${waterVendo.id} = ${sql.placeholder("id")}`)
+  .where(eq(waterVendo.id, sql.placeholder("id")))
   .limit(1)
   .prepare()
 
@@ -30,6 +32,7 @@ const getWaterSupplyByDateQuery = db
     id: waterSupply.id,
     waterVendoId: waterSupply.waterVendoId,
     supplyDate: waterSupply.supplyDate,
+    expenses: waterSupply.expenses,
   })
   .from(waterSupply)
   .where(
@@ -44,6 +47,7 @@ const getWaterSupplyByDateRangeQuery = db
     id: waterSupply.id,
     waterVendoId: waterSupply.waterVendoId,
     supplyDate: waterSupply.supplyDate,
+    expenses: waterSupply.expenses,
   })
   .from(waterSupply)
   .where(
@@ -72,10 +76,29 @@ const getWaterSupplyByIdQuery = db
   .limit(1)
   .prepare()
 
+const getWaterSupplyByWaterVendoIdQuery = db
+  .select({
+    id: waterSupply.id,
+    waterVendoId: waterSupply.waterVendoId,
+    supplyDate: sql<number>`${waterSupply.supplyDate}`,
+    suppliedGallons: waterSupply.suppliedGallons,
+    expenses: waterSupply.expenses,
+    usedGallons: waterSupply.usedGallons,
+    remainingGallons: waterSupply.remainingGallons,
+    createdAt: sql<number>`${waterSupply.createdAt}`,
+    updatedAt: sql<number>`${waterSupply.updatedAt}`,
+    vendoLocation: waterVendo.waterVendoLocation,
+  })
+  .from(waterSupply)
+  .leftJoin(waterVendo, eq(waterSupply.waterVendoId, waterVendo.id))
+  .where(eq(waterSupply.waterVendoId, sql.placeholder("waterVendoId")))
+  .prepare()
+
 export {
   createWaterSupplyQuery,
   getWaterVendoByIdQuery,
   getWaterSupplyByDateQuery,
   getWaterSupplyByIdQuery,
   getWaterSupplyByDateRangeQuery,
+  getWaterSupplyByWaterVendoIdQuery,
 }

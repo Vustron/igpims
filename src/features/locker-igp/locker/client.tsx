@@ -47,9 +47,8 @@ export const LockerClient = ({ id }: { id: string }) => {
       renterEmail: locker?.rental?.renterEmail || "",
       rentalStatus: locker?.rental?.rentalStatus || "pending",
       paymentStatus: locker?.rental?.paymentStatus || "pending",
-      dateRented:
-        formatDateFromTimestamp(locker?.rental?.dateRented!) || Date.now(),
-      dateDue: formatDateFromTimestamp(locker?.rental?.dateDue!) || Date.now(),
+      dateRented: formatDateFromTimestamp(locker?.rental?.dateRented!),
+      dateDue: formatDateFromTimestamp(locker?.rental?.dateDue!),
     },
   })
 
@@ -211,10 +210,8 @@ export const LockerClient = ({ id }: { id: string }) => {
     const formData = {
       ...values,
       lockerRentalPrice: Number.parseInt(values.lockerRentalPrice, 10),
-      dateRented: values.dateRented
-        ? new Date(values.dateRented).getTime()
-        : undefined,
-      dateDue: values.dateDue ? new Date(values.dateDue).getTime() : undefined,
+      dateRented: new Date(values.dateRented).setHours(0, 0, 0, 0),
+      dateDue: new Date(values.dateDue).setHours(0, 0, 0, 0),
     }
 
     await toast.promise(updateLocker.mutateAsync(formData), {

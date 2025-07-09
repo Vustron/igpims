@@ -1,7 +1,5 @@
 "use client"
 
-import { renderAsync } from "@react-email/components"
-import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/cards"
 import { EmailTemplate } from "@/components/ui/email/email-template"
 import {
@@ -10,6 +8,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/separators"
+import { renderAsync } from "@react-email/components"
+import { useEffect, useState } from "react"
 
 export default function EmailPreviewPage() {
   const previewData = {
@@ -62,6 +62,16 @@ export default function EmailPreviewPage() {
       },
       dueDate: "2025-07-01",
       amount: 1500,
+    },
+    "payment-success": {
+      email: "user@example.com",
+      recipientName: "John Doe",
+      lockerDetails: {
+        name: "Locker A101",
+        location: "Building 1, Floor 1",
+      },
+      transactionId: "123-456-789",
+      paymentDate: "2025-07-01",
     },
   } as const
 

@@ -1,8 +1,8 @@
 "use client"
 
+import { Input } from "@/components/ui/inputs"
 import { Table } from "@tanstack/react-table"
 import { Search } from "lucide-react"
-import { Input } from "@/components/ui/inputs"
 import { TableActions } from "./table-actions"
 
 interface DynamicSearchHeaderProps<TData> {
@@ -21,6 +21,7 @@ interface DynamicSearchHeaderProps<TData> {
   isOnViolations?: boolean
   isOnInspection?: boolean
   isOnWaterSupply?: boolean
+  isOnWaterFund?: boolean
 }
 
 export const DynamicSearchHeader = <TData,>({
@@ -37,6 +38,7 @@ export const DynamicSearchHeader = <TData,>({
   isOnViolations,
   isOnInspection,
   isOnWaterSupply,
+  isOnWaterFund,
 }: DynamicSearchHeaderProps<TData>) => {
   return (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -63,6 +65,7 @@ export const DynamicSearchHeader = <TData,>({
         isOnViolations={isOnViolations}
         isOnInspection={isOnInspection}
         isOnWaterSupply={isOnWaterSupply}
+        isOnWaterFund={isOnWaterFund}
       />
     </div>
   )

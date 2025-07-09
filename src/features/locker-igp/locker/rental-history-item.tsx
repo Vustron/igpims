@@ -56,9 +56,6 @@ export const RentalHistoryItem = ({
             {rental.paymentStatus?.toUpperCase()}
           </Badge>
         </div>
-        <span className="text-slate-500 text-xs sm:text-sm dark:text-slate-400">
-          {formatDateFromTimestamp(rental.createdAt)}
-        </span>
       </div>
 
       {/* Mobile-optimized content grid */}

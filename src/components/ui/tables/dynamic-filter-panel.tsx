@@ -1,6 +1,10 @@
 "use client"
 
-import { X } from "lucide-react"
+import { InspectionFilters } from "@/backend/actions/inspection/find-many"
+import { RentalFilters } from "@/backend/actions/locker-rental/find-many"
+import { UserFilters } from "@/backend/actions/user/find-many"
+import { ViolationFilters } from "@/backend/actions/violation/find-many"
+import { WaterSupplyFilters } from "@/backend/actions/water-supply/find-many"
 import { Button } from "@/components/ui/buttons"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
 import { Input } from "@/components/ui/inputs"
@@ -12,11 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/selects"
-import { InspectionFilters } from "@/backend/actions/inspection/find-many"
-import { RentalFilters } from "@/backend/actions/locker-rental/find-many"
-import { UserFilters } from "@/backend/actions/user/find-many"
-import { ViolationFilters } from "@/backend/actions/violation/find-many"
-import { WaterSupplyFilters } from "@/backend/actions/water-supply/find-many"
+import { X } from "lucide-react"
 
 interface DynamicFiltersPanelProps {
   filters:
@@ -43,6 +43,7 @@ interface DynamicFiltersPanelProps {
     | "violations"
     | "inspection"
     | "water-supplies"
+    | "water-funds"
 }
 
 export const DynamicFiltersPanel = ({

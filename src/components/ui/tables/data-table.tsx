@@ -1,21 +1,5 @@
 "use client"
 
-import type {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-} from "@tanstack/react-table"
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-import { AnimatePresence, motion } from "framer-motion"
-import { History } from "lucide-react"
-import { useMemo, useState } from "react"
 import { EmptyState, Skeleton } from "@/components/ui/fallbacks"
 import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
 import {
@@ -33,6 +17,22 @@ import {
 } from "@/components/ui/tables"
 import { TableActions } from "@/components/ui/tables/table-actions"
 import { deepSearch } from "@/utils/deep-search"
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+} from "@tanstack/react-table"
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { AnimatePresence, motion } from "framer-motion"
+import { History } from "lucide-react"
+import { useMemo, useState } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -75,10 +75,12 @@ interface DataTableProps<TData, TValue> {
     | "violations"
     | "inspection"
     | "water-supplies"
+    | "water-funds"
   resultLabel?: string
   isOnViolations?: boolean
   isOnInspection?: boolean
   isOnWaterSupply?: boolean
+  isOnWaterFund?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -121,6 +123,7 @@ export function DataTable<TData, TValue>({
   isOnViolations,
   isOnInspection,
   isOnWaterSupply,
+  isOnWaterFund,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -179,6 +182,7 @@ export function DataTable<TData, TValue>({
             isOnViolations={isOnViolations}
             isOnInspection={isOnInspection}
             isOnWaterSupply={isOnWaterSupply}
+            isOnWaterFund={isOnWaterFund}
           />
         )}
 

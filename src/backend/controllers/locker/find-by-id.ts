@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from "next/server"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as lockerQuery from "@/backend/queries/locker"
@@ -6,6 +5,7 @@ import * as rentalQuery from "@/backend/queries/rental"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { toTimestamp } from "@/utils/date-convert"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function findLockerById(
   request: NextRequest,
@@ -57,8 +57,6 @@ export async function findLockerById(
 
       const lockerWithTimestamps = {
         ...locker,
-        createdAt: toTimestamp(locker.createdAt),
-        updatedAt: toTimestamp(locker.updatedAt),
       }
 
       return {

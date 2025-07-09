@@ -29,7 +29,7 @@ export const Actions = ({ supply }: ActionsProps) => {
   const handleDelete = async () => {
     const confirmed = confirm(
       "Delete Water Supply",
-      "Are you sure you want to delete this water water supply? This action cannot be undone.",
+      "Are you sure you want to delete this water supply? This action cannot be undone.",
     )
 
     if (await confirmed) {

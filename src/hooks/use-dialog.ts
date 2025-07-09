@@ -1,5 +1,5 @@
-import { create } from "zustand"
 import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
+import { WaterFundWithVendoLocation } from "@/backend/actions/water-fund/find-by-id"
 import { WaterSupplyWithVendoLocation } from "@/backend/actions/water-supply/find-by-id"
 import {
   Inspection,
@@ -8,6 +8,7 @@ import {
   User,
   WaterVendo,
 } from "@/backend/db/schemas"
+import { create } from "zustand"
 
 export type DialogType =
   | "confirm"
@@ -50,6 +51,7 @@ export type DialogType =
   | "editWaterVendo"
   | "createWaterSupply"
   | "editWaterSupply"
+  | "editWaterFund"
 
 interface ConfirmDialogData {
   title?: string
@@ -88,6 +90,10 @@ interface WaterSupplyData {
   waterSupply?: WaterSupplyWithVendoLocation
 }
 
+interface WaterFundData {
+  waterFund?: WaterFundWithVendoLocation
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -105,6 +111,7 @@ export type DialogData =
   | InspectionData
   | WaterVendoData
   | WaterSupplyData
+  | WaterFundData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -140,6 +147,10 @@ export const isWaterVendoData = (data: any): data is WaterVendoData => {
 
 export const isWaterSupplyData = (data: any): data is WaterSupplyData => {
   return data && data.waterSupply !== undefined
+}
+
+export const isWaterFundData = (data: any): data is WaterFundData => {
+  return data && data.waterFund !== undefined
 }
 
 export const useDialog = create<DialogStore>((set) => ({

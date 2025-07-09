@@ -30,14 +30,14 @@ export const CreateWaterFundDialog = () => {
   if (isDesktop) {
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="w-full">
           <DialogHeader>
             <DialogTitle>Create new water fund</DialogTitle>
             <DialogDescription>
               Fill in the details below to create a new water fund.
             </DialogDescription>
           </DialogHeader>
-          <CreateWaterFundForm />
+          <CreateWaterFundForm onSuccess={handleClose} onError={handleClose} />
         </DialogContent>
       </Dialog>
     )
@@ -52,7 +52,7 @@ export const CreateWaterFundDialog = () => {
             Fill in the details below to create a water fund.
           </DrawerDescription>
         </DrawerHeader>
-        <CreateWaterFundForm />
+        <CreateWaterFundForm onSuccess={handleClose} onError={handleClose} />
       </DrawerContent>
     </Drawer>
   )

@@ -1,10 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Loader2, Plus, Search } from "lucide-react"
-import { useEffect, useState } from "react"
-import { FaMoneyBill1Wave } from "react-icons/fa6"
-import { GiWaterGallon, GiWaterSplash } from "react-icons/gi"
+import { useFindManyWaterVendos } from "@/backend/actions/water-vendo/find-many"
 import { Button } from "@/components/ui/buttons"
 import { Input } from "@/components/ui/inputs"
 import { MobileTabNav, TabItem } from "@/components/ui/separators/mobile-tab"
@@ -14,14 +10,18 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/separators/tabs"
-import { useFindManyWaterVendos } from "@/backend/actions/water-vendo/find-many"
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { cn } from "@/utils/cn"
+import { motion } from "framer-motion"
+import { Loader2, Plus, Search } from "lucide-react"
+import { useEffect, useState } from "react"
+import { FaMoneyBill1Wave } from "react-icons/fa6"
+import { GiWaterGallon, GiWaterSplash } from "react-icons/gi"
+import { WaterFundsClient } from "../funds/client"
+import { WaterSupplyClient } from "../supply/client"
 import { WaterVendoCard } from "./water-vendo-card"
 import { FilterState, WaterVendoFilters } from "./water-vendo-filter"
-import { WaterFunds } from "../funds/client"
-import { WaterSupplyClient } from "../supply/client"
 
 const isVendoStatus = (
   status: string,
@@ -328,7 +328,7 @@ export const WaterVendoClient = () => {
         value="water_funds"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <WaterFunds />
+        <WaterFundsClient />
       </TabsContent>
     </Tabs>
   )

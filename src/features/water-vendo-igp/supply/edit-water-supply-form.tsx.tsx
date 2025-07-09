@@ -1,19 +1,19 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
-import { useForm } from "react-hook-form"
-import toast from "react-hot-toast"
-import { DynamicForm } from "@/components/ui/forms"
 import { useUpdateWaterSupply } from "@/backend/actions/water-supply/update-water-supply"
 import { useFindManyWaterVendos } from "@/backend/actions/water-vendo/find-many"
 import { WaterSupply } from "@/backend/db/schemas"
+import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import {
   UpdateWaterSupplyData,
   updateWaterSupplySchema,
 } from "@/validation/water-supply"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 
 interface EditWaterSupplyFormProps {
   initialData: WaterSupply & { vendoLocation: string }
@@ -41,6 +41,10 @@ export const EditWaterSupplyForm = ({
       expenses: initialData.expenses,
     },
   })
+
+  const suppliedGallons = form.watch("suppliedGallons")
+  const expenses = suppliedGallons * 25
+  form.setValue("expenses", expenses)
 
   const editWaterSupplyFields: FieldConfig<UpdateWaterSupplyData>[] = [
     {
@@ -75,7 +79,8 @@ export const EditWaterSupplyForm = ({
       type: "currency",
       label: "Expenses",
       placeholder: "Enter expenses amount",
-      description: "Total expenses for this supply",
+      description:
+        "Total expenses for this supply (automatically calculated as 25 per gallon)",
       required: true,
     },
   ]

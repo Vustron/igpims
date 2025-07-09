@@ -1,14 +1,5 @@
 "use client"
 
-import { format } from "date-fns/format"
-import {
-  AlertCircle,
-  Calendar,
-  ClipboardCopy,
-  Package,
-  Receipt,
-  User,
-} from "lucide-react"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import { Checkbox } from "@/components/ui/checkboxes"
@@ -18,6 +9,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
+import { format } from "date-fns/format"
+import {
+  AlertCircle,
+  Calendar,
+  ClipboardCopy,
+  Package,
+  Receipt,
+  User,
+} from "lucide-react"
 
 export const ColumnHeader = ({
   icon,
@@ -190,6 +190,9 @@ export const DateCell = ({ value }: { value: number }) => {
     const timestamp = (() => {
       const str = value.toString()
 
+      // Handle small values that are likely in seconds (like 1752076)
+      if (str.length <= 7) return value * 1000
+
       // Nanoseconds (19 digits) -> milliseconds
       if (str.length >= 19) return Math.floor(value / 1000000)
 
@@ -340,7 +343,7 @@ export const AmountCell = ({ value }: { value: number }) => {
       <Tooltip>
         <TooltipTrigger asChild>
           <span
-            className={`font-medium text-xs ${
+            className={`ml-5 font-medium text-xs ${
               isHighAmount
                 ? "text-red-600"
                 : isMediumAmount

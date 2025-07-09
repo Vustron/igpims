@@ -3,7 +3,20 @@ import { locker, lockerRental } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
 
 const getRentalByIdQuery = db
-  .select()
+  .select({
+    id: lockerRental.id,
+    lockerId: lockerRental.id,
+    renterId: lockerRental.renterId,
+    renterName: lockerRental.renterName,
+    courseAndSet: lockerRental.courseAndSet,
+    renterEmail: lockerRental.renterEmail,
+    rentalStatus: lockerRental.rentalStatus,
+    paymentStatus: lockerRental.paymentStatus,
+    dateRented: sql<number>`${lockerRental.dateRented}`,
+    dateDue: sql<number>`${lockerRental.dateDue}`,
+    createdAt: sql<number>`${lockerRental.createdAt}`,
+    updatedAt: sql<number>`${lockerRental.createdAt}`,
+  })
   .from(lockerRental)
   .where(sql`${lockerRental.id} = ${sql.placeholder("id")}`)
   .prepare()

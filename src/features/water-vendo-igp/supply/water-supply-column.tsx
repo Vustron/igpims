@@ -1,40 +1,38 @@
 "use client"
 
+import { WaterSupplyWithVendoLocation } from "@/backend/actions/water-supply/find-by-id"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { DateCell } from "@/features/locker-igp/violations/column-helpers"
+import { cn } from "@/utils/cn"
 import { ColumnDef } from "@tanstack/react-table"
 import {
+  ArrowUpDown,
   Banknote,
   CalendarDays,
   Droplet,
   GlassWaterIcon,
   Hash,
-  LucideIcon,
   Store,
   Timer,
 } from "lucide-react"
-import { Badge } from "@/components/ui/badges"
-import { DateCell } from "@/features/locker-igp/violations/column-helpers"
-import { WaterSupplyWithVendoLocation } from "@/backend/actions/water-supply/find-by-id"
-import { cn } from "@/utils/cn"
 import { Actions } from "./actions"
-
-const HeaderWithIcon = ({
-  icon: Icon,
-  label,
-}: {
-  icon?: LucideIcon
-  label: string
-}) => (
-  <div className="ml-2 flex items-center gap-2">
-    {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
-    <span className="font-medium">{label}</span>
-  </div>
-)
 
 export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
   [
     {
       accessorKey: "id",
-      header: () => <HeaderWithIcon icon={Hash} label="Supply ID" />,
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <Hash className="mr-2 h-3 w-3" />
+          Supply ID
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="ml-2 w-[80px] truncate sm:w-auto">
           <span className="font-medium font-mono">{row.getValue("id")}</span>
@@ -43,7 +41,17 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
     },
     {
       accessorKey: "supplyDate",
-      header: () => <HeaderWithIcon icon={CalendarDays} label="Supply Date" />,
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <CalendarDays className="mr-2 h-3 w-3" />
+          Supply Date
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const timestamp = row.getValue("supplyDate") as number
         return <DateCell value={timestamp} />
@@ -51,7 +59,17 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
     },
     {
       accessorKey: "vendoLocation",
-      header: () => <HeaderWithIcon icon={Store} label="Location" />,
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <Store className="mr-2 h-3 w-3" />
+          Location
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Store className="h-4 w-4 shrink-0 text-purple-500" />
@@ -63,7 +81,17 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
     },
     {
       accessorKey: "suppliedGallons",
-      header: () => <HeaderWithIcon icon={Droplet} label="Supplied" />,
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <Droplet className="mr-2 h-3 w-3" />
+          Supplied
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const amount = Number.parseInt(row.getValue("suppliedGallons"))
         return (
@@ -78,7 +106,17 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
     },
     {
       accessorKey: "expenses",
-      header: () => <HeaderWithIcon icon={Banknote} label="Expenses" />,
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <Banknote className="mr-2 h-3 w-3" />
+          Expenses
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const amount = Number.parseInt(row.getValue("expenses"))
         const formatted = new Intl.NumberFormat("en-PH", {
@@ -100,7 +138,17 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
     },
     {
       accessorKey: "usedGallons",
-      header: () => <HeaderWithIcon icon={GlassWaterIcon} label="Used" />,
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <GlassWaterIcon className="mr-2 h-3 w-3" />
+          Used
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const used = Number.parseInt(row.getValue("usedGallons"))
         const supplied = Number.parseInt(row.getValue("suppliedGallons"))
@@ -115,7 +163,7 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
           <div className="flex items-center gap-2">
             <GlassWaterIcon className={cn("h-4 w-4 shrink-0", colorClass)} />
             <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-              <span className="whitespace-nowrap text-sm sm:text-base">
+              <span className="whitespace-nowrap text-xs">
                 {used.toLocaleString()} gal
               </span>
               <Badge
@@ -131,7 +179,17 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
     },
     {
       accessorKey: "remainingGallons",
-      header: () => <HeaderWithIcon icon={Timer} label="Remaining" />,
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <Timer className="mr-2 h-3 w-3" />
+          Remaining
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const remaining = Number.parseInt(row.getValue("remainingGallons"))
         const supplied = Number.parseInt(row.getValue("suppliedGallons"))
@@ -162,7 +220,6 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
     },
     {
       id: "actions",
-      header: () => <HeaderWithIcon label="Actions" />,
       cell: ({ row }) => <Actions supply={row.original} />,
     },
   ]

@@ -1,3 +1,4 @@
+import { env } from "@/config/env"
 import {
   Body,
   Button,
@@ -12,7 +13,6 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components"
-import { env } from "@/config/env"
 
 interface EmailTemplateProps {
   token?: string
@@ -21,6 +21,8 @@ interface EmailTemplateProps {
   lockerDetails?: { name: string; location: string }
   dueDate?: string
   amount?: number
+  transactionId?: string
+  paymentDate?: string
   type?:
     | "verify"
     | "reset-password"
@@ -29,6 +31,7 @@ interface EmailTemplateProps {
     | "rental-expiration"
     | "rental-cancellation"
     | "payment-reminder"
+    | "payment-success"
 }
 
 export function EmailTemplate({
@@ -38,6 +41,8 @@ export function EmailTemplate({
   lockerDetails,
   dueDate,
   amount,
+  transactionId,
+  paymentDate,
   type = "verify",
 }: EmailTemplateProps) {
   const encodedToken = encodeURIComponent(token!)
@@ -105,6 +110,14 @@ export function EmailTemplate({
       disclaimer:
         "Please settle your payment before the due date to avoid any service interruption.",
     },
+    "payment-success": {
+      preview: "Locker Rental Payment Successful",
+      title: "Payment Successful!",
+      subtitle: "Your locker rental payment has been successfully processed.",
+      buttonText: "",
+      disclaimer:
+        "This receipt confirms your payment. Please keep it for your records.",
+    },
   }
 
   const renderLockerContent = () => {
@@ -134,6 +147,37 @@ export function EmailTemplate({
             </>
           )}
         </Text>
+      </Section>
+    )
+  }
+
+  const renderPaymentDetails = () => {
+    return (
+      <Section className="mb-8 rounded-lg border border-gray-200 p-6">
+        <Text className="mb-4 text-center text-lg font-semibold">
+          Payment Details
+        </Text>
+
+        <div className="space-y-4 text-center">
+          <div>
+            <Text className="font-medium text-gray-600">Transaction ID</Text>
+            <Text className="font-mono">{transactionId || "N/A"}</Text>
+          </div>
+
+          <div>
+            <Text className="font-medium text-gray-600">Payment Date</Text>
+            <Text>{paymentDate || new Date().toLocaleDateString()}</Text>
+          </div>
+
+          {lockerDetails && (
+            <div>
+              <Text className="font-medium text-gray-600">Locker</Text>
+              <Text>
+                {lockerDetails.name} ({lockerDetails.location})
+              </Text>
+            </div>
+          )}
+        </div>
       </Section>
     )
   }
@@ -280,13 +324,14 @@ export function EmailTemplate({
 
   return (
     <Html>
-      <Head>
-        <title>{content[type]?.title || "Notification"}</title>
-      </Head>
-      <Preview>{content[type]?.preview}</Preview>
       <Tailwind>
-        <Body className="py-12">
-          <Container className="mx-auto size-full max-w-[800px] rounded-xl border bg-white p-8 shadow-xl">
+        <Head>
+          <title>{content[type]?.title || "Notification"}</title>
+        </Head>
+        <Preview>{content[type]?.preview}</Preview>
+
+        <Body className="py-12 flex flex-col items-center justify-center">
+          <Container className="mx-auto size-full max-w-[800px] rounded-xl border bg-white p-8 shadow-xl flex flex-col items-center justify-center">
             <Section className="text-center">
               <Img
                 src={logoUrl}
@@ -295,18 +340,42 @@ export function EmailTemplate({
                 alt="Logo"
                 className="mx-auto mt-10 mb-8 rounded-xl"
               />
-              <Text className="m-0 mb-6 text-center font-bold text-3xl text-gray-800">
-                {content[type]?.title}
-              </Text>
-              <Text className="mb-4 text-center font-medium text-gray-700 text-xl">
-                {recipientName ? `Hi ${recipientName}! 👋` : "Hi! 👋"}
-              </Text>
+
+              {type === "payment-success" && (
+                <>
+                  <Text className="m-0 mb-2 text-center font-bold text-3xl text-gray-800">
+                    {content[type]?.title}
+                  </Text>
+                  <Img
+                    src={
+                      "https://ik.imagekit.io/qwdde9h0y/checkpng.png?updatedAt=1752049478869"
+                    }
+                    width="100"
+                    height="100"
+                    alt="Logo"
+                    className="mx-auto mt-10 mb-8 rounded-xl"
+                  />
+                  <Text className="mb-6 text-center text-xl text-gray-700">
+                    {recipientName ? `Hi ${recipientName}! 👋` : "Hi! 👋"}
+                  </Text>
+                </>
+              )}
+
+              {type !== "payment-success" && (
+                <Text className="m-0 mb-6 text-center font-bold text-3xl text-gray-800">
+                  {content[type]?.title}
+                </Text>
+              )}
+
               <Text className="m-5 text-center text-base text-gray-600">
                 {content[type]?.subtitle}
               </Text>
             </Section>
 
-            {type.includes("rental") || type === "payment-reminder" ? (
+            {type === "payment-success" && renderPaymentDetails()}
+
+            {(type.includes("rental") && type !== "payment-success") ||
+            type === "payment-reminder" ? (
               renderLockerContent()
             ) : type === "otp" ? (
               <Section className="mb-8 text-center">
@@ -317,7 +386,11 @@ export function EmailTemplate({
             ) : (
               <Section className="mb-8 text-center">
                 <Button
-                  className="inline-block rounded-lg bg-black px-8 py-4 font-semibold text-base text-white shadow-lg"
+                  className={`inline-block rounded-lg px-8 py-4 font-semibold text-base text-white shadow-lg ${
+                    type === "payment-success"
+                      ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                      : "bg-black"
+                  }`}
                   href={URL}
                 >
                   {content[type]?.buttonText}
@@ -329,7 +402,8 @@ export function EmailTemplate({
 
             {type !== "otp" &&
               !type.includes("rental") &&
-              type !== "payment-reminder" && (
+              type !== "payment-reminder" &&
+              type !== "payment-success" && (
                 <Section className="text-center">
                   <Text className="m-1 text-gray-500 text-xs">
                     Button not working? Copy and paste this URL into your

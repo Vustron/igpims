@@ -1,5 +1,14 @@
 "use client"
 
+import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
+import { Button } from "@/components/ui/buttons"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdowns"
+import { useDialog } from "@/hooks/use-dialog"
 // import toast from "react-hot-toast"
 import { Table } from "@tanstack/react-table"
 import { motion } from "framer-motion"
@@ -10,15 +19,6 @@ import {
   Settings2,
   // PrinterIcon,
 } from "lucide-react"
-import { Button } from "@/components/ui/buttons"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdowns"
-import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
-import { useDialog } from "@/hooks/use-dialog"
 
 interface TableActionsProps<TData> {
   isIgp?: boolean
@@ -31,6 +31,7 @@ interface TableActionsProps<TData> {
   isOnViolations?: boolean
   isOnInspection?: boolean
   isOnWaterSupply?: boolean
+  isOnWaterFund?: boolean
 }
 
 export function TableActions<TData>({
@@ -44,6 +45,7 @@ export function TableActions<TData>({
   isOnViolations,
   isOnInspection,
   isOnWaterSupply,
+  isOnWaterFund,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
 
@@ -91,7 +93,8 @@ export function TableActions<TData>({
         isUser ||
         isOnViolations ||
         isOnInspection ||
-        isOnWaterSupply) && (
+        isOnWaterSupply ||
+        isOnWaterFund) && (
         <motion.div
           key="add-button"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -113,7 +116,9 @@ export function TableActions<TData>({
                       ? "createInspection"
                       : isOnWaterSupply
                         ? "createWaterSupply"
-                        : "createRent",
+                        : isOnWaterFund
+                          ? "createWaterFund"
+                          : "createRent",
                 isOnViolations
                   ? {
                       violation: tableData[0] as ViolationWithRenters,
@@ -131,7 +136,9 @@ export function TableActions<TData>({
                   ? "Create inspection"
                   : isOnWaterSupply
                     ? "Create water supply"
-                    : "Create rent"}
+                    : isOnWaterFund
+                      ? "Create water fund"
+                      : "Create rent"}
           </Button>
         </motion.div>
       )}

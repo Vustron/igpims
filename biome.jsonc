@@ -1,75 +1,23 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
-  "files": {
-    "maxSize": 1572864
-  },
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+
   // imports section
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": {
-          "level": "on",
-          "options": {
-            "groups": [
-              // React and third-party libraries
-              ":NODE:",
-              ":BUN:",
-              ":PACKAGE:",
-              ["npm:*", "npm:*/**"],
-              ":PACKAGE_WITH_PROTOCOL:",
-              ":URL:",
 
-              // Empty line between groups
-              "",
-
-              // Global application imports (@ paths)
-              ["@/components/**"],
-              ["@/features/**"],
-              ["@/backend/**"],
-              ["@/hooks/**"],
-              ["@/**"],
-
-              // Empty line between groups
-              "",
-
-              // Absolute paths
-              ["/**"],
-
-              // Empty line between groups
-              "",
-
-              // Sharp aliases
-              ["#*", "#*/**"],
-
-              // Empty line between groups
-              "",
-
-              // Local imports
-              ["./**"],
-              ":PATH:",
-
-              // Empty line between groups
-              "",
-
-              // Type imports - make sure these are handled properly
-              "type:*"
-            ]
-          }
-        }
-      }
-    }
+  "organizeImports": {
+    "enabled": true
   },
+
   // formatter section
   "formatter": {
     "enabled": true,
-    "formatWithErrors": true,
+    "formatWithErrors": false,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
     "lineWidth": 80,
-    "attributePosition": "auto",
-    "includes": ["**", "!**/node_modules", "!**/.next", "!**/out"]
+    "attributePosition": "auto"
   },
+
   // linter section
   "linter": {
     "enabled": true,
@@ -85,10 +33,8 @@
       "correctness": {
         "useExhaustiveDependencies": "off",
         "noPrecisionLoss": "error",
-        "noUnusedVariables": "off"
-      },
-      "security": {
-        "noDangerouslySetInnerHtml": "off"
+        "noUnusedVariables": "off",
+        "useArrayLiterals": "off"
       },
       "style": {
         "noInferrableTypes": "off",
@@ -97,40 +43,29 @@
         "useBlockStatements": "off",
         "useConsistentArrayType": "warn",
         "noNonNullAssertion": "off",
-        "useImportType": "off",
-        "noParameterAssign": "error",
-        "useDefaultParameterLast": "error",
-        "useEnumInitializers": "error",
-        "useSelfClosingElements": "error",
-        "useSingleVarDeclarator": "error",
-        "noUnusedTemplateLiteral": "error",
-        "useNumberNamespace": "error",
-        "noUselessElse": "error",
-        "useArrayLiterals": "off"
+        "useImportType": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off",
         "noExplicitAny": "off",
         "noExtraNonNullAssertion": "error",
         "noMisleadingInstantiator": "error",
-        "noUnsafeDeclarationMerging": "error"
-      },
-      "nursery": {
-        "useSortedClasses": "error"
+        "noUnsafeDeclarationMerging": "error",
+        "useAwait": "off"
       },
       "a11y": {
         "noSvgWithoutTitle": "off",
-        "useKeyWithClickEvents": "off",
-        "useFocusableInteractive": "off",
-        "useSemanticElements": "off",
-        "noAutofocus": "off",
-        "noAriaHiddenOnFocusable": "off"
+        "useFocusableInteractive": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
       }
-    },
-    "includes": ["**", "!**/node_modules", "!**/.next", "!**/out"]
+    }
   },
+
   // javascript section
   "javascript": {
+    "jsxRuntime": "reactClassic",
     "formatter": {
       "jsxQuoteStyle": "double",
       "quoteProperties": "asNeeded",
@@ -143,6 +78,7 @@
       "attributePosition": "auto"
     }
   },
+
   // vcs section
   "vcs": {
     "enabled": true,
@@ -150,17 +86,18 @@
     "useIgnoreFile": true,
     "defaultBranch": "main"
   },
+
   // json section
   "json": {
     "formatter": {
-      "trailingCommas": "none",
-      "expand": "auto"
+      "trailingCommas": "none"
     }
   },
+
   // overrides section
   "overrides": [
     {
-      "includes": ["**/*.json"],
+      "include": ["*.json"],
       "formatter": {
         "indentWidth": 2
       }

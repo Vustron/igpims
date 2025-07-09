@@ -15,7 +15,14 @@ const createLockerQuery = db
   .prepare()
 
 const getLockerByIdQuery = db
-  .select()
+  .select({
+    id: locker.id,
+    lockerStatus: locker.lockerStatus,
+    lockerType: locker.lockerType,
+    lockerName: locker.lockerName,
+    lockerLocation: locker.lockerLocation,
+    lockerRentalPrice: sql<number>`${locker.lockerRentalPrice}`,
+  })
   .from(locker)
   .where(sql`${locker.id} = ${sql.placeholder("id")}`)
   .prepare()

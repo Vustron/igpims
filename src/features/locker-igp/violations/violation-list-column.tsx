@@ -1,13 +1,20 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
-import { AlertCircle, Calendar, Package, Receipt, User } from "lucide-react"
-import { BiCard } from "react-icons/bi"
 import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
+import { Button } from "@/components/ui/buttons"
+import { ColumnDef } from "@tanstack/react-table"
+import {
+  AlertCircle,
+  ArrowUpDown,
+  Calendar,
+  Package,
+  Receipt,
+  User,
+} from "lucide-react"
+import { BiCard } from "react-icons/bi"
 import { ViolationActions } from "./actions"
 import {
   AmountCell,
-  ColumnHeader,
   DateCell,
   IdCell,
   LockerCell,
@@ -19,13 +26,16 @@ import {
 export const violationListColumns: ColumnDef<ViolationWithRenters>[] = [
   {
     accessorKey: "id",
-    header: () => (
-      <div className="ml-5">
-        <ColumnHeader
-          icon={<BiCard className="h-3.5 w-3.5" />}
-          text="Transaction Id"
-        />
-      </div>
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="ml-2 font-medium text-xs"
+      >
+        <BiCard className="mr-2 h-3 w-3" />
+        Transaction ID
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
     ),
     cell: ({ row }) => (
       <div className="ml-5">
@@ -36,38 +46,64 @@ export const violationListColumns: ColumnDef<ViolationWithRenters>[] = [
   },
   {
     accessorKey: "studentName",
-    header: () => (
-      <ColumnHeader icon={<User className="h-3.5 w-3.5" />} text="Student" />
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <User className="mr-2 h-3 w-3" />
+        Student
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
     ),
     cell: ({ row }) => <RenterNameCell value={row.getValue("studentName")} />,
     size: 140,
   },
   {
     accessorKey: "lockerId",
-    header: () => (
-      <ColumnHeader icon={<Package className="h-3.5 w-3.5" />} text="Locker" />
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <Package className="mr-2 h-3 w-3" />
+        Locker
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
     ),
     cell: ({ row }) => <LockerCell value={row.getValue("lockerId")} />,
     size: 100,
   },
   {
     accessorKey: "violations",
-    header: () => (
-      <ColumnHeader
-        icon={<AlertCircle className="h-3.5 w-3.5" />}
-        text="Violations"
-      />
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <AlertCircle className="mr-2 h-3 w-3" />
+        Violations
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
     ),
     cell: ({ row }) => <ViolationCell value={row.getValue("violations")} />,
     size: 150,
   },
   {
     accessorKey: "dateOfInspection",
-    header: () => (
-      <ColumnHeader
-        icon={<Calendar className="h-3.5 w-3.5" />}
-        text="Inspection"
-      />
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <Calendar className="mr-2 h-3 w-3" />
+        Inspection
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
     ),
     cell: ({ row }) => {
       const timestamp = row.getValue("dateOfInspection") as number
@@ -78,11 +114,16 @@ export const violationListColumns: ColumnDef<ViolationWithRenters>[] = [
   },
   {
     accessorKey: "datePaid",
-    header: () => (
-      <ColumnHeader
-        icon={<Calendar className="h-3.5 w-3.5" />}
-        text="Date Paid"
-      />
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <Calendar className="mr-2 h-3 w-3" />
+        Date Paid
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
     ),
     cell: ({ row }) => {
       const timestamp = row.getValue("datePaid") as number
@@ -93,9 +134,17 @@ export const violationListColumns: ColumnDef<ViolationWithRenters>[] = [
   },
   {
     accessorKey: "totalFine",
-    header: () => (
-      <div className="text-right">
-        <ColumnHeader icon={<Receipt className="h-3.5 w-3.5" />} text="Fine" />
+    header: ({ column }) => (
+      <div className="flex justify-end">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <Receipt className="mr-2 h-3 w-3" />
+          Fine
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
       </div>
     ),
     cell: ({ row }) => <AmountCell value={row.getValue("totalFine")} />,
@@ -103,12 +152,17 @@ export const violationListColumns: ColumnDef<ViolationWithRenters>[] = [
   },
   {
     accessorKey: "fineStatus",
-    header: () => (
-      <div className="text-center">
-        <ColumnHeader
-          icon={<Receipt className="h-3.5 w-3.5" />}
-          text="Status"
-        />
+    header: ({ column }) => (
+      <div className="flex justify-center">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="font-medium text-xs"
+        >
+          <Receipt className="mr-2 h-3 w-3" />
+          Status
+          <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
       </div>
     ),
     cell: ({ row }) => (
@@ -116,7 +170,7 @@ export const violationListColumns: ColumnDef<ViolationWithRenters>[] = [
         <PaymentStatusCell value={row.getValue("fineStatus")} />
       </div>
     ),
-    size: 100,
+    size: 50,
   },
   {
     id: "actions",

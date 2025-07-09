@@ -1,9 +1,17 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
 import { LockerRental } from "@/backend/db/schemas"
+import { Button } from "@/components/ui/buttons"
+import { ColumnDef } from "@tanstack/react-table"
+import {
+  ArrowUpDown,
+  Box,
+  Calendar,
+  CreditCard,
+  Hash,
+  User,
+} from "lucide-react"
 import { ActionMenu } from "./action-menu"
-import { columnHeaders } from "./column-helper"
 import {
   CourseAndSetCell,
   DateDueCell,
@@ -18,7 +26,17 @@ import {
 export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   {
     accessorKey: "id",
-    header: () => <div className="ml-2">Transaction Id</div>,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <Hash className="mr-2 h-3 w-3" />
+        Transaction ID
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const transactionId = row.getValue("id") as string
       return <IdCell value={transactionId} />
@@ -27,7 +45,17 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   },
   {
     accessorKey: "lockerId",
-    header: "Locker",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <Box className="mr-2 h-3 w-3" />
+        Locker
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const lockerId = row.getValue("lockerId") as string
       return <LockerIdCell value={lockerId} />
@@ -36,7 +64,17 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   },
   {
     accessorKey: "renterName",
-    header: columnHeaders.renter,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <User className="mr-2 h-3 w-3" />
+        Renter
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const renterName = row.getValue("renterName") as string
       return <RenterNameCell value={renterName} />
@@ -45,7 +83,16 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   },
   {
     accessorKey: "courseAndSet",
-    header: columnHeaders.course,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        Course
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const courseAndSet = row.getValue("courseAndSet") as string
       return <CourseAndSetCell value={courseAndSet} />
@@ -54,7 +101,16 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   },
   {
     accessorKey: "rentalStatus",
-    header: columnHeaders.status,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        Status
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const status = row.getValue("rentalStatus") as string
       return <RentalStatusCell value={status} />
@@ -66,7 +122,17 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   },
   {
     accessorKey: "paymentStatus",
-    header: columnHeaders.payment,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <CreditCard className="mr-2 h-3 w-3" />
+        Payment
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const status = row.getValue("paymentStatus") as string
       return <PaymentStatusCell value={status} />
@@ -75,7 +141,17 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   },
   {
     accessorKey: "dateRented",
-    header: columnHeaders.rental,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <Calendar className="mr-2 h-3 w-3" />
+        Rental Date
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const timestamp = row.getValue("dateRented") as number
       return <DateRentedCell value={timestamp} />
@@ -85,7 +161,17 @@ export const lockerRentalListColumns: ColumnDef<LockerRental>[] = [
   },
   {
     accessorKey: "dateDue",
-    header: columnHeaders.due,
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="font-medium text-xs"
+      >
+        <Calendar className="mr-2 h-3 w-3" />
+        Due Date
+        <ArrowUpDown className="ml-2 h-3 w-3" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const timestamp = row.getValue("dateDue") as number
       return <DateDueCell value={timestamp} />

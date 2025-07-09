@@ -1,6 +1,6 @@
-import { eq, sql } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 import { locker } from "@/backend/db/schemas"
+import { sendLockerEmail } from "@/backend/helpers/send-email"
+// Removed unused sendLockerEmail import - c:\Users\Kaijinu\igpims\src\backend\controllers\locker\update-locker.ts
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as lockerQuery from "@/backend/queries/locker"
@@ -10,6 +10,8 @@ import { catchError } from "@/utils/catch-error"
 import { toTimestamp } from "@/utils/date-convert"
 import { requestJson } from "@/utils/request-json"
 import { LockerConfig, lockerConfigSchema } from "@/validation/locker"
+import { eq, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function updateLocker(
   request: NextRequest,
@@ -60,14 +62,14 @@ export async function updateLocker(
       validationResult.data.lockerName &&
       validationResult.data.lockerName !== existingLocker.lockerName
     ) {
-      const duplicateLocker = await db.transaction(async (_tx) => {
+      const locker = await db.transaction(async (_tx) => {
         const result = await lockerQuery.getLockerByNameQuery.execute({
           name: validationResult.data.lockerName,
         })
         return result[0]
       })
 
-      if (duplicateLocker) {
+      if (locker) {
         return NextResponse.json(
           { error: "A locker with this name already exists" },
           { status: 409 },
@@ -190,6 +192,28 @@ export async function updateLocker(
         }
       }
     })
+
+    const updatedRental = await rentalQuery.getRentalByIdQuery.execute({
+      id: validationResult.data.rentalId,
+    })
+
+    const updatedRentalData = updatedRental[0]
+    if (!updatedRentalData) {
+      return NextResponse.json({ error: "Rental not found" }, { status: 404 })
+    }
+
+    if (updatedRentalData.paymentStatus === "paid") {
+      await sendLockerEmail({
+        recipientName: updatedRentalData.renterName,
+        lockerDetails: {
+          name: existingLocker.lockerName,
+          location: existingLocker.lockerLocation,
+        },
+        renterEmail: updatedRentalData.renterEmail,
+        subject: "Locker Rental Payment Successful",
+        type: "payment-success",
+      })
+    }
 
     const updatedLocker = {
       id: existingLocker.id,

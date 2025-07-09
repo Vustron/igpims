@@ -1,6 +1,6 @@
 import { deleteInspection } from "../controllers/inspection/delete-inspection"
-import { deleteLockerById } from "../controllers/locker/delete-by-id"
 import { deleteRentById } from "../controllers/locker-rental/delete-rent"
+import { deleteLockerById } from "../controllers/locker/delete-by-id"
 import { deleteUserById } from "../controllers/user/delete-by-id"
 import { deleteViolation } from "../controllers/violation/delete-violation"
 import { deleteWaterFund } from "../controllers/water-funds/delete-fund"
@@ -22,6 +22,6 @@ export const deleteRoutes: Route[] = [
     path: "/api/v1/water-supplies/delete-water-supply",
     handler: deleteWaterSupply,
   },
-  { path: "/api/v1/water-funds/delete-fund", handler: deleteWaterFund },
+  { path: "/api/v1/water-funds/delete-water-fund", handler: deleteWaterFund },
   // Add more DELETE routes here
 ]

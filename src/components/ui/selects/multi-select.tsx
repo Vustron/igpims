@@ -267,12 +267,7 @@ export function MultiSelectContent({
               }
             />
           ) : (
-            <button
-              type="button"
-              autoFocus
-              aria-hidden="true"
-              className="sr-only"
-            />
+            <button type="button" className="sr-only" />
           )}
           <CommandList>
             {canSearch && (

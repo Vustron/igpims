@@ -162,6 +162,10 @@ export async function updateRental(
         id: rentalId,
       })
 
+      if (!updatedResult[0]) {
+        throw new Error("Locker not found")
+      }
+
       return updatedResult[0]
     })
 
@@ -170,6 +174,15 @@ export async function updateRental(
         { error: "Failed to update rental" },
         { status: 500 },
       )
+    }
+
+    const locker = await lockerQuery.getLockerByIdQuery.execute({
+      id: rentalData.lockerId,
+    })
+
+    const lockerData = locker[0]
+    if (!lockerData) {
+      return NextResponse.json({ error: "Locker not found" }, { status: 500 })
     }
 
     return NextResponse.json(updatedRental, { status: 200 })

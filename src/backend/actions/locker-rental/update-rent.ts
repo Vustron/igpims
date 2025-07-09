@@ -270,7 +270,15 @@ export const useUpdateRent = (id: string) => {
 
       catchError(error)
     },
-    onSettled: () => {
+    onSettled: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["locker-rentals-infinite"],
+        }),
+        queryClient.invalidateQueries({ queryKey: ["lockers"] }),
+        queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] }),
+      ])
       router.refresh()
     },
   })

@@ -1,18 +1,18 @@
 "use client"
 
+import { useFindManyInspections } from "@/backend/actions/inspection/find-many"
+import { useFindManyLockers } from "@/backend/actions/locker/find-many"
+import { useCreateViolation } from "@/backend/actions/violation/create-violation"
+import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
+import { DynamicForm } from "@/components/ui/forms"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import { Violation, ViolationSchema } from "@/validation/violation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import toast from "react-hot-toast"
-import { DynamicForm } from "@/components/ui/forms"
-import { useFindManyInspections } from "@/backend/actions/inspection/find-many"
-import { useFindManyLockers } from "@/backend/actions/locker/find-many"
-import { useCreateViolation } from "@/backend/actions/violation/create-violation"
-import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
-import { FieldConfig } from "@/interfaces/form"
-import { catchError } from "@/utils/catch-error"
-import { Violation, ViolationSchema } from "@/validation/violation"
 
 interface ViolationFormProps {
   violation?: ViolationWithRenters
@@ -68,7 +68,7 @@ export const ViolationForm = ({
       lockerId: violation?.lockerId || "",
       inspectionId: violation?.inspectionId || "",
       studentName: violation?.studentName || "",
-      violations: violation?.violations || [],
+      violations: [],
       dateOfInspection: violation?.dateOfInspection || Date.now(),
       datePaid: violation?.datePaid || null,
       totalFine: calculateTotalFine(violation?.violations || []),

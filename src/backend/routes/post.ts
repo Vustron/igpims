@@ -1,7 +1,7 @@
 import { sendRentLockerConfirm } from "../controllers/email/send-rent-locker-confirm.ts"
 import { createInspection } from "../controllers/inspection/create-inspection"
-import { createLocker } from "../controllers/locker/create-locker"
 import { createRent } from "../controllers/locker-rental/create-rent"
+import { createLocker } from "../controllers/locker/create-locker"
 import { deleteManyUserById } from "../controllers/user/delete-many-by-id"
 import { resetUserPassword } from "../controllers/user/reset-password"
 import { sendResetLink } from "../controllers/user/send-reset-link"
@@ -45,6 +45,6 @@ export const postRoutes: Route[] = [
     path: "/api/v1/water-supplies/create-water-supply",
     handler: createWaterSupply,
   },
-  { path: "/api/v1/water-funds/create-fund", handler: createWaterFund },
+  { path: "/api/v1/water-funds/create-water-fund", handler: createWaterFund },
   // Add more POST routes here
 ]

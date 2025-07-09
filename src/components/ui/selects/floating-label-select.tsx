@@ -1,8 +1,5 @@
 "use client"
 
-import { SelectProps } from "@radix-ui/react-select"
-import * as React from "react"
-import { FieldErrors, FieldValues } from "react-hook-form"
 import { Label } from "@/components/ui/labels"
 import {
   Select,
@@ -12,6 +9,9 @@ import {
   SelectValue,
 } from "@/components/ui/selects"
 import { cn } from "@/utils/cn"
+import { SelectProps } from "@radix-ui/react-select"
+import * as React from "react"
+import { FieldErrors, FieldValues } from "react-hook-form"
 
 interface FloatingSelectProps extends SelectProps {
   options: Array<{ value: string; label: string }>
@@ -38,7 +38,7 @@ const FloatingLabelSelect = React.forwardRef<
             className,
           )}
         >
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={placeholder} className="text-sm" />
         </SelectTrigger>
         <SelectContent
           className="w-[var(--radix-select-trigger-width)] min-w-[200px]"

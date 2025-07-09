@@ -1,7 +1,7 @@
 import { Route } from "@/backend/routes/api-routes"
 import { updateInspection } from "../controllers/inspection/update-inspection"
-import { updateLocker } from "../controllers/locker/update-locker"
 import { updateRental } from "../controllers/locker-rental/update-rental"
+import { updateLocker } from "../controllers/locker/update-locker"
 import { updateUserInfo } from "../controllers/user/update-info"
 import { updateViolation } from "../controllers/violation/update-violation"
 import { updateWaterFund } from "../controllers/water-funds/update-fund"
@@ -22,6 +22,6 @@ export const patchRoutes: Route[] = [
     path: "/api/v1/water-supplies/update-water-supply",
     handler: updateWaterSupply,
   },
-  { path: "/api/v1/water-funds/update-fund", handler: updateWaterFund },
+  { path: "/api/v1/water-funds/update-water-fund", handler: updateWaterFund },
   // Add more PATCH routes here
 ]
