@@ -58,7 +58,6 @@ export const FundRequestClient = () => {
         return true
       })
       .sort((a, b) => {
-        // Sort by lastUpdated date in descending order (newest first)
         const dateA = new Date(a.lastUpdated)
         const dateB = new Date(b.lastUpdated)
         return dateB.getTime() - dateA.getTime()
@@ -67,14 +66,12 @@ export const FundRequestClient = () => {
 
   return (
     <div className="space-y-4">
-      {/* Fund Request Filter */}
       <div className="mb-6">
         <FundRequestFilter
           onFilterChange={(newFilters) => setFilters(newFilters)}
         />
       </div>
 
-      {/* Display results count when filtering */}
       {(filters.search ||
         filters.status !== "all" ||
         filters.dateRange.from ||

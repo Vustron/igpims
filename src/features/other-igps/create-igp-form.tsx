@@ -1,59 +1,46 @@
 "use client"
 
+import { Button } from "@/components/ui/buttons"
+import { DynamicForm } from "@/components/ui/forms"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next-nprogress-bar"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { z } from "zod"
-import { Button } from "@/components/ui/buttons"
-import { DynamicForm } from "@/components/ui/forms"
-import { FieldConfig } from "@/interfaces/form"
-import { catchError } from "@/utils/catch-error"
 import { useProjectRequestStore } from "../project-request/project-request-store"
 
-const igpSchema = z.object({
-  id: z.string().optional(),
-  igpName: z.string({
-    required_error: "IGP name is required.",
-  }),
-  semesterYear: z.string({
-    required_error: "Semester and academic year are required.",
-  }),
-  igpType: z.string({
-    required_error: "Type of IGP is required.",
-  }),
-  dateStart: z.date({
-    required_error: "Start date is required.",
-    invalid_type_error: "Start date must be a valid date.",
-  }),
-  dateEnd: z.date({
-    required_error: "End date is required.",
-    invalid_type_error: "End date must be a valid date.",
-  }),
-  itemToSell: z.string({
-    required_error: "Item to sell is required.",
-  }),
-  assignedOfficers: z.string({
-    required_error: "Assigned officers are required.",
-  }),
-  estimatedQuantities: z.string({
-    required_error: "Estimated quantities are required.",
-  }),
-  budget: z.string({
-    required_error: "Budget is required.",
-  }),
-  costPerItem: z.string({
-    required_error: "Cost per item is required.",
-  }),
-  projectLead: z.string({
-    required_error: "Project lead is required.",
-  }),
-  department: z.string({
-    required_error: "Department is required.",
-  }),
-  position: z.string().optional(),
-})
+const igpSchema = z
+  .object({
+    id: z.string().optional(),
+    igpName: z.string().min(1, "IGP name is required."),
+    semesterYear: z.string().min(1, "Semester and academic year are required."),
+    igpType: z.string().min(1, "Type of IGP is required."),
+    dateStart: z.date(),
+    dateEnd: z.date(),
+    itemToSell: z.string().min(1, "Item to sell is required."),
+    assignedOfficers: z.string().min(1, "Assigned officers are required."),
+    estimatedQuantities: z
+      .string()
+      .min(1, "Estimated quantities are required."),
+    budget: z.string().min(1, "Budget is required."),
+    costPerItem: z.string().min(1, "Cost per item is required."),
+    projectLead: z.string().min(1, "Project lead is required."),
+    department: z.string().min(1, "Department is required."),
+    position: z.string().optional(),
+  })
+  .refine(
+    (data) =>
+      data.dateStart instanceof Date && !Number.isNaN(data.dateStart.getTime()),
+    { message: "Start date must be a valid date.", path: ["dateStart"] },
+  )
+  .refine(
+    (data) =>
+      data.dateEnd instanceof Date && !Number.isNaN(data.dateEnd.getTime()),
+    { message: "End date must be a valid date.", path: ["dateEnd"] },
+  )
 
 type IgpFormData = z.infer<typeof igpSchema>
 

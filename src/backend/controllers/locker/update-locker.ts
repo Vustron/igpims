@@ -215,6 +215,19 @@ export async function updateLocker(
       })
     }
 
+    if (updatedRentalData.paymentStatus === "overdue") {
+      await sendLockerEmail({
+        recipientName: updatedRentalData.renterName,
+        lockerDetails: {
+          name: existingLocker.lockerName,
+          location: existingLocker.lockerLocation,
+        },
+        renterEmail: updatedRentalData.renterEmail,
+        subject: "Locker Rental Payment Overdue",
+        type: "payment-overdue",
+      })
+    }
+
     const updatedLocker = {
       id: existingLocker.id,
       lockerStatus: finalLockerStatus,

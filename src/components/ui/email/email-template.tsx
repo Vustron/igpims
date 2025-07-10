@@ -32,6 +32,7 @@ interface EmailTemplateProps {
     | "rental-cancellation"
     | "payment-reminder"
     | "payment-success"
+    | "payment-overdue"
 }
 
 export function EmailTemplate({
@@ -118,6 +119,14 @@ export function EmailTemplate({
       disclaimer:
         "This receipt confirms your payment. Please keep it for your records.",
     },
+    "payment-overdue": {
+      preview: "Urgent: Locker Rental Payment Overdue",
+      title: "Payment Overdue Notice",
+      subtitle: `Your payment for locker ${lockerDetails?.name} is now overdue. Please settle immediately to avoid penalties.`,
+      buttonText: "",
+      disclaimer:
+        "Failure to pay may result in additional late fees and locker access suspension.",
+    },
   }
 
   const renderLockerContent = () => {
@@ -177,6 +186,31 @@ export function EmailTemplate({
               </Text>
             </div>
           )}
+        </div>
+      </Section>
+    )
+  }
+
+  const renderOverdueNotice = () => {
+    return (
+      <Section className="my-6 rounded-lg border-2 border-red-200 bg-red-50 p-6">
+        <Text className="mb-4 text-center text-lg font-bold text-red-700">
+          Urgent Payment Required
+        </Text>
+        <div className="space-y-3 text-center">
+          <div>
+            <Text className="font-medium text-red-600">Days Overdue</Text>
+            <Text className="font-semibold">
+              {Math.max(
+                1,
+                Math.floor(
+                  (new Date().getTime() - new Date(dueDate || "").getTime()) /
+                    (1000 * 60 * 60 * 24),
+                ),
+              )}{" "}
+              days
+            </Text>
+          </div>
         </div>
       </Section>
     )
@@ -373,6 +407,8 @@ export function EmailTemplate({
             </Section>
 
             {type === "payment-success" && renderPaymentDetails()}
+            {type === "payment-overdue" && renderOverdueNotice()}
+            {type === "payment-overdue" && renderLockerContent()}
 
             {(type.includes("rental") && type !== "payment-success") ||
             type === "payment-reminder" ? (
@@ -385,16 +421,18 @@ export function EmailTemplate({
               </Section>
             ) : (
               <Section className="mb-8 text-center">
-                <Button
-                  className={`inline-block rounded-lg px-8 py-4 font-semibold text-base text-white shadow-lg ${
-                    type === "payment-success"
-                      ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-                      : "bg-black"
-                  }`}
-                  href={URL}
-                >
-                  {content[type]?.buttonText}
-                </Button>
+                {type !== "payment-overdue" && (
+                  <Button
+                    className={`inline-block rounded-lg px-8 py-4 font-semibold text-base text-white shadow-lg ${
+                      type === "payment-success"
+                        ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                        : "bg-black"
+                    }`}
+                    href={URL}
+                  >
+                    {content[type]?.buttonText}
+                  </Button>
+                )}
               </Section>
             )}
 
@@ -403,7 +441,8 @@ export function EmailTemplate({
             {type !== "otp" &&
               !type.includes("rental") &&
               type !== "payment-reminder" &&
-              type !== "payment-success" && (
+              type !== "payment-success" &&
+              type !== "payment-overdue" && (
                 <Section className="text-center">
                   <Text className="m-1 text-gray-500 text-xs">
                     Button not working? Copy and paste this URL into your

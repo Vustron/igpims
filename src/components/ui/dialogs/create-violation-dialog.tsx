@@ -60,7 +60,7 @@ export const CreateViolationDialog = () => {
             Fill in the details below to create a new violation.
           </DrawerDescription>
         </DrawerHeader>
-        <div className="px-6 pb-6">
+        <div className="overflow-y-auto px-4 pb-4">
           <ViolationForm
             violation={data.violation || undefined}
             onSuccess={handleClose}

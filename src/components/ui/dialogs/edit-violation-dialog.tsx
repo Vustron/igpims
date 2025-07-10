@@ -40,7 +40,7 @@ export const EditViolationDialog = () => {
   if (isDesktop) {
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Edit Violation</DialogTitle>
             <DialogDescription>

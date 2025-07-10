@@ -1,8 +1,5 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import toast from "react-hot-toast"
 import { useDeleteLockerById } from "@/backend/actions/locker/delete-by-id"
 import { useFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { useUpdateLocker } from "@/backend/actions/locker/update-locker"
@@ -11,6 +8,9 @@ import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { LockerConfig, lockerConfigSchema } from "@/validation/locker"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { CurrentRentalCard } from "./current-rental-card"
 import { LockerConfigurationCard } from "./locker-config"
 import { LockerInfoEmptyState } from "./locker-info-empty"
@@ -185,7 +185,6 @@ export const LockerClient = ({ id }: { id: string }) => {
               { value: "partial", label: "Partially Paid" },
               { value: "paid", label: "Fully Paid" },
               { value: "overdue", label: "Overdue" },
-              { value: "refunded", label: "Refunded" },
             ],
           },
           {

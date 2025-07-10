@@ -1,9 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next-nprogress-bar"
 import { LockerRental } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 import { CreateRentalData, createRentalSchema } from "@/validation/rental"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next-nprogress-bar"
 import { PaginatedRentalsResponse } from "../locker-rental/find-many"
 
 export async function createRent(
@@ -196,6 +196,21 @@ export const useCreateRent = () => {
           },
         )
       }
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["locker-rentals-infinite"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["locker-rental", newRental.id],
+        }),
+        queryClient.invalidateQueries({ queryKey: ["lockers"] }),
+        queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["locker", newRental.lockerId],
+        }),
+      ])
     },
     onError: (error, _variables, context) => {
       if (context?.previousRentals) {
@@ -231,15 +246,7 @@ export const useCreateRent = () => {
 
       catchError(error)
     },
-    onSettled: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["locker-rentals"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["locker-rentals-infinite"],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["lockers"] }),
-        queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] }),
-      ])
+    onSettled: () => {
       router.refresh()
     },
   })

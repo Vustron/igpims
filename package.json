@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.159",
+  "version": "1.0.160",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -48,8 +48,8 @@
     "@react-email/components": "0.2.0",
     "@react-pdf/renderer": "4.3.0",
     "@t3-oss/env-nextjs": "0.13.8",
-    "@tanstack/react-query": "5.81.5",
-    "@tanstack/react-query-devtools": "5.81.5",
+    "@tanstack/react-query": "5.82.0",
+    "@tanstack/react-query-devtools": "5.82.0",
     "@tanstack/react-table": "8.21.3",
     "async-ratelimiter": "1.6.1",
     "bcrypt-ts": "7.1.0",
@@ -57,11 +57,11 @@
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "date-fns": "4.1.0",
-    "dotenv": "17.1.0",
+    "dotenv": "17.2.0",
     "drizzle-erd": "0.0.1-alpha.11",
     "drizzle-orm": "0.44.2",
     "drizzle-zod": "0.8.2",
-    "framer-motion": "12.23.0",
+    "framer-motion": "12.23.1",
     "input-otp": "1.4.2",
     "ioredis": "5.6.1",
     "iron-session": "8.0.4",
@@ -89,7 +89,7 @@
     "tailwind-merge": "3.3.1",
     "tailwindcss-animate": "1.0.7",
     "vaul": "1.1.2",
-    "zod": "3.25.76",
+    "zod": "4.0.2",
     "zustand": "5.0.6"
   },
   "devDependencies": {

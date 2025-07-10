@@ -1,26 +1,18 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import toast from "react-hot-toast"
-import { z } from "zod"
 import { DynamicForm } from "@/components/ui/forms"
 import { useDialog } from "@/hooks/use-dialog"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
+import {
+  CreateFundRequest,
+  createFundRequestSchema,
+} from "@/validation/fund-request"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { useFundRequestStore } from "./fund-request-store"
-
-export const fundRequestSchema = z.object({
-  requestorName: z.string().min(1, "Requestor name is required"),
-  purpose: z.string().min(1, "Purpose is required"),
-  position: z.string().min(1, "Position is required"),
-  amount: z.coerce.number().positive("Amount must be greater than 0"),
-  requestDate: z.any().optional(),
-  dateNeeded: z.any().optional(),
-})
-
-export type CreateFundRequestForm = z.infer<typeof fundRequestSchema>
 
 export const CreateFundRequestForm = ({
   onSuccess,
@@ -33,8 +25,8 @@ export const CreateFundRequestForm = ({
   const { addRequest } = useFundRequestStore()
   const { onClose } = useDialog()
 
-  const form = useForm<CreateFundRequestForm>({
-    resolver: zodResolver(fundRequestSchema),
+  const form = useForm<CreateFundRequest>({
+    resolver: zodResolver(createFundRequestSchema),
     defaultValues: {
       requestorName: "",
       purpose: "",
@@ -45,7 +37,7 @@ export const CreateFundRequestForm = ({
     },
   })
 
-  const createFundRequestFields: FieldConfig<CreateFundRequestForm>[] = [
+  const createFundRequestFields: FieldConfig<CreateFundRequest>[] = [
     {
       name: "requestorName",
       type: "text",
@@ -98,11 +90,11 @@ export const CreateFundRequestForm = ({
     },
   ]
 
-  const onSubmit = async (data: CreateFundRequestForm) => {
+  const onSubmit = async (values: CreateFundRequest) => {
     try {
       setIsSubmitting(true)
 
-      if (data.amount <= 0) {
+      if (values.amount <= 0) {
         form.setError("amount", {
           type: "manual",
           message: "Amount must be greater than 0",
@@ -112,12 +104,12 @@ export const CreateFundRequestForm = ({
       }
 
       const requestId = addRequest({
-        requestor: data.requestorName,
-        position: data.position,
-        purpose: data.purpose,
-        amount: data.amount,
-        requestDate: data.requestDate,
-        dateNeeded: data.dateNeeded,
+        requestor: values.requestorName,
+        position: values.position,
+        purpose: values.purpose,
+        amount: values.amount,
+        requestDate: values.requestDate,
+        dateNeeded: values.dateNeeded,
         utilizedFunds: 0,
         allocatedFunds: 0,
       })

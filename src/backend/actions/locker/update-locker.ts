@@ -1,11 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next-nprogress-bar"
 import { PaginatedLockersResponse } from "@/backend/actions/locker/find-many"
 import { Locker, LockerRental } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
 import { LockerConfig, lockerConfigSchema } from "@/validation/locker"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next-nprogress-bar"
 import { PaginatedRentalsResponse } from "../locker-rental/find-many"
 
 interface LockerWithRental extends Locker {
@@ -169,7 +169,7 @@ export const useUpdateLocker = (id: string) => {
         previousRentalsInfinite,
       }
     },
-    onSuccess: (updatedLocker: Locker) => {
+    onSuccess: async (updatedLocker: Locker) => {
       const currentData = queryClient.getQueryData<LockerWithRental>([
         "locker",
         id,
@@ -245,6 +245,21 @@ export const useUpdateLocker = (id: string) => {
           },
         )
       }
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["locker-rentals-infinite"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["locker-rental", mergedData.rental?.id],
+        }),
+        queryClient.invalidateQueries({ queryKey: ["lockers"] }),
+        queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["locker", mergedData.rental?.lockerId],
+        }),
+      ])
     },
     onError: (error, _payload, context) => {
       if (context?.previousLocker) {
@@ -271,15 +286,7 @@ export const useUpdateLocker = (id: string) => {
 
       catchError(error)
     },
-    onSettled: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["locker-rentals"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["locker-rentals-infinite"],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["lockers"] }),
-        queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] }),
-      ])
+    onSettled: () => {
       router.refresh()
     },
   })

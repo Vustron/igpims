@@ -1,7 +1,7 @@
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-import { timestamp } from "@/backend/helpers/schema-helpers"
 import { user } from "./user"
 
 export const fundRequest = sqliteTable(
@@ -21,6 +21,13 @@ export const fundRequest = sqliteTable(
     requestedBy: text("requestedBy").references(() => user.id, {
       onDelete: "set null",
     }),
+    requestorPosition: text("requestorPosition", { length: 50 }),
+    requestDate: integer("requestDate", {
+      mode: "timestamp",
+    }).notNull(),
+    dateNeeded: integer("requestDate", {
+      mode: "timestamp",
+    }).notNull(),
     approvedBy: text("approvedBy").references(() => user.id, {
       onDelete: "set null",
     }),

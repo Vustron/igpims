@@ -40,7 +40,7 @@ export class ErrorHandler {
   }
 
   private static handleZodError(error: ZodError): ErrorResponseData {
-    const message = error.errors.map((e) => e.message).join(", ")
+    const message = error.issues.map((e) => e.message).join(", ")
     return {
       message: `Validation error: ${message}`,
       statusCode: 400,

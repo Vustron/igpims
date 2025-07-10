@@ -1,10 +1,5 @@
 "use client"
 
-import { ClipboardList, FileX } from "lucide-react"
-import dynamic from "next/dynamic"
-import { Suspense, useEffect, useState } from "react"
-import { GiMagnifyingGlass } from "react-icons/gi"
-import { PiLockers } from "react-icons/pi"
 import { MobileTabNav } from "@/components/ui/separators/mobile-tab"
 import {
   Tabs,
@@ -14,12 +9,19 @@ import {
 } from "@/components/ui/separators/tabs"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { cn } from "@/utils/cn"
+import { ClipboardList, FileX, Loader2 } from "lucide-react"
+import dynamic from "next/dynamic"
+import { Suspense, useEffect, useState } from "react"
+import { GiMagnifyingGlass } from "react-icons/gi"
+import { PiLockers } from "react-icons/pi"
 
 const LockersClient = dynamic(
   () => import("./lockers/client").then((mod) => mod.LockersClient),
   {
     loading: () => (
-      <div className="flex justify-center py-8">Loading lockers...</div>
+      <div className="flex justify-center py-15">
+        <Loader2 className="animate-spin size-10" />
+      </div>
     ),
     ssr: false,
   },
@@ -29,7 +31,9 @@ const LockerRentClient = dynamic(
   () => import("./rent/client").then((mod) => mod.LockerRentClient),
   {
     loading: () => (
-      <div className="flex justify-center py-8">Loading rental list...</div>
+      <div className="flex justify-center py-15">
+        <Loader2 className="animate-spin size-10" />
+      </div>
     ),
     ssr: false,
   },
@@ -39,7 +43,9 @@ const InspectionClient = dynamic(
   () => import("./inspection/client").then((mod) => mod.InspectionClient),
   {
     loading: () => (
-      <div className="flex justify-center py-8">Loading inspections...</div>
+      <div className="flex justify-center py-15">
+        <Loader2 className="animate-spin size-10" />
+      </div>
     ),
     ssr: false,
   },
@@ -49,7 +55,9 @@ const ViolationClient = dynamic(
   () => import("./violations/client").then((mod) => mod.ViolationClient),
   {
     loading: () => (
-      <div className="flex justify-center py-8">Loading violations...</div>
+      <div className="flex justify-center py-15">
+        <Loader2 className="animate-spin size-10" />
+      </div>
     ),
     ssr: false,
   },

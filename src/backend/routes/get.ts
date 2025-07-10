@@ -1,9 +1,12 @@
+import { findFundRequestById } from "../controllers/fund-request/find-by-id"
+import { findManyFundRequest } from "../controllers/fund-request/find-many"
+import { findTotalProfit } from "../controllers/fund-request/total-profit"
 import { findInspectionById } from "../controllers/inspection/find-by-id"
 import { findManyInspections } from "../controllers/inspection/find-many"
-import { findLockerById } from "../controllers/locker/find-by-id"
-import { findManyLockers } from "../controllers/locker/find-many"
 import { findManyRents } from "../controllers/locker-rental/find-many"
 import { findRentById } from "../controllers/locker-rental/find-rent-by-id"
+import { findLockerById } from "../controllers/locker/find-by-id"
+import { findManyLockers } from "../controllers/locker/find-many"
 import { findUserById } from "../controllers/user/find-by-id"
 import { findManyUser } from "../controllers/user/find-many"
 import { findManyRenterInfo } from "../controllers/user/find-many-renter-info"
@@ -37,5 +40,8 @@ export const getRoutes: Route[] = [
   { path: "/api/v1/water-supplies/find-by-id", handler: findWaterSupplyById },
   { path: "/api/v1/water-funds/find-many", handler: findManyWaterFunds },
   { path: "/api/v1/water-funds/find-by-id", handler: findWaterFundById },
+  { path: "/api/v1/fund-request/find-total-profit", handler: findTotalProfit },
+  { path: "/api/v1/fund-request/find-many", handler: findManyFundRequest },
+  { path: "/api/v1/fund-request/find-by-id", handler: findFundRequestById },
   // Add more GET routes here
 ]

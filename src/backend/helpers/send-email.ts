@@ -23,13 +23,11 @@ interface EmailParams {
     | "rental-cancellation"
     | "payment-reminder"
     | "payment-success"
+    | "payment-overdue"
 }
 
 export async function sendLockerEmail(params: EmailParams) {
   try {
-    console.log("Starting email sending process...")
-    console.log("Recipient:", params.renterEmail)
-
     if (!params.renterEmail || !params.subject) {
       throw new Error("Missing required email parameters")
     }
@@ -55,11 +53,6 @@ export async function sendLockerEmail(params: EmailParams) {
       html: emailHtml,
     }
 
-    console.log("Mail options:", {
-      ...mailOptions,
-      html: "[REDACTED]",
-    })
-
     if (!transporter) {
       throw new Error("Email transporter not configured")
     }
@@ -68,13 +61,10 @@ export async function sendLockerEmail(params: EmailParams) {
       throw new Error("Sender email not configured in environment variables")
     }
 
-    const info = await transporter.sendMail(mailOptions)
-    console.log("Email sent", info)
+    await transporter.sendMail(mailOptions)
 
     return { success: true }
   } catch (error) {
-    console.error("Failed to send email", error)
-
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",

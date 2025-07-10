@@ -2,13 +2,14 @@
 
 import { Card } from "@/components/ui/cards"
 import { EmailTemplate } from "@/components/ui/email/email-template"
+import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/separators"
-import { renderAsync } from "@react-email/components"
+import { render } from "@react-email/components"
 import { useEffect, useState } from "react"
 
 export default function EmailPreviewPage() {
@@ -73,6 +74,16 @@ export default function EmailPreviewPage() {
       transactionId: "123-456-789",
       paymentDate: "2025-07-01",
     },
+    "payment-overdue": {
+      email: "user@example.com",
+      recipientName: "John Doe",
+      lockerDetails: {
+        name: "Locker A101",
+        location: "Building 1, Floor 1",
+      },
+      transactionId: "123-456-789",
+      paymentDate: "2025-07-01",
+    },
   } as const
 
   const templates = Object.keys(previewData) as Array<keyof typeof previewData>
@@ -82,9 +93,7 @@ export default function EmailPreviewPage() {
 
     useEffect(() => {
       const loadTemplate = async () => {
-        const result = await renderAsync(
-          <EmailTemplate {...data} type={template} />,
-        )
+        const result = await render(<EmailTemplate {...data} type={template} />)
         setHtml(result)
       }
       loadTemplate()
@@ -104,16 +113,23 @@ export default function EmailPreviewPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="mb-8 font-bold text-3xl">Email Template Preview</h1>
+      <h1 className="mb-8 text-3xl font-bold">Email Template Preview</h1>
 
       <Tabs defaultValue="verify" className="w-full">
-        <TabsList className="mb-8 grid w-full grid-cols-2 lg:grid-cols-4">
-          {templates.map((template) => (
-            <TabsTrigger key={template} value={template} className="capitalize">
-              {template.replace("-", " ")}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <ScrollArea className="mb-8 w-full pb-2">
+          <ScrollBar orientation="horizontal" />
+          <TabsList className="flex w-max space-x-2">
+            {templates.map((template) => (
+              <TabsTrigger
+                key={template}
+                value={template}
+                className="flex-shrink-0 capitalize"
+              >
+                {template.replace("-", " ")}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </ScrollArea>
 
         {templates.map((template) => (
           <TabsContent key={template} value={template}>

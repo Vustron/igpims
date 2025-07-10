@@ -1,5 +1,3 @@
-import { format } from "date-fns"
-import { FieldValues, UseFormReturn } from "react-hook-form"
 import { Button } from "@/components/ui/buttons"
 import { Calendar } from "@/components/ui/calendars"
 import { FormLabel, PasswordStrengthMeter } from "@/components/ui/forms"
@@ -31,6 +29,8 @@ import {
 import { useOtpStore } from "@/hooks/use-otp-store"
 import { FieldConfig, Mutation } from "@/interfaces/form"
 import { cn } from "@/utils/cn"
+import { format } from "date-fns"
+import { FieldValues, UseFormReturn } from "react-hook-form"
 
 interface FormControlRendererProps<TFieldValues extends FieldValues> {
   field: FieldConfig<TFieldValues>
@@ -413,6 +413,7 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
                 className={cn(
                   form.formState.errors[field.name] ? "border-red-600" : "",
                 )}
+                overflowBehavior="wrap"
               />
             </MultiSelectTrigger>
             <MultiSelectContent>
