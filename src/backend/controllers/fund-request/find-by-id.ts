@@ -1,10 +1,11 @@
-import { fundRequest } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import {
+  findFundRequestByIdQuery,
+  getTotalProfit,
+} from "@/backend/queries/fund-request"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
-import { toTimestamp } from "@/utils/date-convert"
-import { eq } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function findFundRequestById(
@@ -12,14 +13,10 @@ export async function findFundRequestById(
 ): Promise<NextResponse<unknown>> {
   try {
     const rateLimitCheck = await httpRequestLimit(request)
-    if (rateLimitCheck instanceof NextResponse) {
-      return rateLimitCheck
-    }
+    if (rateLimitCheck instanceof NextResponse) return rateLimitCheck
 
     const currentSession = await checkAuth()
-    if (currentSession instanceof NextResponse) {
-      return currentSession
-    }
+    if (currentSession instanceof NextResponse) return currentSession
 
     const url = new URL(request.url)
     const id = url.searchParams.get("id")
@@ -32,11 +29,9 @@ export async function findFundRequestById(
     }
 
     const fundRequestData = await db.transaction(async (_tx) => {
-      const requestResult = await db
-        .select()
-        .from(fundRequest)
-        .where(eq(fundRequest.id, id))
-        .limit(1)
+      const requestResult = await findFundRequestByIdQuery.execute({
+        id: id,
+      })
 
       return requestResult[0] || null
     })
@@ -48,15 +43,14 @@ export async function findFundRequestById(
       )
     }
 
-    const formattedRequest = {
+    const profitData = await getTotalProfit()
+
+    const fundRequestDataWithProfitData = {
       ...fundRequestData,
-      requestDate: toTimestamp(fundRequestData.requestDate),
-      dateNeeded: toTimestamp(fundRequestData.dateNeeded),
-      createdAt: toTimestamp(fundRequestData.createdAt),
-      updatedAt: toTimestamp(fundRequestData.updatedAt),
+      profitData,
     }
 
-    return NextResponse.json(formattedRequest, { status: 200 })
+    return NextResponse.json(fundRequestDataWithProfitData, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

@@ -1,0 +1,47 @@
+import { expenseTransaction } from "@/backend/db/schemas"
+import { checkAuth } from "@/backend/middlewares/check-auth"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { db } from "@/config/drizzle"
+import { catchError } from "@/utils/catch-error"
+import { eq } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
+
+export async function deleteExpenseTransaction(
+  request: NextRequest,
+): Promise<NextResponse<unknown>> {
+  try {
+    const rateLimitCheck = await httpRequestLimit(request)
+    if (rateLimitCheck instanceof NextResponse) return rateLimitCheck
+
+    const currentSession = await checkAuth()
+    if (currentSession instanceof NextResponse) return currentSession
+
+    const searchParams = request.nextUrl.searchParams
+    const expenseId = searchParams.get("id")
+
+    if (!expenseId) {
+      return NextResponse.json(
+        { error: "Expense Transaction ID is required" },
+        { status: 400 },
+      )
+    }
+
+    await db.transaction(async (tx) => {
+      const expenseResult = await tx.query.expenseTransaction.findFirst({
+        where: eq(expenseTransaction.id, expenseId),
+      })
+
+      if (!expenseResult) {
+        throw new Error("Expense Transaction not found")
+      }
+
+      await tx
+        .delete(expenseTransaction)
+        .where(eq(expenseTransaction.id, expenseId))
+    })
+
+    return NextResponse.json({ status: 201 })
+  } catch (error) {
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
+  }
+}

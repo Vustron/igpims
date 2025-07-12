@@ -1,8 +1,7 @@
 "use client"
 
-import { format } from "date-fns"
-import { Calendar, DollarSign } from "lucide-react"
-import { useState } from "react"
+import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
+import { useUpdateFundRequest } from "@/backend/actions/fund-request/update-fund-request"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -21,37 +20,50 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawers"
 import { Textarea } from "@/components/ui/inputs"
-import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
-import { isFundRequestData, useDialog } from "@/hooks/use-dialog"
+import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { catchError } from "@/utils/catch-error"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
+import { Calendar, DollarSign } from "lucide-react"
+import { useState } from "react"
+import { toast } from "react-hot-toast"
 
 export const DisburseFundsDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()
-  const { getRequestById, approveRequest } = useFundRequestStore()
   const [disbursementNotes, setDisbursementNotes] = useState("")
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
-  const isDialogOpen = isOpen && type === "disburseFunds"
-  const request =
-    isFundRequestData(data) && data.requestId
-      ? getRequestById(data.requestId)
+  const fundRequest =
+    data && "fundRequest" in data
+      ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const handleDisburse = () => {
-    if (request) {
-      const notes = `Funds disbursed. ${disbursementNotes ? `Notes: ${disbursementNotes}` : ""}`
+  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+    fundRequest?.id || "",
+  )
 
-      approveRequest(request.id, notes)
-
+  const handleDisburse = async () => {
+    try {
+      await toast.promise(
+        updateRequest({
+          status: "disbursed",
+          notes: disbursementNotes,
+          disbursementDate: new Date().toISOString(),
+          currentStep: fundRequest?.currentStep
+            ? fundRequest.currentStep + 1
+            : 5,
+        }),
+        {
+          loading: "Processing fund disbursement...",
+          success: "Funds disbursed successfully",
+          error: (error) => catchError(error),
+        },
+      )
       onClose()
-      resetForm()
-    } else {
-      console.error("Disbursement method and reference number are required.")
+      setDisbursementNotes("")
+    } catch (error) {
+      catchError(error)
     }
-  }
-
-  const resetForm = () => {
-    setDisbursementNotes("")
   }
 
   const formatCurrency = (amount: number) => {
@@ -62,7 +74,9 @@ export const DisburseFundsDialog = () => {
     }).format(amount)
   }
 
-  if (!request) return null
+  const isDialogOpen = isOpen && type === "disburseFunds"
+
+  if (!isDialogOpen || !fundRequest) return null
 
   const DialogContent_Component = isDesktop ? Dialog : Drawer
   const Content = isDesktop ? DialogContent : DrawerContent
@@ -84,28 +98,29 @@ export const DisburseFundsDialog = () => {
           </Description>
         </Header>
 
-        <div className="space-y-4 p-6">
-          {/* Disbursement Summary */}
-
+        <div className="p-6">
+          {/* Request Summary */}
           <div className="rounded-lg border bg-gray-50 p-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="font-medium text-gray-600 text-sm">Request ID</p>
-                <p className="font-mono text-sm">{request.id}</p>
+                <p className="font-mono text-sm">{fundRequest.id}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Purpose</p>
-                <p className="text-sm">{request.purpose}</p>
+                <p className="text-sm">{fundRequest.purpose}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Amount</p>
                 <p className="font-semibold text-green-600 text-sm">
-                  {formatCurrency(request.amount)}
+                  {formatCurrency(fundRequest.amount)}
                 </p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Requestor</p>
-                <p className="text-sm">{request.requestor}</p>
+                <p className="text-sm">
+                  {fundRequest.requestorData?.name || fundRequest.requestor}
+                </p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">
@@ -114,7 +129,7 @@ export const DisburseFundsDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {format(new Date(request.requestDate), "MMM d, yyyy")}
+                    {formatDateFromTimestamp(fundRequest.requestDate)}
                   </p>
                 </div>
               </div>
@@ -123,8 +138,8 @@ export const DisburseFundsDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {request.dateNeeded
-                      ? format(new Date(request.dateNeeded), "MMM d, yyyy")
+                    {fundRequest.dateNeeded
+                      ? formatDateFromTimestamp(fundRequest.dateNeeded)
                       : "Not specified"}
                   </p>
                 </div>
@@ -132,19 +147,17 @@ export const DisburseFundsDialog = () => {
             </div>
           </div>
 
-          {/* Disbursement Details */}
-          <div className="space-y-4">
-            <div>
-              <span className="mb-2 block font-medium text-gray-700 text-sm">
-                Disbursement Notes (Optional)
-              </span>
-              <Textarea
-                placeholder="Add any disbursement notes..."
-                value={disbursementNotes}
-                onChange={(e) => setDisbursementNotes(e.target.value)}
-                rows={3}
-              />
-            </div>
+          {/* Disbursement Notes */}
+          <div className="mt-4">
+            <span className="mb-2 block font-medium text-gray-700 text-sm">
+              Disbursement Notes (Optional)
+            </span>
+            <Textarea
+              placeholder="Add any notes about this disbursement..."
+              value={disbursementNotes}
+              onChange={(e) => setDisbursementNotes(e.target.value)}
+              rows={3}
+            />
           </div>
         </div>
 
@@ -152,12 +165,7 @@ export const DisburseFundsDialog = () => {
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            onClick={handleDisburse}
-            className="bg-indigo-600 hover:bg-indigo-700"
-          >
-            Approve Disbursement
-          </Button>
+          <Button onClick={handleDisburse}>Confirm Disbursement</Button>
         </Footer>
       </Content>
     </DialogContent_Component>

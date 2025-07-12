@@ -1,3 +1,5 @@
+import { ExpenseTransactionWithRequestor } from "@/backend/actions/expense-transaction/find-many"
+import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
 import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { WaterFundWithVendoLocation } from "@/backend/actions/water-fund/find-by-id"
 import { WaterSupplyWithVendoLocation } from "@/backend/actions/water-supply/find-by-id"
@@ -52,6 +54,9 @@ export type DialogType =
   | "createWaterSupply"
   | "editWaterSupply"
   | "editWaterFund"
+  | "createExpense"
+  | "editExpense"
+  | "viewImage"
 
 interface ConfirmDialogData {
   title?: string
@@ -60,8 +65,7 @@ interface ConfirmDialogData {
 }
 
 interface FundRequestDialogData {
-  requestId?: string
-  currentStatus?: string
+  fundRequest?: FundRequestWithUser
 }
 
 export interface ProjectRequestData {
@@ -94,6 +98,14 @@ interface WaterFundData {
   waterFund?: WaterFundWithVendoLocation
 }
 
+interface ExpenseTransactionData {
+  expenseTransaction?: ExpenseTransactionWithRequestor
+}
+
+interface ViewImageData {
+  imgUrl?: string
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -112,6 +124,8 @@ export type DialogData =
   | WaterVendoData
   | WaterSupplyData
   | WaterFundData
+  | ExpenseTransactionData
+  | ViewImageData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -119,10 +133,8 @@ export const isConfirmData = (
   return data !== null && "resolve" in data
 }
 
-export const isFundRequestData = (
-  data: DialogData | null,
-): data is FundRequestDialogData => {
-  return data !== null && "requestId" in data
+export const isFundRequestData = (data: any): data is FundRequestDialogData => {
+  return data && data.fundRequest !== undefined
 }
 
 export const isProjectRequestData = (data: any): data is ProjectRequestData => {
@@ -151,6 +163,16 @@ export const isWaterSupplyData = (data: any): data is WaterSupplyData => {
 
 export const isWaterFundData = (data: any): data is WaterFundData => {
   return data && data.waterFund !== undefined
+}
+
+export const isViewImageData = (data: any): data is ViewImageData => {
+  return data && data.imgUrl !== undefined
+}
+
+export const isExpenseTransactionData = (
+  data: any,
+): data is ExpenseTransactionData => {
+  return data && data.expenseTransaction !== undefined
 }
 
 export const useDialog = create<DialogStore>((set) => ({

@@ -1,7 +1,8 @@
 "use client"
 
+import { useCreateFundRequest } from "@/backend/actions/fund-request/create-fund-request"
+import { useFindManyUser } from "@/backend/actions/user/find-many"
 import { DynamicForm } from "@/components/ui/forms"
-import { useDialog } from "@/hooks/use-dialog"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import {
@@ -9,10 +10,10 @@ import {
   createFundRequestSchema,
 } from "@/validation/fund-request"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
+import { Loader2 } from "lucide-react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-import { useFundRequestStore } from "./fund-request-store"
 
 export const CreateFundRequestForm = ({
   onSuccess,
@@ -21,14 +22,13 @@ export const CreateFundRequestForm = ({
   onSuccess?: () => void
   onError?: () => void
 }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { addRequest } = useFundRequestStore()
-  const { onClose } = useDialog()
+  const createFundRequest = useCreateFundRequest()
+  const { data: users, isLoading } = useFindManyUser()
 
   const form = useForm<CreateFundRequest>({
     resolver: zodResolver(createFundRequestSchema),
     defaultValues: {
-      requestorName: "",
+      requestor: "",
       purpose: "",
       position: "",
       amount: 0,
@@ -37,13 +37,31 @@ export const CreateFundRequestForm = ({
     },
   })
 
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "requestor" && value.requestor && users?.data) {
+        const selectedUser = users.data.find(
+          (user) => user.id === value.requestor,
+        )
+        if (selectedUser) {
+          form.setValue("position", selectedUser.role || "")
+        }
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form, users])
+
   const createFundRequestFields: FieldConfig<CreateFundRequest>[] = [
     {
-      name: "requestorName",
-      type: "text",
+      name: "requestor",
+      type: "select",
       label: "Requestor Name",
       placeholder: "Enter requestor name",
       description: "Full name of the person requesting funds",
+      options: users?.data.map((user) => ({
+        label: user.name,
+        value: user.id,
+      })),
       required: true,
     },
     {
@@ -91,58 +109,45 @@ export const CreateFundRequestForm = ({
   ]
 
   const onSubmit = async (values: CreateFundRequest) => {
-    try {
-      setIsSubmitting(true)
-
-      if (values.amount <= 0) {
-        form.setError("amount", {
-          type: "manual",
-          message: "Amount must be greater than 0",
-        })
-        setIsSubmitting(false)
-        return
-      }
-
-      const requestId = addRequest({
-        requestor: values.requestorName,
-        position: values.position,
-        purpose: values.purpose,
-        amount: values.amount,
-        requestDate: values.requestDate,
-        dateNeeded: values.dateNeeded,
-        utilizedFunds: 0,
-        allocatedFunds: 0,
-      })
-
-      toast.success(`Fund request ${requestId} created successfully!`)
-
-      form.reset({
-        requestorName: "",
-        position: "",
-        purpose: "",
-        amount: 0,
-        requestDate: new Date(),
-        dateNeeded: new Date(),
-      })
-
-      onClose()
-      onSuccess?.()
-    } catch (error) {
-      const errorMessage = catchError(error)
-      toast.error(errorMessage || "Failed to create fund request")
-      onError?.()
-    } finally {
-      setIsSubmitting(false)
+    const processedValues = {
+      ...values,
+      amount: Number(values.amount),
+      requestDate: new Date(values.requestDate).setHours(0, 0, 0, 0),
+      dateNeeded: new Date(values.dateNeeded).setHours(0, 0, 0, 0),
     }
+    await toast.promise(createFundRequest.mutateAsync(processedValues), {
+      loading: <span className="animate-pulse">Creating fund request...</span>,
+      success: "Successfully created fund request",
+      error: (error: unknown) => catchError(error),
+    })
+
+    form.reset()
+
+    if (createFundRequest.isSuccess) {
+      onSuccess?.()
+    } else {
+      onError?.()
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
   }
 
   return (
     <DynamicForm
       form={form}
       onSubmit={onSubmit}
+      mutation={createFundRequest}
       fields={createFundRequestFields}
-      submitButtonTitle={isSubmitting ? "Creating..." : "Submit Fund Request"}
-      disabled={isSubmitting}
+      submitButtonTitle={
+        createFundRequest.isPending ? "Creating..." : "Submit Fund Request"
+      }
+      disabled={createFundRequest.isPending}
       twoColumnLayout
     />
   )

@@ -1,8 +1,7 @@
 "use client"
 
-import { format } from "date-fns"
-import { Calendar, FileSearch } from "lucide-react"
-import { useState } from "react"
+import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
+import { useUpdateFundRequest } from "@/backend/actions/fund-request/update-fund-request"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -21,40 +20,77 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawers"
 import { Textarea } from "@/components/ui/inputs"
-import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
-import { isFundRequestData, useDialog } from "@/hooks/use-dialog"
+import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { catchError } from "@/utils/catch-error"
+import { format } from "date-fns"
+import { Calendar, FileSearch } from "lucide-react"
+import { useState } from "react"
+import { toast } from "react-hot-toast"
 
 export const ReviewFundRequestDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()
-  const { getRequestById, approveRequest, rejectRequest } =
-    useFundRequestStore()
   const [reviewComments, setReviewComments] = useState("")
   const [rejectionReason, setRejectionReason] = useState("")
   const [isRejecting, setIsRejecting] = useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
-  const isDialogOpen = isOpen && type === "reviewFundRequest"
-  const request =
-    isFundRequestData(data) && data.requestId
-      ? getRequestById(data.requestId)
+  const fundRequest =
+    data && "fundRequest" in data
+      ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const handleApprove = () => {
-    if (request) {
-      approveRequest(request.id, reviewComments)
+  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+    fundRequest?.id || "",
+  )
+
+  const handleApprove = async () => {
+    try {
+      await toast.promise(
+        updateRequest({
+          status: "in_review",
+          reviewerComments: reviewComments,
+          currentStep: fundRequest?.currentStep
+            ? fundRequest.currentStep + 1
+            : 2,
+        }),
+        {
+          loading: "Approving fund request...",
+          success: "Fund request approved for checking",
+          error: (error) => catchError(error),
+        },
+      )
       onClose()
       setReviewComments("")
       setIsRejecting(false)
+    } catch (error) {
+      catchError(error)
     }
   }
 
-  const handleReject = () => {
-    if (request && rejectionReason.trim()) {
-      rejectRequest(request.id, rejectionReason, 2)
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) return
+
+    try {
+      await toast.promise(
+        updateRequest({
+          status: "rejected",
+          isRejected: true,
+          rejectionReason,
+          rejectionStep: fundRequest?.currentStep || 1,
+          currentStep: fundRequest?.currentStep || 1,
+        }),
+        {
+          loading: "Rejecting fund request...",
+          success: "Fund request rejected",
+          error: (error) => catchError(error),
+        },
+      )
       onClose()
       setRejectionReason("")
       setIsRejecting(false)
+    } catch (error) {
+      catchError(error)
     }
   }
 
@@ -66,7 +102,9 @@ export const ReviewFundRequestDialog = () => {
     }).format(amount)
   }
 
-  if (!request) return null
+  const isDialogOpen = isOpen && type === "reviewFundRequest"
+
+  if (!isDialogOpen || !fundRequest) return null
 
   const DialogContent_Component = isDesktop ? Dialog : Drawer
   const Content = isDesktop ? DialogContent : DrawerContent
@@ -94,21 +132,23 @@ export const ReviewFundRequestDialog = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="font-medium text-gray-600 text-sm">Request ID</p>
-                <p className="font-mono text-sm">{request.id}</p>
+                <p className="font-mono text-sm">{fundRequest.id}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Purpose</p>
-                <p className="text-sm">{request.purpose}</p>
+                <p className="text-sm">{fundRequest.purpose}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Amount</p>
                 <p className="font-semibold text-green-600 text-sm">
-                  {formatCurrency(request.amount)}
+                  {formatCurrency(fundRequest.amount)}
                 </p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Requestor</p>
-                <p className="text-sm">{request.requestor}</p>
+                <p className="text-sm">
+                  {fundRequest.requestorData?.name || fundRequest.requestor}
+                </p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">
@@ -117,7 +157,7 @@ export const ReviewFundRequestDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {format(new Date(request.requestDate), "MMM d, yyyy")}
+                    {format(new Date(fundRequest.requestDate), "MMM d, yyyy")}
                   </p>
                 </div>
               </div>
@@ -126,8 +166,8 @@ export const ReviewFundRequestDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {request.dateNeeded
-                      ? format(new Date(request.dateNeeded), "MMM d, yyyy")
+                    {fundRequest.dateNeeded
+                      ? format(new Date(fundRequest.dateNeeded), "MMM d, yyyy")
                       : "Not specified"}
                   </p>
                 </div>

@@ -1,5 +1,18 @@
 "use client"
 
+import { useDeleteFundRequest } from "@/backend/actions/fund-request/delete-fund-request"
+import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
+import { Button } from "@/components/ui/buttons"
+import { Card, CardContent, CardHeader } from "@/components/ui/cards"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdowns"
+import { useConfirm } from "@/hooks/use-confirm"
+import { useDialog } from "@/hooks/use-dialog"
+import { catchError } from "@/utils/catch-error"
 import {
   CheckCircle,
   ChevronDown,
@@ -9,28 +22,46 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react"
+import { useRouter } from "next-nprogress-bar"
 import { useState } from "react"
-import { Button } from "@/components/ui/buttons"
-import { Card, CardContent, CardHeader } from "@/components/ui/cards"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdowns"
-import { useDialog } from "@/hooks/use-dialog"
-import { FundRequest } from "./fund-request-store"
+import toast from "react-hot-toast"
 import { Timeline } from "./timeline"
 import { timelineSteps } from "./timeline-sample-data"
 import { TimelineStatusBadge } from "./timeline-status"
 
+interface FundRequestCardProps {
+  fundRequest: FundRequestWithUser
+  isSelected?: boolean
+  onSelect?: () => void
+}
+
 export const FundRequestCard = ({
   fundRequest,
-}: {
-  fundRequest: FundRequest
-}) => {
+  // isSelected = false,
+  // onSelect,
+}: FundRequestCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { onOpen } = useDialog()
+  const confirm = useConfirm()
+  const deleteFundRequest = useDeleteFundRequest(fundRequest.id)
+  const router = useRouter()
+
+  const handleDelete = async () => {
+    const confirmed = await confirm(
+      "Delete fund request",
+      "Are you sure you want to delete this fund request? This action cannot be undone.",
+    )
+
+    if (confirmed) {
+      await toast.promise(deleteFundRequest.mutateAsync(), {
+        loading: (
+          <span className="animate-pulse">Deleting fund request...</span>
+        ),
+        success: "Fund request deleted successfully",
+        error: (error) => catchError(error),
+      })
+    }
+  }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-PH", {
@@ -51,45 +82,44 @@ export const FundRequestCard = ({
         return {
           label: "Start Review",
           action: () =>
-            onOpen("reviewFundRequest", { requestId: fundRequest.id }),
+            onOpen("reviewFundRequest", { fundRequest: fundRequest }),
           color: "bg-blue-600 hover:bg-blue-700",
         }
       case "in_review":
         return {
           label: "Check Funds",
-          action: () => onOpen("checkFunds", { requestId: fundRequest.id }),
+          action: () => onOpen("checkFunds", { fundRequest: fundRequest }),
           color: "bg-purple-600 hover:bg-purple-700",
         }
       case "checking":
         return {
           label: "Approve Release",
           action: () =>
-            onOpen("approveFundRequest", { requestId: fundRequest.id }),
+            onOpen("approveFundRequest", { fundRequest: fundRequest }),
           color: "bg-emerald-600 hover:bg-emerald-700",
         }
       case "approved":
         return {
           label: "Disburse Funds",
-          action: () => onOpen("disburseFunds", { requestId: fundRequest.id }),
+          action: () => onOpen("disburseFunds", { fundRequest: fundRequest }),
           color: "bg-indigo-600 hover:bg-indigo-700",
         }
       case "disbursed":
         return {
           label: "Mark as Received",
-          action: () => onOpen("receiveFunds", { requestId: fundRequest.id }),
+          action: () => onOpen("receiveFunds", { fundRequest: fundRequest }),
           color: "bg-sky-600 hover:bg-sky-700",
         }
       case "received":
         return {
           label: "Submit Receipt",
-          action: () => onOpen("submitReceipt", { requestId: fundRequest.id }),
+          action: () => router.push(`/fund-request/${fundRequest.id}`),
           color: "bg-teal-600 hover:bg-teal-700",
         }
       case "receipted":
         return {
           label: "Validate Expense",
-          action: () =>
-            onOpen("validateExpense", { requestId: fundRequest.id }),
+          action: () => router.push(`/fund-request/${fundRequest.id}`),
           color: "bg-green-600 hover:bg-green-700",
         }
       default:
@@ -99,11 +129,6 @@ export const FundRequestCard = ({
 
   const statusAction = getStatusAction()
 
-  // Determine if deletion is allowed
-  // const canDelete =
-  //   fundRequest.status === "pending" || fundRequest.status === "rejected"
-
-  // Determine card styling based on status
   const getCardStyling = () => {
     if (fundRequest.status === "validated") {
       return {
@@ -213,9 +238,7 @@ export const FundRequestCard = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    onClick={() =>
-                      onOpen("deleteFundRequest", { requestId: fundRequest.id })
-                    }
+                    onClick={handleDelete}
                     className="text-red-600 focus:text-red-600"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />

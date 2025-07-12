@@ -1,7 +1,7 @@
 "use client"
 
-import { FilePen, MoreHorizontal, Trash } from "lucide-react"
-import toast from "react-hot-toast"
+import { useDeleteViolation } from "@/backend/actions/violation/delete-violation"
+import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
@@ -11,10 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
-import { useDeleteViolation } from "@/backend/actions/violation/delete-violation"
-import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
+import { useConfirm } from "@/hooks/use-confirm"
 import { useDialog } from "@/hooks/use-dialog"
 import { catchError } from "@/utils/catch-error"
+import { FilePen, MoreHorizontal, Trash } from "lucide-react"
+import toast from "react-hot-toast"
 
 export const ViolationActions = ({
   violation,
@@ -22,6 +23,7 @@ export const ViolationActions = ({
   violation: ViolationWithRenters
 }) => {
   const deleteViolation = useDeleteViolation(violation?.id!)
+  const confirm = useConfirm()
   const { onOpen } = useDialog()
 
   const handleEdit = () => {
@@ -29,13 +31,20 @@ export const ViolationActions = ({
   }
 
   const handleDelete = async () => {
-    await toast.promise(deleteViolation.mutateAsync(), {
-      loading: (
-        <span className="animate-pulse">Deleting violation record...</span>
-      ),
-      success: "Violation record deleted successfully",
-      error: (error) => catchError(error),
-    })
+    const confirmed = await confirm(
+      "Delete violation",
+      "Are you sure you want to delete this violation? This action cannot be undone.",
+    )
+
+    if (confirmed) {
+      await toast.promise(deleteViolation.mutateAsync(), {
+        loading: (
+          <span className="animate-pulse">Deleting violation record...</span>
+        ),
+        success: "Violation record deleted successfully",
+        error: (error) => catchError(error),
+      })
+    }
   }
 
   return (

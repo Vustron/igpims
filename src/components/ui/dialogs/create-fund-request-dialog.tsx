@@ -37,7 +37,10 @@ export const CreateFundRequestDialog = () => {
               Fill in the details below to create a new fund request.
             </DialogDescription>
           </DialogHeader>
-          <CreateFundRequestForm />
+          <CreateFundRequestForm
+            onSuccess={handleClose}
+            onError={handleClose}
+          />
         </DialogContent>
       </Dialog>
     )
@@ -53,7 +56,10 @@ export const CreateFundRequestDialog = () => {
           </DrawerDescription>
         </DrawerHeader>
         <div className="px-6 pb-6">
-          <CreateFundRequestForm />
+          <CreateFundRequestForm
+            onSuccess={handleClose}
+            onError={handleClose}
+          />
         </div>
       </DrawerContent>
     </Drawer>

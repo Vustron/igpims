@@ -38,7 +38,7 @@ const normalizeTimestampToMillis = (value: number): number => {
  * Safely formats a timestamp into a date string
  * @param timestamp Can be in seconds, milliseconds, microseconds, or nanoseconds
  */
-export const formatDateFromTimestamp = (timestamp: number): string => {
+export const formatDateFromTimestamp = (timestamp: any) => {
   try {
     const millis = normalizeTimestampToMillis(timestamp)
     const date = new Date(millis)
@@ -83,4 +83,17 @@ export function convertDatesToTimestamps(obj: any): any {
   }
 
   return obj
+}
+
+export const convertTimestampToDate = (timestamp: number | Date): Date => {
+  // If it's already a Date object, return it
+  if (timestamp instanceof Date) return timestamp
+
+  const str = timestamp.toString()
+
+  // Handle Unix timestamps (seconds since epoch)
+  if (str.length <= 10) return new Date(timestamp * 1000)
+
+  // Handle milliseconds since epoch
+  return new Date(timestamp)
 }

@@ -1,4 +1,5 @@
 import { sendRentLockerConfirm } from "../controllers/email/send-rent-locker-confirm.ts"
+import { createExpenseTransaction } from "../controllers/expense-transaction/create-expense"
 import { createFundRequest } from "../controllers/fund-request/create-fund-request"
 import { createInspection } from "../controllers/inspection/create-inspection"
 import { createRent } from "../controllers/locker-rental/create-rent"
@@ -48,8 +49,12 @@ export const postRoutes: Route[] = [
   },
   { path: "/api/v1/water-funds/create-water-fund", handler: createWaterFund },
   {
-    path: "/api/v1/fund-request/create-fund-request",
+    path: "/api/v1/fund-requests/create-fund-request",
     handler: createFundRequest,
+  },
+  {
+    path: "/api/v1/expense-transactions/create-expense",
+    handler: createExpenseTransaction,
   },
   // Add more POST routes here
 ]

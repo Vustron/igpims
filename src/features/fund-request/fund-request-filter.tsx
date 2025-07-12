@@ -1,8 +1,7 @@
 "use client"
 
-import { format } from "date-fns"
-import { CalendarIcon, Plus, Search, X } from "lucide-react"
-import { useState } from "react"
+import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
+import { FundRequest } from "@/backend/db/schemas"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import { Calendar } from "@/components/ui/calendars"
@@ -21,19 +20,30 @@ import {
 } from "@/components/ui/selects"
 import { useDialog } from "@/hooks/use-dialog"
 import { cn } from "@/utils/cn"
-import { FundRequest } from "./fund-request-store"
+import { format } from "date-fns"
+import { CalendarIcon, Plus, Search, X } from "lucide-react"
+import { useState } from "react"
 
 type StatusOption = FundRequest["status"] | "all"
 
+interface FundRequestFilterProps {
+  onFilterChange?: (filters: {
+    search?: string
+    status?: StatusOption
+    startDate?: string
+    endDate?: string
+  }) => void
+  statusCounts?: Record<StatusOption, number>
+  isSidebarOpen?: boolean
+  fundRequest: FundRequestWithUser | undefined
+}
+
 export const FundRequestFilter = ({
   onFilterChange,
-}: {
-  onFilterChange?: (filters: {
-    search: string
-    status: StatusOption
-    dateRange: { from: Date | undefined; to: Date | undefined }
-  }) => void
-}) => {
+  statusCounts,
+  isSidebarOpen = false,
+  fundRequest,
+}: FundRequestFilterProps) => {
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<StatusOption>("all")
   const [dateRange, setDateRange] = useState<{
@@ -43,24 +53,33 @@ export const FundRequestFilter = ({
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const { onOpen } = useDialog()
 
-  const statusOptions: { value: StatusOption; label: string }[] = [
-    { value: "all", label: "All Statuses" },
-    { value: "pending", label: "Pending" },
-    { value: "in_review", label: "In Review" },
-    { value: "checking", label: "Checking" },
-    { value: "approved", label: "Approved" },
-    { value: "disbursed", label: "Disbursed" },
-    { value: "received", label: "Received" },
-    { value: "receipted", label: "Receipted" },
-    { value: "validated", label: "Validated" },
-    { value: "rejected", label: "Rejected" },
+  const statusOptions: {
+    value: StatusOption
+    label: string
+    count?: number
+  }[] = [
+    { value: "all", label: "All Statuses", count: statusCounts?.all },
+    { value: "pending", label: "Pending", count: statusCounts?.pending },
+    { value: "in_review", label: "In Review", count: statusCounts?.in_review },
+    { value: "checking", label: "Checking", count: statusCounts?.checking },
+    { value: "approved", label: "Approved", count: statusCounts?.approved },
+    { value: "disbursed", label: "Disbursed", count: statusCounts?.disbursed },
+    { value: "received", label: "Received", count: statusCounts?.received },
+    { value: "receipted", label: "Receipted", count: statusCounts?.receipted },
+    { value: "validated", label: "Validated", count: statusCounts?.validated },
+    { value: "rejected", label: "Rejected", count: statusCounts?.rejected },
   ]
 
   const handleSearch = (value: string) => {
     setSearch(value)
     updateActiveFilters("search", value)
     if (onFilterChange) {
-      onFilterChange({ search: value, status, dateRange })
+      onFilterChange({
+        search: value || undefined,
+        status: status !== "all" ? status : undefined,
+        startDate: dateRange.from?.toISOString(),
+        endDate: dateRange.to?.toISOString(),
+      })
     }
   }
 
@@ -68,23 +87,31 @@ export const FundRequestFilter = ({
     setStatus(value)
     updateActiveFilters("status", value)
     if (onFilterChange) {
-      onFilterChange({ search, status: value, dateRange })
+      onFilterChange({
+        search: search || undefined,
+        status: value !== "all" ? value : undefined,
+        startDate: dateRange.from?.toISOString(),
+        endDate: dateRange.to?.toISOString(),
+      })
     }
   }
 
   const handleDateRangeChange = (
     range: { from: Date | undefined; to?: Date | undefined } | undefined,
   ) => {
-    if (range) {
-      const normalizedRange = {
-        from: range.from,
-        to: range.to || undefined,
-      }
-      setDateRange(normalizedRange)
-      updateActiveFilters("date", normalizedRange)
-      if (onFilterChange) {
-        onFilterChange({ search, status, dateRange: normalizedRange })
-      }
+    const newRange = {
+      from: range?.from ?? undefined,
+      to: range?.to ?? undefined,
+    }
+    setDateRange(newRange)
+    updateActiveFilters("date", newRange)
+    if (onFilterChange) {
+      onFilterChange({
+        search: search || undefined,
+        status: status !== "all" ? status : undefined,
+        startDate: newRange.from ? newRange.from.toISOString() : undefined,
+        endDate: newRange.to ? newRange.to.toISOString() : undefined,
+      })
     }
   }
 
@@ -120,26 +147,23 @@ export const FundRequestFilter = ({
 
     if (type === "search") {
       setSearch("")
-      if (onFilterChange) {
-        onFilterChange({ search: "", status, dateRange })
-      }
     } else if (type === "status") {
       setStatus("all")
-      if (onFilterChange) {
-        onFilterChange({ search, status: "all", dateRange })
-      }
     } else if (type === "date") {
       setDateRange({ from: undefined, to: undefined })
-      if (onFilterChange) {
-        onFilterChange({
-          search,
-          status,
-          dateRange: { from: undefined, to: undefined },
-        })
-      }
     }
 
     setActiveFilters(activeFilters.filter((f) => f !== filter))
+
+    if (onFilterChange) {
+      onFilterChange({
+        search: type === "search" ? undefined : search || undefined,
+        status:
+          type === "status" ? undefined : status !== "all" ? status : undefined,
+        startDate: type === "date" ? undefined : dateRange.from?.toISOString(),
+        endDate: type === "date" ? undefined : dateRange.to?.toISOString(),
+      })
+    }
   }
 
   const clearAllFilters = () => {
@@ -150,21 +174,27 @@ export const FundRequestFilter = ({
 
     if (onFilterChange) {
       onFilterChange({
-        search: "",
-        status: "all",
-        dateRange: { from: undefined, to: undefined },
+        search: undefined,
+        status: undefined,
+        startDate: undefined,
+        endDate: undefined,
       })
     }
   }
 
   return (
-    <div className="mt-2">
-      <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="mt-2 mb-5">
+      <div
+        className={cn(
+          "flex flex-col gap-3",
+          isSidebarOpen ? "sm:flex-col" : "sm:flex-row",
+        )}
+      >
         {/* Search */}
         <div className="relative flex-grow">
-          <Search className="-translate-y-1/2 absolute top-1/2 left-3 size-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
           <Input
-            placeholder="Search by ID or purpose..."
+            placeholder="Search by ID, purpose or requestor..."
             className="pl-10"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
@@ -172,7 +202,7 @@ export const FundRequestFilter = ({
         </div>
 
         {/* Status filter */}
-        <div className="w-full sm:w-48">
+        <div className={cn("w-full", isSidebarOpen ? "" : "sm:w-48")}>
           <Select
             value={status}
             onValueChange={(value) => handleStatusChange(value as StatusOption)}
@@ -182,8 +212,19 @@ export const FundRequestFilter = ({
             </SelectTrigger>
             <SelectContent>
               {statusOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                <SelectItem
+                  key={option.value}
+                  value={option.value}
+                  disabled={option.count === 0 && option.value !== "all"}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{option.label}</span>
+                    {option.count !== undefined && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        {option.count}
+                      </span>
+                    )}
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -196,11 +237,12 @@ export const FundRequestFilter = ({
             <Button
               variant="outline"
               className={cn(
-                "w-full justify-start text-left font-normal sm:w-[240px]",
+                "w-full justify-start text-left font-normal",
+                isSidebarOpen ? "" : "sm:w-[240px]",
                 !dateRange.from && !dateRange.to && "text-muted-foreground",
               )}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
+              <CalendarIcon className="mr-2 size-4" />
               {dateRange.from ? (
                 dateRange.to ? (
                   <>
@@ -228,18 +270,23 @@ export const FundRequestFilter = ({
         </Popover>
 
         <Button
-          className="gap-2 shadow-sm transition-all hover:shadow"
-          onClick={() => onOpen("createFundRequest")}
+          className={cn(
+            "gap-2 shadow-sm transition-all hover:shadow",
+            isSidebarOpen ? "w-full" : "",
+          )}
+          onClick={() =>
+            onOpen("createFundRequest", { fundRequest: fundRequest })
+          }
         >
           <Plus className="size-4" />
-          <span className="whitespace-nowrap">New Fund Request</span>
+          <span className="whitespace-nowrap">New Request</span>
         </Button>
       </div>
 
       {/* Active filters */}
       {activeFilters.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-slate-500 text-xs">Active filters:</span>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-slate-500">Active filters:</span>
           {activeFilters.map((filter) => {
             const [type, value] = filter.split(":", 2)
             return (
@@ -270,7 +317,7 @@ export const FundRequestFilter = ({
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-slate-600 text-xs"
+            className="h-7 px-2 text-xs text-slate-600"
             onClick={clearAllFilters}
           >
             Clear all

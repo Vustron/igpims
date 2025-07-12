@@ -1,16 +1,9 @@
 "use client"
 
-import { format } from "date-fns/format"
-import {
-  AlertTriangle,
-  Calendar,
-  Eye,
-  Plus,
-  ReceiptText,
-  Trash2,
-} from "lucide-react"
-import { useState } from "react"
-import toast from "react-hot-toast"
+import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
+import { useFindFundRequestById } from "@/backend/actions/fund-request/find-by-id"
+import { useUpdateFundRequest } from "@/backend/actions/fund-request/update-fund-request"
+import { ExpenseTransaction } from "@/backend/db/schemas"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import {
@@ -32,34 +25,34 @@ import {
 import { Input, Textarea } from "@/components/ui/inputs"
 import { FileUpload } from "@/components/ui/inputs/file-upload"
 import { Label } from "@/components/ui/labels"
-import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
-import { isFundRequestData, useDialog } from "@/hooks/use-dialog"
+import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
-
-interface ExpenseEntry {
-  expenseName: string
-  amount: number
-  date: Date
-  receipt?: File
-}
+import { format } from "date-fns/format"
+import {
+  AlertTriangle,
+  Calendar,
+  Eye,
+  Plus,
+  ReceiptText,
+  Trash2,
+} from "lucide-react"
+import { useState } from "react"
+import toast from "react-hot-toast"
 
 export const SubmitReceiptDialog = () => {
   const { type, data, isOpen, onOpen, onClose } = useDialog()
-  const {
-    getRequestById,
-    approveRequest,
-    updateUtilizedFunds,
-    addExpenseTransaction,
-  } = useFundRequestStore()
-  const [expenses, setExpenses] = useState<ExpenseEntry[]>([])
+  const [expenses, setExpenses] = useState<ExpenseTransaction[]>([])
   const [receiptNotes, setReceiptNotes] = useState("")
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
   const isDialogOpen = isOpen && type === "submitReceipt"
-  const request =
-    isFundRequestData(data) && data.requestId
-      ? getRequestById(data.requestId)
+  const fundRequest =
+    data && "fundRequest" in data
+      ? (data.fundRequest as FundRequestWithUser)
       : null
+
+  const { data: request } = useFindFundRequestById(fundRequest?.id!)
+  const { mutateAsync: updateRequest } = useUpdateFundRequest(fundRequest?.id!)
 
   const addExpenseEntry = () => {
     setExpenses([
@@ -68,6 +61,15 @@ export const SubmitReceiptDialog = () => {
         expenseName: "",
         amount: 0,
         date: new Date(),
+        id: "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        requestId: "",
+        status: "pending",
+        rejectionReason: null,
+        receipt: null,
+        validatedBy: null,
+        validatedDate: null,
       },
     ])
   }
@@ -78,7 +80,7 @@ export const SubmitReceiptDialog = () => {
 
   const updateExpenseEntry = (
     index: number,
-    field: keyof ExpenseEntry,
+    field: keyof ExpenseTransaction,
     value: any,
   ) => {
     setExpenses(
@@ -100,50 +102,42 @@ export const SubmitReceiptDialog = () => {
     0,
   )
 
-  const handleSubmitReceipt = () => {
-    if (request && expenses.length > 0) {
-      // Validate that all expenses have required fields
-      const invalidExpenses = expenses.filter(
-        (expense) => !expense.expenseName.trim() || expense.amount <= 0,
-      )
+  const handleSubmitReceipt = async () => {
+    if (!request || expenses.length === 0) {
+      toast.error("Please add at least one expense entry")
+      return
+    }
 
-      if (invalidExpenses.length > 0) {
-        toast.error("Please fill in all expense details")
-        return
-      }
+    // Validate that all expenses have required fields
+    const invalidExpenses = expenses.filter(
+      (expense) => !expense.expenseName.trim() || expense.amount <= 0,
+    )
 
-      if (totalExpenseAmount > request.allocatedFunds) {
-        toast.error("Total expenses cannot exceed allocated funds")
-        return
-      }
+    if (invalidExpenses.length > 0) {
+      toast.error("Please fill in all expense details")
+      return
+    }
 
-      // Add each expense transaction
-      expenses.forEach((expense) => {
-        return addExpenseTransaction(request.id, {
-          expenseName: expense.expenseName,
-          amount: expense.amount,
-          date: expense.date,
-          receipt: expense.receipt
-            ? `receipt-${Date.now()}-${expense.expenseName}`
-            : undefined,
-          status: "pending",
-        })
-      })
+    if (totalExpenseAmount > request.allocatedFunds) {
+      toast.error("Total expenses cannot exceed allocated funds")
+      return
+    }
 
-      // Update utilized funds with total expense amount
-      updateUtilizedFunds(request.id, totalExpenseAmount)
-
-      // Move to next step
+    try {
       const notes = `Expense receipts submitted. Total expenses: ${formatCurrency(totalExpenseAmount)}. Items: ${expenses.length} expense(s). ${receiptNotes ? `Notes: ${receiptNotes}` : ""}`
 
-      approveRequest(request.id, notes)
+      await updateRequest({
+        status: "receipted",
+        utilizedFunds: totalExpenseAmount,
+        notes,
+        currentStep: request.currentStep ? request.currentStep + 1 : 5,
+      })
 
       toast.success("Receipts and expenses submitted successfully!")
-
       onClose()
       resetForm()
-    } else {
-      toast.error("Please add at least one expense entry")
+    } catch (error) {
+      toast.error("Failed to submit receipts")
     }
   }
 

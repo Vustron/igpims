@@ -1,9 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Check, X } from "lucide-react"
-import type { ReactElement } from "react"
-import React from "react"
 import {
   Tooltip,
   TooltipContent,
@@ -11,6 +7,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltips"
 import { cn } from "@/utils/cn"
+import { motion } from "framer-motion"
+import { Check, X } from "lucide-react"
+import type { ReactElement } from "react"
+import React from "react"
 import { TimelineStepType } from "./timeline-sample-data"
 
 export const TimelineStep = ({

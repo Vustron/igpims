@@ -1,5 +1,7 @@
 "use client"
 
+import { ExpenseTransactionWithRequestor } from "@/backend/actions/expense-transaction/find-many"
+import { useUpdateFundRequest } from "@/backend/actions/fund-request/update-fund-request"
 import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { Button } from "@/components/ui/buttons"
 import {
@@ -8,17 +10,14 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
+import { useConfirm } from "@/hooks/use-confirm"
 import { useDialog } from "@/hooks/use-dialog"
-// import toast from "react-hot-toast"
+import { catchError } from "@/utils/catch-error"
 import { Table } from "@tanstack/react-table"
 import { motion } from "framer-motion"
-import {
-  Mail,
-  PlusCircle,
-  RefreshCw,
-  Settings2,
-  // PrinterIcon,
-} from "lucide-react"
+import { FileCheck, Mail, PlusCircle, RefreshCw, Settings2 } from "lucide-react"
+import { useRouter } from "next-nprogress-bar"
+import toast from "react-hot-toast"
 
 interface TableActionsProps<TData> {
   isIgp?: boolean
@@ -32,6 +31,8 @@ interface TableActionsProps<TData> {
   isOnInspection?: boolean
   isOnWaterSupply?: boolean
   isOnWaterFund?: boolean
+  isOnExpense?: boolean
+  isBudgetFullyUtilized?: boolean
 }
 
 export function TableActions<TData>({
@@ -46,8 +47,44 @@ export function TableActions<TData>({
   isOnInspection,
   isOnWaterSupply,
   isOnWaterFund,
+  isOnExpense,
+  isBudgetFullyUtilized,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
+  const hasExpenseTransactions = tableData.length > 0
+  const fundRequestData = tableData[0] as ExpenseTransactionWithRequestor
+  const confirm = useConfirm()
+  const updateFundRequest = useUpdateFundRequest(fundRequestData.requestId)
+  const router = useRouter()
+  const isReceipted = fundRequestData.requestData.status === "receipted"
+
+  const handleConfirmSubmittedReceipt = async () => {
+    const confirmed = await confirm(
+      isReceipted ? "Confirm validated receipts" : "Confirm submitted receipts",
+      isReceipted
+        ? "Are you sure you want to confirm these submitted receipts? This action cannot be undone."
+        : "Are you sure you want to confirm these validated receipts? This action cannot be undone.",
+    )
+    if (confirmed) {
+      await toast.promise(
+        updateFundRequest.mutateAsync({
+          id: fundRequestData.requestId,
+          status: isReceipted ? "validated" : "receipted",
+          currentStep: 8,
+        }),
+        {
+          loading: isReceipted
+            ? "Confirming validated receipts..."
+            : "Confirming submitted receipts...",
+          success: isReceipted
+            ? "Validated receipts confirmed successfully"
+            : "Submitted receipts confirmed successfully",
+          error: (error) => catchError(error),
+        },
+      )
+      router.push("/fund-request")
+    }
+  }
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -71,30 +108,36 @@ export function TableActions<TData>({
         </motion.div>
       )}
 
-      {/* <motion.div
-        key="print-button"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.2, delay: 0.05 }}
-      >
-        <Button
-          size="sm"
-          variant="outline"
-          className="font-normal text-xs shadow-xs"
-          onClick={() => onOpen("printRentalAgreementReceipt")}
+      {isOnExpense && (
+        <motion.div
+          key="confirm-submit-reciept-button"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: 0.2 }}
         >
-          <PrinterIcon className="mr-2 h-4 w-4" />
-          Print
-        </Button>
-      </motion.div> */}
+          <Button
+            size="sm"
+            variant="outline"
+            className="font-normal text-xs shadow-xs"
+            onClick={handleConfirmSubmittedReceipt}
+            disabled={!hasExpenseTransactions}
+          >
+            <FileCheck />
+            {isReceipted
+              ? "Confirm validated reciepts"
+              : "Confirm submitted receipts"}
+          </Button>
+        </motion.div>
+      )}
 
       {(isLockerRental ||
         isUser ||
         isOnViolations ||
         isOnInspection ||
         isOnWaterSupply ||
-        isOnWaterFund) && (
+        isOnWaterFund ||
+        isOnExpense) && (
         <motion.div
           key="add-button"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -118,14 +161,22 @@ export function TableActions<TData>({
                         ? "createWaterSupply"
                         : isOnWaterFund
                           ? "createWaterFund"
-                          : "createRent",
+                          : isOnExpense
+                            ? "createExpense"
+                            : "createRent",
                 isOnViolations
                   ? {
                       violation: tableData[0] as ViolationWithRenters,
                     }
-                  : undefined,
+                  : isOnExpense
+                    ? {
+                        expenseTransaction:
+                          tableData[0] as ExpenseTransactionWithRequestor,
+                      }
+                    : undefined,
               )
             }
+            disabled={isOnExpense && isBudgetFullyUtilized}
           >
             <PlusCircle className="mr-2 h-4 w-4" />
             {isUser
@@ -138,7 +189,9 @@ export function TableActions<TData>({
                     ? "Create water supply"
                     : isOnWaterFund
                       ? "Create water fund"
-                      : "Create rent"}
+                      : isOnExpense
+                        ? "Create expense"
+                        : "Create rent"}
           </Button>
         </motion.div>
       )}

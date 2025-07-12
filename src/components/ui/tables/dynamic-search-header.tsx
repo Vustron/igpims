@@ -22,6 +22,8 @@ interface DynamicSearchHeaderProps<TData> {
   isOnInspection?: boolean
   isOnWaterSupply?: boolean
   isOnWaterFund?: boolean
+  isOnExpense?: boolean
+  isBudgetFullyUtilized?: boolean
 }
 
 export const DynamicSearchHeader = <TData,>({
@@ -39,6 +41,8 @@ export const DynamicSearchHeader = <TData,>({
   isOnInspection,
   isOnWaterSupply,
   isOnWaterFund,
+  isOnExpense,
+  isBudgetFullyUtilized,
 }: DynamicSearchHeaderProps<TData>) => {
   return (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -66,6 +70,8 @@ export const DynamicSearchHeader = <TData,>({
         isOnInspection={isOnInspection}
         isOnWaterSupply={isOnWaterSupply}
         isOnWaterFund={isOnWaterFund}
+        isOnExpense={isOnExpense}
+        isBudgetFullyUtilized={isBudgetFullyUtilized}
       />
     </div>
   )

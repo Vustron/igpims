@@ -1,7 +1,10 @@
 import { fundRequest } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { insertFundRequestQuery } from "@/backend/queries/fund-request"
+import {
+  findFundRequestByIdQuery,
+  insertFundRequestQuery,
+} from "@/backend/queries/fund-request"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
@@ -9,7 +12,7 @@ import {
   CreateFundRequest,
   createFundRequestSchema,
 } from "@/validation/fund-request"
-import { eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { nanoid } from "nanoid"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -36,7 +39,9 @@ export async function createFundRequest(
     const fundRequestData = validationResult.data
 
     const existingRequest = await db
-      .select()
+      .select({
+        purpose: fundRequest.purpose,
+      })
       .from(fundRequest)
       .where(eq(fundRequest.purpose, fundRequestData.purpose))
       .limit(1)
@@ -55,32 +60,19 @@ export async function createFundRequest(
         purpose: fundRequestData.purpose,
         amount: fundRequestData.amount,
         status: "pending",
-        requestedBy: fundRequestData.requestorName,
-        requestorPosition: fundRequestData.position,
+        currentStep: 1,
         requestDate: fundRequestData.requestDate,
         dateNeeded: fundRequestData.dateNeeded,
+        requestor: fundRequestData.requestor,
+        requestorPosition: fundRequestData.position,
+        isRejected: false,
+        rejectionStep: 0,
       })
     })
 
-    const [updatedRequest] = await db
-      .select({
-        id: fundRequest.id,
-        purpose: fundRequest.purpose,
-        amount: fundRequest.amount,
-        utilizedFunds: fundRequest.utilizedFunds,
-        allocatedFunds: fundRequest.allocatedFunds,
-        status: fundRequest.status,
-        requestedBy: fundRequest.requestedBy,
-        requestorPosition: fundRequest.requestorPosition,
-        requestDate: sql<number>`${fundRequest.requestDate}`,
-        dateNeeded: sql<number>`${fundRequest.dateNeeded}`,
-        approvedBy: fundRequest.approvedBy,
-        createdAt: sql<number>`${fundRequest.createdAt}`,
-        updatedAt: sql<number>`${fundRequest.updatedAt}`,
-      })
-      .from(fundRequest)
-      .where(eq(fundRequest.id, fundRequestId))
-      .limit(1)
+    const [updatedRequest] = await findFundRequestByIdQuery.execute({
+      id: fundRequestId,
+    })
 
     return NextResponse.json(updatedRequest, { status: 200 })
   } catch (error) {

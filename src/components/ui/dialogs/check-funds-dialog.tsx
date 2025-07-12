@@ -1,8 +1,10 @@
 "use client"
 
-import { format } from "date-fns/format"
-import { Calendar, PiggyBank } from "lucide-react"
-import { useState } from "react"
+import {
+  FundRequestWithUser,
+  useFindFundRequestById,
+} from "@/backend/actions/fund-request/find-by-id"
+import { useUpdateFundRequest } from "@/backend/actions/fund-request/update-fund-request"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -21,43 +23,76 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawers"
 import { Textarea } from "@/components/ui/inputs"
-import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
-import { isFundRequestData, useDialog } from "@/hooks/use-dialog"
+import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { catchError } from "@/utils/catch-error"
+import { format } from "date-fns"
+import { Calendar, Loader2, PiggyBank } from "lucide-react"
+import { useState } from "react"
+import { toast } from "react-hot-toast"
 
 export const CheckFundsDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()
-  const {
-    getRequestById,
-    approveRequest,
-    rejectRequest,
-    updateAllocatedFunds,
-  } = useFundRequestStore()
   const [notes, setNotes] = useState("")
   const [isRejecting, setIsRejecting] = useState(false)
   const [rejectionReason, setRejectionReason] = useState("")
   const isDesktop = useMediaQuery("(min-width: 768px)")
-
-  const isDialogOpen = isOpen && type === "checkFunds"
-  const request =
-    isFundRequestData(data) && data.requestId
-      ? getRequestById(data.requestId)
+  const fundRequest =
+    data && "fundRequest" in data
+      ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const handleApprove = () => {
-    if (request) {
-      updateAllocatedFunds(request.id)
-      approveRequest(request.id, `${notes}`)
+  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+    fundRequest?.id || "",
+  )
+  const { data: fundRequestData, isLoading } = useFindFundRequestById(
+    fundRequest?.id || "",
+  )
+
+  const handleApprove = async () => {
+    try {
+      await toast.promise(
+        updateRequest({
+          status: "checking",
+          allocatedFunds: fundRequest?.amount,
+          notes: notes,
+          currentStep: 3,
+        }),
+        {
+          loading: "Approving fund allocation...",
+          success: "Funds allocated successfully",
+          error: (error) => catchError(error),
+        },
+      )
       onClose()
       resetForm()
+    } catch (error) {
+      catchError(error)
     }
   }
 
-  const handleReject = () => {
-    if (request && rejectionReason.trim()) {
-      rejectRequest(request.id, rejectionReason, 3)
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) return
+
+    try {
+      await toast.promise(
+        updateRequest({
+          status: "rejected",
+          isRejected: true,
+          rejectionReason,
+          rejectionStep: 2,
+          currentStep: 2,
+        }),
+        {
+          loading: "Rejecting fund request...",
+          success: "Fund request rejected",
+          error: (error) => catchError(error),
+        },
+      )
       onClose()
       resetForm()
+    } catch (error) {
+      catchError(error)
     }
   }
 
@@ -75,7 +110,9 @@ export const CheckFundsDialog = () => {
     }).format(amount)
   }
 
-  if (!request) return null
+  const isDialogOpen = isOpen && type === "checkFunds"
+
+  if (!isDialogOpen || !fundRequest) return null
 
   const DialogContent_Component = isDesktop ? Dialog : Drawer
   const Content = isDesktop ? DialogContent : DrawerContent
@@ -83,6 +120,14 @@ export const CheckFundsDialog = () => {
   const Title = isDesktop ? DialogTitle : DrawerTitle
   const Description = isDesktop ? DialogDescription : DrawerDescription
   const Footer = isDesktop ? DialogFooter : DrawerFooter
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <DialogContent_Component open={isDialogOpen} onOpenChange={onClose}>
@@ -95,32 +140,39 @@ export const CheckFundsDialog = () => {
           <Description>
             Verify fund availability and allocate the appropriate amount.
           </Description>
-          <div className="mt-2 w-full text-center font-bold">
-            Current IGP Funds: P2345.00
+          <div className="mt-2 -mb-5 w-full text-center font-bold">
+            Current IGP Funds:{" "}
+            {isLoading
+              ? "Loading..."
+              : fundRequestData?.profitData?.totalRevenue !== undefined
+                ? formatCurrency(fundRequestData.profitData.totalRevenue)
+                : "N/A"}
           </div>
         </Header>
 
-        <div className="space-y-4 p-6">
+        <div className="p-6">
           {/* Request Summary */}
           <div className="rounded-lg border bg-gray-50 p-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="font-medium text-gray-600 text-sm">Request ID</p>
-                <p className="font-mono text-sm">{request.id}</p>
+                <p className="font-mono text-sm">{fundRequest.id}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Purpose</p>
-                <p className="text-sm">{request.purpose}</p>
+                <p className="text-sm">{fundRequest.purpose}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Amount</p>
                 <p className="font-semibold text-green-600 text-sm">
-                  {formatCurrency(request.amount)}
+                  {formatCurrency(fundRequest.amount)}
                 </p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Requestor</p>
-                <p className="text-sm">{request.requestor}</p>
+                <p className="text-sm">
+                  {fundRequest.requestorData?.name || fundRequest.requestor}
+                </p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">
@@ -129,7 +181,7 @@ export const CheckFundsDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {format(new Date(request.requestDate), "MMM d, yyyy")}
+                    {format(new Date(fundRequest.requestDate), "MMM d, yyyy")}
                   </p>
                 </div>
               </div>
@@ -138,8 +190,8 @@ export const CheckFundsDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {request.dateNeeded
-                      ? format(new Date(request.dateNeeded), "MMM d, yyyy")
+                    {fundRequest.dateNeeded
+                      ? format(new Date(fundRequest.dateNeeded), "MMM d, yyyy")
                       : "Not specified"}
                   </p>
                 </div>
@@ -147,9 +199,21 @@ export const CheckFundsDialog = () => {
             </div>
           </div>
 
-          {!isRejecting && (
+          {!isRejecting ? (
             <div>
-              <span className="mb-2 block font-medium text-sm">
+              <span className="mt-2 mb-2 block font-medium text-gray-700 text-sm">
+                Allocation Notes (Optional)
+              </span>
+              <Textarea
+                placeholder="Add any notes about this allocation..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+              />
+            </div>
+          ) : (
+            <div>
+              <span className="mt-2 mb-2 block font-medium text-red-700 text-sm">
                 Rejection Reason *
               </span>
               <Textarea
@@ -157,6 +221,7 @@ export const CheckFundsDialog = () => {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={3}
+                className="border-red-300 focus:border-red-500 focus:ring-red-500"
               />
             </div>
           )}

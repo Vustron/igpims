@@ -1,6 +1,7 @@
 import { fundRequest } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { findFundRequestByIdQuery } from "@/backend/queries/fund-request"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
@@ -8,7 +9,7 @@ import {
   UpdateFundRequest,
   updateFundRequestSchema,
 } from "@/validation/fund-request"
-import { eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function updateFundRequest(
@@ -16,14 +17,10 @@ export async function updateFundRequest(
 ): Promise<NextResponse<unknown>> {
   try {
     const rateLimitCheck = await httpRequestLimit(request)
-    if (rateLimitCheck instanceof NextResponse) {
-      return rateLimitCheck
-    }
+    if (rateLimitCheck instanceof NextResponse) return rateLimitCheck
 
     const currentSession = await checkAuth()
-    if (currentSession instanceof NextResponse) {
-      return currentSession
-    }
+    if (currentSession instanceof NextResponse) return currentSession
 
     const url = new URL(request.url)
     const id = url.searchParams.get("id")
@@ -60,7 +57,27 @@ export async function updateFundRequest(
         throw new Error("Fund Request not found")
       }
 
-      const updateValues: Record<string, any> = {}
+      const updateValues: Partial<typeof fundRequest.$inferInsert> = {}
+
+      if (updateData.status !== undefined) {
+        updateValues.status = updateData.status
+
+        if (updateData.status === "rejected" && updateData.rejectionReason) {
+          updateValues.isRejected = true
+          updateValues.rejectionReason = updateData.rejectionReason
+          updateValues.rejectionStep =
+            updateData.currentStep ?? existingRequest[0]?.currentStep ?? 1
+        }
+      }
+
+      const handleDateField = (
+        dateValue: string | number | Date | undefined,
+      ) => {
+        if (!dateValue) return undefined
+        if (typeof dateValue === "string") return new Date(dateValue)
+        if (typeof dateValue === "number") return new Date(dateValue)
+        return dateValue
+      }
 
       if (updateData.purpose !== undefined)
         updateValues.purpose = updateData.purpose
@@ -70,44 +87,59 @@ export async function updateFundRequest(
         updateValues.utilizedFunds = updateData.utilizedFunds
       if (updateData.allocatedFunds !== undefined)
         updateValues.allocatedFunds = updateData.allocatedFunds
-      if (updateData.status !== undefined)
-        updateValues.status = updateData.status
+      if (updateData.currentStep !== undefined)
+        updateValues.currentStep = updateData.currentStep
       if (updateData.requestorPosition !== undefined)
         updateValues.requestorPosition = updateData.requestorPosition
       if (updateData.dateNeeded !== undefined)
-        updateValues.dateNeeded = new Date(updateData.dateNeeded).getTime()
+        updateValues.dateNeeded = handleDateField(updateData.dateNeeded)
+      if (updateData.rejectionReason !== undefined)
+        updateValues.rejectionReason = updateData.rejectionReason
+      if (updateData.rejectionStep !== undefined)
+        updateValues.rejectionStep = updateData.rejectionStep
+      if (updateData.notes !== undefined) updateValues.notes = updateData.notes
+      if (updateData.reviewerComments !== undefined)
+        updateValues.reviewerComments = updateData.reviewerComments
+      if (updateData.receipts !== undefined)
+        updateValues.receipts = updateData.receipts
       if (updateData.approvedBy !== undefined)
         updateValues.approvedBy = updateData.approvedBy
+      if (updateData.disbursementDate !== undefined)
+        updateValues.disbursementDate = handleDateField(
+          updateData.disbursementDate,
+        )
+      if (updateData.receiptDate !== undefined)
+        updateValues.receiptDate = handleDateField(updateData.receiptDate)
+      if (updateData.validationDate !== undefined)
+        updateValues.validationDate = handleDateField(updateData.validationDate)
 
       if (Object.keys(updateValues).length > 0) {
         await db
           .update(fundRequest)
-          .set(updateValues)
+          .set({
+            ...updateValues,
+            updatedAt: new Date(),
+          })
           .where(eq(fundRequest.id, id))
       }
     })
 
-    const updatedRequest = await db
-      .select({
-        id: fundRequest.id,
-        purpose: fundRequest.purpose,
-        amount: fundRequest.amount,
-        utilizedFunds: fundRequest.utilizedFunds,
-        allocatedFunds: fundRequest.allocatedFunds,
-        status: fundRequest.status,
-        requestedBy: fundRequest.requestedBy,
-        requestorPosition: fundRequest.requestorPosition,
-        requestDate: sql<number>`${fundRequest.requestDate}`,
-        dateNeeded: sql<number>`${fundRequest.dateNeeded}`,
-        approvedBy: fundRequest.approvedBy,
-        createdAt: sql<number>`${fundRequest.createdAt}`,
-        updatedAt: sql<number>`${fundRequest.updatedAt}`,
+    const fundRequestData = await db.transaction(async (_tx) => {
+      const requestResult = await findFundRequestByIdQuery.execute({
+        id: id,
       })
-      .from(fundRequest)
-      .where(eq(fundRequest.id, id))
-      .limit(1)
 
-    return NextResponse.json(updatedRequest[0], { status: 200 })
+      return requestResult[0] || null
+    })
+
+    if (!fundRequestData) {
+      return NextResponse.json(
+        { error: "Fund Request not found" },
+        { status: 404 },
+      )
+    }
+
+    return NextResponse.json(fundRequestData, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

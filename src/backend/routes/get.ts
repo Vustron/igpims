@@ -1,3 +1,5 @@
+import { findExpenseTransactionById } from "../controllers/expense-transaction/find-by-id"
+import { findManyExpenseTransaction } from "../controllers/expense-transaction/find-many"
 import { findFundRequestById } from "../controllers/fund-request/find-by-id"
 import { findManyFundRequest } from "../controllers/fund-request/find-many"
 import { findTotalProfit } from "../controllers/fund-request/total-profit"
@@ -40,8 +42,16 @@ export const getRoutes: Route[] = [
   { path: "/api/v1/water-supplies/find-by-id", handler: findWaterSupplyById },
   { path: "/api/v1/water-funds/find-many", handler: findManyWaterFunds },
   { path: "/api/v1/water-funds/find-by-id", handler: findWaterFundById },
-  { path: "/api/v1/fund-request/find-total-profit", handler: findTotalProfit },
-  { path: "/api/v1/fund-request/find-many", handler: findManyFundRequest },
-  { path: "/api/v1/fund-request/find-by-id", handler: findFundRequestById },
+  { path: "/api/v1/fund-requests/find-total-profit", handler: findTotalProfit },
+  { path: "/api/v1/fund-requests/find-many", handler: findManyFundRequest },
+  { path: "/api/v1/fund-requests/find-by-id", handler: findFundRequestById },
+  {
+    path: "/api/v1/expense-transactions/find-many",
+    handler: findManyExpenseTransaction,
+  },
+  {
+    path: "/api/v1/expense-transactions/find-by-id",
+    handler: findExpenseTransactionById,
+  },
   // Add more GET routes here
 ]

@@ -154,11 +154,6 @@ const DeleteProjectRequestDialog = dynamic(() =>
     (mod) => mod.DeleteProjectRequestDialog,
   ),
 )
-const DeleteFundRequestDialog = dynamic(() =>
-  import("@/components/ui/dialogs/delete-fund-request-dialog").then(
-    (mod) => mod.DeleteFundRequestDialog,
-  ),
-)
 const CreateViolationDialog = dynamic(() =>
   import("@/components/ui/dialogs/create-violation-dialog").then(
     (mod) => mod.CreateViolationDialog,
@@ -204,6 +199,21 @@ const EditWaterFundDialog = dynamic(() =>
     (mod) => mod.EditWaterFundDialog,
   ),
 )
+const CreateExpenseDialog = dynamic(() =>
+  import("@/components/ui/dialogs/create-expense-dialog").then(
+    (mod) => mod.CreateExpenseDialog,
+  ),
+)
+const ViewImageDialog = dynamic(() =>
+  import("@/components/ui/dialogs/view-image-dialog").then(
+    (mod) => mod.ViewImageDialog,
+  ),
+)
+const EditExpenseDialog = dynamic(() =>
+  import("@/components/ui/dialogs/edit-expense-dialog").then(
+    (mod) => mod.EditExpenseDialog,
+  ),
+)
 
 export const DialogProvider = () => {
   const isMounted = useMounted()
@@ -242,7 +252,6 @@ export const DialogProvider = () => {
         <StartImplementationDialog />
         <CompleteProjectDialog />
         <DeleteProjectRequestDialog />
-        <DeleteFundRequestDialog />
         <CreateViolationDialog />
         <EditViolationDialog />
         <CreateInspectionDialog />
@@ -252,6 +261,9 @@ export const DialogProvider = () => {
         <CreateWaterSupplyDialog />
         <EditWaterSupplyDialog />
         <EditWaterFundDialog />
+        <CreateExpenseDialog />
+        <ViewImageDialog />
+        <EditExpenseDialog />
       </Suspense>
     </>
   )

@@ -1,15 +1,7 @@
 "use client"
 
-import { format } from "date-fns/format"
-import {
-  AlertCircle,
-  ArrowDownToLine,
-  Calendar,
-  Target,
-  User,
-} from "lucide-react"
-import { useState } from "react"
-import toast from "react-hot-toast"
+import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
+import { useUpdateFundRequest } from "@/backend/actions/fund-request/update-fund-request"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -29,37 +21,58 @@ import {
 } from "@/components/ui/drawers"
 import { Textarea } from "@/components/ui/inputs"
 import { Label } from "@/components/ui/labels"
-import { useFundRequestStore } from "@/features/fund-request/fund-request-store"
-import { isFundRequestData, useDialog } from "@/hooks/use-dialog"
+import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { catchError } from "@/utils/catch-error"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
+import {
+  AlertCircle,
+  ArrowDownToLine,
+  Calendar,
+  Target,
+  User,
+} from "lucide-react"
+import { useState } from "react"
+import { toast } from "react-hot-toast"
 
 export const ReceiveFundsDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()
-  const { getRequestById, approveRequest } = useFundRequestStore()
   const [confirmationNotes, setConfirmationNotes] = useState("")
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
-  const isDialogOpen = isOpen && type === "receiveFunds"
-  const request =
-    isFundRequestData(data) && data.requestId
-      ? getRequestById(data.requestId)
+  const fundRequest =
+    data && "fundRequest" in data
+      ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const handleConfirmReceipt = () => {
-    if (request) {
-      const notes = confirmationNotes.trim()
-        ? `Funds received by ${request.requestor}. Notes: ${confirmationNotes.trim()}`
-        : `Funds received by ${request.requestor}.`
+  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+    fundRequest?.id || "",
+  )
 
-      approveRequest(request.id, notes)
-      toast.success("Fund receipt confirmed successfully!")
+  const handleConfirmReceipt = async () => {
+    try {
+      await toast.promise(
+        updateRequest({
+          status: "received",
+          notes: confirmationNotes.trim()
+            ? `Funds received by ${fundRequest?.requestorData?.name || fundRequest?.requestor}. Notes: ${confirmationNotes.trim()}`
+            : `Funds received by ${fundRequest?.requestorData?.name || fundRequest?.requestor}`,
+          receiptDate: new Date().toISOString(),
+          currentStep: fundRequest?.currentStep
+            ? fundRequest.currentStep + 1
+            : 6,
+        }),
+        {
+          loading: "Confirming fund receipt...",
+          success: "Fund receipt confirmed successfully!",
+          error: (error) => catchError(error),
+        },
+      )
       onClose()
-      resetForm()
+      setConfirmationNotes("")
+    } catch (error) {
+      catchError(error)
     }
-  }
-
-  const resetForm = () => {
-    setConfirmationNotes("")
   }
 
   const formatCurrency = (amount: number) => {
@@ -70,7 +83,9 @@ export const ReceiveFundsDialog = () => {
     }).format(amount)
   }
 
-  if (!request) return null
+  const isDialogOpen = isOpen && type === "receiveFunds"
+
+  if (!isDialogOpen || !fundRequest) return null
 
   const DialogContent_Component = isDesktop ? Dialog : Drawer
   const Content = isDesktop ? DialogContent : DrawerContent
@@ -94,10 +109,10 @@ export const ReceiveFundsDialog = () => {
               <ArrowDownToLine className="h-5 w-5 text-sky-600" />
             </div>
             <div className="min-w-0">
-              <Title className="font-semibold text-lg">
+              <Title className="text-lg font-semibold">
                 Confirm Fund Receipt
               </Title>
-              <Description className="text-muted-foreground text-sm">
+              <Description className="text-sm text-muted-foreground">
                 Confirm that you have successfully received the disbursed funds.
               </Description>
             </div>
@@ -110,11 +125,11 @@ export const ReceiveFundsDialog = () => {
             <div className="rounded-lg border bg-gradient-to-br from-sky-50 to-sky-100/50 p-6 shadow-sm">
               <div className="text-center">
                 <div className="mb-3">
-                  <p className="font-medium text-sky-700 text-sm uppercase tracking-wide">
+                  <p className="text-sm font-medium uppercase tracking-wide text-sky-700">
                     Amount Received
                   </p>
-                  <p className="font-bold text-3xl text-sky-800 tracking-tight">
-                    {formatCurrency(request.amount)}
+                  <p className="text-3xl font-bold tracking-tight text-sky-800">
+                    {formatCurrency(fundRequest.amount)}
                   </p>
                 </div>
 
@@ -122,16 +137,13 @@ export const ReceiveFundsDialog = () => {
                   <div className="rounded-md bg-white/60 p-3">
                     <div className="mb-1 flex items-center gap-2">
                       <Calendar className="h-3 w-3 text-sky-600" />
-                      <p className="font-medium text-sky-700 text-xs uppercase tracking-wide">
+                      <p className="text-xs font-medium uppercase tracking-wide text-sky-700">
                         Disbursed On
                       </p>
                     </div>
-                    <p className="text-gray-700 text-sm">
-                      {request.disbursementDate
-                        ? format(
-                            new Date(request.disbursementDate),
-                            "MMM d, yyyy",
-                          )
+                    <p className="text-sm text-gray-700">
+                      {fundRequest.disbursementDate
+                        ? formatDateFromTimestamp(fundRequest.disbursementDate)
                         : "Not specified"}
                     </p>
                   </div>
@@ -139,11 +151,13 @@ export const ReceiveFundsDialog = () => {
                   <div className="rounded-md bg-white/60 p-3">
                     <div className="mb-1 flex items-center gap-2">
                       <User className="h-3 w-3 text-sky-600" />
-                      <p className="font-medium text-sky-700 text-xs uppercase tracking-wide">
+                      <p className="text-xs font-medium uppercase tracking-wide text-sky-700">
                         Requestor
                       </p>
                     </div>
-                    <p className="text-gray-700 text-sm">{request.requestor}</p>
+                    <p className="text-sm text-gray-700">
+                      {fundRequest.requestorData?.name || fundRequest.requestor}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -156,9 +170,9 @@ export const ReceiveFundsDialog = () => {
                   <Target className="h-4 w-4 text-gray-600" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-gray-700 text-sm">Purpose</p>
-                  <p className="break-words text-gray-600 text-sm leading-relaxed">
-                    {request.purpose}
+                  <p className="text-sm font-medium text-gray-700">Purpose</p>
+                  <p className="text-sm leading-relaxed text-gray-600 break-words">
+                    {fundRequest.purpose}
                   </p>
                 </div>
               </div>
@@ -166,7 +180,7 @@ export const ReceiveFundsDialog = () => {
 
             {/* Confirmation Notes */}
             <div className="space-y-3">
-              <Label className="block font-medium text-gray-700 text-sm">
+              <Label className="block text-sm font-medium text-gray-700">
                 Confirmation Notes (Optional)
               </Label>
               <Textarea
@@ -176,7 +190,7 @@ export const ReceiveFundsDialog = () => {
                 rows={3}
                 className="w-full resize-none border-gray-300 focus:border-sky-300 focus:ring-sky-200"
               />
-              <p className="text-gray-500 text-xs">
+              <p className="text-xs text-gray-500">
                 These notes will be added to the request history for record
                 keeping.
               </p>
@@ -189,14 +203,14 @@ export const ReceiveFundsDialog = () => {
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                 </div>
                 <div className="space-y-1">
-                  <p className="font-medium text-amber-800 text-sm">
+                  <p className="text-sm font-medium text-amber-800">
                     Important Notice
                   </p>
-                  <p className="text-amber-700 text-xs leading-relaxed">
+                  <p className="text-xs leading-relaxed text-amber-700">
                     By confirming receipt, you acknowledge that you have
                     received the full amount of{" "}
                     <span className="font-semibold">
-                      {formatCurrency(request.amount)}
+                      {formatCurrency(fundRequest.amount)}
                     </span>{" "}
                     for the specified purpose. You will be responsible for
                     submitting expense receipts after utilizing the funds.
