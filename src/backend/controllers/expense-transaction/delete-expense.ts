@@ -1,9 +1,9 @@
-import { expenseTransaction } from "@/backend/db/schemas"
+import { expenseTransaction, fundRequest } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteExpenseTransaction(
@@ -38,6 +38,15 @@ export async function deleteExpenseTransaction(
       await tx
         .delete(expenseTransaction)
         .where(eq(expenseTransaction.id, expenseId))
+
+      if (expenseResult.requestId && expenseResult.amount) {
+        await tx
+          .update(fundRequest)
+          .set({
+            utilizedFunds: sql`${fundRequest.utilizedFunds} - ${expenseResult.amount}`,
+          })
+          .where(eq(fundRequest.id, expenseResult.requestId))
+      }
     })
 
     return NextResponse.json({ status: 201 })

@@ -106,7 +106,8 @@ export const useUpdateExpenseTransaction = (id: string) => {
           queryClient.setQueryData(
             ["fund-request", previousExpenseTransaction.requestId],
             (oldData: any) => {
-              if (!oldData?.expenseTransactions) return oldData
+              if (!oldData || !Array.isArray(oldData.expenseTransactions))
+                return oldData
               return {
                 ...oldData,
                 expenseTransactions: oldData.expenseTransactions.map(
@@ -166,7 +167,8 @@ export const useUpdateExpenseTransaction = (id: string) => {
         queryClient.setQueryData(
           ["fund-request", updatedExpenseTransaction.requestId],
           (oldData: any) => {
-            if (!oldData?.expenseTransactions) return oldData
+            if (!oldData || !Array.isArray(oldData.expenseTransactions))
+              return oldData
             return {
               ...oldData,
               expenseTransactions: oldData.expenseTransactions.map(

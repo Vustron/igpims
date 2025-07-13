@@ -31,7 +31,7 @@ export default async function ValidateFundRequestPage({ params }: PageProps) {
     <QueryHydrator prefetchFns={[preFindFundRequest]}>
       <ContentLayout title="Validate Fund Request">
         <DynamicBreadcrumb items={validateFundRequestItems} />
-        <ExpenseTransactionClient />
+        <ExpenseTransactionClient id={id} />
       </ContentLayout>
     </QueryHydrator>
   )

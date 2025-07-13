@@ -45,7 +45,7 @@ export const ReceiveFundsDialog = () => {
       ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+  const { mutateAsync: updateRequest, isPending } = useUpdateFundRequest(
     fundRequest?.id || "",
   )
 
@@ -189,6 +189,7 @@ export const ReceiveFundsDialog = () => {
                 onChange={(e) => setConfirmationNotes(e.target.value)}
                 rows={3}
                 className="w-full resize-none border-gray-300 focus:border-sky-300 focus:ring-sky-200"
+                disabled={isPending}
               />
               <p className="text-xs text-gray-500">
                 These notes will be added to the request history for record
@@ -227,12 +228,14 @@ export const ReceiveFundsDialog = () => {
               variant="outline"
               onClick={onClose}
               className="w-full sm:w-auto"
+              disabled={isPending}
             >
               Cancel
             </Button>
             <Button
               onClick={handleConfirmReceipt}
               className="w-full bg-sky-600 hover:bg-sky-700 sm:w-auto"
+              disabled={isPending}
             >
               Confirm Receipt
             </Button>

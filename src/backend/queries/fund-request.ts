@@ -144,20 +144,38 @@ export async function getTotalProfit() {
     .execute()
     .then((res) => res[0]?.totalExpenseAmount ?? 0)
 
+  const fundRequestsData = await db
+    .select({
+      totalAllocatedFunds: sql<number>`COALESCE(SUM(${fundRequest.allocatedFunds}), 0)`,
+      totalUtilizedFunds: sql<number>`COALESCE(SUM(${fundRequest.utilizedFunds}), 0)`,
+    })
+    .from(fundRequest)
+    .execute()
+    .then(
+      (res) =>
+        res[0] ?? {
+          totalAllocatedFunds: 0,
+          totalUtilizedFunds: 0,
+        },
+    )
+
   const totalRevenue = lockerRevenue + (waterFundsData.totalWaterRevenue || 0)
   const totalExpenseAmount =
-    totalExpenses + (waterFundsData.totalWaterExpenses || 0)
+    (waterFundsData.totalWaterExpenses || 0) +
+    (fundRequestsData.totalUtilizedFunds || 0)
   const netProfit = totalRevenue - totalExpenseAmount
 
   return {
     totalLockerRevenue: lockerRevenue,
     totalWaterRevenue: waterFundsData.totalWaterRevenue,
     totalWaterExpenses: waterFundsData.totalWaterExpenses,
-    totalWaterProfit: waterFundsData.totalWaterProfit,
     totalExpenseTransactions: totalExpenses,
+    totalFundsUtilized: fundRequestsData.totalUtilizedFunds,
+    totalFundRequests: fundRequestsData.totalAllocatedFunds,
     totalRevenue,
     totalExpenses: totalExpenseAmount,
     netProfit,
+    totalWaterProfit: waterFundsData.totalWaterProfit,
   }
 }
 

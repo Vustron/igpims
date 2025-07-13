@@ -1,8 +1,17 @@
 "use client"
 
 import { cn } from "@/utils/cn"
-import { TimelineStepType } from "./timeline-sample-data"
+import { TimelineStepType } from "./fund-request-interface"
 import { TimelineStep } from "./timeline-step"
+
+interface TimelineProps {
+  currentStep: number
+  steps: TimelineStepType[]
+  isMobile?: boolean
+  isRejected?: boolean
+  rejectionStep?: number
+  isCompleted?: boolean
+}
 
 export const Timeline = ({
   currentStep,
@@ -10,13 +19,8 @@ export const Timeline = ({
   isMobile = false,
   isRejected,
   rejectionStep,
-}: {
-  currentStep: number
-  steps: TimelineStepType[]
-  isMobile?: boolean
-  isRejected?: boolean
-  rejectionStep?: number
-}) => {
+  isCompleted,
+}: TimelineProps) => {
   return (
     <div
       className={cn(
@@ -24,7 +28,6 @@ export const Timeline = ({
         isMobile ? "flex-col items-start gap-0" : "gap-1 sm:gap-2",
       )}
     >
-      {/* Background connector line */}
       <div
         className={cn(
           "absolute h-0.5 bg-slate-200",
@@ -34,33 +37,40 @@ export const Timeline = ({
         )}
       />
 
-      {/* Active connector line */}
       <div
         className={cn(
           "absolute h-0.5 transition-all duration-500",
-          isRejected ? "bg-red-500" : "bg-emerald-500",
+          isCompleted
+            ? "bg-green-500"
+            : isRejected
+              ? "bg-red-500"
+              : "bg-emerald-500",
           isMobile ? "top-0 left-4 w-0.5" : "-translate-y-1/2 top-1/2 left-0",
         )}
         style={
           isMobile
             ? {
-                height: `${(Math.min(currentStep - 1, steps.length - 1) / (steps.length - 1)) * 100}%`,
+                height: isCompleted
+                  ? "100%"
+                  : `${(Math.min(currentStep - 1, steps.length - 1) / (steps.length - 1)) * 100}%`,
               }
             : {
-                width: `${(Math.min(currentStep - 1, steps.length - 1) / (steps.length - 1)) * 100}%`,
+                width: isCompleted
+                  ? "100%"
+                  : `${(Math.min(currentStep - 1, steps.length - 1) / (steps.length - 1)) * 100}%`,
               }
         }
       />
 
-      {/* Steps */}
       {steps.map((step) => (
         <TimelineStep
           key={step.id}
           step={step}
-          isCompleted={step.id <= currentStep}
-          isCurrent={false}
+          isFinished={isCompleted ? true : step.id <= currentStep}
+          isCurrent={isCompleted ? false : step.id === currentStep}
           isMobile={isMobile}
           isRejected={isRejected && step.id === rejectionStep}
+          isCompleted={isCompleted}
         />
       ))}
     </div>

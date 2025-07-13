@@ -145,6 +145,10 @@ export async function findManyFundRequest(
           ? and(...countWhereConditions)
           : undefined,
       )
+      .orderBy(
+        sql`CASE WHEN ${fundRequest.status} = 'pending' THEN 0 ELSE 1 END`,
+        sql`${fundRequest.requestDate} DESC`,
+      )
 
     const countResult = await countQuery
     const totalItems = countResult[0]?.count || 0

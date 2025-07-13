@@ -1,8 +1,7 @@
 "use client"
 
 import { useCreateExpenseTransaction } from "@/backend/actions/expense-transaction/create-expense"
-import { ExpenseTransactionWithRequestor } from "@/backend/actions/expense-transaction/find-many"
-import { useFindManyFundRequests } from "@/backend/actions/fund-request/find-many"
+import { useFindFundRequestById } from "@/backend/actions/fund-request/find-by-id"
 import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
@@ -18,34 +17,32 @@ import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 
 interface CreateExpenseFormProps {
-  initialExpenseTransaction?: ExpenseTransactionWithRequestor
+  requestId?: string
   onSuccess?: () => void
   onError?: () => void
 }
 
 export const CreateExpenseForm = ({
-  // initialExpenseTransaction,
+  requestId,
   onSuccess,
   onError,
 }: CreateExpenseFormProps) => {
   const createExpense = useCreateExpenseTransaction()
   const [isFormReady, setIsFormReady] = useState(false)
   const {
-    data: fundRequestsData,
-    isLoading: isLoadingFundRequests,
-    isError: isFundRequestsError,
-  } = useFindManyFundRequests({
-    limit: 100,
-  })
+    data: fundRequestData,
+    isLoading: isLoadingFundRequest,
+    isError: isFundRequestError,
+  } = useFindFundRequestById(requestId || "")
 
   const remainingBalance =
-    (fundRequestsData?.profitData?.totalRevenue ?? 0) -
-    (fundRequestsData?.profitData?.totalExpenses ?? 0)
+    (fundRequestData?.allocatedFunds ?? 0) -
+    (fundRequestData?.utilizedFunds ?? 0)
 
   const form = useForm<CreateExpenseTransaction>({
     resolver: zodResolver(createExpenseTransactionSchema),
     defaultValues: {
-      requestId: "",
+      requestId: requestId || "",
       expenseName: "",
       amount: 0,
       date: Date.now(),
@@ -56,26 +53,37 @@ export const CreateExpenseForm = ({
   })
 
   useEffect(() => {
-    if (
-      !isLoadingFundRequests &&
-      (fundRequestsData?.data?.length! > 0 || isFundRequestsError)
-    ) {
+    if (requestId && !isLoadingFundRequest) {
+      form.reset({
+        requestId: requestId,
+        expenseName: "",
+        amount: 0,
+        date: Date.now(),
+        receipt: undefined,
+        status: "pending",
+        rejectionReason: null,
+      })
+      setIsFormReady(true)
+    } else if (!requestId) {
       setIsFormReady(true)
     }
-  }, [isLoadingFundRequests, fundRequestsData, isFundRequestsError])
+  }, [requestId, isLoadingFundRequest, form])
 
   const fundRequestOptions =
-    fundRequestsData?.data.map((request) => ({
-      value: request.id,
-      label: `${request.purpose}`,
-    })) || []
-
+    requestId && fundRequestData
+      ? [
+          {
+            value: fundRequestData.id,
+            label: fundRequestData.purpose,
+          },
+        ]
+      : []
   const expenseFields: FieldConfig<CreateExpenseTransaction>[] = [
     {
       name: "requestId",
       type: "select",
       label: "Fund Request",
-      placeholder: isLoadingFundRequests
+      placeholder: isLoadingFundRequest
         ? "Loading fund requests..."
         : "Select fund request",
       description: "The approved fund request this expense belongs to",
@@ -131,7 +139,7 @@ export const CreateExpenseForm = ({
       return
     }
 
-    const formData = { ...values }
+    const formData = { ...values, utilizedFunds: values.amount }
 
     if (formData.receipt instanceof File) {
       const base64Image = await convertImageToBase64(formData.receipt)
@@ -152,7 +160,7 @@ export const CreateExpenseForm = ({
     }
   }
 
-  if (isLoadingFundRequests || !isFormReady) {
+  if (isLoadingFundRequest || !isFormReady) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="size-8 animate-spin text-primary" />
@@ -161,8 +169,8 @@ export const CreateExpenseForm = ({
   }
 
   if (
-    isFundRequestsError ||
-    (!isLoadingFundRequests && fundRequestOptions.length === 0)
+    isFundRequestError ||
+    (!isLoadingFundRequest && fundRequestOptions.length === 0)
   ) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">

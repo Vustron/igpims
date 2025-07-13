@@ -27,8 +27,9 @@ import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { catchError } from "@/utils/catch-error"
 import { format } from "date-fns"
-import { Calendar, Loader2, PiggyBank } from "lucide-react"
-import { useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { AlertTriangle, Calendar, Loader2, PiggyBank } from "lucide-react"
+import { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 
 export const CheckFundsDialog = () => {
@@ -36,20 +37,37 @@ export const CheckFundsDialog = () => {
   const [notes, setNotes] = useState("")
   const [isRejecting, setIsRejecting] = useState(false)
   const [rejectionReason, setRejectionReason] = useState("")
+  const [showWarning, setShowWarning] = useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const fundRequest =
     data && "fundRequest" in data
       ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+  const { mutateAsync: updateRequest, isPending } = useUpdateFundRequest(
     fundRequest?.id || "",
   )
   const { data: fundRequestData, isLoading } = useFindFundRequestById(
     fundRequest?.id || "",
   )
 
+  const isInsufficientFunds =
+    (fundRequest?.amount ?? 0) > (fundRequestData?.profitData?.netProfit ?? 0)
+
+  useEffect(() => {
+    if (fundRequestData && fundRequest) {
+      setShowWarning(isInsufficientFunds)
+    }
+  }, [fundRequestData, fundRequest])
+
   const handleApprove = async () => {
+    if (isPending) return
+
+    if (isInsufficientFunds) {
+      toast.error("The amount requested exceeds the available budget")
+      return
+    }
+
     try {
       await toast.promise(
         updateRequest({
@@ -72,6 +90,7 @@ export const CheckFundsDialog = () => {
   }
 
   const handleReject = async () => {
+    if (isPending) return
     if (!rejectionReason.trim()) return
 
     try {
@@ -140,19 +159,48 @@ export const CheckFundsDialog = () => {
           <Description>
             Verify fund availability and allocate the appropriate amount.
           </Description>
-          <div className="mt-2 -mb-5 w-full text-center font-bold">
-            Current IGP Funds:{" "}
-            {isLoading
-              ? "Loading..."
-              : fundRequestData?.profitData?.totalRevenue !== undefined
-                ? formatCurrency(fundRequestData.profitData.totalRevenue)
-                : "N/A"}
+
+          <div className="mt-2 -mb-5 w-full text-center">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center"
+            >
+              <span className="font-bold">
+                Current IGP Funds:{" "}
+                {isLoading
+                  ? "Loading..."
+                  : fundRequestData?.profitData?.netProfit !== undefined
+                    ? formatCurrency(fundRequestData.profitData.netProfit)
+                    : "N/A"}
+              </span>
+
+              <AnimatePresence>
+                {showWarning && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="mt-2 flex items-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-yellow-800"
+                  >
+                    <AlertTriangle className="h-4 w-4" />
+                    <span>Requested amount exceeds available funds!</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </div>
         </Header>
 
         <div className="p-6">
           {/* Request Summary */}
-          <div className="rounded-lg border bg-gray-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-lg border bg-gray-50 p-4"
+          >
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="font-medium text-gray-600 text-sm">Request ID</p>
@@ -164,9 +212,14 @@ export const CheckFundsDialog = () => {
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Amount</p>
-                <p className="font-semibold text-green-600 text-sm">
+                <motion.p
+                  className="font-semibold text-sm"
+                  animate={{
+                    color: isInsufficientFunds ? "#dc2626" : "#16a34a",
+                  }}
+                >
                   {formatCurrency(fundRequest.amount)}
-                </p>
+                </motion.p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Requestor</p>
@@ -197,10 +250,14 @@ export const CheckFundsDialog = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {!isRejecting ? (
-            <div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <span className="mt-2 mb-2 block font-medium text-gray-700 text-sm">
                 Allocation Notes (Optional)
               </span>
@@ -209,10 +266,15 @@ export const CheckFundsDialog = () => {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
+                disabled={isPending}
               />
-            </div>
+            </motion.div>
           ) : (
-            <div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <span className="mt-2 mb-2 block font-medium text-red-700 text-sm">
                 Rejection Reason *
               </span>
@@ -221,32 +283,72 @@ export const CheckFundsDialog = () => {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={3}
+                disabled={isPending}
                 className="border-red-300 focus:border-red-500 focus:ring-red-500"
               />
-            </div>
+            </motion.div>
           )}
         </div>
 
         <Footer className="flex flex-col gap-2 sm:flex-row">
           {!isRejecting ? (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(true)}>
-                Reject - Insufficient Funds
-              </Button>
-              <Button onClick={handleApprove}>Approve Fund Allocation</Button>
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <Button
+                  variant="outline"
+                  onClick={() => setIsRejecting(true)}
+                  disabled={isPending}
+                  className={
+                    isInsufficientFunds ? "bg-red-50 hover:bg-red-100" : ""
+                  }
+                >
+                  Reject - Insufficient Funds
+                </Button>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: isInsufficientFunds ? 1 : 1.03 }}
+                whileTap={{ scale: isInsufficientFunds ? 1 : 0.97 }}
+              >
+                <Button
+                  onClick={handleApprove}
+                  disabled={isPending || isInsufficientFunds}
+                  className={
+                    isInsufficientFunds ? "opacity-50 cursor-not-allowed" : ""
+                  }
+                >
+                  Approve Fund Allocation
+                </Button>
+              </motion.div>
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(false)}>
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleReject}
-                disabled={!rejectionReason.trim()}
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
               >
-                Reject Request
-              </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsRejecting(false)}
+                  disabled={isPending}
+                >
+                  Cancel
+                </Button>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <Button
+                  variant="destructive"
+                  onClick={handleReject}
+                  disabled={!rejectionReason.trim() || isPending}
+                >
+                  Reject Request
+                </Button>
+              </motion.div>
             </>
           )}
         </Footer>

@@ -1,4 +1,4 @@
-import { expenseTransaction } from "@/backend/db/schemas"
+import { expenseTransaction, fundRequest } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import {
@@ -51,7 +51,9 @@ export async function createExpenseTransaction(
     }
 
     const existingExpense = await db.query.expenseTransaction.findFirst({
-      where: eq(expenseTransaction.expenseName, expenseData.expenseName),
+      where: (exp) =>
+        eq(exp.expenseName, expenseData.expenseName) &&
+        eq(exp.requestId, expenseData.requestId),
     })
 
     if (existingExpense) {
@@ -61,22 +63,54 @@ export async function createExpenseTransaction(
       )
     }
 
-    const [insertResult] = await db
-      .insert(expenseTransaction)
-      .values({
-        id: nanoid(15),
-        requestId: expenseData.requestId,
-        expenseName: expenseData.expenseName,
-        amount: expenseData.amount,
-        date: sql<number>`${expenseData.date}`,
-        receipt: expenseData.receipt,
-        status: expenseData.status,
-        rejectionReason: expenseData.rejectionReason,
-      })
-      .returning()
+    const expense = await db.transaction(async (tx) => {
+      const [insertResult] = await tx
+        .insert(expenseTransaction)
+        .values({
+          id: nanoid(15),
+          requestId: expenseData.requestId,
+          expenseName: expenseData.expenseName,
+          amount: expenseData.amount,
+          date: sql<number>`${expenseData.date}`,
+          receipt: expenseData.receipt,
+          status: expenseData.status,
+          rejectionReason: expenseData.rejectionReason,
+        })
+        .returning()
+
+      await tx
+        .update(fundRequest)
+        .set({
+          utilizedFunds: sql`${fundRequest.utilizedFunds} + ${expenseData.amount}`,
+        })
+        .where(eq(fundRequest.id, expenseData.requestId))
+
+      if (expenseData.status === "validated") {
+        const allExpenses = await tx
+          .select()
+          .from(expenseTransaction)
+          .where(eq(expenseTransaction.requestId, expenseData.requestId))
+
+        const allValidated = allExpenses.every(
+          (expense) => expense.status === "validated",
+        )
+
+        if (allValidated) {
+          await tx
+            .update(fundRequest)
+            .set({
+              status: "validated",
+              currentStep: 8,
+            })
+            .where(eq(fundRequest.id, expenseData.requestId))
+        }
+      }
+
+      return insertResult
+    })
 
     const [result] = await findExpenseTransactionByIdQuery.execute({
-      id: insertResult?.id,
+      id: expense?.id,
     })
 
     if (!result) {

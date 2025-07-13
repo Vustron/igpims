@@ -4,14 +4,25 @@ import {
   ExpenseTransactionFilters,
   useFindManyExpenseTransactions,
 } from "@/backend/actions/expense-transaction/find-many"
+import { useFindFundRequestById } from "@/backend/actions/fund-request/find-by-id"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
-import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
+import {
+  Skeleton,
+  TableErrorState,
+  TableLoadingState,
+} from "@/components/ui/fallbacks"
 import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { expenseTransactionListColumn } from "./expense-transaction-column"
 
-export const ExpenseTransactionClient = () => {
+interface ExpenseTransactionClientProps {
+  id: string
+}
+
+export const ExpenseTransactionClient = ({
+  id,
+}: ExpenseTransactionClientProps) => {
   const [filters, setFilters] = useState<ExpenseTransactionFilters>({
     page: 1,
     limit: 10,
@@ -19,6 +30,8 @@ export const ExpenseTransactionClient = () => {
 
   const [searchValue, setSearchValue] = useState("")
   const [showFilters, setShowFilters] = useState(false)
+  const { data: fundRequestData, isLoading: fundRequestLoading } =
+    useFindFundRequestById(id)
 
   const debouncedSearch = useDebounce(searchValue, 500)
 
@@ -26,8 +39,9 @@ export const ExpenseTransactionClient = () => {
     () => ({
       ...filters,
       search: debouncedSearch || undefined,
+      requestId: id,
     }),
-    [filters, debouncedSearch],
+    [filters, debouncedSearch, id],
   )
 
   const {
@@ -38,6 +52,7 @@ export const ExpenseTransactionClient = () => {
     refetch,
     isFetching,
   } = useFindManyExpenseTransactions(finalFilters)
+  const isLoadingData = isLoading || fundRequestLoading || isFetching
 
   const transformedData = useMemo(() => {
     if (!transactionsResponse?.data) return []
@@ -56,7 +71,7 @@ export const ExpenseTransactionClient = () => {
     )
   }, [transactionsResponse?.data])
 
-  const allocatedFunds = transactionsResponse?.profitData.totalRevenue || 0
+  const allocatedFunds = fundRequestData?.allocatedFunds || 0
   const isBudgetFullyUtilized = totalExpenses >= allocatedFunds
 
   const formatCurrency = (amount: number) => {
@@ -142,7 +157,7 @@ export const ExpenseTransactionClient = () => {
     return count
   }, [filters, debouncedSearch])
 
-  if (isLoading) {
+  if (isLoading || fundRequestLoading) {
     return <TableLoadingState />
   }
 
@@ -168,9 +183,13 @@ export const ExpenseTransactionClient = () => {
             <span className="text-sm text-muted-foreground">Total</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(allocatedFunds)}
-            </div>
+            {isLoadingData ? (
+              <Skeleton className="h-8 w-full" />
+            ) : (
+              <div className="text-2xl font-bold text-green-600">
+                {formatCurrency(allocatedFunds)}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -182,11 +201,15 @@ export const ExpenseTransactionClient = () => {
             <span className="text-sm text-muted-foreground">Used</span>
           </CardHeader>
           <CardContent>
-            <div
-              className={`text-2xl font-bold ${totalExpenses > allocatedFunds ? "text-red-600" : "text-blue-600"}`}
-            >
-              {formatCurrency(totalExpenses)}
-            </div>
+            {isLoadingData ? (
+              <Skeleton className="h-8 w-full" />
+            ) : (
+              <div
+                className={`text-2xl font-bold ${totalExpenses > allocatedFunds ? "text-red-600" : "text-blue-600"}`}
+              >
+                {formatCurrency(totalExpenses)}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -198,11 +221,15 @@ export const ExpenseTransactionClient = () => {
             <span className="text-sm text-muted-foreground">Balance</span>
           </CardHeader>
           <CardContent>
-            <div
-              className={`text-2xl font-bold ${(allocatedFunds - totalExpenses) < 0 ? "text-red-600" : "text-gray-700"}`}
-            >
-              {formatCurrency(allocatedFunds - totalExpenses)}
-            </div>
+            {isLoadingData ? (
+              <Skeleton className="h-8 w-full" />
+            ) : (
+              <div
+                className={`text-2xl font-bold ${(allocatedFunds - totalExpenses) < 0 ? "text-red-600" : "text-gray-700"}`}
+              >
+                {formatCurrency(allocatedFunds - totalExpenses)}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -214,20 +241,29 @@ export const ExpenseTransactionClient = () => {
             <span className="text-sm text-muted-foreground">% Used</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {allocatedFunds > 0
-                ? Math.round((totalExpenses / allocatedFunds) * 100)
-                : 0}
-              %
-            </div>
-            <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
-              <div
-                className={`h-full rounded-full ${totalExpenses > allocatedFunds ? "bg-red-500" : "bg-blue-500"}`}
-                style={{
-                  width: `${allocatedFunds > 0 ? Math.min(100, (totalExpenses / allocatedFunds) * 100) : 0}%`,
-                }}
-              />
-            </div>
+            {isLoadingData ? (
+              <>
+                <Skeleton className="h-8 w-full mb-2" />
+                <Skeleton className="h-2 w-full" />
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">
+                  {allocatedFunds > 0
+                    ? Math.round((totalExpenses / allocatedFunds) * 100)
+                    : 0}
+                  %
+                </div>
+                <div className="mt-2 h-2 w-full rounded-full bg-gray-200">
+                  <div
+                    className={`h-full rounded-full ${totalExpenses > allocatedFunds ? "bg-red-500" : "bg-blue-500"}`}
+                    style={{
+                      width: `${allocatedFunds > 0 ? Math.min(100, (totalExpenses / allocatedFunds) * 100) : 0}%`,
+                    }}
+                  />
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -237,9 +273,9 @@ export const ExpenseTransactionClient = () => {
         columns={expenseTransactionListColumn}
         data={transformedData}
         placeholder="Search expense transactions..."
-        isLoading={isFetching}
+        isLoading={isLoadingData}
         onRefetch={refetch}
-        isFetching={isFetching}
+        isFetching={isLoadingData}
         isDynamic={true}
         searchValue={searchValue}
         onSearchChange={handleSearch}
@@ -267,6 +303,7 @@ export const ExpenseTransactionClient = () => {
         resultLabel="expense transactions"
         isOnExpense={true}
         isBudgetFullyUtilized={isBudgetFullyUtilized}
+        requestId={id}
       />
     </div>
   )

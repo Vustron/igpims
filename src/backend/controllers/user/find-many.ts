@@ -1,10 +1,10 @@
-import { and, eq, like, ne, or, sql } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 import { user } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { and, eq, like, ne, or, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function findManyUser(
   request: NextRequest,

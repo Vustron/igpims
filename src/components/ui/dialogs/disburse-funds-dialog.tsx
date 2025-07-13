@@ -38,7 +38,7 @@ export const DisburseFundsDialog = () => {
       ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+  const { mutateAsync: updateRequest, isPending } = useUpdateFundRequest(
     fundRequest?.id || "",
   )
 
@@ -157,15 +157,18 @@ export const DisburseFundsDialog = () => {
               value={disbursementNotes}
               onChange={(e) => setDisbursementNotes(e.target.value)}
               rows={3}
+              disabled={isPending}
             />
           </div>
         </div>
 
         <Footer className="flex flex-col gap-2 sm:flex-row">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isPending}>
             Cancel
           </Button>
-          <Button onClick={handleDisburse}>Confirm Disbursement</Button>
+          <Button onClick={handleDisburse} disabled={isPending}>
+            Confirm Disbursement
+          </Button>
         </Footer>
       </Content>
     </DialogContent_Component>

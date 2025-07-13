@@ -8,30 +8,34 @@ import {
 } from "@/components/ui/tooltips"
 import { cn } from "@/utils/cn"
 import { motion } from "framer-motion"
-import { Check, X } from "lucide-react"
+import { Check, MessageCircleWarning, X } from "lucide-react"
 import type { ReactElement } from "react"
 import React from "react"
-import { TimelineStepType } from "./timeline-sample-data"
+import { TimelineStepType } from "./fund-request-interface"
 
-export const TimelineStep = ({
-  step,
-  isCompleted,
-  isCurrent,
-  isRejected,
-  isMobile = false,
-  onStepClick,
-}: {
+interface TimelineStepProps {
   step: TimelineStepType
-  isCompleted: boolean
+  isFinished: boolean
   isCurrent: boolean
   isRejected?: boolean
   isMobile?: boolean
+  isCompleted?: boolean
   onStepClick?: (stepId: number) => void
-}) => {
+}
+
+export const TimelineStep = ({
+  step,
+  isFinished,
+  isCurrent,
+  isRejected,
+  isMobile = false,
+  isCompleted,
+  onStepClick,
+}: TimelineStepProps) => {
   const showTooltip =
     !isCurrent && (step.description || (isRejected && step.rejectionReason))
 
-  const isClickable = isCompleted && onStepClick
+  const isClickable = isFinished && onStepClick
 
   return (
     <TooltipProvider>
@@ -51,41 +55,50 @@ export const TimelineStep = ({
             whileHover={{ scale: isClickable ? 1.05 : 1 }}
             onClick={() => isClickable && onStepClick(step.id)}
           >
-            {/* Step circle */}
             <motion.div
               className={cn(
                 "z-10 flex size-6 shrink-0 items-center justify-center rounded-full border-2 sm:size-8",
-                isRejected
-                  ? "border-red-500 bg-red-500 text-white"
-                  : isCompleted
-                    ? "border-green-500 bg-green-500 text-white"
+                isCompleted
+                  ? "border-green-500 bg-green-500 text-white"
+                  : isRejected
+                    ? "border-red-500 bg-red-500 text-white"
                     : isCurrent
                       ? "border-blue-500 bg-blue-500 text-white"
-                      : "border-slate-200 bg-white text-slate-400",
+                      : isFinished
+                        ? "border-green-500 bg-green-500 text-white"
+                        : "border-slate-200 bg-white text-slate-400",
                 "transition-transform duration-200 group-hover:scale-110",
               )}
               whileHover={{ scale: 1.05 }}
               animate={
-                isCurrent && !isRejected
-                  ? {
-                      scale: [1, 1.1, 1],
-                      boxShadow: "0 0 0 4px rgba(59, 130, 246, 0.3)",
-                    }
-                  : isRejected
-                    ? { boxShadow: "0 0 0 4px rgba(239, 68, 68, 0.3)" }
-                    : isCompleted
-                      ? { boxShadow: "0 0 0 4px rgba(34, 197, 94, 0.3)" }
-                      : {}
+                isCompleted
+                  ? { boxShadow: "0 0 0 4px rgba(34, 197, 94, 0.3)" }
+                  : isCurrent && !isRejected
+                    ? {
+                        scale: [1, 1.1, 1],
+                        boxShadow: "0 0 0 4px rgba(59, 130, 246, 0.3)",
+                      }
+                    : isRejected
+                      ? { boxShadow: "0 0 0 4px rgba(239, 68, 68, 0.3)" }
+                      : isFinished
+                        ? { boxShadow: "0 0 0 4px rgba(34, 197, 94, 0.3)" }
+                        : {}
               }
               transition={{
-                repeat: isCurrent && !isRejected ? Number.POSITIVE_INFINITY : 0,
+                repeat:
+                  isCurrent && !isRejected && !isCompleted
+                    ? Number.POSITIVE_INFINITY
+                    : 0,
                 duration: 2,
               }}
             >
-              {isRejected ? (
-                <X className="size-3 sm:size-4" />
-              ) : isCompleted ? (
+              {isCurrent && !isRejected ? (
+                <MessageCircleWarning className="size-3 sm:size-4" />
+              ) : (isCompleted && !isRejected) ||
+                (isFinished && !isRejected) ? (
                 <Check className="size-3 sm:size-4" />
+              ) : isRejected ? (
+                <X className="size-3 sm:size-4" />
               ) : React.isValidElement(step.icon) ? (
                 React.cloneElement(
                   step.icon as ReactElement<{ className?: string }>,
@@ -94,17 +107,18 @@ export const TimelineStep = ({
               ) : null}
             </motion.div>
 
-            {/* Step label */}
             <div
               className={cn(
                 isMobile ? "mt-0" : "mt-1 text-center",
-                isRejected
-                  ? "text-red-700"
-                  : isCompleted
-                    ? "text-green-700"
+                isCompleted
+                  ? "text-green-700"
+                  : isRejected
+                    ? "text-red-700"
                     : isCurrent
                       ? "font-medium text-blue-700"
-                      : "text-slate-500",
+                      : isFinished
+                        ? "text-green-700"
+                        : "text-slate-500",
               )}
             >
               <p
@@ -115,7 +129,7 @@ export const TimelineStep = ({
               >
                 {isMobile ? step.name : step.shortName}
               </p>
-              {(isCurrent || isRejected) && (
+              {(isCurrent || isRejected || isCompleted) && (
                 <p
                   className={cn(
                     isRejected ? "text-red-500" : "text-slate-500",
@@ -133,18 +147,17 @@ export const TimelineStep = ({
           </motion.div>
         </TooltipTrigger>
 
-        {/* Only render tooltip content if we should show it */}
         {showTooltip && (
           <TooltipContent
             side={isMobile ? "right" : "bottom"}
             align={isMobile ? "start" : "center"}
             className={cn(
               "max-w-xs",
-              isRejected
-                ? "bg-red-800 text-white"
-                : isCompleted
-                  ? "bg-green-800 text-white"
-                  : "text-white",
+              isCompleted
+                ? "bg-green-800 text-white"
+                : isRejected
+                  ? "bg-red-800 text-white"
+                  : "bg-slate-800 text-white",
             )}
           >
             {isRejected && step.rejectionReason ? (

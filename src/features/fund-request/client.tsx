@@ -4,6 +4,7 @@ import { useFindManyFundRequests } from "@/backend/actions/fund-request/find-man
 import { FundRequest } from "@/backend/db/schemas"
 import { Button } from "@/components/ui/buttons"
 import { motion } from "framer-motion"
+import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { FundRequestCard } from "./fund-request-card"
 import { FundRequestFilter } from "./fund-request-filter"
@@ -108,7 +109,7 @@ export const FundRequestClient = ({ isSidebarOpen = false }) => {
       {isLoading && (
         <div className="flex h-48 flex-col items-center justify-center">
           <p className="text-center font-medium text-lg">
-            Loading fund requests...
+            <Loader2 className="size-12 animate-spin" />
           </p>
         </div>
       )}
@@ -147,21 +148,28 @@ export const FundRequestClient = ({ isSidebarOpen = false }) => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              {fundRequestsResponse.data.map((request) => (
-                <FundRequestCard
-                  key={request.id}
-                  fundRequest={{
-                    ...request,
-                    users: fundRequestsResponse.users,
-                  }}
-                  isSelected={selectedRequest === request.id}
-                  onSelect={() =>
-                    setSelectedRequest(
-                      selectedRequest === request.id ? null : request.id,
-                    )
-                  }
-                />
-              ))}
+              {[...fundRequestsResponse.data]
+                .sort((a, b) => {
+                  if (a.status === "pending" && b.status !== "pending")
+                    return -1
+                  if (a.status !== "pending" && b.status === "pending") return 1
+                  return 0
+                })
+                .map((request) => (
+                  <FundRequestCard
+                    key={request.id}
+                    fundRequest={{
+                      ...request,
+                      users: fundRequestsResponse.users,
+                    }}
+                    isSelected={selectedRequest === request.id}
+                    onSelect={() =>
+                      setSelectedRequest(
+                        selectedRequest === request.id ? null : request.id,
+                      )
+                    }
+                  />
+                ))}
             </motion.div>
           ) : (
             <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-dashed p-3 sm:p-4">

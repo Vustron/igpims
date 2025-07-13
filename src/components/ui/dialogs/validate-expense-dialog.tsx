@@ -51,7 +51,7 @@ export const ValidateExpenseDialog = () => {
       ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+  const { mutateAsync: updateRequest, isPending } = useUpdateFundRequest(
     fundRequest?.id || "",
   )
 
@@ -435,6 +435,7 @@ export const ValidateExpenseDialog = () => {
                           <Textarea
                             placeholder="Optional: Add rejection reason for this expense..."
                             value={individualRejectionReasons[expense.id] || ""}
+                            disabled={isPending}
                             onChange={(e) =>
                               handleIndividualRejectionReasonChange(
                                 expense.id,

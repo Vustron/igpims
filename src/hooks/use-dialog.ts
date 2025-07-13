@@ -106,6 +106,10 @@ interface ViewImageData {
   imgUrl?: string
 }
 
+interface isRequestId {
+  requestId?: string
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -173,6 +177,10 @@ export const isExpenseTransactionData = (
   data: any,
 ): data is ExpenseTransactionData => {
   return data && data.expenseTransaction !== undefined
+}
+
+export const isRequestId = (data: any): data is isRequestId => {
+  return data && typeof data.requestId === "string"
 }
 
 export const useDialog = create<DialogStore>((set) => ({

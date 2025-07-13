@@ -162,7 +162,7 @@ export const useCreateExpenseTransaction = () => {
           if (!oldData?.data) return oldData
 
           const filteredData = oldData.data.filter(
-            (item: any) => !item.id.toString().startsWith("temp-"),
+            (item: any) => item?.id && !item.id.toString().startsWith("temp-"),
           )
 
           if (oldData.meta.page === 1) {
@@ -189,7 +189,7 @@ export const useCreateExpenseTransaction = () => {
           const updatedPages = oldData.pages.map(
             (page: PaginatedExpenseTransactionsResponse) => {
               const filteredData = page.data.filter(
-                (item) => !item.id.toString().startsWith("temp-"),
+                (item) => item?.id && !item.id.toString().startsWith("temp-"),
               )
 
               return {
@@ -209,7 +209,6 @@ export const useCreateExpenseTransaction = () => {
         },
       )
 
-      // Update the related fund request's expense transactions
       queryClient.setQueryData(
         ["fund-request", newExpenseTransaction.requestId],
         (oldData: any) => {
@@ -217,7 +216,9 @@ export const useCreateExpenseTransaction = () => {
 
           const filteredTransactions = (
             oldData.expenseTransactions || []
-          ).filter((item: any) => !item.id.toString().startsWith("temp-"))
+          ).filter(
+            (item: any) => item?.id && !item.id.toString().startsWith("temp-"),
+          )
 
           return {
             ...oldData,
@@ -229,6 +230,7 @@ export const useCreateExpenseTransaction = () => {
         },
       )
     },
+
     onError: (error, _variables, context) => {
       if (context?.previousExpenseTransactions) {
         queryClient.setQueryData(

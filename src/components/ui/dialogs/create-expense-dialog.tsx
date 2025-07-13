@@ -15,11 +15,11 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawers"
 import { CreateExpenseForm } from "@/features/expense-transaction/create-expense-form"
-import { useDialog } from "@/hooks/use-dialog"
+import { isRequestId, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
 export const CreateExpenseDialog = () => {
-  const { isOpen, onClose, type } = useDialog()
+  const { isOpen, onClose, type, data } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "createExpense"
 
@@ -27,13 +27,9 @@ export const CreateExpenseDialog = () => {
     onClose()
   }
 
-  // if (
-  //   !isDialogOpen ||
-  //   !isExpenseTransactionData(data) ||
-  //   !data.expenseTransaction
-  // ) {
-  //   return null
-  // }
+  if (!isDialogOpen || !isRequestId(data) || !data.requestId) {
+    return null
+  }
 
   if (isDesktop) {
     return (
@@ -46,7 +42,7 @@ export const CreateExpenseDialog = () => {
             </DialogDescription>
           </DialogHeader>
           <CreateExpenseForm
-            // initialExpenseTransaction={data.expenseTransaction || undefined}
+            requestId={data.requestId}
             onSuccess={handleClose}
             onError={handleClose}
           />
@@ -66,7 +62,7 @@ export const CreateExpenseDialog = () => {
         </DrawerHeader>
         <div className="overflow-y-auto px-4 pb-4">
           <CreateExpenseForm
-            // initialExpenseTransaction={data.expenseTransaction || undefined}
+            requestId={data.requestId}
             onSuccess={handleClose}
             onError={handleClose}
           />

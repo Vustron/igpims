@@ -102,8 +102,8 @@ export async function updateFundRequest(
         updateValues.reviewerComments = updateData.reviewerComments
       if (updateData.receipts !== undefined)
         updateValues.receipts = updateData.receipts
-      if (updateData.approvedBy !== undefined)
-        updateValues.approvedBy = updateData.approvedBy
+      if (updateData.status === "approved")
+        updateValues.approvedBy = currentSession.userId
       if (updateData.disbursementDate !== undefined)
         updateValues.disbursementDate = handleDateField(
           updateData.disbursementDate,

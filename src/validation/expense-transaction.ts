@@ -6,11 +6,12 @@ export const createExpenseTransactionSchema = z.object({
   amount: z.number().min(1, "Amount must be positive"),
   date: z.any(),
   receipt: z.any().optional(),
+  utilizedFunds: z.number().min(1, "Funds must be positive").optional(),
   status: z
     .enum(["pending", "validated", "rejected"])
     .default("pending")
     .optional(),
-  rejectionReason: z.any().optional(),
+  rejectionReason: z.string().nullish(),
 })
 
 export const updateExpenseTransactionSchema = z
@@ -21,10 +22,11 @@ export const updateExpenseTransactionSchema = z
     amount: z.number().min(1, "Amount must be positive").optional(),
     date: z.any().optional(),
     receipt: z.any().optional(),
+    utilizedFunds: z.number().min(1, "Funds must be positive").optional(),
     status: z.enum(["pending", "validated", "rejected"]).optional(),
     validatedBy: z.string().optional(),
     validatedDate: z.any().optional(),
-    rejectionReason: z.any().optional(),
+    rejectionReason: z.string().nullish(),
   })
   .refine(
     (data) => {

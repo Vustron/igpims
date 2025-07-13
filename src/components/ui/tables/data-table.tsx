@@ -84,6 +84,7 @@ interface DataTableProps<TData, TValue> {
   isOnWaterFund?: boolean
   isOnExpense?: boolean
   isBudgetFullyUtilized?: boolean
+  requestId?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -129,6 +130,7 @@ export function DataTable<TData, TValue>({
   isOnWaterFund,
   isOnExpense,
   isBudgetFullyUtilized = false,
+  requestId,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -190,6 +192,7 @@ export function DataTable<TData, TValue>({
             isOnWaterFund={isOnWaterFund}
             isOnExpense={isOnExpense}
             isBudgetFullyUtilized={isBudgetFullyUtilized}
+            requestId={requestId}
           />
         )}
 

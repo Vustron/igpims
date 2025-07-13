@@ -9,14 +9,10 @@ export async function findTotalProfit(
 ): Promise<NextResponse<unknown>> {
   try {
     const rateLimitCheck = await httpRequestLimit(request)
-    if (rateLimitCheck instanceof NextResponse) {
-      return rateLimitCheck
-    }
+    if (rateLimitCheck instanceof NextResponse) return rateLimitCheck
 
     const currentSession = await checkAuth()
-    if (currentSession instanceof NextResponse) {
-      return currentSession
-    }
+    if (currentSession instanceof NextResponse) return currentSession
 
     const profitData = await getTotalProfit()
 

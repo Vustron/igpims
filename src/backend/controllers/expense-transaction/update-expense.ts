@@ -1,4 +1,4 @@
-import { expenseTransaction } from "@/backend/db/schemas"
+import { expenseTransaction, fundRequest } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { findExpenseTransactionByIdQuery } from "@/backend/queries/fund-request"
@@ -46,8 +46,8 @@ export async function updateExpenseTransaction(
 
     const updateData = validationResult.data
 
-    await db.transaction(async (_tx) => {
-      const existingExpense = await db
+    await db.transaction(async (tx) => {
+      const existingExpense = await tx
         .select()
         .from(expenseTransaction)
         .where(eq(expenseTransaction.id, id))
@@ -58,11 +58,16 @@ export async function updateExpenseTransaction(
       }
 
       const updateValues: Partial<typeof expenseTransaction.$inferInsert> = {}
+      let amountChanged = false
+      let amountDifference = 0
 
       if (updateData.expenseName !== undefined)
         updateValues.expenseName = updateData.expenseName
-      if (updateData.amount !== undefined)
+      if (updateData.amount !== undefined) {
+        amountChanged = true
+        amountDifference = updateData.amount - existingExpense[0]?.amount!
         updateValues.amount = updateData.amount
+      }
       if (updateData.date !== undefined) updateValues.date = updateData.date
       if (updateData.receipt !== undefined)
         updateValues.receipt = updateData.receipt
@@ -83,7 +88,7 @@ export async function updateExpenseTransaction(
         updateValues.rejectionReason = updateData.rejectionReason
 
       if (Object.keys(updateValues).length > 0) {
-        await db
+        await tx
           .update(expenseTransaction)
           .set({
             ...updateValues,
@@ -98,6 +103,15 @@ export async function updateExpenseTransaction(
               : null,
           })
           .where(eq(expenseTransaction.id, id))
+
+        if (amountChanged && existingExpense[0]?.requestId) {
+          await tx
+            .update(fundRequest)
+            .set({
+              utilizedFunds: sql`${fundRequest.utilizedFunds} + ${amountDifference}`,
+            })
+            .where(eq(fundRequest.id, existingExpense[0].requestId))
+        }
       }
     })
 

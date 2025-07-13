@@ -33,6 +33,7 @@ interface TableActionsProps<TData> {
   isOnWaterFund?: boolean
   isOnExpense?: boolean
   isBudgetFullyUtilized?: boolean
+  requestId?: string
 }
 
 export function TableActions<TData>({
@@ -49,16 +50,29 @@ export function TableActions<TData>({
   isOnWaterFund,
   isOnExpense,
   isBudgetFullyUtilized,
+  requestId,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
   const hasExpenseTransactions = tableData.length > 0
-  const fundRequestData = tableData[0] as ExpenseTransactionWithRequestor
+  const fundRequestData = tableData[0] as
+    | ExpenseTransactionWithRequestor
+    | undefined
   const confirm = useConfirm()
-  const updateFundRequest = useUpdateFundRequest(fundRequestData.requestId)
+  const updateFundRequest = useUpdateFundRequest(
+    fundRequestData?.requestId || "",
+  )
   const router = useRouter()
-  const isReceipted = fundRequestData.requestData.status === "receipted"
+  const isReceipted = fundRequestData?.requestData?.status === "receipted"
+  const isValidated = tableData.every(
+    (transaction) =>
+      (transaction as ExpenseTransactionWithRequestor).status === "validated",
+  )
+  const isFundRequestValidated =
+    fundRequestData?.requestData?.status === "validated"
 
   const handleConfirmSubmittedReceipt = async () => {
+    if (!fundRequestData) return
+
     const confirmed = await confirm(
       isReceipted ? "Confirm validated receipts" : "Confirm submitted receipts",
       isReceipted
@@ -108,7 +122,7 @@ export function TableActions<TData>({
         </motion.div>
       )}
 
-      {isOnExpense && (
+      {isOnExpense && !isFundRequestValidated && (
         <motion.div
           key="confirm-submit-reciept-button"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -121,12 +135,14 @@ export function TableActions<TData>({
             variant="outline"
             className="font-normal text-xs shadow-xs"
             onClick={handleConfirmSubmittedReceipt}
-            disabled={!hasExpenseTransactions}
+            disabled={!hasExpenseTransactions || (isReceipted && !isValidated)}
           >
             <FileCheck />
-            {isReceipted
-              ? "Confirm validated reciepts"
-              : "Confirm submitted receipts"}
+            {isValidated
+              ? "Confirm all validated receipts"
+              : isReceipted
+                ? "Validate receipts first"
+                : "Confirm submitted receipts"}
           </Button>
         </motion.div>
       )}
@@ -137,7 +153,7 @@ export function TableActions<TData>({
         isOnInspection ||
         isOnWaterSupply ||
         isOnWaterFund ||
-        isOnExpense) && (
+        (isOnExpense && !isBudgetFullyUtilized)) && (
         <motion.div
           key="add-button"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -170,8 +186,7 @@ export function TableActions<TData>({
                     }
                   : isOnExpense
                     ? {
-                        expenseTransaction:
-                          tableData[0] as ExpenseTransactionWithRequestor,
+                        requestId: requestId,
                       }
                     : undefined,
               )

@@ -48,6 +48,7 @@ export const EditExpenseForm = ({
       amount: initialData.amount,
       date: initialData.date,
       receipt: initialData.receipt || undefined,
+      utilizedFunds: initialData.amount,
       status: initialData.status,
       rejectionReason: initialData.rejectionReason || undefined,
     },

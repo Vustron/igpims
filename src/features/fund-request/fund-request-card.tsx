@@ -25,8 +25,8 @@ import {
 import { useRouter } from "next-nprogress-bar"
 import { useState } from "react"
 import toast from "react-hot-toast"
+import { timelineSteps } from "./fund-request-interface"
 import { Timeline } from "./timeline"
-import { timelineSteps } from "./timeline-sample-data"
 import { TimelineStatusBadge } from "./timeline-status"
 
 interface FundRequestCardProps {
@@ -162,13 +162,11 @@ export const FundRequestCard = ({
     <Card className={cardClass}>
       <CardHeader className={headerClass}>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-          {/* ID */}
           <div className="col-span-1 space-y-0.5">
             <p className="text-slate-500 text-xs">Request ID</p>
             <p className="truncate font-medium text-sm">{fundRequest.id}</p>
           </div>
 
-          {/* Purpose */}
           <div className="col-span-1 space-y-0.5">
             <p className="text-slate-500 text-xs">Purpose</p>
             <p className="truncate font-medium text-sm">
@@ -176,7 +174,6 @@ export const FundRequestCard = ({
             </p>
           </div>
 
-          {/* Amount */}
           <div className="col-span-2 space-y-0.5 sm:col-span-1">
             <p className="text-slate-500 text-xs">Amount</p>
             <p className="truncate font-medium text-emerald-700 text-sm">
@@ -184,7 +181,6 @@ export const FundRequestCard = ({
             </p>
           </div>
 
-          {/* Utilized Funds */}
           <div className="col-span-2 space-y-0.5 sm:col-span-1">
             <p className="text-slate-500 text-xs">Utilized</p>
             <div className="flex items-center gap-1">
@@ -197,7 +193,6 @@ export const FundRequestCard = ({
             </div>
           </div>
 
-          {/* Allocated Funds */}
           <div className="col-span-2 space-y-0.5 sm:col-span-1 md:col-span-1">
             <p className="text-slate-500 text-xs">Allocated</p>
             <p className="truncate font-medium text-sm">
@@ -205,13 +200,10 @@ export const FundRequestCard = ({
             </p>
           </div>
 
-          {/* Status & Actions */}
           <div className="col-span-2 space-y-0.5 sm:col-span-3 md:col-span-1">
             <p className="text-slate-500 text-xs">Status</p>
             <div className="flex items-center gap-2">
               <TimelineStatusBadge status={fundRequest.status} />
-
-              {/* Mobile expand button */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -225,7 +217,6 @@ export const FundRequestCard = ({
                 )}
               </Button>
 
-              {/* Actions dropdown menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -250,7 +241,6 @@ export const FundRequestCard = ({
           </div>
         </div>
 
-        {/* Completed Badge for Validated */}
         {fundRequest.status === "validated" && (
           <div className="mt-3 flex items-center gap-2 rounded-md bg-green-100 p-2 text-green-700">
             <CheckCircle className="size-4 text-green-600" />
@@ -279,7 +269,6 @@ export const FundRequestCard = ({
             </div>
           )}
 
-        {/* Rejection reason (if rejected) */}
         {fundRequest.isRejected && fundRequest.rejectionReason && (
           <div className="mt-3 flex items-start gap-2 rounded-md bg-red-100 p-2 text-red-700">
             <XCircle className="mt-0.5 size-4 shrink-0 text-red-500" />
@@ -292,17 +281,16 @@ export const FundRequestCard = ({
       </CardHeader>
 
       <CardContent className={contentClass}>
-        {/* Timeline for desktop */}
         <div className="mb-3 hidden rounded-md bg-slate-50 p-4 sm:block">
           <Timeline
             currentStep={fundRequest.currentStep}
             steps={timelineSteps}
             isRejected={fundRequest.isRejected}
             rejectionStep={fundRequest.rejectionStep}
+            isCompleted={fundRequest.status === "validated"}
           />
         </div>
 
-        {/* Timeline for mobile */}
         <div className="mb-3 rounded-md bg-slate-50 p-3 sm:hidden">
           <div className="flex flex-col">
             <Timeline
@@ -311,6 +299,7 @@ export const FundRequestCard = ({
               steps={timelineSteps}
               isRejected={fundRequest.isRejected}
               rejectionStep={fundRequest.rejectionStep}
+              isCompleted={fundRequest.status === "validated"}
             />
           </div>
         </div>

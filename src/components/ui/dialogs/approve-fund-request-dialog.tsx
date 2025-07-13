@@ -40,7 +40,7 @@ export const ApproveFundRequestDialog = () => {
       ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+  const { mutateAsync: updateRequest, isPending } = useUpdateFundRequest(
     fundRequest?.id || "",
   )
 
@@ -188,6 +188,7 @@ export const ApproveFundRequestDialog = () => {
                 value={approvalNotes}
                 onChange={(e) => setApprovalNotes(e.target.value)}
                 rows={3}
+                disabled={isPending}
               />
             </div>
           ) : (
@@ -200,6 +201,7 @@ export const ApproveFundRequestDialog = () => {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={3}
+                disabled={isPending}
                 className="border-red-300 focus:border-red-500 focus:ring-red-500"
               />
             </div>
@@ -209,14 +211,22 @@ export const ApproveFundRequestDialog = () => {
         <Footer className="flex flex-col gap-2 sm:flex-row">
           {!isRejecting ? (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRejecting(true)}
+                disabled={isPending}
+              >
                 Reject Release
               </Button>
               <Button onClick={handleApprove}>Approve Fund Release</Button>
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRejecting(false)}
+                disabled={isPending}
+              >
                 Cancel
               </Button>
               <Button

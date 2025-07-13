@@ -40,11 +40,20 @@ export const ReviewFundRequestDialog = () => {
       ? (data.fundRequest as FundRequestWithUser)
       : null
 
-  const { mutateAsync: updateRequest } = useUpdateFundRequest(
+  const { mutateAsync: updateRequest, isPending } = useUpdateFundRequest(
     fundRequest?.id || "",
   )
 
   const handleApprove = async () => {
+    if (isPending) return
+
+    // if (
+    //   (fundRequest?.amount ?? 0) > (fundRequest?.profitData?.netProfit ?? 0)
+    // ) {
+    //   toast.error("The amount requested exceeds the available budget")
+    //   return
+    // }
+
     try {
       await toast.promise(
         updateRequest({
@@ -69,6 +78,7 @@ export const ReviewFundRequestDialog = () => {
   }
 
   const handleReject = async () => {
+    if (isPending) return
     if (!rejectionReason.trim()) return
 
     try {
@@ -186,6 +196,7 @@ export const ReviewFundRequestDialog = () => {
                 value={reviewComments}
                 onChange={(e) => setReviewComments(e.target.value)}
                 rows={3}
+                disabled={isPending}
               />
             </div>
           ) : (
@@ -198,6 +209,7 @@ export const ReviewFundRequestDialog = () => {
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={3}
+                disabled={isPending}
                 className="border-red-300 focus:border-red-500 focus:ring-red-500"
               />
             </div>
@@ -207,22 +219,30 @@ export const ReviewFundRequestDialog = () => {
         <Footer className="flex flex-col gap-2 sm:flex-row">
           {!isRejecting ? (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRejecting(true)}
+                disabled={isPending}
+              >
                 Reject Request
               </Button>
-              <Button onClick={handleApprove}>
+              <Button onClick={handleApprove} disabled={isPending}>
                 Approve & Move to Checking
               </Button>
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRejecting(false)}
+                disabled={isPending}
+              >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleReject}
-                disabled={!rejectionReason.trim()}
+                disabled={!rejectionReason.trim() || isPending}
               >
                 Reject Request
               </Button>
