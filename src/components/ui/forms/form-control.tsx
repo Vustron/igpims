@@ -42,6 +42,7 @@ interface FormControlRendererProps<TFieldValues extends FieldValues> {
   isFloatingLabel?: boolean
   onPasswordStrengthChange?: (isStrong: boolean) => void
   isOnAuth?: boolean
+  isUsingImagekit?: boolean
 }
 
 export const FormControlRenderer = <TFieldValues extends FieldValues>({
@@ -52,6 +53,7 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
   disabled,
   isSignUp,
   isFloatingLabel = true,
+  isUsingImagekit,
   onPasswordStrengthChange,
 }: FormControlRendererProps<TFieldValues>) => {
   const isOtpSignIn = useOtpStore((state) => state.isOtpSignIn)
@@ -130,6 +132,7 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
     case "image":
       return (
         <FileUpload
+          isUsingImagekit={isUsingImagekit}
           onChange={(files) => formField.onChange(files[0])}
           value={formField.value}
           label={field.label}

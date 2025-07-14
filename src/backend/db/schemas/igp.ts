@@ -1,7 +1,8 @@
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { InferInsertModel, InferSelectModel, relations, sql } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-import { timestamp } from "@/backend/helpers/schema-helpers"
+import { user } from "./user"
 
 export const igp = sqliteTable(
   "igp",
@@ -9,20 +10,66 @@ export const igp = sqliteTable(
     id: text("id", { length: 15 })
       .primaryKey()
       .$defaultFn(() => nanoid(15)),
-    igpName: text("igpName", { length: 255 }).notNull(),
-    semesterAndAcademicYear: text("semesterAndAcademicYear", {
-      length: 100,
-    }).notNull(),
-    typeOfTransaction: text("typeOfTransaction", { length: 100 }).notNull(),
-    igpStartDate: integer("igpStartDate", { mode: "timestamp" }).notNull(),
-    igpEndDate: integer("igpEndDate", { mode: "timestamp" }),
-    itemsToSell: text("itemsToSell", { length: 1000 }),
-    assignedOfficers: text("assignedOfficers", { length: 1000 }),
-    costPerItem: integer("costPerItem").notNull(),
+    igpName: text("igpName", { length: 255 }),
+    igpDescription: text("igpDescription", { length: 2000 }),
     igpType: text("igpType", { length: 20 })
       .notNull()
-      .default("goods")
-      .$type<"goods" | "services" | "rentals" | "events" | "other">(),
+      .default("permanent")
+      .$type<"permanent" | "temporary" | "maintenance">(),
+    iconType: text("iconType", { length: 255 }),
+    semesterAndAcademicYear: text("semesterAndAcademicYear", {
+      length: 255,
+    }),
+    totalSold: integer("totalSold").default(0),
+    igpRevenue: integer("igpRevenue").default(0),
+    igpStartDate: integer("igpStartDate", { mode: "timestamp" }),
+    igpEndDate: integer("igpEndDate", { mode: "timestamp" }),
+    igpDateNeeded: integer("igpDateNeeded", { mode: "timestamp" }),
+    itemsToSell: text("itemsToSell", { length: 2000 }),
+    assignedOfficers: text("assignedOfficers", { length: 1000 })
+      .$type<string[]>()
+      .default([]),
+    estimatedQuantities: integer("estimatedQuantities").default(0),
+    budget: integer("costPerItem").default(0),
+    costPerItem: integer("costPerItem").default(0),
+    projectLead: text("projectLead").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    department: text("department", { length: 2000 }),
+    position: text("department", { length: 1000 }),
+    typeOfTransaction: text("typeOfTransaction", { length: 255 }),
+    status: text("status", { length: 20 })
+      .notNull()
+      .default("pending")
+      .$type<
+        | "pending"
+        | "in_review"
+        | "checking"
+        | "approved"
+        | "in_progress"
+        | "completed"
+        | "rejected"
+      >(),
+    currentStep: integer("currentStep").default(1),
+    requestDate: integer("requestDate", {
+      mode: "timestamp",
+    }),
+    dateNeeded: integer("dateNeeded", {
+      mode: "timestamp",
+    }),
+    isRejected: integer("isRejected", { mode: "boolean" }).default(false),
+    rejectionStep: integer("rejectionStep").default(0),
+    rejectionReason: text("rejectionReason", { length: 2000 }),
+    notes: text("notes", { length: 2000 }),
+    reviewerComments: text("reviewerComments", { length: 2000 }),
+    projectDocument: text("projectDocument", { length: 2000 }),
+    resolutionDocument: text("projectDocument", { length: 2000 }),
+    submissionDate: integer("submissionDate", {
+      mode: "timestamp",
+    }),
+    approvalDate: integer("approvalDate", {
+      mode: "timestamp",
+    }),
     ...timestamp,
   },
   (t) => [
@@ -30,12 +77,18 @@ export const igp = sqliteTable(
     index("igp_semester_year_idx").on(t.semesterAndAcademicYear),
     index("igp_type_idx").on(t.igpType),
     index("igp_start_date_idx").on(t.igpStartDate),
+    index("igp_project_lead_idx").on(t.projectLead),
   ],
 )
 
-export const igpRelations = relations(igp, ({ many }) => ({
+export const igpRelations = relations(igp, ({ many, one }) => ({
   transactions: many(igpTransactions),
   supplies: many(igpSupply),
+  projectLead: one(user, {
+    fields: [igp.projectLead],
+    references: [user.id],
+    relationName: "ledIgpProjects",
+  }),
 }))
 
 export const igpTransactions = sqliteTable(

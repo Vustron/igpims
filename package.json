@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.162",
+  "version": "1.0.164",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "5.1.1",
+    "@imagekit/next": "^2.1.2",
     "@libsql/client": "0.15.9",
     "@radix-ui/react-accordion": "1.2.11",
     "@radix-ui/react-alert-dialog": "1.1.14",

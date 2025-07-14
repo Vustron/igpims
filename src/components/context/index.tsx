@@ -1,20 +1,23 @@
-import { DialogProvider } from "@/components/context/dialog"
-import { ProgressBarProvider } from "@/components/context/progress-bar"
-import { QueryProvider } from "@/components/context/query"
-import { TailwindIndicator } from "@/components/context/tailwind-indicator"
-import { ThemeProvider } from "@/components/context/themes"
-import { ToastProvider } from "@/components/context/toast"
 import { TooltipProvider } from "@/components/ui/tooltips"
+import { DialogProvider } from "./dialog"
+import { ImagekitProviderContext } from "./imagekit"
+import { ProgressBarProvider } from "./progress-bar"
+import { QueryProvider } from "./query"
+import { TailwindIndicator } from "./tailwind-indicator"
+import { ThemeProvider } from "./themes"
+import { ToastProvider } from "./toast"
 
 export const Contexts = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark">
+    <ThemeProvider attribute="class" defaultTheme="light">
       <TooltipProvider disableHoverableContent>
         <QueryProvider>
           <ProgressBarProvider>
-            <DialogProvider />
-            <ToastProvider />
-            {children}
+            <ImagekitProviderContext>
+              <DialogProvider />
+              <ToastProvider />
+              {children}
+            </ImagekitProviderContext>
           </ProgressBarProvider>
           <TailwindIndicator />
         </QueryProvider>

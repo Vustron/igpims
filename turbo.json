@@ -12,7 +12,10 @@
         "EMAIL",
         "PASS",
         "NEXT_PUBLIC_LOGO_URL",
-        "TWO_FACTOR_SECRET"
+        "TWO_FACTOR_SECRET",
+        "IMAGEKIT_PRIVATE_KEY",
+        "NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY",
+        "NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT"
       ],
       "inputs": [
         "$TURBO_DEFAULT$",

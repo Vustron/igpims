@@ -3,6 +3,9 @@ import { findManyExpenseTransaction } from "../controllers/expense-transaction/f
 import { findFundRequestById } from "../controllers/fund-request/find-by-id"
 import { findManyFundRequest } from "../controllers/fund-request/find-many"
 import { findTotalProfit } from "../controllers/fund-request/total-profit"
+import { findIgpById } from "../controllers/igp/find-by-id"
+import { findManyIgp } from "../controllers/igp/find-many"
+import { imageKitUploadAuth } from "../controllers/imagekit-api/upload-auth"
 import { findInspectionById } from "../controllers/inspection/find-by-id"
 import { findManyInspections } from "../controllers/inspection/find-many"
 import { findManyRents } from "../controllers/locker-rental/find-many"
@@ -53,5 +56,8 @@ export const getRoutes: Route[] = [
     path: "/api/v1/expense-transactions/find-by-id",
     handler: findExpenseTransactionById,
   },
+  { path: "/api/v1/igps/find-many", handler: findManyIgp },
+  { path: "/api/v1/igps/find-by-id", handler: findIgpById },
+  { path: "/api/v1/imagekit-api/upload-auth", handler: imageKitUploadAuth },
   // Add more GET routes here
 ]

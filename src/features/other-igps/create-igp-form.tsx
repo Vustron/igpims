@@ -4,45 +4,13 @@ import { Button } from "@/components/ui/buttons"
 import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
+import { CreateIgpPayload, createIgpSchema } from "@/validation/igp"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next-nprogress-bar"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-import { z } from "zod"
 import { useProjectRequestStore } from "../project-request/project-request-store"
-
-const igpSchema = z
-  .object({
-    id: z.string().optional(),
-    igpName: z.string().min(1, "IGP name is required."),
-    semesterYear: z.string().min(1, "Semester and academic year are required."),
-    igpType: z.string().min(1, "Type of IGP is required."),
-    dateStart: z.date(),
-    dateEnd: z.date(),
-    itemToSell: z.string().min(1, "Item to sell is required."),
-    assignedOfficers: z.string().min(1, "Assigned officers are required."),
-    estimatedQuantities: z
-      .string()
-      .min(1, "Estimated quantities are required."),
-    budget: z.string().min(1, "Budget is required."),
-    costPerItem: z.string().min(1, "Cost per item is required."),
-    projectLead: z.string().min(1, "Project lead is required."),
-    department: z.string().min(1, "Department is required."),
-    position: z.string().optional(),
-  })
-  .refine(
-    (data) =>
-      data.dateStart instanceof Date && !Number.isNaN(data.dateStart.getTime()),
-    { message: "Start date must be a valid date.", path: ["dateStart"] },
-  )
-  .refine(
-    (data) =>
-      data.dateEnd instanceof Date && !Number.isNaN(data.dateEnd.getTime()),
-    { message: "End date must be a valid date.", path: ["dateEnd"] },
-  )
-
-type IgpFormData = z.infer<typeof igpSchema>
 
 interface CreateIgpFormProps {
   onSuccess?: () => void
@@ -64,11 +32,11 @@ export const CreateIgpForm = ({
 
   const router = useRouter()
 
-  const form = useForm<IgpFormData>({
-    resolver: zodResolver(igpSchema),
+  const form = useForm<CreateIgpPayload>({
+    resolver: zodResolver(createIgpSchema),
     defaultValues: {
-      dateStart: new Date(),
-      dateEnd: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+      igpStartDate: new Date(),
+      igpEndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
       projectLead: "",
       department: "",
       position: "",
@@ -146,7 +114,7 @@ export const CreateIgpForm = ({
     { label: "Education", value: "Education" },
   ]
 
-  const createIgpFields: FieldConfig<IgpFormData>[] = [
+  const createIgpFields: FieldConfig<CreateIgpPayload>[] = [
     {
       name: "projectLead",
       type: "text",
@@ -182,7 +150,7 @@ export const CreateIgpForm = ({
       required: true,
     },
     {
-      name: "semesterYear",
+      name: "semesterAndAcademicYear",
       type: "select",
       label: "Semester & Academic Year",
       placeholder: "Select semester",
@@ -200,7 +168,7 @@ export const CreateIgpForm = ({
       required: true,
     },
     {
-      name: "dateStart",
+      name: "igpStartDate",
       type: "date",
       label: "Start Date",
       placeholder: "Select start date",
@@ -208,7 +176,7 @@ export const CreateIgpForm = ({
       required: true,
     },
     {
-      name: "dateEnd",
+      name: "igpEndDate",
       type: "date",
       label: "End Date",
       placeholder: "Select end date",
@@ -216,7 +184,7 @@ export const CreateIgpForm = ({
       required: true,
     },
     {
-      name: "itemToSell",
+      name: "itemsToSell",
       type: "text",
       label: "Item to Sell",
       placeholder: "Enter items or services to offer",
@@ -261,13 +229,13 @@ export const CreateIgpForm = ({
     },
   ]
 
-  const onSubmit = async (data: IgpFormData) => {
+  const onSubmit = async (data: CreateIgpPayload) => {
     try {
       setIsSubmitting(true)
       setDuplicateError("")
 
-      if (data.dateEnd < data.dateStart) {
-        form.setError("dateEnd", {
+      if (data.igpEndDate < data.igpStartDate) {
+        form.setError("igpEndDate", {
           type: "manual",
           message: "End date must be after start date",
         })
@@ -276,10 +244,13 @@ export const CreateIgpForm = ({
       }
 
       // Create project title from IGP details
-      const projectTitle = `${data.igpName} - ${data.itemToSell} (${data.semesterYear})`
+      const projectTitle = `${data.igpName} - ${data.itemsToSell} (${data.semesterAndAcademicYear})`
 
       // Check for duplicates before proceeding
-      const validation = validateProjectCreation(projectTitle, data.projectLead)
+      const validation = validateProjectCreation(
+        projectTitle,
+        data.projectLead!,
+      )
 
       if (!validation.isValid) {
         setDuplicateError(validation.error || "Duplicate project detected")
@@ -293,7 +264,7 @@ export const CreateIgpForm = ({
             type: "manual",
             message: "This project title already exists",
           })
-          form.setError("itemToSell", {
+          form.setError("itemsToSell", {
             type: "manual",
             message: "This combination already exists",
           })
@@ -315,16 +286,16 @@ export const CreateIgpForm = ({
       }
 
       // Create comprehensive purpose description
-      const purpose = `Income Generating Project proposal for ${data.igpName} focusing on ${data.itemToSell}. 
+      const purpose = `Income Generating Project proposal for ${data.igpName} focusing on ${data.itemsToSell}. 
 
 Project Details:
 - Type: ${data.igpType}
-- Academic Period: ${data.semesterYear}
+- Academic Period: ${data.semesterAndAcademicYear}
 - Estimated Quantities: ${data.estimatedQuantities}
 - Budget: ₱${data.budget}
 - Cost per Item: ₱${data.costPerItem}
 - Assigned Officers: ${data.assignedOfficers}
-- Implementation Period: ${data.dateStart.toLocaleDateString()} to ${data.dateEnd.toLocaleDateString()}
+- Implementation Period: ${data.igpStartDate.toLocaleDateString()} to ${data.igpEndDate.toLocaleDateString()}
 
 This IGP aims to generate income while providing valuable products/services to the college community.`
 
@@ -332,10 +303,10 @@ This IGP aims to generate income while providing valuable products/services to t
       const projectId = addRequest({
         projectTitle,
         purpose,
-        projectLead: data.projectLead,
+        projectLead: data.projectLead!,
         position: data.position || "IGP Coordinator",
-        department: data.department,
-        dateNeeded: data.dateStart,
+        department: data.department!,
+        dateNeeded: data.igpStartDate,
         requestDate: new Date(),
       })
 
@@ -354,8 +325,8 @@ This IGP aims to generate income while providing valuable products/services to t
 
       // Reset the form
       form.reset({
-        dateStart: new Date(),
-        dateEnd: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+        igpStartDate: new Date(),
+        igpEndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
         projectLead: "",
         department: "",
         position: "",

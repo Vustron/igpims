@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/drawers"
 import { isViewImageData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import Image from "next/image"
+import { Image } from "@imagekit/next"
 import { useCallback, useEffect, useState } from "react"
 import { ScrollArea } from "../scrollareas"
 import VisuallyHiddenComponent from "../separators/visually-hidden"

@@ -1,12 +1,6 @@
 "use client"
 
-import { AnimatePresence, motion } from "framer-motion"
-import { ChevronDown, ChevronUp, Loader2Icon } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { useRouter } from "next-nprogress-bar"
-import { useEffect, useState } from "react"
-import { FieldValues, Path, PathValue } from "react-hook-form"
+import { useGenerate2FA } from "@/backend/actions/user/generate-2fa"
 import { Button, DynamicButton } from "@/components/ui/buttons"
 import {
   Form,
@@ -17,10 +11,16 @@ import {
   FormMessage,
 } from "@/components/ui/forms"
 import { Switch } from "@/components/ui/inputs"
-import { useGenerate2FA } from "@/backend/actions/user/generate-2fa"
 import { useOtpStore } from "@/hooks/use-otp-store"
 import { DynamicFormProps } from "@/interfaces/form"
 import { cn } from "@/utils/cn"
+import { AnimatePresence, motion } from "framer-motion"
+import { ChevronDown, ChevronUp, Loader2Icon } from "lucide-react"
+import { useRouter } from "next-nprogress-bar"
+import Image from "next/image"
+import Link from "next/link"
+import { useEffect, useState } from "react"
+import { FieldValues, Path, PathValue } from "react-hook-form"
 
 export const DynamicForm = <TFieldValues extends FieldValues>({
   form,
@@ -40,6 +40,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
   isFloatingLabelInput,
   addCancelButton,
   twoColumnLayout = false,
+  isUsingImagekit = false,
 }: DynamicFormProps<TFieldValues>) => {
   const [isPasswordStrong, setIsPasswordStrong] = useState(true)
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(
@@ -168,6 +169,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
                                       setIsPasswordStrong
                                     }
                                     isFloatingLabel={isFloatingLabelInput}
+                                    isUsingImagekit={isUsingImagekit}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -207,6 +209,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
                           isSignUp={isSignUp}
                           onPasswordStrengthChange={setIsPasswordStrong}
                           isFloatingLabel={isFloatingLabelInput}
+                          isUsingImagekit={isUsingImagekit}
                         />
                       </FormControl>
                       <FormMessage />
@@ -243,6 +246,7 @@ export const DynamicForm = <TFieldValues extends FieldValues>({
                     isSignUp={isSignUp}
                     onPasswordStrengthChange={setIsPasswordStrong}
                     isFloatingLabel={isFloatingLabelInput}
+                    isUsingImagekit={isUsingImagekit}
                   />
                 </FormControl>
                 <FormMessage />

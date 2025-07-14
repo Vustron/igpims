@@ -75,4 +75,5 @@ export interface DynamicFormProps<TFieldValues extends FieldValues> {
   isFloatingLabelInput?: boolean
   addCancelButton?: boolean
   twoColumnLayout?: boolean
+  isUsingImagekit?: boolean
 }

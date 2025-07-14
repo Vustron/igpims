@@ -1,12 +1,12 @@
+import { useUpdateUserInfo } from "@/backend/actions/user/update-info"
+import { DynamicForm } from "@/components/ui/forms"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+// import { convertImageToBase64 } from "@/utils/image-convert-base64"
+import { UpdateUserPayload, updateUserSchema } from "@/validation/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-import { DynamicForm } from "@/components/ui/forms"
-import { useUpdateUserInfo } from "@/backend/actions/user/update-info"
-import { FieldConfig } from "@/interfaces/form"
-import { catchError } from "@/utils/catch-error"
-import { convertImageToBase64 } from "@/utils/image-convert-base64"
-import { UpdateUserPayload, updateUserSchema } from "@/validation/user"
 
 interface EditUserFormProps {
   data: UpdateUserPayload
@@ -92,14 +92,14 @@ export const EditUserForm = ({ data, id }: EditUserFormProps) => {
 
   const onSubmit = async (values: UpdateUserPayload) => {
     try {
-      const formData = { ...values }
+      // const formData = { ...values }
 
-      if (formData.image instanceof File) {
-        const base64Image = await convertImageToBase64(formData.image)
-        formData.image = base64Image
-      }
+      // if (formData.image instanceof File) {
+      //   const base64Image = await convertImageToBase64(formData.image)
+      //   formData.image = base64Image
+      // }
 
-      await toast.promise(updateInfo.mutateAsync(formData), {
+      await toast.promise(updateInfo.mutateAsync(values), {
         loading: <span className="animate-pulse">Updating user...</span>,
         success: "User updated",
         error: (error: unknown) => catchError(error),
@@ -120,6 +120,7 @@ export const EditUserForm = ({ data, id }: EditUserFormProps) => {
       className="w-auto"
       mutation={updateInfo}
       isOnEditAccount
+      isUsingImagekit
     />
   )
 }

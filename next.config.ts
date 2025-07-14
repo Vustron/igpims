@@ -13,7 +13,7 @@ const ContentSecurityPolicy = `
     style-src 'self' 'unsafe-inline';
     img-src * blob: data:;
     media-src 'none';
-    connect-src 'self' blob: data: firestore.googleapis.com firebasestorage.googleapis.com;
+    connect-src 'self' blob: data: firestore.googleapis.com firebasestorage.googleapis.com upload.imagekit.io;
     font-src 'self' data: https://fonts.gstatic.com;
     frame-src 'self' blob: data: *.codesandbox.io vercel.live upload-widget.cloudinary.com;
     base-uri 'self';
@@ -72,7 +72,7 @@ const nextConfig: import("next").NextConfig = {
       static: 180,
     },
   },
-  serverExternalPackages: [ '@react-pdf/renderer' ],
+  serverExternalPackages: ["@react-pdf/renderer"],
   webpack: (config, { isServer }) => {
     config.experiments = {
       ...config.experiments,
@@ -93,7 +93,7 @@ const nextConfig: import("next").NextConfig = {
 
     config.module.rules.push({
       test: /\.wasm$/,
-      type: 'webassembly/async',
+      type: "webassembly/async",
     })
 
     return config
@@ -101,7 +101,7 @@ const nextConfig: import("next").NextConfig = {
   turbopack: {
     rules: {
       "*.svg": {
-        loaders: [ "@svgr/webpack" ],
+        loaders: ["@svgr/webpack"],
         as: "*.js",
       },
     },
@@ -145,7 +145,7 @@ const nextConfig: import("next").NextConfig = {
     },
   ],
   images: {
-    formats: [ "image/avif", "image/webp" ],
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "avatars.githubusercontent.com" },

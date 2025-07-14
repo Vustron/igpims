@@ -1,5 +1,6 @@
 import { deleteExpenseTransaction } from "../controllers/expense-transaction/delete-expense"
 import { deleteFundRequest } from "../controllers/fund-request/delete-fund-request"
+import { deleteIgp } from "../controllers/igp/delete-igp"
 import { deleteInspection } from "../controllers/inspection/delete-inspection"
 import { deleteRentById } from "../controllers/locker-rental/delete-rent"
 import { deleteLockerById } from "../controllers/locker/delete-by-id"
@@ -33,5 +34,6 @@ export const deleteRoutes: Route[] = [
     path: "/api/v1/expense-transactions/delete-expense",
     handler: deleteExpenseTransaction,
   },
+  { path: "/api/v1/igps/delete-igp", handler: deleteIgp },
   // Add more DELETE routes here
 ]

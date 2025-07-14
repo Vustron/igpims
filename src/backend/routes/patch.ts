@@ -1,6 +1,7 @@
 import { Route } from "@/backend/routes/api-routes"
 import { updateExpenseTransaction } from "../controllers/expense-transaction/update-expense"
 import { updateFundRequest } from "../controllers/fund-request/update-fund-request"
+import { updateIgp } from "../controllers/igp/update-igp"
 import { updateInspection } from "../controllers/inspection/update-inspection"
 import { updateRental } from "../controllers/locker-rental/update-rental"
 import { updateLocker } from "../controllers/locker/update-locker"
@@ -33,5 +34,6 @@ export const patchRoutes: Route[] = [
     path: "/api/v1/expense-transactions/update-expense",
     handler: updateExpenseTransaction,
   },
+  { path: "/api/v1/igps/update-igp", handler: updateIgp },
   // Add more PATCH routes here
 ]

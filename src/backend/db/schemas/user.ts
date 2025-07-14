@@ -1,9 +1,10 @@
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-import { timestamp } from "@/backend/helpers/schema-helpers"
 import { account } from "./account"
 import { fundRequest } from "./fund_request"
+import { igp } from "./igp"
 import { projectRequest } from "./project_request"
 import { session } from "./session"
 
@@ -53,6 +54,7 @@ export const userRelations = relations(user, ({ many }) => ({
     relationName: "submittedProjects",
   }),
   approvedProjects: many(projectRequest, { relationName: "approvedProjects" }),
+  ledIgpProjects: many(igp, { relationName: "ledIgpProjects" }),
 }))
 
 export type User = InferSelectModel<typeof user>
