@@ -1,14 +1,5 @@
 "use client"
 
-import { AnimatePresence, motion } from "framer-motion"
-import {
-  ArrowUpDown,
-  Filter,
-  PlusCircleIcon,
-  Search,
-  SlidersHorizontal,
-  X,
-} from "lucide-react"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import {
@@ -27,6 +18,15 @@ import {
 } from "@/components/ui/tooltips"
 import { useDialog } from "@/hooks/use-dialog"
 import { cn } from "@/utils/cn"
+import { AnimatePresence, motion } from "framer-motion"
+import {
+  ArrowUpDown,
+  Filter,
+  PlusCircleIcon,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react"
 import { useProjectRequestStore } from "../project-request/project-request-store"
 
 export type SortOption =
@@ -67,13 +67,11 @@ export function IgpFilters({
   const { onOpen } = useDialog()
   const { requests } = useProjectRequestStore()
 
-  // Check if there are any active projects (not completed or rejected)
   const hasActiveProjects = requests.some(
     (request) =>
       request.status !== "completed" && request.status !== "rejected",
   )
 
-  // Find the latest active project for tooltip message
   const latestActiveProject = requests
     .filter(
       (request) =>
@@ -202,7 +200,6 @@ export function IgpFilters({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Sort Options */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -278,7 +275,6 @@ export function IgpFilters({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Reset button - only visible when filters are active */}
           {hasActiveFilters && (
             <Button
               variant="ghost"
@@ -290,7 +286,6 @@ export function IgpFilters({
             </Button>
           )}
 
-          {/* New IGP Proposal Button with Tooltip */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -335,7 +330,6 @@ export function IgpFilters({
         </div>
       </div>
 
-      {/* Active filters display */}
       <AnimatePresence>
         {hasActiveFilters && (
           <motion.div

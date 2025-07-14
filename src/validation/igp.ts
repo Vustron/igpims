@@ -51,6 +51,29 @@ export const updateIgpSchema = z.object({
   department: z.string().min(1, "Department is required.").optional(),
   position: z.string().optional(),
   typeOfTransaction: z.string().optional(),
+  status: z
+    .enum([
+      "pending",
+      "in_review",
+      "checking",
+      "approved",
+      "in_progress",
+      "completed",
+      "rejected",
+    ])
+    .optional(),
+  currentStep: z.number().optional(),
+  requestDate: z.number().optional(),
+  dateNeeded: z.number().optional(),
+  isRejected: z.boolean().optional(),
+  rejectionStep: z.number().optional(),
+  rejectionReason: z.string().optional(),
+  notes: z.string().optional(),
+  reviewerComments: z.string().optional(),
+  projectDocument: z.string().optional(),
+  resolutionDocument: z.string().optional(),
+  submissionDate: z.number().optional(),
+  approvalDate: z.number().optional(),
 })
 
 export type CreateIgpPayload = z.infer<typeof createIgpSchema>

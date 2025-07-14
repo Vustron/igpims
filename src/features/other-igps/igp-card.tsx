@@ -1,5 +1,10 @@
 "use client"
 
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { Card, CardContent, CardFooter } from "@/components/ui/cards"
+import { cn } from "@/utils/cn"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { motion } from "framer-motion"
 import {
   AlertTriangle,
@@ -42,10 +47,6 @@ import {
   MdOutlineSportsBasketball,
 } from "react-icons/md"
 import { TbPlant } from "react-icons/tb"
-import { Badge } from "@/components/ui/badges"
-import { Button } from "@/components/ui/buttons"
-import { Card, CardContent, CardFooter } from "@/components/ui/cards"
-import { cn } from "@/utils/cn"
 
 export interface IgpCardProps {
   id: string
@@ -85,10 +86,17 @@ export interface IgpCardProps {
   revenue: number
   href?: string
   maintenanceDate?: Date
+  status?:
+    | "pending"
+    | "in_review"
+    | "checking"
+    | "approved"
+    | "in_progress"
+    | "completed"
+    | "rejected"
 }
 
 export function IgpCard({
-  // id,
   name,
   description,
   type,
@@ -97,6 +105,7 @@ export function IgpCard({
   revenue,
   maintenanceDate,
   href = `/other-igps/${name}`,
+  status,
 }: IgpCardProps) {
   const icons = {
     store: Store,
@@ -129,7 +138,7 @@ export function IgpCard({
     pin: GiShirtButton,
   }
 
-  const Icon = icons[iconType]
+  const Icon = icons[iconType] || Store
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-PH", {
@@ -140,6 +149,20 @@ export function IgpCard({
   }
 
   const getStatusStyles = () => {
+    if (status === "pending") {
+      return {
+        iconBg: "bg-blue-100",
+        iconColor: "text-blue-700",
+        badgeBorder: "border-blue-200",
+        badgeBg: "bg-blue-50",
+        badgeText: "text-blue-700",
+        statusIcon: Clock,
+        statusText: "Pending",
+        cardBorder: "border-blue-200",
+        cardOverlay: false,
+      }
+    }
+
     switch (type) {
       case "permanent":
         return {
@@ -193,13 +216,18 @@ export function IgpCard({
         className={cn(
           "flex h-full flex-col overflow-hidden transition-all hover:shadow-md",
           statusStyles.cardBorder,
-          type === "maintenance"
-            ? "hover:border-red-300"
-            : "hover:border-slate-300",
+          status === "pending"
+            ? "hover:border-blue-300"
+            : type === "maintenance"
+              ? "hover:border-red-300"
+              : "hover:border-slate-300",
         )}
       >
-        {type === "maintenance" && (
+        {type === "maintenance" && status !== "pending" && (
           <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-blue-red/5 to-blue-red/10" />
+        )}
+        {status === "pending" && type !== "maintenance" && (
+          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-blue-50/5 to-blue-50/10" />
         )}
 
         <CardContent className="relative flex flex-col gap-4 p-5">
@@ -231,11 +259,13 @@ export function IgpCard({
                     </motion.span>
                   </Badge>
 
-                  {type === "maintenance" && maintenanceDate && (
-                    <span className="ml-1.5 text-[10px] text-red-600">
-                      Until {maintenanceDate.toLocaleDateString()}
-                    </span>
-                  )}
+                  {type === "maintenance" &&
+                    maintenanceDate &&
+                    status !== "pending" && (
+                      <span className="ml-1.5 text-[10px] text-red-600">
+                        Until {formatDateFromTimestamp(maintenanceDate)}
+                      </span>
+                    )}
                 </div>
               </div>
             </div>
@@ -243,11 +273,18 @@ export function IgpCard({
 
           <p className="line-clamp-2 text-slate-600 text-xs">{description}</p>
 
-          {type === "maintenance" ? (
+          {type === "maintenance" && status !== "pending" ? (
             <div className="flex items-center gap-2 rounded-md border border-red-100 bg-red-50 px-3 py-2">
               <AlertTriangle className="h-4 w-4 text-red-600" />
               <p className="text-red-700 text-xs">
                 This IGP is currently unavailable due to maintenance work.
+              </p>
+            </div>
+          ) : status === "pending" ? (
+            <div className="flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2">
+              <Clock className="h-4 w-4 text-blue-600" />
+              <p className="text-blue-700 text-xs">
+                This IGP is pending approval.
               </p>
             </div>
           ) : (
@@ -277,7 +314,11 @@ export function IgpCard({
         <CardFooter
           className={cn(
             "border-t p-4",
-            type === "maintenance" ? "bg-red-50" : "bg-slate-50",
+            type === "maintenance" && status !== "pending"
+              ? "bg-red-50"
+              : status === "pending"
+                ? "bg-blue-50"
+                : "bg-slate-50",
           )}
         >
           <Link href={href} className="w-full">
@@ -285,15 +326,19 @@ export function IgpCard({
               variant="outline"
               className={cn(
                 "w-full bg-white",
-                type === "maintenance"
+                type === "maintenance" && status !== "pending"
                   ? "border-red-300 hover:bg-red-50"
-                  : "border-slate-300 hover:bg-slate-100",
+                  : status === "pending"
+                    ? "border-blue-300 hover:bg-blue-50"
+                    : "border-slate-300 hover:bg-slate-100",
               )}
             >
               <span className="mr-1">
-                {type === "maintenance"
+                {type === "maintenance" && status !== "pending"
                   ? "View Maintenance Details"
-                  : "View Details"}
+                  : status === "pending"
+                    ? "View Pending Request"
+                    : "View Details"}
               </span>
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>

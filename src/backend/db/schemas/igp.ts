@@ -16,7 +16,39 @@ export const igp = sqliteTable(
       .notNull()
       .default("permanent")
       .$type<"permanent" | "temporary" | "maintenance">(),
-    iconType: text("iconType", { length: 255 }),
+    iconType: text("iconType", { length: 255 })
+      .notNull()
+      .default("store")
+      .$type<
+        | "store"
+        | "card"
+        | "tag"
+        | "package"
+        | "shirt"
+        | "food"
+        | "coffee"
+        | "bakery"
+        | "event"
+        | "book"
+        | "tech"
+        | "education"
+        | "service"
+        | "craft"
+        | "sports"
+        | "ticket"
+        | "research"
+        | "printing"
+        | "media"
+        | "farm"
+        | "vendo"
+        | "music"
+        | "health"
+        | "donation"
+        | "art"
+        | "rental"
+        | "newspaper"
+        | "pin"
+      >(),
     semesterAndAcademicYear: text("semesterAndAcademicYear", {
       length: 255,
     }),

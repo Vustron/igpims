@@ -74,6 +74,30 @@ export async function updateIgp(
       if (data.position !== undefined) updateValues.position = data.position
       if (data.typeOfTransaction !== undefined)
         updateValues.typeOfTransaction = data.typeOfTransaction
+      if (data.status !== undefined) updateValues.status = data.status
+      if (data.currentStep !== undefined)
+        updateValues.currentStep = data.currentStep
+      if (data.requestDate !== undefined)
+        updateValues.requestDate = data.requestDate
+      if (data.dateNeeded !== undefined)
+        updateValues.dateNeeded = data.dateNeeded
+      if (data.isRejected !== undefined)
+        updateValues.isRejected = data.isRejected
+      if (data.rejectionStep !== undefined)
+        updateValues.rejectionStep = data.rejectionStep
+      if (data.rejectionReason !== undefined)
+        updateValues.rejectionReason = data.rejectionReason
+      if (data.notes !== undefined) updateValues.notes = data.notes
+      if (data.reviewerComments !== undefined)
+        updateValues.reviewerComments = data.reviewerComments
+      if (data.projectDocument !== undefined)
+        updateValues.projectDocument = data.projectDocument
+      if (data.resolutionDocument !== undefined)
+        updateValues.resolutionDocument = data.resolutionDocument
+      if (data.submissionDate !== undefined)
+        updateValues.submissionDate = data.submissionDate
+      if (data.approvalDate !== undefined)
+        updateValues.approvalDate = data.approvalDate
 
       if (Object.keys(updateValues).length > 0) {
         await updateIgpQuery.execute({

@@ -1,9 +1,11 @@
 "use client"
 
-import { AnimatePresence, motion } from "framer-motion"
-import { useState } from "react"
+import { useFindManyIgp } from "@/backend/actions/igp/find-many"
+import { Igp } from "@/backend/db/schemas"
 import { Button } from "@/components/ui/buttons"
 import { Separator } from "@/components/ui/separators"
+import { AnimatePresence, motion } from "framer-motion"
+import { useState } from "react"
 import { IgpCard, IgpCardProps } from "./igp-card"
 import { IgpFilters, SortOption } from "./igp-filters"
 
@@ -13,104 +15,45 @@ export const OtherIgpsClient = () => {
   const [sortOption, setSortOption] = useState<SortOption>("name-asc")
   const [selectedIconTypes, setSelectedIconTypes] = useState<string[]>([])
 
-  const demoIgps: IgpCardProps[] = [
-    {
-      id: "igp-1",
-      name: "Kalibulong T-Shirts",
-      description:
-        "Limited edition t-shirts featuring original artwork by local artists celebrating Davao's indigenous heritage.",
-      type: "permanent",
-      iconType: "shirt",
-      totalSold: 2456,
-      revenue: 345750.5,
-    },
-    {
-      id: "igp-2",
-      name: "Eco Tote-bags",
-      description:
-        "Sustainable canvas bags handcrafted by DNSC students using upcycled materials with ethnic-inspired designs.",
-      type: "temporary",
-      iconType: "package",
-      totalSold: 834,
-      revenue: 125680.75,
-    },
-    {
-      id: "igp-3",
-      name: "DNSC Campus Merchandise",
-      description:
-        "Official college apparel featuring the DNSC logo and colors, perfect for students, alumni and supporters.",
-      type: "permanent",
-      iconType: "shirt",
-      totalSold: 1356,
-      revenue: 203450.0,
-    },
-    {
-      id: "igp-4",
-      name: "Button Pins",
-      description:
-        "Button pins with unique designs created by the Fine Arts students, perfect for personalizing bags and jackets.",
-      type: "temporary",
-      iconType: "pin",
-      totalSold: 512,
-      revenue: 89600.0,
-    },
-    {
-      id: "igp-5",
-      name: "Raffle Tickets",
-      description:
-        "Raffle tickets for various events organized by the student council, with proceeds going to student scholarships.",
-      type: "maintenance",
-      iconType: "ticket",
-      totalSold: 743,
-      revenue: 59440.0,
-      maintenanceDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-    },
-    {
-      id: "igp-6",
-      name: "Customized ID Lace",
-      description:
-        "Personalized ID laces with unique designs and colors, made by the students of the Arts and Design department.",
-      type: "maintenance",
-      iconType: "store",
-      totalSold: 928,
-      revenue: 111360.0,
-      maintenanceDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-    },
-  ]
+  const {
+    data: igpsResponse,
+    isLoading,
+    error,
+  } = useFindManyIgp({
+    search: searchTerm,
+    igpType: selectedTypes.length > 0 ? selectedTypes.join(",") : undefined,
+    sort: mapSortOptionToApiSort(sortOption),
+  })
 
   const allIconTypes = Array.from(
-    new Set(demoIgps.map((igp) => igp.iconType || "")),
+    new Set(igpsResponse?.data.map((igp) => igp.iconType || "")),
   ).filter(Boolean) as string[]
 
-  const filteredIgps = demoIgps.filter((igp) => {
-    const matchesSearch =
-      igp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      igp.description.toLowerCase().includes(searchTerm.toLowerCase())
-
+  const filteredIgps = (igpsResponse?.data || []).filter((igp) => {
     const matchesType =
-      selectedTypes.length === 0 || selectedTypes.includes(igp.type)
+      selectedTypes.length === 0 || selectedTypes.includes(igp.igpType)
 
     const matchesIconType =
       selectedIconTypes.length === 0 ||
       selectedIconTypes.includes(igp.iconType || "")
 
-    return matchesSearch && matchesType && matchesIconType
+    return matchesType && matchesIconType
   })
 
   const sortedIgps = [...filteredIgps].sort((a, b) => {
     switch (sortOption) {
       case "name-asc":
-        return a.name.localeCompare(b.name)
+        return (a.igpName ?? "").localeCompare(b.igpName ?? "")
       case "name-desc":
-        return b.name.localeCompare(a.name)
+        return (b.igpName ?? "").localeCompare(a.igpName ?? "")
       case "revenue-high":
-        return b.revenue - a.revenue
+        return (b.igpRevenue || 0) - (a.igpRevenue || 0)
       case "revenue-low":
-        return a.revenue - b.revenue
+        return (a.igpRevenue || 0) - (b.igpRevenue || 0)
       case "sold-high":
-        return b.totalSold - a.totalSold
+        return (b.totalSold || 0) - (a.totalSold || 0)
       case "sold-low":
-        return a.totalSold - b.totalSold
+        return (a.totalSold || 0) - (b.totalSold || 0)
       default:
         return 0
     }
@@ -143,9 +86,46 @@ export const OtherIgpsClient = () => {
     selectedIconTypes.length > 0 ||
     sortOption !== "name-asc"
 
+  if (isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-muted-foreground">Loading IGPs...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-4">
+        <p className="text-center font-medium text-red-600">
+          Error loading IGPs
+        </p>
+        <Button
+          className="mt-4"
+          variant="outline"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </Button>
+      </div>
+    )
+  }
+
+  const mapToCardProps = (igp: Igp): IgpCardProps => ({
+    id: igp.id,
+    name: igp.igpName || "Unnamed IGP",
+    description: igp.igpDescription || "No description provided",
+    type: igp.igpType as "permanent" | "temporary" | "maintenance",
+    iconType: igp.iconType as any,
+    totalSold: igp.totalSold || 0,
+    revenue: igp.igpRevenue || 0,
+    maintenanceDate:
+      igp.igpType === "maintenance" ? (igp.igpEndDate ?? undefined) : undefined,
+    status: igp.status,
+  })
+
   return (
     <div className="mt-2 space-y-6">
-      {/* Filters component */}
       <IgpFilters
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -160,7 +140,6 @@ export const OtherIgpsClient = () => {
         allIconTypes={allIconTypes}
       />
 
-      {/* Results count and separator */}
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
           Showing{" "}
@@ -168,12 +147,12 @@ export const OtherIgpsClient = () => {
             {sortedIgps.length}
           </span>{" "}
           IGP{sortedIgps.length !== 1 ? "s" : ""}
-          {demoIgps.length !== sortedIgps.length && (
+          {igpsResponse?.meta.totalItems !== sortedIgps.length && (
             <>
               {" "}
               out of{" "}
               <span className="font-medium text-foreground">
-                {demoIgps.length}
+                {igpsResponse?.meta.totalItems}
               </span>{" "}
               total
             </>
@@ -182,7 +161,6 @@ export const OtherIgpsClient = () => {
         <Separator orientation="vertical" className="h-4" />
       </div>
 
-      {/* IGP Cards Grid */}
       <motion.div
         layout
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
@@ -198,7 +176,7 @@ export const OtherIgpsClient = () => {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2 }}
               >
-                <IgpCard {...igp} />
+                <IgpCard {...mapToCardProps(igp)} />
               </motion.div>
             ))
           ) : (
@@ -219,4 +197,23 @@ export const OtherIgpsClient = () => {
       </motion.div>
     </div>
   )
+}
+
+function mapSortOptionToApiSort(sortOption: SortOption): string | undefined {
+  switch (sortOption) {
+    case "name-asc":
+      return "igpName:asc"
+    case "name-desc":
+      return "igpName:desc"
+    case "revenue-high":
+      return "igpRevenue:desc"
+    case "revenue-low":
+      return "igpRevenue:asc"
+    case "sold-high":
+      return "totalSold:desc"
+    case "sold-low":
+      return "totalSold:asc"
+    default:
+      return undefined
+  }
 }

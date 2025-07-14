@@ -25,6 +25,7 @@ export async function findManyIgp(
     const semester = url.searchParams.get("semester") || undefined
     const startDate = url.searchParams.get("startDate") || undefined
     const endDate = url.searchParams.get("endDate") || undefined
+    const status = url.searchParams.get("status") || undefined
 
     const whereConditions: any[] = []
 
@@ -64,6 +65,22 @@ export async function findManyIgp(
       )
     }
 
+    if (status) {
+      whereConditions.push(
+        eq(
+          igp.status,
+          status as
+            | "pending"
+            | "in_review"
+            | "checking"
+            | "approved"
+            | "in_progress"
+            | "completed"
+            | "rejected",
+        ),
+      )
+    }
+
     const query = db
       .select({
         id: igp.id,
@@ -76,6 +93,7 @@ export async function findManyIgp(
         igpRevenue: igp.igpRevenue,
         igpStartDate: sql<number>`${igp.igpStartDate}`,
         igpEndDate: sql<number>`${igp.igpEndDate}`,
+        igpDateNeeded: sql<number>`${igp.igpDateNeeded}`,
         itemsToSell: igp.itemsToSell,
         assignedOfficers: igp.assignedOfficers,
         estimatedQuantities: igp.estimatedQuantities,
@@ -85,6 +103,20 @@ export async function findManyIgp(
         department: igp.department,
         position: igp.position,
         typeOfTransaction: igp.typeOfTransaction,
+        // Add status-related fields
+        status: igp.status,
+        currentStep: igp.currentStep,
+        requestDate: sql<number>`${igp.requestDate}`,
+        dateNeeded: sql<number>`${igp.dateNeeded}`,
+        isRejected: igp.isRejected,
+        rejectionStep: igp.rejectionStep,
+        rejectionReason: igp.rejectionReason,
+        notes: igp.notes,
+        reviewerComments: igp.reviewerComments,
+        projectDocument: igp.projectDocument,
+        resolutionDocument: igp.resolutionDocument,
+        submissionDate: sql<number>`${igp.submissionDate}`,
+        approvalDate: sql<number>`${igp.approvalDate}`,
         createdAt: sql<number>`${igp.createdAt}`,
         updatedAt: sql<number>`${igp.updatedAt}`,
         projectLeadData: {
@@ -141,6 +173,22 @@ export async function findManyIgp(
       endDateObj.setUTCHours(23, 59, 59, 999)
       countWhereConditions.push(
         sql`${igp.igpStartDate} <= ${Math.floor(endDateObj.getTime())}`,
+      )
+    }
+
+    if (status) {
+      countWhereConditions.push(
+        eq(
+          igp.status,
+          status as
+            | "pending"
+            | "in_review"
+            | "checking"
+            | "approved"
+            | "in_progress"
+            | "completed"
+            | "rejected",
+        ),
       )
     }
 
