@@ -1,6 +1,16 @@
 "use client"
 
-import { format } from "date-fns"
+import { IgpWithProjectLeadData } from "@/backend/actions/igp/find-many"
+import { Button } from "@/components/ui/buttons"
+import { Card, CardContent, CardHeader } from "@/components/ui/cards"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdowns"
+import { useDialog } from "@/hooks/use-dialog"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
 import {
   Calendar,
   CheckCircle,
@@ -12,16 +22,6 @@ import {
   XCircle,
 } from "lucide-react"
 import { useState } from "react"
-import { Button } from "@/components/ui/buttons"
-import { Card, CardContent, CardHeader } from "@/components/ui/cards"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdowns"
-import { useDialog } from "@/hooks/use-dialog"
-import { ProjectRequest } from "./project-request-store"
 import { ProjectTimeline } from "./project-timeline"
 import { timelineSteps } from "./project-timeline-sample-data"
 import { TimelineStatusBadge } from "./project-timeline-status"
@@ -29,18 +29,19 @@ import { TimelineStatusBadge } from "./project-timeline-status"
 export const ProjectRequestCard = ({
   projectRequest,
 }: {
-  projectRequest: ProjectRequest
+  projectRequest: IgpWithProjectLeadData
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { onOpen } = useDialog()
+
+  console.log(projectRequest)
 
   const getStatusAction = () => {
     switch (projectRequest.status) {
       case "pending":
         return {
           label: "Start Review",
-          action: () =>
-            onOpen("reviewProjectRequest", { requestId: projectRequest.id }),
+          action: () => onOpen("reviewProjectRequest", { igp: projectRequest }),
           color: "bg-blue-600 hover:bg-blue-700",
         }
       case "in_review":
@@ -78,11 +79,6 @@ export const ProjectRequestCard = ({
 
   const statusAction = getStatusAction()
 
-  // Determine if deletion is allowed
-  // const canDelete =
-  //   projectRequest.status === "pending" || projectRequest.status === "rejected"
-
-  // Determine card styling based on status
   const getCardStyling = () => {
     if (projectRequest.status === "completed") {
       return {
@@ -126,7 +122,7 @@ export const ProjectRequestCard = ({
           <div className="col-span-1 space-y-0.5">
             <p className="text-slate-500 text-xs">Project Lead</p>
             <p className="truncate font-medium text-sm">
-              {projectRequest.projectLead}
+              {projectRequest.projectLeadData?.name}
             </p>
           </div>
 
@@ -134,26 +130,23 @@ export const ProjectRequestCard = ({
           <div className="col-span-2 space-y-0.5 sm:col-span-1">
             <p className="text-slate-500 text-xs">Project Title</p>
             <p className="truncate font-medium text-sm">
-              {projectRequest.projectTitle}
+              {projectRequest.igpName}
             </p>
           </div>
 
-          {/* Date Submitted */}
           <div className="col-span-1 space-y-0.5">
             <p className="text-slate-500 text-xs">Date Submitted</p>
             <p className="flex items-center gap-1 truncate font-medium text-sm">
               <Calendar className="size-3.5 text-slate-400" />
-              {format(projectRequest.requestDate, "MMM d, yyyy")}
+              {formatDateFromTimestamp(projectRequest.requestDate)}
             </p>
           </div>
 
-          {/* Status & Actions */}
           <div className="col-span-2 space-y-0.5 sm:col-span-1">
             <p className="text-slate-500 text-xs">Status</p>
             <div className="flex items-center gap-2">
               <TimelineStatusBadge status={projectRequest.status} />
 
-              {/* Mobile expand button */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -167,7 +160,6 @@ export const ProjectRequestCard = ({
                 )}
               </Button>
 
-              {/* Actions dropdown menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -197,7 +189,6 @@ export const ProjectRequestCard = ({
           </div>
         </div>
 
-        {/* Completed Badge */}
         {projectRequest.status === "completed" && (
           <div className="mt-3 flex items-center gap-2 rounded-md bg-green-100 p-2 text-green-700">
             <CheckCircle className="size-4 text-green-600" />
@@ -210,7 +201,6 @@ export const ProjectRequestCard = ({
           </div>
         )}
 
-        {/* Action Button */}
         {statusAction &&
           projectRequest.status !== "completed" &&
           projectRequest.status !== "rejected" && (
@@ -226,7 +216,6 @@ export const ProjectRequestCard = ({
             </div>
           )}
 
-        {/* Rejection reason (if rejected) */}
         {projectRequest.isRejected && projectRequest.rejectionReason && (
           <div className="mt-3 flex items-start gap-2 rounded-md bg-red-100 p-2 text-red-700">
             <XCircle className="mt-0.5 size-4 shrink-0 text-red-500" />
@@ -239,25 +228,23 @@ export const ProjectRequestCard = ({
       </CardHeader>
 
       <CardContent className={contentClass}>
-        {/* Timeline for desktop */}
         <div className="mb-3 hidden rounded-md bg-slate-50 p-4 sm:block">
           <ProjectTimeline
-            currentStep={projectRequest.currentStep}
+            currentStep={projectRequest.currentStep ?? 1}
             steps={timelineSteps}
-            isRejected={projectRequest.isRejected}
-            rejectionStep={projectRequest.rejectionStep}
+            isRejected={projectRequest.isRejected ?? undefined}
+            rejectionStep={projectRequest.rejectionStep ?? undefined}
           />
         </div>
 
-        {/* Timeline for mobile */}
         <div className="mb-3 rounded-md bg-slate-50 p-3 sm:hidden">
           <div className="flex flex-col">
             <ProjectTimeline
-              currentStep={projectRequest.currentStep}
+              currentStep={projectRequest.currentStep ?? 1}
               isMobile={true}
               steps={timelineSteps}
-              isRejected={projectRequest.isRejected}
-              rejectionStep={projectRequest.rejectionStep}
+              isRejected={projectRequest.isRejected ?? undefined}
+              rejectionStep={projectRequest.rejectionStep ?? undefined}
             />
           </div>
         </div>

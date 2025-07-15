@@ -24,7 +24,6 @@ export const ProjectTimeline = ({
         isMobile ? "flex-col items-start gap-0" : "gap-1 sm:gap-2",
       )}
     >
-      {/* Background connector line */}
       <div
         className={cn(
           "absolute h-0.5 bg-slate-200",
@@ -34,7 +33,6 @@ export const ProjectTimeline = ({
         )}
       />
 
-      {/* Active connector line */}
       <div
         className={cn(
           "absolute h-0.5 transition-all duration-500",
@@ -52,7 +50,6 @@ export const ProjectTimeline = ({
         }
       />
 
-      {/* Steps */}
       {steps.map((step) => (
         <TimelineStep
           key={step.id}

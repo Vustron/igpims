@@ -1,14 +1,21 @@
 "use client"
 
+import { useFindManyIgp } from "@/backend/actions/igp/find-many"
 import { useMemo, useState } from "react"
 import { ProjectRequestCard } from "./project-request-card"
 import { ProjectRequestFilter } from "./project-request-filter"
-import { ProjectRequest, useProjectRequestStore } from "./project-request-store"
 
-type StatusOption = ProjectRequest["status"] | "all"
+type StatusOption =
+  | "pending"
+  | "in_review"
+  | "checking"
+  | "approved"
+  | "in_progress"
+  | "completed"
+  | "rejected"
+  | "all"
 
 export const ProjectRequestClient = () => {
-  const { requests } = useProjectRequestStore()
   const [filters, setFilters] = useState({
     search: "",
     status: "all" as StatusOption,
@@ -18,72 +25,38 @@ export const ProjectRequestClient = () => {
     },
   })
 
+  const { data: igpData } = useFindManyIgp({
+    search: filters.search,
+    status: filters.status !== "all" ? filters.status : undefined,
+    startDate: filters.dateRange.from?.toISOString(),
+    endDate: filters.dateRange.to?.toISOString(),
+  })
+
+  const requests = igpData?.data || []
+  const totalRequests = igpData?.meta.totalItems || 0
+
   const filteredRequests = useMemo(() => {
-    return requests
-      .filter((request) => {
-        if (
-          filters.search &&
-          !request.id.toLowerCase().includes(filters.search.toLowerCase()) &&
-          !request.purpose
-            .toLowerCase()
-            .includes(filters.search.toLowerCase()) &&
-          !request.projectLead
-            .toLowerCase()
-            .includes(filters.search.toLowerCase()) &&
-          !request.projectTitle
-            .toLowerCase()
-            .includes(filters.search.toLowerCase())
-        ) {
-          return false
-        }
-
-        if (filters.status !== "all" && request.status !== filters.status) {
-          return false
-        }
-
-        if (filters.dateRange.from || filters.dateRange.to) {
-          const requestDate = new Date(request.requestDate)
-
-          if (filters.dateRange.from && requestDate < filters.dateRange.from) {
-            return false
-          }
-
-          if (filters.dateRange.to) {
-            const endDate = new Date(filters.dateRange.to)
-            endDate.setDate(endDate.getDate() + 1)
-
-            if (requestDate > endDate) {
-              return false
-            }
-          }
-        }
-
-        return true
-      })
-      .sort((a, b) => {
-        const dateA = new Date(a.lastUpdated)
-        const dateB = new Date(b.lastUpdated)
-        return dateB.getTime() - dateA.getTime()
-      })
-  }, [requests, filters])
+    return requests.sort((a, b) => {
+      const dateA = new Date(a.requestDate ?? 0)
+      const dateB = new Date(b.requestDate ?? 0)
+      return dateB.getTime() - dateA.getTime()
+    })
+  }, [requests])
 
   return (
     <div className="space-y-4">
-      {/* Project Request Filter */}
       <div className="mt-2 mb-6">
         <ProjectRequestFilter
           onFilterChange={(newFilters) => setFilters(newFilters)}
         />
       </div>
 
-      {/* Display results count when filtering */}
       {(filters.search ||
         filters.status !== "all" ||
         filters.dateRange.from ||
         filters.dateRange.to) && (
         <div className="mb-4 text-slate-600 text-sm">
-          Showing {filteredRequests.length} of {requests.length} project
-          requests
+          Showing {filteredRequests.length} of {totalRequests} project requests
         </div>
       )}
 

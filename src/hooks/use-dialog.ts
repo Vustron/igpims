@@ -1,5 +1,6 @@
 import { ExpenseTransactionWithRequestor } from "@/backend/actions/expense-transaction/find-many"
 import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
+import { IgpWithProjectLeadData } from "@/backend/actions/igp/find-many"
 import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { WaterFundWithVendoLocation } from "@/backend/actions/water-fund/find-by-id"
 import { WaterSupplyWithVendoLocation } from "@/backend/actions/water-supply/find-by-id"
@@ -110,6 +111,10 @@ interface isRequestId {
   requestId?: string
 }
 
+interface IgpData {
+  igp?: IgpWithProjectLeadData
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -130,6 +135,7 @@ export type DialogData =
   | WaterFundData
   | ExpenseTransactionData
   | ViewImageData
+  | IgpData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -181,6 +187,10 @@ export const isExpenseTransactionData = (
 
 export const isRequestId = (data: any): data is isRequestId => {
   return data && typeof data.requestId === "string"
+}
+
+export const isIgpData = (data: any): data is IgpData => {
+  return data && data.igp !== undefined
 }
 
 export const useDialog = create<DialogStore>((set) => ({

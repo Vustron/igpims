@@ -103,7 +103,6 @@ export async function findManyIgp(
         department: igp.department,
         position: igp.position,
         typeOfTransaction: igp.typeOfTransaction,
-        // Add status-related fields
         status: igp.status,
         currentStep: igp.currentStep,
         requestDate: sql<number>`${igp.requestDate}`,

@@ -1,8 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Check, X } from "lucide-react"
-import React, { ReactElement } from "react"
 import {
   Tooltip,
   TooltipContent,
@@ -10,6 +7,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltips"
 import { cn } from "@/utils/cn"
+import { motion } from "framer-motion"
+import { Check, X } from "lucide-react"
+import React, { ReactElement } from "react"
 import { TimelineStepType } from "./project-timeline-sample-data"
 
 export const TimelineStep = ({
@@ -87,7 +87,6 @@ export const TimelineStep = ({
               ) : null}
             </motion.div>
 
-            {/* Step label */}
             <div
               className={cn(
                 isMobile ? "mt-0" : "mt-1 text-center",
@@ -126,7 +125,6 @@ export const TimelineStep = ({
           </motion.div>
         </TooltipTrigger>
 
-        {/* Only render tooltip content if we should show it */}
         {showTooltip && (
           <TooltipContent
             side={isMobile ? "right" : "bottom"}

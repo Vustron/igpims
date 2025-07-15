@@ -85,7 +85,7 @@ export interface IgpCardProps {
   totalSold: number
   revenue: number
   href?: string
-  maintenanceDate?: Date
+  maintenanceDate?: number
   status?:
     | "pending"
     | "in_review"
@@ -203,6 +203,7 @@ export function IgpCard({
 
   const statusStyles = getStatusStyles()
   const StatusIcon = statusStyles.statusIcon
+  const projectStatusLink = status === "pending" ? "/project-approval" : href
 
   return (
     <motion.div
@@ -321,7 +322,7 @@ export function IgpCard({
                 : "bg-slate-50",
           )}
         >
-          <Link href={href} className="w-full">
+          <Link href={projectStatusLink} className="w-full">
             <Button
               variant="outline"
               className={cn(

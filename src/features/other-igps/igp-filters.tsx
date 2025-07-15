@@ -1,5 +1,6 @@
 "use client"
 
+import { IgpWithProjectLeadData } from "@/backend/actions/igp/find-many"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import {
@@ -27,7 +28,6 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react"
-import { useProjectRequestStore } from "../project-request/project-request-store"
 
 export type SortOption =
   | "name-asc"
@@ -49,6 +49,7 @@ export interface IgpFiltersProps {
   resetFilters: () => void
   hasActiveFilters: boolean
   allIconTypes: string[]
+  requests: IgpWithProjectLeadData[]
 }
 
 export function IgpFilters({
@@ -63,9 +64,9 @@ export function IgpFilters({
   resetFilters,
   hasActiveFilters,
   allIconTypes,
+  requests,
 }: IgpFiltersProps) {
   const { onOpen } = useDialog()
-  const { requests } = useProjectRequestStore()
 
   const hasActiveProjects = requests.some(
     (request) =>
@@ -79,7 +80,7 @@ export function IgpFilters({
     )
     .sort(
       (a, b) =>
-        new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(),
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     )[0]
 
   const getIconTypeDisplayName = (iconType: string) => {
@@ -317,7 +318,7 @@ export function IgpFilters({
                   <div className="space-y-1">
                     <p className="font-medium text-sm">Active project exists</p>
                     <p className="text-amber-100 text-xs">
-                      Complete "{latestActiveProject.projectTitle}" (
+                      Complete "{latestActiveProject.igpName}" (
                       {latestActiveProject.id}) first
                     </p>
                   </div>

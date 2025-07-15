@@ -1,15 +1,5 @@
 "use client"
 
-import { format } from "date-fns"
-import {
-  Calendar,
-  Clock,
-  DollarSign,
-  FileSearch,
-  Target,
-  Users,
-} from "lucide-react"
-import { useState } from "react"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -27,107 +17,152 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
-import { Textarea } from "@/components/ui/inputs"
 import { useProjectRequestStore } from "@/features/project-request/project-request-store"
-import { isProjectRequestData, useDialog } from "@/hooks/use-dialog"
+import { isIgpData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
+import { EditorContent, useEditor } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
+import { Calendar, FileSearch, FileText, Upload } from "lucide-react"
+import { useRef, useState } from "react"
+import { TiptapEditorControls } from "../text-editor/tiptap-controls"
+import dynamic from "next/dynamic"
+
+const PDFViewer = dynamic(
+  () => import("@/components/ui/pdf/pdf-viewer").then((mod) => mod.PDFViewer),
+  { ssr: false },
+)
 
 export const ReviewProjectRequestDialog = () => {
-  const { type, data, isOpen, onClose } = useDialog()
-  const { getRequestById, approveRequest, rejectRequest } =
-    useProjectRequestStore()
-  const [reviewComments, setReviewComments] = useState("")
-  const [rejectionReason, setRejectionReason] = useState("")
+  const { type, isOpen, onClose, data } = useDialog()
+  const { approveRequest, rejectRequest } = useProjectRequestStore()
   const [isRejecting, setIsRejecting] = useState(false)
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: "",
+    immediatelyRender: false,
+  })
+
+  const rejectionEditor = useEditor({
+    extensions: [StarterKit],
+    content: "",
+    immediatelyRender: false,
+  })
+
   const isDialogOpen = isOpen && type === "reviewProjectRequest"
-  const request =
-    isProjectRequestData(data) && data.requestId
-      ? getRequestById(data.requestId)
-      : null
+
+  const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === "application/pdf") {
+      setPdfFile(file)
+      const url = URL.createObjectURL(file)
+      setPdfPreviewUrl(url)
+    }
+  }
+
+  const removePdf = () => {
+    if (pdfPreviewUrl) {
+      URL.revokeObjectURL(pdfPreviewUrl)
+    }
+    setPdfFile(null)
+    setPdfPreviewUrl(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
+  if (!isDialogOpen || !isIgpData(data) || !data.igp) {
+    return null
+  }
 
   const handleApprove = () => {
-    if (request) {
-      approveRequest(request.id, reviewComments)
+    if (data.igp && editor) {
+      approveRequest(data.igp.id, editor.getHTML())
       onClose()
       resetForm()
     }
   }
 
   const handleReject = () => {
-    if (request && rejectionReason.trim()) {
-      rejectRequest(request.id, rejectionReason, 2)
+    if (data.igp && rejectionEditor && rejectionEditor.getText().trim()) {
+      rejectRequest(data.igp.id, rejectionEditor.getHTML(), 2)
       onClose()
       resetForm()
     }
   }
 
   const resetForm = () => {
-    setReviewComments("")
-    setRejectionReason("")
+    editor?.commands.clearContent()
+    rejectionEditor?.commands.clearContent()
     setIsRejecting(false)
+    removePdf()
   }
 
-  // Function to parse and format the purpose text
-  const parsePurpose = (purpose: string) => {
-    const lines = purpose.split("\n").filter((line) => line.trim())
+  // const parsePurpose = (purpose: string | null) => {
+  //   if (!purpose) {
+  //     return {
+  //       mainDescription: "",
+  //       projectDetails: [],
+  //       conclusion: "",
+  //     }
+  //   }
 
-    // Extract main description (first line)
-    const mainDescription = lines[0]?.trim() || ""
+  //   const lines = purpose.split("\n").filter((line) => line.trim())
+  //   const mainDescription = lines[0]?.trim() || ""
 
-    // Extract project details section
-    const projectDetailsStart = lines.findIndex((line) =>
-      line.includes("Project Details:"),
-    )
-    const projectDetailsEnd = lines.findIndex((line) =>
-      line.includes("This IGP aims"),
-    )
+  //   const projectDetailsStart = lines.findIndex((line) =>
+  //     line.includes("Project Details:"),
+  //   )
+  //   const projectDetailsEnd = lines.findIndex((line) =>
+  //     line.includes("This IGP aims"),
+  //   )
 
-    let projectDetails: Array<{ label: string; value: string; icon?: any }> = []
+  //   let projectDetails: Array<{ label: string; value: string; icon?: any }> = []
 
-    if (projectDetailsStart !== -1) {
-      const detailLines = lines.slice(
-        projectDetailsStart + 1,
-        projectDetailsEnd !== -1 ? projectDetailsEnd : undefined,
-      )
+  //   if (projectDetailsStart !== -1) {
+  //     const detailLines = lines.slice(
+  //       projectDetailsStart + 1,
+  //       projectDetailsEnd !== -1 ? projectDetailsEnd : undefined,
+  //     )
 
-      projectDetails = detailLines
-        .filter((line) => line.includes("- ") && line.includes(":"))
-        .map((line) => {
-          const cleanLine = line.replace("- ", "").trim()
-          const [label, ...valueParts] = cleanLine.split(":")
-          const value = valueParts.join(":").trim()
+  //     projectDetails = detailLines
+  //       .filter((line) => line.includes("- ") && line.includes(":"))
+  //       .map((line) => {
+  //         const cleanLine = line.replace("- ", "").trim()
+  //         const [label, ...valueParts] = cleanLine.split(":")
+  //         const value = valueParts.join(":").trim()
 
-          // Add icons based on the label
-          let icon = null
-          if (label?.toLowerCase().includes("type")) icon = Target
-          if (label?.toLowerCase().includes("period")) icon = Calendar
-          if (label?.toLowerCase().includes("quantities")) icon = Users
-          if (
-            label?.toLowerCase().includes("budget") ||
-            label?.toLowerCase().includes("cost")
-          )
-            icon = DollarSign
-          if (label?.toLowerCase().includes("officers")) icon = Users
-          if (label?.toLowerCase().includes("implementation")) icon = Clock
+  //         let icon = null
+  //         if (label?.toLowerCase().includes("type")) icon = Target
+  //         if (label?.toLowerCase().includes("period")) icon = Calendar
+  //         if (label?.toLowerCase().includes("quantities")) icon = Users
+  //         if (
+  //           label?.toLowerCase().includes("budget") ||
+  //           label?.toLowerCase().includes("cost")
+  //         )
+  //           icon = DollarSign
+  //         if (label?.toLowerCase().includes("officers")) icon = Users
+  //         if (label?.toLowerCase().includes("implementation")) icon = Clock
 
-          return { label: label?.trim() || "", value, icon }
-        })
-        .filter((item) => item.label !== "")
-    }
+  //         return { label: label?.trim() || "", value, icon }
+  //       })
+  //       .filter((item) => item.label !== "")
+  //   }
 
-    const conclusion =
-      lines.find((line) => line.includes("This IGP aims"))?.trim() || ""
+  //   const conclusion =
+  //     lines.find((line) => line.includes("This IGP aims"))?.trim() || ""
 
-    return { mainDescription, projectDetails, conclusion }
-  }
+  //   return { mainDescription, projectDetails, conclusion }
+  // }
 
-  if (!request) return null
-
-  const { mainDescription, projectDetails, conclusion } = parsePurpose(
-    request.purpose,
-  )
+  // const { mainDescription, projectDetails, conclusion } = parsePurpose(
+  //   data.igp.reviewerComments || null,
+  // )
 
   const DialogContent_Component = isDesktop ? Dialog : Drawer
   const Content = isDesktop ? DialogContent : DrawerContent
@@ -153,7 +188,6 @@ export const ReviewProjectRequestDialog = () => {
         </Header>
 
         <div className="space-y-6">
-          {/* Request Overview */}
           <div className="rounded-lg border bg-gray-50 p-4">
             <h3 className="mb-3 font-semibold text-gray-800 text-sm">
               Request Overview
@@ -161,23 +195,23 @@ export const ReviewProjectRequestDialog = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="font-medium text-gray-600 text-sm">Request ID</p>
-                <p className="font-mono text-sm">{request.id}</p>
+                <p className="font-mono text-sm">{data.igp.id}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">
                   Project Title
                 </p>
-                <p className="text-sm">{request.projectTitle}</p>
+                <p className="text-sm">{data.igp.igpName}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">
                   Project Lead
                 </p>
-                <p className="text-sm">{request.projectLead}</p>
+                <p className="text-sm">{data.igp.projectLeadData?.name}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">Department</p>
-                <p className="text-sm">{request.department}</p>
+                <p className="text-sm">{data.igp.department}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">
@@ -186,7 +220,7 @@ export const ReviewProjectRequestDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {format(new Date(request.requestDate), "MMM d, yyyy")}
+                    {formatDateFromTimestamp(data.igp.requestDate)}
                   </p>
                 </div>
               </div>
@@ -195,8 +229,8 @@ export const ReviewProjectRequestDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {request.dateNeeded
-                      ? format(new Date(request.dateNeeded), "MMM d, yyyy")
+                    {data.igp.dateNeeded
+                      ? formatDateFromTimestamp(data.igp.dateNeeded)
                       : "Not specified"}
                   </p>
                 </div>
@@ -204,94 +238,91 @@ export const ReviewProjectRequestDialog = () => {
             </div>
           </div>
 
-          {/* Project Purpose & Details */}
           <div className="rounded-lg border bg-blue-50/30 p-4">
             <h3 className="mb-3 font-semibold text-blue-800 text-sm">
               Project Purpose & Details
             </h3>
 
-            {/* Main Description */}
-            {mainDescription && (
-              <div className="mb-4">
-                <p className="text-blue-900 text-sm leading-relaxed">
-                  {mainDescription}
-                </p>
-              </div>
-            )}
+            <div className="rounded-lg border bg-white p-4">
+              <h3 className="mb-3 font-semibold text-gray-800 text-sm">
+                Project Documentation (PDF)
+              </h3>
 
-            {/* Project Details Grid */}
-            {projectDetails.length > 0 && (
-              <div className="mb-4">
-                <h4 className="mb-3 font-medium text-blue-800 text-sm">
-                  Project Specifications
-                </h4>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {projectDetails.map((detail, index) => {
-                    const IconComponent = detail.icon
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-start gap-2 rounded-md bg-white/60 p-3"
-                      >
-                        {IconComponent && (
-                          <IconComponent className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-blue-800 text-xs">
-                            {detail.label}
-                          </p>
-                          <p className="text-blue-900 text-sm">
-                            {detail.value}
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  })}
+              {!pdfPreviewUrl ? (
+                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6">
+                  <Upload className="mb-2 h-8 w-8 text-gray-400" />
+                  <p className="mb-2 text-sm text-gray-600">
+                    Upload project documentation PDF
+                  </p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="application/pdf"
+                    onChange={handlePdfUpload}
+                    className="hidden"
+                    id="pdf-upload"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Select PDF File
+                  </Button>
+                  <p className="mt-2 text-xs text-gray-500">
+                    Only PDF files are accepted
+                  </p>
                 </div>
-              </div>
-            )}
-
-            {/* Conclusion */}
-            {conclusion && (
-              <div className="rounded-md bg-blue-100/50 p-3">
-                <div className="flex items-start gap-2">
-                  <Target className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-                  <div>
-                    <p className="font-medium text-blue-800 text-xs">
-                      Project Objective
-                    </p>
-                    <p className="text-blue-900 text-sm">{conclusion}</p>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between rounded-md bg-gray-50 p-3">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-red-500" />
+                      <span className="text-sm font-medium">
+                        {pdfFile?.name}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={removePdf}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      Remove
+                    </Button>
                   </div>
+
+                  {pdfPreviewUrl && <PDFViewer file={pdfPreviewUrl} />}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          {/* Review Comments */}
           {!isRejecting ? (
-            <div>
-              <span className="mb-2 block font-medium text-gray-700 text-sm">
+            <div className="space-y-2">
+              <span className="block font-medium text-gray-700 text-sm">
                 Review Comments (Optional)
               </span>
-              <Textarea
-                placeholder="Add any comments about this review..."
-                value={reviewComments}
-                onChange={(e) => setReviewComments(e.target.value)}
-                rows={3}
-              />
+              <div className="rounded-lg border bg-white p-2">
+                <TiptapEditorControls editor={editor} />
+                <div className="mt-2 rounded border p-2">
+                  <EditorContent editor={editor} className="min-h-[100px]" />
+                </div>
+              </div>
             </div>
           ) : (
-            <div>
-              <span className="mb-2 block font-medium text-red-700 text-sm">
+            <div className="space-y-2">
+              <span className="block font-medium text-red-700 text-sm">
                 Rejection Reason *
               </span>
-              <Textarea
-                placeholder="Please provide a reason for rejection..."
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                rows={3}
-                className="border-red-300 focus:border-red-500 focus:ring-red-500"
-              />
+              <div className="rounded-lg border bg-white p-2">
+                <TiptapEditorControls editor={rejectionEditor} />
+                <div className="mt-2 rounded border border-red-300 p-2 focus-within:border-red-500 focus-within:ring-red-500">
+                  <EditorContent
+                    editor={rejectionEditor}
+                    className="min-h-[100px]"
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -302,7 +333,7 @@ export const ReviewProjectRequestDialog = () => {
               <Button variant="outline" onClick={() => setIsRejecting(true)}>
                 Reject Request
               </Button>
-              <Button onClick={handleApprove}>
+              <Button onClick={handleApprove} disabled={editor?.isEmpty}>
                 Approve & Create Resolution
               </Button>
             </>
@@ -314,7 +345,7 @@ export const ReviewProjectRequestDialog = () => {
               <Button
                 variant="destructive"
                 onClick={handleReject}
-                disabled={!rejectionReason.trim()}
+                disabled={rejectionEditor?.isEmpty}
               >
                 Reject Request
               </Button>

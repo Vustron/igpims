@@ -1,4 +1,4 @@
-import { Igp, User } from "@/backend/db/schemas"
+import { User } from "@/backend/db/schemas"
 import { api } from "@/backend/helpers/api-client"
 import {
   QueryClient,
@@ -21,7 +21,7 @@ export interface IgpFilters {
 }
 
 export interface PaginatedIgpResponse {
-  data: (Igp & {
+  data: (IgpWithProjectLeadData & {
     projectLeadData?: {
       id: string
       name: string
@@ -71,6 +71,86 @@ export interface PaginatedIgpResponse {
     totalPages: number
     hasNextPage: boolean
     hasPrevPage: boolean
+  }
+}
+
+export interface IgpWithProjectLeadData {
+  id: string
+  igpName: string
+  igpDescription: string
+  igpType: "permanent" | "temporary" | "maintenance"
+  iconType:
+    | "store"
+    | "card"
+    | "tag"
+    | "package"
+    | "shirt"
+    | "food"
+    | "coffee"
+    | "bakery"
+    | "event"
+    | "book"
+    | "tech"
+    | "education"
+    | "service"
+    | "craft"
+    | "sports"
+    | "ticket"
+    | "research"
+    | "printing"
+    | "media"
+    | "farm"
+    | "vendo"
+    | "music"
+    | "health"
+    | "donation"
+    | "art"
+    | "rental"
+    | "newspaper"
+    | "pin"
+  semesterAndAcademicYear: string
+  totalSold: number
+  igpRevenue: number
+  igpStartDate: number
+  igpEndDate: number
+  igpDateNeeded: number
+  itemsToSell: string
+  assignedOfficers: string[]
+  estimatedQuantities: number
+  budget: number
+  costPerItem: number
+  projectLead: string
+  department: string
+  position: string
+  typeOfTransaction: string
+  status:
+    | "pending"
+    | "in_review"
+    | "checking"
+    | "approved"
+    | "in_progress"
+    | "completed"
+    | "rejected"
+  currentStep: number
+  requestDate: number
+  dateNeeded: number
+  isRejected: boolean
+  rejectionStep: number
+  rejectionReason: string
+  notes: string
+  reviewerComments: string
+  projectDocument: string
+  resolutionDocument: string
+  submissionDate: number
+  approvalDate: number
+  createdAt: number
+  updatedAt: number
+  projectLeadData?: {
+    id: string
+    name: string
+    email: string
+    role: string
+    image: string | null
   }
 }
 

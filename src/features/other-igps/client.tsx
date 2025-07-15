@@ -1,7 +1,9 @@
 "use client"
 
-import { useFindManyIgp } from "@/backend/actions/igp/find-many"
-import { Igp } from "@/backend/db/schemas"
+import {
+  IgpWithProjectLeadData,
+  useFindManyIgp,
+} from "@/backend/actions/igp/find-many"
 import { Button } from "@/components/ui/buttons"
 import { Separator } from "@/components/ui/separators"
 import { AnimatePresence, motion } from "framer-motion"
@@ -111,7 +113,7 @@ export const OtherIgpsClient = () => {
     )
   }
 
-  const mapToCardProps = (igp: Igp): IgpCardProps => ({
+  const mapToCardProps = (igp: IgpWithProjectLeadData): IgpCardProps => ({
     id: igp.id,
     name: igp.igpName || "Unnamed IGP",
     description: igp.igpDescription || "No description provided",
@@ -138,6 +140,7 @@ export const OtherIgpsClient = () => {
         resetFilters={resetFilters}
         hasActiveFilters={hasActiveFilters}
         allIconTypes={allIconTypes}
+        requests={igpsResponse?.data || []}
       />
 
       <div className="flex items-center justify-between">
