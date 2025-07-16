@@ -1,5 +1,5 @@
-import { hashSync } from "bcrypt-ts"
 import { env } from "@/config/env"
+import { hashSync } from "bcrypt-ts"
 
 export const addKeyHeaders = <T>(options?: T) => {
   const rawAppApiKey = env.NEXT_PUBLIC_APP_API_KEY

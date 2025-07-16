@@ -6,7 +6,6 @@ import { useFindManyFundRequests } from "@/backend/actions/fund-request/find-man
 import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
-import { convertImageToBase64 } from "@/utils/image-convert-base64"
 import {
   UpdateExpenseTransaction,
   updateExpenseTransactionSchema,
@@ -152,16 +151,8 @@ export const EditExpenseForm = ({
 
     const formData = {
       ...values,
+      receipt: values.receipt === undefined ? null : values.receipt,
       date: new Date(values.date).setHours(0, 0, 0, 0),
-    }
-
-    if (formData.receipt instanceof File) {
-      const base64Image = await convertImageToBase64(formData.receipt)
-      formData.receipt = base64Image
-    } else if (formData.receipt === null) {
-      formData.receipt = null
-    } else {
-      formData.receipt = undefined
     }
 
     await toast.promise(updateExpense.mutateAsync(formData), {
@@ -208,6 +199,7 @@ export const EditExpenseForm = ({
       mutation={updateExpense}
       submitButtonTitle="Update Expense"
       twoColumnLayout
+      isUsingImagekit
     />
   )
 }

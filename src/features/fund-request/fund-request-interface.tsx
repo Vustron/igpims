@@ -52,14 +52,14 @@ export const timelineSteps: TimelineStepType[] = [
     name: "Disburse Fund",
     shortName: "Disburse",
     icon: <DollarSign className="size-4" />,
-    description: "Funds disbursed",
+    description: "Funds disbursed successfully",
   },
   {
     id: 6,
     name: "Receive Fund",
     shortName: "Receive",
     icon: <ArrowDownToLine className="size-4" />,
-    description: "Funds received",
+    description: "Funds received successfully",
   },
   {
     id: 7,
@@ -73,6 +73,6 @@ export const timelineSteps: TimelineStepType[] = [
     name: "Validate Expense",
     shortName: "Validate",
     icon: <ClipboardCheck className="size-4" />,
-    description: "Expenses validated",
+    description: "Expenses validated successfully",
   },
 ]

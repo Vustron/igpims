@@ -5,7 +5,7 @@ import { useFindFundRequestById } from "@/backend/actions/fund-request/find-by-i
 import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
-import { convertImageToBase64 } from "@/utils/image-convert-base64"
+// import { convertImageToBase64 } from "@/utils/image-convert-base64"
 import {
   CreateExpenseTransaction,
   createExpenseTransactionSchema,
@@ -139,12 +139,17 @@ export const CreateExpenseForm = ({
       return
     }
 
+    if (values.receipt === undefined || values.receipt === null) {
+      toast.error("Receipt is required")
+      return
+    }
+
     const formData = { ...values, utilizedFunds: values.amount }
 
-    if (formData.receipt instanceof File) {
-      const base64Image = await convertImageToBase64(formData.receipt)
-      formData.receipt = base64Image
-    }
+    // if (formData.receipt instanceof File) {
+    //   const base64Image = await convertImageToBase64(formData.receipt)
+    //   formData.receipt = base64Image
+    // }
 
     await toast.promise(createExpense.mutateAsync(formData), {
       loading: <span className="animate-pulse">Recording expense...</span>,
@@ -191,6 +196,7 @@ export const CreateExpenseForm = ({
       mutation={createExpense}
       submitButtonTitle="Record Expense"
       twoColumnLayout
+      isUsingImagekit
     />
   )
 }

@@ -225,7 +225,7 @@ export const FileUpload = ({
   })
 
   return (
-    <>
+    <div className="w-full space-y-1">
       {label && (
         <Label className="bg-background px-2 text-muted-foreground text-xs">
           {label}
@@ -288,17 +288,17 @@ export const FileUpload = ({
                   <motion.div
                     key={`file-${idx}`}
                     layoutId={`file-upload-${idx}`}
-                    className="relative mx-auto flex w-full items-start gap-2 overflow-hidden rounded-md bg-background p-2"
+                    className="relative flex w-full items-start gap-2 overflow-hidden rounded-md bg-background p-2"
                   >
                     <motion.button
                       onClick={(e) => handleRemoveFile(idx, e)}
                       className="absolute top-1 right-1 rounded-full bg-white/80 p-0.5 backdrop-blur-sm hover:bg-white dark:bg-neutral-800/80 dark:hover:bg-neutral-800"
                     >
-                      <XCircleIcon className="size-5 text-neutral-500 hover:text-red-500" />
+                      <XCircleIcon className="size-4 sm:size-5 text-neutral-500 hover:text-red-500" />
                     </motion.button>
 
                     {isImageFile(file) ? (
-                      <div className="relative size-8 overflow-hidden rounded-md">
+                      <div className="relative size-8 sm:size-10 overflow-hidden rounded-md">
                         <Image
                           src={getImageUrl(file)}
                           alt={getFileName(file)}
@@ -309,13 +309,13 @@ export const FileUpload = ({
                         />
                       </div>
                     ) : (
-                      <div className="flex size-8 items-center justify-center rounded-md bg-muted">
-                        <FileIcon className="size-4 text-muted-foreground" />
+                      <div className="flex size-8 sm:size-10 items-center justify-center rounded-md bg-muted">
+                        <FileIcon className="size-3 sm:size-4 text-muted-foreground" />
                       </div>
                     )}
 
-                    <div className="flex flex-1 flex-col">
-                      <motion.p className="max-w-xs truncate text-foreground text-xs">
+                    <div className="flex flex-1 flex-col min-w-0">
+                      <motion.p className="truncate text-foreground text-xs sm:text-sm">
                         {getFileName(file)}
                       </motion.p>
                       <motion.p className="text-muted-foreground text-xs">
@@ -330,21 +330,21 @@ export const FileUpload = ({
                 layoutId="file-upload"
                 variants={mainVariant}
                 transition={{ type: "spring", stiffness: 500, damping: 50 }}
-                className="relative mx-auto flex h-8 w-full items-center justify-center rounded-md bg-background"
+                className="relative flex h-10 sm:h-12 w-full items-center justify-center rounded-md bg-background"
               >
                 {isDragActive ? (
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="flex items-center gap-2 text-muted-foreground text-xs"
+                    className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm"
                   >
                     Drop {multiple ? "files" : "file"}
-                    <UploadIcon className="size-3" />
+                    <UploadIcon className="size-3 sm:size-4" />
                   </motion.p>
                 ) : (
-                  <p className="flex items-center gap-2 text-muted-foreground text-xs">
+                  <p className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm">
                     Click to upload {multiple ? `(max ${maxFiles} files)` : ""}
-                    <UploadIcon className="size-3" />
+                    <UploadIcon className="size-3 sm:size-4" />
                   </p>
                 )}
               </motion.div>
@@ -352,6 +352,6 @@ export const FileUpload = ({
           </div>
         </motion.div>
       </div>
-    </>
+    </div>
   )
 }

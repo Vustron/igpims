@@ -1,5 +1,7 @@
 "use client"
 
+import { useCreateIgp } from "@/backend/actions/igp/create-igp"
+import { useFindManyUser } from "@/backend/actions/user/find-many"
 import { Button } from "@/components/ui/buttons"
 import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
@@ -7,10 +9,9 @@ import { catchError } from "@/utils/catch-error"
 import { CreateIgpPayload, createIgpSchema } from "@/validation/igp"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next-nprogress-bar"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-import { useProjectRequestStore } from "../project-request/project-request-store"
 
 interface CreateIgpFormProps {
   onSuccess?: () => void
@@ -19,31 +20,59 @@ interface CreateIgpFormProps {
 }
 
 export const CreateIgpForm = ({
-  // onSuccess,
+  onSuccess,
   onError,
   onClose,
 }: CreateIgpFormProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submittedProjectId, setSubmittedProjectId] = useState<string>("")
   const [duplicateError, setDuplicateError] = useState<string>("")
-  const { addRequest, validateProjectCreation } = useProjectRequestStore()
+  const createIgp = useCreateIgp()
   const currentYear = new Date().getFullYear()
+  const { data: users } = useFindManyUser()
 
   const router = useRouter()
 
   const form = useForm<CreateIgpPayload>({
     resolver: zodResolver(createIgpSchema),
     defaultValues: {
+      igpName: "",
+      igpDescription: "",
+      iconType: "",
+      semesterAndAcademicYear: "",
+      igpType: "",
       igpStartDate: new Date(),
       igpEndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+      itemsToSell: "",
+      assignedOfficers: [],
+      estimatedQuantities: "",
+      budget: "",
+      costPerItem: "",
       projectLead: "",
       department: "",
       position: "",
+      typeOfTransaction: "",
+      projectTitle: "",
+      purpose: "",
+      requestDate: new Date(),
+      dateNeeded: new Date(),
     },
   })
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "projectLead" && value.projectLead && users?.data) {
+        const selectedUser = users.data.find(
+          (user) => user.id === value.projectLead,
+        )
+        if (selectedUser) {
+          form.setValue("position", selectedUser.role || "")
+        }
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form, users?.data])
 
-  // Options for form fields
   const igpNameOptions = [
     { label: "Food Sale", value: "foodSale" },
     { label: "Merchandise Sale", value: "merchandiseSale" },
@@ -70,12 +99,42 @@ export const CreateIgpForm = ({
     { label: "Event", value: "event" },
   ]
 
-  const officerOptions = [
-    { label: "SSC President", value: "president" },
-    { label: "Secretary", value: "secretary" },
-    { label: "Treasurer", value: "treasurer" },
-    { label: "Auditor", value: "auditor" },
+  const iconTypeOptions = [
+    { label: "Food", value: "food" },
+    { label: "Merchandise", value: "merchandise" },
+    { label: "Service", value: "service" },
+    { label: "Event", value: "event" },
+    { label: "Bakery", value: "bakery" },
+    { label: "Coffee", value: "coffee" },
+    { label: "Books", value: "books" },
+    { label: "Technology", value: "tech" },
+    { label: "Education", value: "education" },
+    { label: "Crafts", value: "craft" },
+    { label: "Sports", value: "sports" },
+    { label: "Tickets", value: "tickets" },
+    { label: "Health", value: "health" },
+    { label: "Donation", value: "donation" },
+    { label: "Art", value: "art" },
+    { label: "Store", value: "store" },
+    { label: "Card", value: "card" },
+    { label: "Tag", value: "tag" },
+    { label: "Package", value: "package" },
+    { label: "Shirt", value: "shirt" },
+    { label: "Research", value: "research" },
+    { label: "Printing", value: "printing" },
+    { label: "Media", value: "media" },
+    { label: "Farm", value: "farm" },
+    { label: "Vendo", value: "vendo" },
+    { label: "Music", value: "music" },
+    { label: "Rental", value: "rental" },
+    { label: "Newspaper", value: "newspaper" },
+    { label: "Pin", value: "pin" },
   ]
+
+  const officerOptions = users?.data.map((user) => ({
+    label: user.name,
+    value: user.id,
+  }))
 
   const quantityOptions = [
     { label: "10", value: "10" },
@@ -117,10 +176,11 @@ export const CreateIgpForm = ({
   const createIgpFields: FieldConfig<CreateIgpPayload>[] = [
     {
       name: "projectLead",
-      type: "text",
-      label: "Project Lead Name",
-      placeholder: "Enter project lead name",
+      type: "select",
+      label: "Project Lead",
+      placeholder: "select project lead",
       description: "Full name of the person leading the project",
+      options: officerOptions,
       required: true,
     },
     {
@@ -168,6 +228,24 @@ export const CreateIgpForm = ({
       required: true,
     },
     {
+      name: "igpDescription",
+      type: "textarea",
+      label: "IGP Description",
+      placeholder: "Enter IGP description",
+      description: "Detailed description of the IGP",
+      required: true,
+    },
+
+    {
+      name: "iconType",
+      type: "select",
+      label: "Select icon",
+      placeholder: "Select IGP icon",
+      description: "Category classification of the IGP",
+      options: iconTypeOptions,
+      required: true,
+    },
+    {
       name: "igpStartDate",
       type: "date",
       label: "Start Date",
@@ -193,7 +271,7 @@ export const CreateIgpForm = ({
     },
     {
       name: "assignedOfficers",
-      type: "select",
+      type: "multiselect",
       label: "Assigned Officers",
       placeholder: "Select responsible officers",
       description: "Officers who will manage the IGP",
@@ -229,123 +307,53 @@ export const CreateIgpForm = ({
     },
   ]
 
-  const onSubmit = async (data: CreateIgpPayload) => {
+  const onSubmit = async (values: CreateIgpPayload) => {
     try {
-      setIsSubmitting(true)
       setDuplicateError("")
 
-      if (data.igpEndDate < data.igpStartDate) {
-        form.setError("igpEndDate", {
-          type: "manual",
-          message: "End date must be after start date",
-        })
-        setIsSubmitting(false)
+      if (values.igpEndDate < values.igpStartDate) {
+        toast.error("End date must be after start date")
         return
       }
 
-      // Create project title from IGP details
-      const projectTitle = `${data.igpName} - ${data.itemsToSell} (${data.semesterAndAcademicYear})`
+      const projectTitle = `${values.igpName} - ${values.itemsToSell} (${values.semesterAndAcademicYear})`
 
-      // Check for duplicates before proceeding
-      const validation = validateProjectCreation(
-        projectTitle,
-        data.projectLead!,
-      )
+      const purpose = `Income Generating Project proposal for ${values.igpName} focusing on ${values.itemsToSell}. 
+  
+  Project Details:
+  - Type: ${values.igpType}
+  - Academic Period: ${values.semesterAndAcademicYear}
+  - Estimated Quantities: ${values.estimatedQuantities}
+  - Budget: ₱${values.budget}
+  - Cost per Item: ₱${values.costPerItem}
+  - Assigned Officers: ${values.assignedOfficers}
+  - Implementation Period: ${values.igpStartDate.toLocaleDateString()} to ${values.igpEndDate.toLocaleDateString()}
+  
+  This IGP aims to generate income while providing valuable products/services to the college community.`
 
-      if (!validation.isValid) {
-        setDuplicateError(validation.error || "Duplicate project detected")
-
-        // Set form field errors for better UX
-        if (
-          validation.duplicateInfo?.duplicateType === "title" ||
-          validation.duplicateInfo?.duplicateType === "both"
-        ) {
-          form.setError("igpName", {
-            type: "manual",
-            message: "This project title already exists",
-          })
-          form.setError("itemsToSell", {
-            type: "manual",
-            message: "This combination already exists",
-          })
-        }
-
-        if (
-          validation.duplicateInfo?.duplicateType === "lead" ||
-          validation.duplicateInfo?.duplicateType === "both"
-        ) {
-          form.setError("projectLead", {
-            type: "manual",
-            message: "This person already has an active project",
-          })
-        }
-
-        toast.error(validation.error || "Cannot create duplicate project")
-        setIsSubmitting(false)
-        return
+      const formData = {
+        ...values,
+        igpName: projectTitle,
+        igpDescription: purpose,
+        position: values.position || "IGP Coordinator",
+        igpStartDate: new Date(values.igpStartDate).setHours(0, 0, 0, 0),
+        igpEndDate: new Date(values.igpEndDate).setHours(0, 0, 0, 0),
       }
 
-      // Create comprehensive purpose description
-      const purpose = `Income Generating Project proposal for ${data.igpName} focusing on ${data.itemsToSell}. 
-
-Project Details:
-- Type: ${data.igpType}
-- Academic Period: ${data.semesterAndAcademicYear}
-- Estimated Quantities: ${data.estimatedQuantities}
-- Budget: ₱${data.budget}
-- Cost per Item: ₱${data.costPerItem}
-- Assigned Officers: ${data.assignedOfficers}
-- Implementation Period: ${data.igpStartDate.toLocaleDateString()} to ${data.igpEndDate.toLocaleDateString()}
-
-This IGP aims to generate income while providing valuable products/services to the college community.`
-
-      // Create project request using the project request store
-      const projectId = addRequest({
-        projectTitle,
-        purpose,
-        projectLead: data.projectLead!,
-        position: data.position || "IGP Coordinator",
-        department: data.department!,
-        dateNeeded: data.igpStartDate,
-        requestDate: new Date(),
+      await toast.promise(createIgp.mutateAsync(formData), {
+        loading: <span className="animate-pulse">Creating proposal...</span>,
+        success: "Proposal successfully submitted",
+        error: (error: unknown) => catchError(error),
       })
 
-      console.log("Created IGP Project Request:", {
-        projectId,
-        projectTitle,
-        projectLead: data.projectLead,
-        department: data.department,
-      })
-
-      toast.success(`IGP Proposal ${projectId} submitted successfully!`)
-
-      // Set submission state
-      setIsSubmitted(true)
-      setSubmittedProjectId(projectId)
-
-      // Reset the form
-      form.reset({
-        igpStartDate: new Date(),
-        igpEndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
-        projectLead: "",
-        department: "",
-        position: "",
-      })
+      if (createIgp.isSuccess) {
+        onSuccess?.()
+      } else {
+        onError?.()
+      }
     } catch (error) {
       const errorMessage = catchError(error)
-
-      // Check if it's a duplicate error
-      if (
-        errorMessage.includes("already exists") ||
-        errorMessage.includes("already has an active")
-      ) {
-        setDuplicateError(errorMessage)
-      }
-
       toast.error(errorMessage || "Failed to submit IGP proposal")
-      if (onError) onError()
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -448,7 +456,7 @@ This IGP aims to generate income while providing valuable products/services to t
         submitButtonTitle={
           isSubmitting ? "Submitting..." : "Submit IGP Proposal"
         }
-        disabled={isSubmitting}
+        mutation={createIgp}
         twoColumnLayout={true}
       />
     </div>

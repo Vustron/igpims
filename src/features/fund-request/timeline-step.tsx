@@ -9,7 +9,7 @@ import {
 import { cn } from "@/utils/cn"
 import { motion } from "framer-motion"
 import { Check, MessageCircleWarning, X } from "lucide-react"
-import type { ReactElement } from "react"
+import { ReactElement } from "react"
 import React from "react"
 import { TimelineStepType } from "./fund-request-interface"
 
@@ -121,21 +121,15 @@ export const TimelineStep = ({
                         : "text-slate-500",
               )}
             >
-              <p
-                className={cn(
-                  "whitespace-nowrap font-medium",
-                  isMobile ? "text-sm" : "text-xs sm:text-sm",
-                )}
-              >
+              <p className={cn("whitespace-nowrap font-medium")}>
                 {isMobile ? step.name : step.shortName}
               </p>
               {(isCurrent || isRejected || isCompleted) && (
                 <p
                   className={cn(
+                    "text-[9px] line-clamp-2 h-8",
                     isRejected ? "text-red-500" : "text-slate-500",
-                    isMobile
-                      ? "mt-1 text-xs sm:text-sm"
-                      : "mx-auto mt-0.5 max-w-20 text-[10px] sm:text-xs",
+                    isMobile ? "mt-1" : "mx-auto mt-0.5 w-24",
                   )}
                 >
                   {isRejected && step.rejectionReason

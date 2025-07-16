@@ -13,7 +13,7 @@ const ContentSecurityPolicy = `
     style-src 'self' 'unsafe-inline';
     img-src * blob: data:;
     media-src 'none';
-    connect-src 'self' blob: data: firestore.googleapis.com firebasestorage.googleapis.com upload.imagekit.io;
+    connect-src 'self' blob: data: firestore.googleapis.com firebasestorage.googleapis.com upload.imagekit.io api.imagekit.io;
     font-src 'self' data: https://fonts.gstatic.com;
     frame-src 'self' blob: data: *.codesandbox.io vercel.live upload-widget.cloudinary.com;
     base-uri 'self';
