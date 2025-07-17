@@ -62,18 +62,11 @@ export async function updateIgp(
         updateValues.itemsToSell = data.itemsToSell
       if (data.assignedOfficers !== undefined)
         updateValues.assignedOfficers = JSON.stringify(data.assignedOfficers)
-      if (data.estimatedQuantities !== undefined)
-        updateValues.estimatedQuantities = data.estimatedQuantities
-      if (data.budget !== undefined) updateValues.budget = data.budget
       if (data.costPerItem !== undefined)
         updateValues.costPerItem = data.costPerItem
       if (data.projectLead !== undefined)
         updateValues.projectLead = data.projectLead
-      if (data.department !== undefined)
-        updateValues.department = data.department
       if (data.position !== undefined) updateValues.position = data.position
-      if (data.typeOfTransaction !== undefined)
-        updateValues.typeOfTransaction = data.typeOfTransaction
       if (data.status !== undefined) updateValues.status = data.status
       if (data.currentStep !== undefined)
         updateValues.currentStep = data.currentStep

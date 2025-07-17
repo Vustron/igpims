@@ -1,5 +1,4 @@
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
+import { sendLockerEmail } from "@/backend/helpers/send-email"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as lockerQuery from "@/backend/queries/locker"
@@ -8,6 +7,8 @@ import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { CreateRentalData, createRentalSchema } from "@/validation/rental"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function createRent(
   request: NextRequest,
@@ -34,6 +35,18 @@ export async function createRent(
     }
 
     const rentalData = validationResult.data
+
+    const activeRentals =
+      await rentalQuery.getActiveRentalsByRenterIdQuery.execute({
+        renterId: rentalData.renterId,
+      })
+
+    if (activeRentals.length > 0) {
+      return NextResponse.json(
+        { error: "This user already has an active rental" },
+        { status: 400 },
+      )
+    }
 
     const dateRentedTimestamp =
       typeof rentalData.dateRented === "string"
@@ -100,6 +113,17 @@ export async function createRent(
           status: "occupied",
         })
       }
+
+      await sendLockerEmail({
+        recipientName: rentalData.renterName ?? "",
+        lockerDetails: {
+          name: locker.lockerName,
+          location: locker.lockerLocation,
+        },
+        renterEmail: rentalData.renterEmail ?? "",
+        subject: "Locker Rental Confirmation",
+        type: "rental-confirmation",
+      })
 
       return {
         id: rentalId,

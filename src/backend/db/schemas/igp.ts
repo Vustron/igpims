@@ -61,15 +61,11 @@ export const igp = sqliteTable(
     assignedOfficers: text("assignedOfficers", { length: 1000 })
       .$type<string[]>()
       .default([]),
-    estimatedQuantities: integer("estimatedQuantities").default(0),
-    budget: integer("costPerItem").default(0),
     costPerItem: integer("costPerItem").default(0),
     projectLead: text("projectLead").references(() => user.id, {
       onDelete: "set null",
     }),
-    department: text("department", { length: 2000 }),
     position: text("department", { length: 1000 }),
-    typeOfTransaction: text("typeOfTransaction", { length: 255 }),
     status: text("status", { length: 20 })
       .notNull()
       .default("pending")

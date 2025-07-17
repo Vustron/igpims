@@ -1,16 +1,18 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import toast from "react-hot-toast"
-import { DynamicForm } from "@/components/ui/forms"
+import { useFindManyWaterSupplies } from "@/backend/actions/water-supply/find-many"
 import { useCreateWaterVendo } from "@/backend/actions/water-vendo/create-water-vendo"
+import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import {
   CreateWaterVendoData,
   createWaterVendoSchema,
 } from "@/validation/water-vendo"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 
 interface CreateWaterVendoFormProps {
   onSuccess?: () => void
@@ -22,6 +24,7 @@ export const CreateWaterVendoForm = ({
   onError,
 }: CreateWaterVendoFormProps) => {
   const createWaterVendo = useCreateWaterVendo()
+  const { data: suppliesResponse, isLoading } = useFindManyWaterSupplies()
 
   const form = useForm<CreateWaterVendoData>({
     resolver: zodResolver(createWaterVendoSchema),
@@ -32,6 +35,8 @@ export const CreateWaterVendoForm = ({
       waterRefillStatus: "full",
     },
   })
+
+  const remainingGallons = suppliesResponse?.data?.[0]?.remainingGallons || 0
 
   const createWaterVendoFields: FieldConfig<CreateWaterVendoData>[] = [
     {
@@ -77,6 +82,8 @@ export const CreateWaterVendoForm = ({
       placeholder: "Enter gallons used",
       description: "Number of gallons currently used",
       required: true,
+      min: 0,
+      max: remainingGallons,
     },
   ]
 
@@ -93,6 +100,14 @@ export const CreateWaterVendoForm = ({
     } else {
       onError?.()
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
   }
 
   return (

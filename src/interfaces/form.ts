@@ -49,6 +49,8 @@ export interface FieldConfig<TFieldValues> {
   maxDate?: Date | string
   disabledDates?: Date[]
   span?: 1 | 2
+  min?: number
+  max?: number
 }
 
 export interface Mutation {

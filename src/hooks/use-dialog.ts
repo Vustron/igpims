@@ -8,6 +8,7 @@ import {
   Inspection,
   Locker,
   LockerRental,
+  Session,
   User,
   WaterVendo,
 } from "@/backend/db/schemas"
@@ -67,6 +68,7 @@ interface ConfirmDialogData {
 
 interface FundRequestDialogData {
   fundRequest?: FundRequestWithUser
+  session?: Session
 }
 
 export interface ProjectRequestData {

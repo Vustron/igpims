@@ -1,6 +1,7 @@
 "use client"
 
 import { useFindManyIgp } from "@/backend/actions/igp/find-many"
+import { Loader2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { ProjectRequestCard } from "./project-request-card"
 import { ProjectRequestFilter } from "./project-request-filter"
@@ -25,7 +26,7 @@ export const ProjectRequestClient = () => {
     },
   })
 
-  const { data: igpData } = useFindManyIgp({
+  const { data: igpData, isLoading } = useFindManyIgp({
     search: filters.search,
     status: filters.status !== "all" ? filters.status : undefined,
     startDate: filters.dateRange.from?.toISOString(),
@@ -43,11 +44,20 @@ export const ProjectRequestClient = () => {
     })
   }, [requests])
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="mt-2 mb-6">
         <ProjectRequestFilter
           onFilterChange={(newFilters) => setFilters(newFilters)}
+          requests={requests}
         />
       </div>
 

@@ -18,13 +18,35 @@ import { CreateFundRequestForm } from "@/features/fund-request/create-fund-reque
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
+interface CreateFundRequestDialogData {
+  session: {
+    id: string
+    userId: string
+    token: string
+    createdAt: Date
+    updatedAt: Date
+    expiresAt: Date
+    userAgent: string
+    ipAddress: string
+  }
+  fundRequest?: any
+}
+
 export const CreateFundRequestDialog = () => {
-  const { isOpen, onClose, type } = useDialog()
+  const { isOpen, onClose, type, data } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "createFundRequest"
 
   const handleClose = () => {
     onClose()
+  }
+
+  const hasSessionData = (data: any): data is CreateFundRequestDialogData => {
+    return data?.session !== undefined
+  }
+
+  if (!isDialogOpen || !hasSessionData(data)) {
+    return null
   }
 
   if (isDesktop) {
@@ -38,6 +60,7 @@ export const CreateFundRequestDialog = () => {
             </DialogDescription>
           </DialogHeader>
           <CreateFundRequestForm
+            session={data.session}
             onSuccess={handleClose}
             onError={handleClose}
           />
@@ -57,6 +80,7 @@ export const CreateFundRequestDialog = () => {
         </DrawerHeader>
         <div className="px-6 pb-6">
           <CreateFundRequestForm
+            session={data.session}
             onSuccess={handleClose}
             onError={handleClose}
           />

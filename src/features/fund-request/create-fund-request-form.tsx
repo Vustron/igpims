@@ -2,6 +2,7 @@
 
 import { useCreateFundRequest } from "@/backend/actions/fund-request/create-fund-request"
 import { useFindManyUser } from "@/backend/actions/user/find-many"
+import { Session } from "@/backend/db/schemas"
 import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
@@ -16,21 +17,27 @@ import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 
 export const CreateFundRequestForm = ({
+  session,
   onSuccess,
   onError,
 }: {
+  session?: Session
   onSuccess?: () => void
   onError?: () => void
 }) => {
   const createFundRequest = useCreateFundRequest()
   const { data: users, isLoading } = useFindManyUser()
 
+  const initialRequestor = users?.data?.find(
+    (user) => user.id === session?.userId,
+  )
+
   const form = useForm<CreateFundRequest>({
     resolver: zodResolver(createFundRequestSchema),
     defaultValues: {
-      requestor: "",
+      requestor: initialRequestor?.id || "",
       purpose: "",
-      position: "",
+      position: initialRequestor?.role || "",
       amount: 0,
       requestDate: new Date(),
       dateNeeded: new Date(),

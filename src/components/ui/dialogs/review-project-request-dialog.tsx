@@ -24,9 +24,9 @@ import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import { Calendar, FileSearch, FileText, Upload } from "lucide-react"
+import dynamic from "next/dynamic"
 import { useRef, useState } from "react"
 import { TiptapEditorControls } from "../text-editor/tiptap-controls"
-import dynamic from "next/dynamic"
 
 const PDFViewer = dynamic(
   () => import("@/components/ui/pdf/pdf-viewer").then((mod) => mod.PDFViewer),
@@ -243,58 +243,50 @@ export const ReviewProjectRequestDialog = () => {
               Project Purpose & Details
             </h3>
 
-            <div className="rounded-lg border bg-white p-4">
-              <h3 className="mb-3 font-semibold text-gray-800 text-sm">
-                Project Documentation (PDF)
-              </h3>
-
-              {!pdfPreviewUrl ? (
-                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6">
-                  <Upload className="mb-2 h-8 w-8 text-gray-400" />
-                  <p className="mb-2 text-sm text-gray-600">
-                    Upload project documentation PDF
-                  </p>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="application/pdf"
-                    onChange={handlePdfUpload}
-                    className="hidden"
-                    id="pdf-upload"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    Select PDF File
-                  </Button>
-                  <p className="mt-2 text-xs text-gray-500">
-                    Only PDF files are accepted
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between rounded-md bg-gray-50 p-3">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-red-500" />
-                      <span className="text-sm font-medium">
-                        {pdfFile?.name}
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={removePdf}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      Remove
-                    </Button>
+            {!pdfPreviewUrl ? (
+              <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6">
+                <Upload className="mb-2 h-8 w-8 text-gray-400" />
+                <p className="mb-2 text-sm text-gray-600">
+                  Upload project documentation PDF
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handlePdfUpload}
+                  className="hidden"
+                  id="pdf-upload"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Select PDF File
+                </Button>
+                <p className="mt-2 text-xs text-gray-500">
+                  Only PDF files are accepted
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between rounded-md bg-gray-50 p-3">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-red-500" />
+                    <span className="text-sm font-medium">{pdfFile?.name}</span>
                   </div>
-
-                  {pdfPreviewUrl && <PDFViewer file={pdfPreviewUrl} />}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={removePdf}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    Remove
+                  </Button>
                 </div>
-              )}
-            </div>
+
+                {pdfPreviewUrl && <PDFViewer file={pdfPreviewUrl} />}
+              </div>
+            )}
           </div>
 
           {!isRejecting ? (

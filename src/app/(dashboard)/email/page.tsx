@@ -36,6 +36,10 @@ export default function EmailPreviewPage() {
         name: "Locker A101",
         location: "Building 1, Floor 1",
       },
+      dueDate: "2025-12-31",
+      amount: 150,
+      paymentDate: "2025-07-01",
+      transactionId: "RENT-12345",
     },
     "rental-expiration": {
       email: "user@example.com",
@@ -93,21 +97,35 @@ export default function EmailPreviewPage() {
 
     useEffect(() => {
       const loadTemplate = async () => {
-        const result = await render(<EmailTemplate {...data} type={template} />)
-        setHtml(result)
+        try {
+          const result = await render(
+            <EmailTemplate {...data} type={template} />,
+          )
+          setHtml(result)
+        } catch (error) {
+          console.error("Error rendering email template:", error)
+          setHtml("<div>Error loading email preview</div>")
+        }
       }
       loadTemplate()
     }, [template, data])
 
-    if (!html) return <div>Loading email preview...</div>
+    if (!html)
+      return (
+        <div className="flex h-full items-center justify-center">
+          Loading email preview...
+        </div>
+      )
 
     return (
-      <iframe
-        srcDoc={html}
-        className="h-full w-full border-none"
-        sandbox="allow-same-origin"
-        title={`Email template preview for ${template.replace("-", " ")}`}
-      />
+      <div className="h-full w-full">
+        <iframe
+          srcDoc={html}
+          className="h-full w-full border-none"
+          sandbox="allow-same-origin allow-scripts"
+          title={`Email template preview for ${template.replace("-", " ")}`}
+        />
+      </div>
     )
   }
 
@@ -133,7 +151,7 @@ export default function EmailPreviewPage() {
 
         {templates.map((template) => (
           <TabsContent key={template} value={template}>
-            <Card className="flex h-[900px] w-full flex-col items-center justify-center overflow-auto p-6">
+            <Card className="flex h-[900px] w-full flex-col overflow-hidden p-0">
               <EmailPreview template={template} data={previewData[template]} />
             </Card>
           </TabsContent>

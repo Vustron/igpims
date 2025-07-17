@@ -1,6 +1,6 @@
-import { eq, sql } from "drizzle-orm"
 import { locker, lockerRental } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
+import { eq, sql } from "drizzle-orm"
 
 const getRentalByIdQuery = db
   .select({
@@ -99,6 +99,15 @@ const countRentalsQuery = db
   .from(lockerRental)
   .prepare()
 
+const getActiveRentalsByRenterIdQuery = db
+  .select()
+  .from(lockerRental)
+  .where(
+    sql`${lockerRental.renterId} = ${sql.placeholder("renterId")}
+    AND ${lockerRental.rentalStatus} = 'active'`,
+  )
+  .prepare()
+
 export {
   getRentalByIdQuery,
   getRentalByLockerIdQuery,
@@ -108,4 +117,5 @@ export {
   deleteRentalQuery,
   findManyRentalsQuery,
   countRentalsQuery,
+  getActiveRentalsByRenterIdQuery,
 }

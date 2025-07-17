@@ -357,6 +357,8 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
                     field.className,
                   )}
                   isPassword={field.type === "password"}
+                  min={field.min}
+                  max={field.max}
                 />
               ) : (
                 <div className="space-y-2">
@@ -383,6 +385,8 @@ export const FormControlRenderer = <TFieldValues extends FieldValues>({
                     )}
                     aria-invalid={!!form.formState.errors[field.name]}
                     isPassword={field.type === "password"}
+                    min={field.min}
+                    max={field.max}
                   />
                 </div>
               )}

@@ -27,7 +27,6 @@ export const CreateIgpForm = ({
   const [isSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submittedProjectId, setSubmittedProjectId] = useState<string>("")
-  const [duplicateError, setDuplicateError] = useState<string>("")
   const createIgp = useCreateIgp()
   const currentYear = new Date().getFullYear()
   const { data: users } = useFindManyUser()
@@ -46,13 +45,9 @@ export const CreateIgpForm = ({
       igpEndDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
       itemsToSell: "",
       assignedOfficers: [],
-      estimatedQuantities: "",
-      budget: "",
       costPerItem: "",
       projectLead: "",
-      department: "",
       position: "",
-      typeOfTransaction: "",
       projectTitle: "",
       purpose: "",
       requestDate: new Date(),
@@ -136,23 +131,6 @@ export const CreateIgpForm = ({
     value: user.id,
   }))
 
-  const quantityOptions = [
-    { label: "10", value: "10" },
-    { label: "20", value: "20" },
-    { label: "50", value: "50" },
-    { label: "100", value: "100" },
-    { label: "200", value: "200" },
-    { label: "500", value: "500" },
-  ]
-
-  const budgetOptions = [
-    { label: "₱1,000", value: "1000" },
-    { label: "₱2,000", value: "2000" },
-    { label: "₱5,000", value: "5000" },
-    { label: "₱10,000", value: "10000" },
-    { label: "₱20,000", value: "20000" },
-  ]
-
   const costOptions = [
     { label: "₱50", value: "50" },
     { label: "₱100", value: "100" },
@@ -160,17 +138,6 @@ export const CreateIgpForm = ({
     { label: "₱200", value: "200" },
     { label: "₱250", value: "250" },
     { label: "₱300", value: "300" },
-  ]
-
-  const departmentOptions = [
-    { label: "Student Affairs", value: "Student Affairs" },
-    { label: "Academic Affairs", value: "Academic Affairs" },
-    { label: "Finance", value: "Finance" },
-    { label: "Student Services", value: "Student Services" },
-    { label: "Information Technology", value: "Information Technology" },
-    { label: "Engineering", value: "Engineering" },
-    { label: "Business Administration", value: "Business Administration" },
-    { label: "Education", value: "Education" },
   ]
 
   const createIgpFields: FieldConfig<CreateIgpPayload>[] = [
@@ -190,15 +157,6 @@ export const CreateIgpForm = ({
       placeholder: "Enter position",
       description: "Job title or position of the project lead",
       required: false,
-    },
-    {
-      name: "department",
-      type: "select",
-      label: "Department",
-      placeholder: "Select department",
-      description: "Department or unit submitting the project",
-      options: departmentOptions,
-      required: true,
     },
     {
       name: "igpName",
@@ -279,24 +237,6 @@ export const CreateIgpForm = ({
       required: true,
     },
     {
-      name: "estimatedQuantities",
-      type: "select",
-      label: "Estimated Quantities",
-      placeholder: "Select expected quantity",
-      description: "Expected number of items/services to sell",
-      options: quantityOptions,
-      required: true,
-    },
-    {
-      name: "budget",
-      type: "select",
-      label: "Budget",
-      placeholder: "Select budget range",
-      description: "Total budget required for the IGP",
-      options: budgetOptions,
-      required: true,
-    },
-    {
       name: "costPerItem",
       type: "select",
       label: "Cost per Item",
@@ -309,35 +249,17 @@ export const CreateIgpForm = ({
 
   const onSubmit = async (values: CreateIgpPayload) => {
     try {
-      setDuplicateError("")
-
       if (values.igpEndDate < values.igpStartDate) {
         toast.error("End date must be after start date")
         return
       }
 
-      const projectTitle = `${values.igpName} - ${values.itemsToSell} (${values.semesterAndAcademicYear})`
-
-      const purpose = `Income Generating Project proposal for ${values.igpName} focusing on ${values.itemsToSell}. 
-  
-  Project Details:
-  - Type: ${values.igpType}
-  - Academic Period: ${values.semesterAndAcademicYear}
-  - Estimated Quantities: ${values.estimatedQuantities}
-  - Budget: ₱${values.budget}
-  - Cost per Item: ₱${values.costPerItem}
-  - Assigned Officers: ${values.assignedOfficers}
-  - Implementation Period: ${values.igpStartDate.toLocaleDateString()} to ${values.igpEndDate.toLocaleDateString()}
-  
-  This IGP aims to generate income while providing valuable products/services to the college community.`
-
       const formData = {
         ...values,
-        igpName: projectTitle,
-        igpDescription: purpose,
         position: values.position || "IGP Coordinator",
         igpStartDate: new Date(values.igpStartDate).setHours(0, 0, 0, 0),
         igpEndDate: new Date(values.igpEndDate).setHours(0, 0, 0, 0),
+        requestDate: new Date(values.igpStartDate).setHours(0, 0, 0, 0),
       }
 
       await toast.promise(createIgp.mutateAsync(formData), {
@@ -420,35 +342,6 @@ export const CreateIgpForm = ({
 
   return (
     <div className="h-[80vh] overflow-y-auto p-6">
-      {/* Duplicate Error Alert */}
-      {duplicateError && (
-        <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4">
-          <div className="flex items-start gap-3">
-            <svg
-              className="mt-0.5 h-5 w-5 shrink-0 text-red-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <div>
-              <h3 className="font-medium text-red-800 text-sm">
-                Duplicate Project Detected
-              </h3>
-              <p className="mt-1 text-red-700 text-sm">{duplicateError}</p>
-              <p className="mt-2 text-red-600 text-xs">
-                Please modify the project details or contact the SSC President
-                if you believe this project does not already exists.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       <DynamicForm
         form={form}
         onSubmit={onSubmit}

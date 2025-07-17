@@ -158,6 +158,15 @@ export const useDeleteRent = (rentalId: string) => {
           }
         },
       )
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["locker-rentals"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["locker-rentals-infinite"],
+        }),
+        queryClient.invalidateQueries({ queryKey: ["lockers"] }),
+        queryClient.invalidateQueries({ queryKey: ["lockers-infinite"] }),
+      ])
     },
     onError: (error, _variables, context) => {
       if (context?.previousRentals) {

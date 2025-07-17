@@ -1,8 +1,6 @@
 "use client"
 
-import { format } from "date-fns"
-import { CalendarIcon, Plus, Search, X } from "lucide-react"
-import { useState } from "react"
+import { IgpWithProjectLeadData } from "@/backend/actions/igp/find-many"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import { Calendar } from "@/components/ui/calendars"
@@ -26,19 +24,33 @@ import {
 } from "@/components/ui/tooltips"
 import { useDialog } from "@/hooks/use-dialog"
 import { cn } from "@/utils/cn"
-import { ProjectRequest, useProjectRequestStore } from "./project-request-store"
+import { format } from "date-fns"
+import { CalendarIcon, PlusCircleIcon, Search, X } from "lucide-react"
+import { useState } from "react"
 
-type StatusOption = ProjectRequest["status"] | "all"
+type StatusOption =
+  | "pending"
+  | "in_review"
+  | "checking"
+  | "approved"
+  | "in_progress"
+  | "completed"
+  | "rejected"
+  | "all"
 
-export const ProjectRequestFilter = ({
-  onFilterChange,
-}: {
+interface ProjectRequestFilterProps {
   onFilterChange?: (filters: {
     search: string
     status: StatusOption
     dateRange: { from: Date | undefined; to: Date | undefined }
   }) => void
-}) => {
+  requests: IgpWithProjectLeadData[]
+}
+
+export const ProjectRequestFilter = ({
+  onFilterChange,
+  requests,
+}: ProjectRequestFilterProps) => {
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<StatusOption>("all")
   const [dateRange, setDateRange] = useState<{
@@ -47,15 +59,12 @@ export const ProjectRequestFilter = ({
   }>({ from: undefined, to: undefined })
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const { onOpen } = useDialog()
-  const { requests } = useProjectRequestStore()
 
-  // Check if there are any active projects (not completed or rejected)
   const hasActiveProjects = requests.some(
     (request) =>
       request.status !== "completed" && request.status !== "rejected",
   )
 
-  // Find the latest active project for tooltip message
   const latestActiveProject = requests
     .filter(
       (request) =>
@@ -63,7 +72,7 @@ export const ProjectRequestFilter = ({
     )
     .sort(
       (a, b) =>
-        new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime(),
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     )[0]
 
   const statusOptions: { value: StatusOption; label: string }[] = [
@@ -248,22 +257,22 @@ export const ProjectRequestFilter = ({
           </PopoverContent>
         </Popover>
 
-        {/* New IGP Proposal Button with Tooltip */}
+        {/* New IGP Proposal Button */}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
+              onClick={() => !hasActiveProjects && onOpen("createIgp")}
+              size="sm"
               className={cn(
-                "gap-2 shadow-sm transition-all hover:shadow",
+                "flex items-center gap-1.5",
                 hasActiveProjects && "cursor-not-allowed opacity-50",
               )}
-              onClick={() => !hasActiveProjects && onOpen("createIgp")}
               disabled={hasActiveProjects}
             >
-              <Plus className="size-4" />
-              <span className="whitespace-nowrap">New IGP Proposal</span>
+              <PlusCircleIcon className="h-4 w-4" />
+              <span>New IGP Proposal</span>
             </Button>
           </TooltipTrigger>
-
           <TooltipContent
             side="bottom"
             align="center"
@@ -279,7 +288,7 @@ export const ProjectRequestFilter = ({
                 <div className="space-y-1">
                   <p className="font-medium text-sm">Active project exists</p>
                   <p className="text-amber-100 text-xs">
-                    Complete "{latestActiveProject.projectTitle}" (
+                    Complete "{latestActiveProject.igpName}" (
                     {latestActiveProject.id}) first
                   </p>
                 </div>

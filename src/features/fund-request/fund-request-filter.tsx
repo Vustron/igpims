@@ -2,6 +2,7 @@
 
 import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
 import { FundRequest } from "@/backend/db/schemas"
+import { useSession } from "@/components/context/session"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import { Calendar } from "@/components/ui/calendars"
@@ -51,6 +52,7 @@ export const FundRequestFilter = ({
     to: Date | undefined
   }>({ from: undefined, to: undefined })
   const [activeFilters, setActiveFilters] = useState<string[]>([])
+  const session = useSession()
   const { onOpen } = useDialog()
 
   const statusOptions: {
@@ -275,7 +277,10 @@ export const FundRequestFilter = ({
             isSidebarOpen ? "w-full" : "",
           )}
           onClick={() =>
-            onOpen("createFundRequest", { fundRequest: fundRequest })
+            onOpen("createFundRequest", {
+              fundRequest: fundRequest,
+              session: session,
+            })
           }
         >
           <Plus className="size-4" />

@@ -1,10 +1,10 @@
-import { Metadata } from "next"
+import { preFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
 import { ContentLayout } from "@/features/layouts/content-layout"
 import { LockerClient } from "@/features/locker-igp/locker/client"
-import { preFindLockerById } from "@/backend/actions/locker/find-by-id"
 import { QueryHydrator } from "@/utils/query-hydrator"
+import { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Locker",
@@ -26,11 +26,11 @@ export default async function LockerIdPage({ params }: PageProps) {
     { label: "Locker" },
   ]
   return (
-    <ContentLayout title="Locker">
-      <DynamicBreadcrumb items={lockerItems} />
-      <QueryHydrator prefetchFns={[preFindLocker]}>
+    <QueryHydrator prefetchFns={[preFindLocker]}>
+      <ContentLayout title="Locker">
+        <DynamicBreadcrumb items={lockerItems} />
         <LockerClient id={id} />
-      </QueryHydrator>
-    </ContentLayout>
+      </ContentLayout>
+    </QueryHydrator>
   )
 }

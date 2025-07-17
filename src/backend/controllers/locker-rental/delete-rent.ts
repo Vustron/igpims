@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
+import { locker, lockerRental } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import * as lockerQuery from "@/backend/queries/locker"
-import * as rentalQuery from "@/backend/queries/rental"
+import { getRentalByIdQuery } from "@/backend/queries/rental"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteRentById(
   request: NextRequest,
@@ -30,37 +31,37 @@ export async function deleteRentById(
       )
     }
 
-    const result = await db.transaction(async (_tx) => {
-      const rentalResult = await rentalQuery.getRentalByIdQuery.execute({
-        id: rentalId,
-      })
+    await db.transaction(async (tx): Promise<{ success: boolean }> => {
+      const rental = await tx
+        .select({ lockerId: lockerRental.lockerId })
+        .from(lockerRental)
+        .where(sql`${lockerRental.id} = ${rentalId}`)
+        .get()
 
-      const rental = rentalResult[0]
       if (!rental) {
         throw new Error("Rental not found")
       }
 
-      const lockerId = rental.lockerId
+      await Promise.all([
+        tx
+          .update(locker)
+          .set({ lockerStatus: "available" })
+          .where(sql`${locker.id} = ${rental.lockerId}`)
+          .run(),
+        tx
+          .delete(lockerRental)
+          .where(sql`${lockerRental.id} = ${rentalId}`)
+          .run(),
+      ])
 
-      await rentalQuery.deleteRentalQuery.execute({
-        id: rentalId,
-      })
-
-      if (lockerId) {
-        await lockerQuery.updateLockerStatusQuery.execute({
-          id: lockerId,
-          status: "available",
-        })
-      }
-
-      return {
-        id: rentalId,
-        lockerId,
-        message: "Rental deleted successfully",
-      }
+      return { success: true }
     })
 
-    return NextResponse.json(result, { status: 200 })
+    const rentalResult = await getRentalByIdQuery.execute({
+      id: rentalId,
+    })
+
+    return NextResponse.json(rentalResult, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

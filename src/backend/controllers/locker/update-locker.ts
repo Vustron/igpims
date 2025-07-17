@@ -1,6 +1,5 @@
 import { locker } from "@/backend/db/schemas"
 import { sendLockerEmail } from "@/backend/helpers/send-email"
-// Removed unused sendLockerEmail import - c:\Users\Kaijinu\igpims\src\backend\controllers\locker\update-locker.ts
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as lockerQuery from "@/backend/queries/locker"

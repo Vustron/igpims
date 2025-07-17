@@ -1,14 +1,14 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import toast from "react-hot-toast"
-import { DynamicForm } from "@/components/ui/forms"
 import { useSignUpUser } from "@/backend/actions/user/sign-up"
+import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import { cn } from "@/utils/cn"
 import { SignUpPayload, signUpSchema } from "@/validation/user"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 
 interface SignUpFormProps {
   isOnAdmin?: boolean
@@ -38,8 +38,6 @@ const SignUpForm = ({ isOnAdmin, onSuccess, onError }: SignUpFormProps) => {
       type: "select",
       placeholder: "Select user role",
       options: [
-        { label: "Admin", value: "admin" },
-        { label: "User", value: "user" },
         { label: "SSC President", value: "ssc_president" },
         { label: "DPDM Secretary", value: "dpdm_secretary" },
         { label: "DPDM Officers", value: "dpdm_officers" },

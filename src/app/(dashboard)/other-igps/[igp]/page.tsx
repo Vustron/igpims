@@ -1,7 +1,9 @@
+import { preFindManyIgp } from "@/backend/actions/igp/find-many"
 import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
 import { ContentLayout } from "@/features/layouts/content-layout"
 import { SpecificIgp } from "@/features/other-igps/specific-igp"
+import { QueryHydrator } from "@/utils/query-hydrator"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -13,6 +15,7 @@ interface PageProps {
 }
 
 export default async function IgpPage({ params }: PageProps) {
+  const [igpResults] = await Promise.all([preFindManyIgp()])
   const [resolvedParams] = await Promise.all([params])
   const { igp } = resolvedParams
 
@@ -32,13 +35,15 @@ export default async function IgpPage({ params }: PageProps) {
   ]
 
   return (
-    <ContentLayout title={displayName}>
-      <DynamicBreadcrumb items={igpItems} />
-      <SpecificIgp
-        igpTab={displayName}
-        igpTabLabel={displayName}
-        igpTabShortLabel={displayName}
-      />
-    </ContentLayout>
+    <QueryHydrator prefetchFns={[igpResults]}>
+      <ContentLayout title={displayName}>
+        <DynamicBreadcrumb items={igpItems} />
+        <SpecificIgp
+          igpTab={displayName}
+          igpTabLabel={displayName}
+          igpTabShortLabel={displayName}
+        />
+      </ContentLayout>
+    </QueryHydrator>
   )
 }

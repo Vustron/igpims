@@ -1,17 +1,19 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import toast from "react-hot-toast"
-import { DynamicForm } from "@/components/ui/forms"
+import { useFindManyWaterSupplies } from "@/backend/actions/water-supply/find-many"
 import { useUpdateWaterVendo } from "@/backend/actions/water-vendo/update-water-vendo"
 import { WaterVendo } from "@/backend/db/schemas"
+import { DynamicForm } from "@/components/ui/forms"
 import { FieldConfig } from "@/interfaces/form"
 import { catchError } from "@/utils/catch-error"
 import {
   UpdateWaterVendoData,
   updateWaterVendoSchema,
 } from "@/validation/water-vendo"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 
 interface EditWaterVendoFormProps {
   initialData: WaterVendo
@@ -25,6 +27,7 @@ export const EditWaterVendoForm = ({
   onError,
 }: EditWaterVendoFormProps) => {
   const updateWaterVendo = useUpdateWaterVendo(initialData.id)
+  const { data: suppliesResponse, isLoading } = useFindManyWaterSupplies()
 
   const form = useForm<UpdateWaterVendoData>({
     resolver: zodResolver(updateWaterVendoSchema),
@@ -35,6 +38,8 @@ export const EditWaterVendoForm = ({
       waterRefillStatus: initialData.waterRefillStatus,
     },
   })
+
+  const remainingGallons = suppliesResponse?.data?.[0]?.remainingGallons || 0
 
   const editWaterVendoFields: FieldConfig<UpdateWaterVendoData>[] = [
     {
@@ -80,6 +85,8 @@ export const EditWaterVendoForm = ({
       placeholder: "Enter gallons used",
       description: "Number of gallons currently used",
       required: true,
+      min: 0,
+      max: remainingGallons,
     },
   ]
 
@@ -100,6 +107,14 @@ export const EditWaterVendoForm = ({
     } else {
       onError?.()
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
   }
 
   return (

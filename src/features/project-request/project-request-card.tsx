@@ -1,5 +1,6 @@
 "use client"
 
+import { useDeleteIgp } from "@/backend/actions/igp/delete-igp"
 import { IgpWithProjectLeadData } from "@/backend/actions/igp/find-many"
 import { Button } from "@/components/ui/buttons"
 import { Card, CardContent, CardHeader } from "@/components/ui/cards"
@@ -9,7 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
+import { useConfirm } from "@/hooks/use-confirm"
 import { useDialog } from "@/hooks/use-dialog"
+import { catchError } from "@/utils/catch-error"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
 import {
   Calendar,
@@ -22,6 +25,7 @@ import {
   XCircle,
 } from "lucide-react"
 import { useState } from "react"
+import toast from "react-hot-toast"
 import { ProjectTimeline } from "./project-timeline"
 import { timelineSteps } from "./project-timeline-sample-data"
 import { TimelineStatusBadge } from "./project-timeline-status"
@@ -32,9 +36,26 @@ export const ProjectRequestCard = ({
   projectRequest: IgpWithProjectLeadData
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
+  const confirm = useConfirm()
+  const deleteFundRequest = useDeleteIgp(projectRequest.id)
   const { onOpen } = useDialog()
 
-  console.log(projectRequest)
+  const handleDelete = async () => {
+    const confirmed = await confirm(
+      "Delete project proposal",
+      "Are you sure you want to delete this project proposal? This action cannot be undone.",
+    )
+
+    if (confirmed) {
+      await toast.promise(deleteFundRequest.mutateAsync(), {
+        loading: (
+          <span className="animate-pulse">Deleting project proposal...</span>
+        ),
+        success: "Project proposal deleted successfully",
+        error: (error) => catchError(error),
+      })
+    }
+  }
 
   const getStatusAction = () => {
     switch (projectRequest.status) {
@@ -172,11 +193,7 @@ export const ProjectRequestCard = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    onClick={() =>
-                      onOpen("deleteProjectRequest", {
-                        requestId: projectRequest.id,
-                      })
-                    }
+                    onClick={handleDelete}
                     // disabled={!canDelete}
                     className="text-red-600 focus:text-red-600"
                   >
