@@ -260,6 +260,7 @@ export const CreateIgpForm = ({
         igpStartDate: new Date(values.igpStartDate).setHours(0, 0, 0, 0),
         igpEndDate: new Date(values.igpEndDate).setHours(0, 0, 0, 0),
         requestDate: new Date(values.igpStartDate).setHours(0, 0, 0, 0),
+        dateNeeded: new Date(values.dateNeeded).setHours(0, 0, 0, 0),
       }
 
       await toast.promise(createIgp.mutateAsync(formData), {

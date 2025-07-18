@@ -1,5 +1,7 @@
 "use client"
 
+import { useUpdateIgp } from "@/backend/actions/igp/update-igp"
+import { getImagekitUploadAuth } from "@/backend/actions/imagekit-api/upload-auth"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -17,15 +19,17 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
-import { useProjectRequestStore } from "@/features/project-request/project-request-store"
 import { isIgpData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { catchError } from "@/utils/catch-error"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
+import { upload } from "@imagekit/next"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import { Calendar, FileSearch, FileText, Upload } from "lucide-react"
 import dynamic from "next/dynamic"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import toast from "react-hot-toast"
 import { TiptapEditorControls } from "../text-editor/tiptap-controls"
 
 const PDFViewer = dynamic(
@@ -35,12 +39,13 @@ const PDFViewer = dynamic(
 
 export const ReviewProjectRequestDialog = () => {
   const { type, isOpen, onClose, data } = useDialog()
-  const { approveRequest, rejectRequest } = useProjectRequestStore()
   const [isRejecting, setIsRejecting] = useState(false)
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const isDesktop = useMediaQuery("(min-width: 768px)")
+  const [igpId, setIgpId] = useState("")
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -54,7 +59,23 @@ export const ReviewProjectRequestDialog = () => {
     immediatelyRender: false,
   })
 
-  const isDialogOpen = isOpen && type === "reviewProjectRequest"
+  useEffect(() => {
+    if (isIgpData(data) && data.igp) {
+      setIgpId(data.igp.id)
+    }
+  }, [data])
+
+  const updateIgp = useUpdateIgp(igpId)
+
+  const isDialogOpen = isOpen && type === "reviewProjectRequest" && igpId !== ""
+
+  if (!isDialogOpen) {
+    return null
+  }
+
+  if (!isIgpData(data) || !data.igp) {
+    return null
+  }
 
   const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -76,24 +97,81 @@ export const ReviewProjectRequestDialog = () => {
     }
   }
 
-  if (!isDialogOpen || !isIgpData(data) || !data.igp) {
-    return null
-  }
+  const uploadPdfToImageKit = async (file: File): Promise<string> => {
+    setIsUploading(true)
+    try {
+      const authParams = await getImagekitUploadAuth()
+      const { signature, expire, token, publicKey } = authParams
 
-  const handleApprove = () => {
-    if (data.igp && editor) {
-      approveRequest(data.igp.id, editor.getHTML())
-      onClose()
-      resetForm()
+      const uploadResponse = await upload({
+        expire,
+        token,
+        signature,
+        publicKey,
+        file,
+        fileName: `project_doc_${Date.now()}.pdf`,
+        useUniqueFileName: true,
+      })
+
+      if (!uploadResponse.url) {
+        throw new Error("Upload did not return a file URL.")
+      }
+
+      return uploadResponse.url
+    } catch (error) {
+      toast.error("Failed to upload PDF document")
+      throw error
+    } finally {
+      setIsUploading(false)
     }
   }
 
-  const handleReject = () => {
-    if (data.igp && rejectionEditor && rejectionEditor.getText().trim()) {
-      rejectRequest(data.igp.id, rejectionEditor.getHTML(), 2)
-      onClose()
-      resetForm()
+  const handleApprove = async () => {
+    if (!data.igp) return
+
+    let projectDocumentUrl = data.igp.projectDocument
+
+    if (pdfFile) {
+      projectDocumentUrl = await uploadPdfToImageKit(pdfFile)
     }
+
+    await toast.promise(
+      updateIgp.mutateAsync({
+        status: "in_review",
+        reviewerComments: editor?.getHTML(),
+        projectDocument: projectDocumentUrl,
+        currentStep: 2,
+      }),
+      {
+        loading: <span className="animate-pulse">Confirming review...</span>,
+        success: "Successfully confirmed review",
+        error: (error: unknown) => catchError(error),
+      },
+    )
+
+    onClose()
+    resetForm()
+  }
+
+  const handleReject = async () => {
+    if (!data.igp || !rejectionEditor?.getText().trim()) return
+
+    await toast.promise(
+      updateIgp.mutateAsync({
+        status: "rejected",
+        rejectionReason: rejectionEditor.getHTML(),
+        isRejected: true,
+        rejectionStep: 2,
+      }),
+      {
+        loading: <span className="animate-pulse">Rejecting review...</span>,
+        success: "Successfully rejected review",
+        error: (error: unknown) => catchError(error),
+      },
+    )
+
+    onClose()
+    resetForm()
   }
 
   const resetForm = () => {
@@ -102,67 +180,6 @@ export const ReviewProjectRequestDialog = () => {
     setIsRejecting(false)
     removePdf()
   }
-
-  // const parsePurpose = (purpose: string | null) => {
-  //   if (!purpose) {
-  //     return {
-  //       mainDescription: "",
-  //       projectDetails: [],
-  //       conclusion: "",
-  //     }
-  //   }
-
-  //   const lines = purpose.split("\n").filter((line) => line.trim())
-  //   const mainDescription = lines[0]?.trim() || ""
-
-  //   const projectDetailsStart = lines.findIndex((line) =>
-  //     line.includes("Project Details:"),
-  //   )
-  //   const projectDetailsEnd = lines.findIndex((line) =>
-  //     line.includes("This IGP aims"),
-  //   )
-
-  //   let projectDetails: Array<{ label: string; value: string; icon?: any }> = []
-
-  //   if (projectDetailsStart !== -1) {
-  //     const detailLines = lines.slice(
-  //       projectDetailsStart + 1,
-  //       projectDetailsEnd !== -1 ? projectDetailsEnd : undefined,
-  //     )
-
-  //     projectDetails = detailLines
-  //       .filter((line) => line.includes("- ") && line.includes(":"))
-  //       .map((line) => {
-  //         const cleanLine = line.replace("- ", "").trim()
-  //         const [label, ...valueParts] = cleanLine.split(":")
-  //         const value = valueParts.join(":").trim()
-
-  //         let icon = null
-  //         if (label?.toLowerCase().includes("type")) icon = Target
-  //         if (label?.toLowerCase().includes("period")) icon = Calendar
-  //         if (label?.toLowerCase().includes("quantities")) icon = Users
-  //         if (
-  //           label?.toLowerCase().includes("budget") ||
-  //           label?.toLowerCase().includes("cost")
-  //         )
-  //           icon = DollarSign
-  //         if (label?.toLowerCase().includes("officers")) icon = Users
-  //         if (label?.toLowerCase().includes("implementation")) icon = Clock
-
-  //         return { label: label?.trim() || "", value, icon }
-  //       })
-  //       .filter((item) => item.label !== "")
-  //   }
-
-  //   const conclusion =
-  //     lines.find((line) => line.includes("This IGP aims"))?.trim() || ""
-
-  //   return { mainDescription, projectDetails, conclusion }
-  // }
-
-  // const { mainDescription, projectDetails, conclusion } = parsePurpose(
-  //   data.igp.reviewerComments || null,
-  // )
 
   const DialogContent_Component = isDesktop ? Dialog : Drawer
   const Content = isDesktop ? DialogContent : DrawerContent
@@ -210,8 +227,8 @@ export const ReviewProjectRequestDialog = () => {
                 <p className="text-sm">{data.igp.projectLeadData?.name}</p>
               </div>
               <div>
-                <p className="font-medium text-gray-600 text-sm">Department</p>
-                <p className="text-sm">{data.igp.department}</p>
+                <p className="font-medium text-gray-600 text-sm">Description</p>
+                <p className="text-sm">{data.igp.igpDescription}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-sm">
@@ -260,8 +277,9 @@ export const ReviewProjectRequestDialog = () => {
                 <Button
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading || updateIgp.isPending}
                 >
-                  Select PDF File
+                  {isUploading ? "Uploading..." : "Select PDF File"}
                 </Button>
                 <p className="mt-2 text-xs text-gray-500">
                   Only PDF files are accepted
@@ -279,6 +297,7 @@ export const ReviewProjectRequestDialog = () => {
                     size="sm"
                     onClick={removePdf}
                     className="text-red-600 hover:text-red-700"
+                    disabled={isUploading || updateIgp.isPending}
                   >
                     Remove
                   </Button>
@@ -322,22 +341,35 @@ export const ReviewProjectRequestDialog = () => {
         <Footer className="flex flex-col gap-2 sm:flex-row">
           {!isRejecting ? (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRejecting(true)}
+                disabled={isUploading || updateIgp.isPending}
+              >
                 Reject Request
               </Button>
-              <Button onClick={handleApprove} disabled={editor?.isEmpty}>
-                Approve & Create Resolution
+              <Button
+                onClick={handleApprove}
+                disabled={isUploading || updateIgp.isPending}
+              >
+                {isUploading ? "Uploading..." : "Approve & Create Resolution"}
               </Button>
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRejecting(false)}
+                disabled={isUploading || updateIgp.isPending}
+              >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleReject}
-                disabled={rejectionEditor?.isEmpty}
+                disabled={
+                  rejectionEditor?.isEmpty || isUploading || updateIgp.isPending
+                }
               >
                 Reject Request
               </Button>

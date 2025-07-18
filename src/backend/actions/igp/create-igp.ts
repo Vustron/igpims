@@ -28,11 +28,11 @@ export const useCreateIgp = () => {
     },
     onMutate: async (newIgp) => {
       await Promise.all([
-        queryClient.cancelQueries({ queryKey: ["igp"] }),
+        queryClient.cancelQueries({ queryKey: ["igps"] }),
         queryClient.cancelQueries({ queryKey: ["igp-infinite"] }),
       ])
 
-      const previousIgp = queryClient.getQueryData(["igp"])
+      const previousIgp = queryClient.getQueryData(["igps"])
       const previousIgpInfinite = queryClient.getQueryData(["igp-infinite"])
 
       const optimisticIgp = {
@@ -135,7 +135,7 @@ export const useCreateIgp = () => {
       queryClient.setQueryData(["igp", newIgp.id], newIgp)
 
       queryClient.setQueriesData<PaginatedIgpResponse>(
-        { queryKey: ["igp"] },
+        { queryKey: ["igps"] },
         (oldData: any) => {
           if (!oldData?.data) return oldData
 
@@ -189,7 +189,7 @@ export const useCreateIgp = () => {
     },
     onError: (error, _variables, context) => {
       if (context?.previousIgp) {
-        queryClient.setQueryData(["igp"], context.previousIgp)
+        queryClient.setQueryData(["igps"], context.previousIgp)
       }
       if (context?.previousIgpInfinite) {
         queryClient.setQueryData(["igp-infinite"], context.previousIgpInfinite)
@@ -197,7 +197,7 @@ export const useCreateIgp = () => {
       catchError(error)
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["igp"] })
+      queryClient.invalidateQueries({ queryKey: ["igps"] })
       queryClient.invalidateQueries({ queryKey: ["igp-infinite"] })
       router.refresh()
     },

@@ -2,8 +2,8 @@ import {
   CheckCircle2,
   ClipboardCheck,
   FileSearch,
-  Files,
   FileText,
+  Files,
   ScrollText,
 } from "lucide-react"
 
@@ -41,8 +41,8 @@ export const timelineSteps: TimelineStepType[] = [
   },
   {
     id: 4,
-    name: "Submit Project & Resolution",
-    shortName: "Submit",
+    name: "Check Project & Resolution",
+    shortName: "Check",
     icon: <Files className="size-4" />,
     description: "Complete project proposal and resolution submitted",
   },

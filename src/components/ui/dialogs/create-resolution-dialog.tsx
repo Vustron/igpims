@@ -1,7 +1,7 @@
 "use client"
 
-import { ScrollText } from "lucide-react"
-import { useState } from "react"
+import { useUpdateIgp } from "@/backend/actions/igp/update-igp"
+import { getImagekitUploadAuth } from "@/backend/actions/imagekit-api/upload-auth"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -19,49 +19,136 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
-import { Textarea } from "@/components/ui/inputs"
-import { useProjectRequestStore } from "@/features/project-request/project-request-store"
-import { isProjectRequestData, useDialog } from "@/hooks/use-dialog"
+import { isIgpData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { catchError } from "@/utils/catch-error"
+import { upload } from "@imagekit/next"
+import { FileText, Upload } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import toast from "react-hot-toast"
+import { PDFViewer } from "../pdf/pdf-viewer"
 
 export const CreateResolutionDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()
-  const { getRequestById, approveRequest, rejectRequest } =
-    useProjectRequestStore()
-  const [resolutionContent, setResolutionContent] = useState("")
-  const [rejectionReason, setRejectionReason] = useState("")
   const [isRejecting, setIsRejecting] = useState(false)
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const isDesktop = useMediaQuery("(min-width: 768px)")
+  const [igpId, setIgpId] = useState("")
 
-  const isDialogOpen = isOpen && type === "createResolution"
-  const request =
-    isProjectRequestData(data) && data.requestId
-      ? getRequestById(data.requestId)
-      : null
+  useEffect(() => {
+    if (isIgpData(data) && data.igp) {
+      setIgpId(data.igp.id)
+    }
+  }, [data])
 
-  const handleCreateResolution = () => {
-    if (request && resolutionContent.trim()) {
-      approveRequest(request.id, resolutionContent)
-      onClose()
-      resetForm()
+  const updateIgp = useUpdateIgp(igpId)
+
+  const isDialogOpen = isOpen && type === "createResolution" && igpId !== ""
+
+  if (!isDialogOpen) {
+    return null
+  }
+
+  if (!isIgpData(data) || !data.igp) {
+    return null
+  }
+
+  const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === "application/pdf") {
+      setPdfFile(file)
+      const url = URL.createObjectURL(file)
+      setPdfPreviewUrl(url)
     }
   }
 
-  const handleReject = () => {
-    if (request && rejectionReason.trim()) {
-      rejectRequest(request.id, rejectionReason, 3)
-      onClose()
-      resetForm()
+  const removePdf = () => {
+    if (pdfPreviewUrl) {
+      URL.revokeObjectURL(pdfPreviewUrl)
     }
+    setPdfFile(null)
+    setPdfPreviewUrl(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
+  const uploadPdfToImageKit = async (file: File): Promise<string> => {
+    setIsUploading(true)
+    try {
+      const authParams = await getImagekitUploadAuth()
+      const { signature, expire, token, publicKey } = authParams
+
+      const uploadResponse = await upload({
+        expire,
+        token,
+        signature,
+        publicKey,
+        file,
+        fileName: `resolution_document_${Date.now()}.pdf`,
+        useUniqueFileName: true,
+      })
+
+      if (!uploadResponse.url) {
+        throw new Error("Upload did not return a file URL.")
+      }
+
+      return uploadResponse.url
+    } catch (error) {
+      toast.error("Failed to upload PDF document")
+      throw error
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleCreateResolution = async () => {
+    if (!data.igp || !pdfFile) return
+
+    const resolutionDocumentUrl = await uploadPdfToImageKit(pdfFile)
+
+    await toast.promise(
+      updateIgp.mutateAsync({
+        status: "checking",
+        resolutionDocument: resolutionDocumentUrl,
+        currentStep: 3,
+      }),
+      {
+        loading: "Creating resolution...",
+        success: "Resolution created successfully",
+        error: (error) => catchError(error),
+      },
+    )
+    onClose()
+    resetForm()
+  }
+
+  const handleReject = async () => {
+    if (!data.igp) return
+
+    await toast.promise(
+      updateIgp.mutateAsync({
+        status: "rejected",
+        isRejected: true,
+        rejectionStep: 3,
+      }),
+      {
+        loading: "Rejecting proposal...",
+        success: "Proposal rejected successfully",
+        error: (error) => catchError(error),
+      },
+    )
+    onClose()
+    resetForm()
   }
 
   const resetForm = () => {
-    setResolutionContent("")
-    setRejectionReason("")
+    removePdf()
     setIsRejecting(false)
   }
-
-  if (!request) return null
 
   const DialogContent_Component = isDesktop ? Dialog : Drawer
   const Content = isDesktop ? DialogContent : DrawerContent
@@ -72,15 +159,17 @@ export const CreateResolutionDialog = () => {
 
   return (
     <DialogContent_Component open={isDialogOpen} onOpenChange={onClose}>
-      <Content className={isDesktop ? "max-w-3xl" : ""}>
+      <Content
+        className={isDesktop ? "max-h-[95vh] max-w-4xl overflow-y-auto" : ""}
+      >
         <Header>
           <div className="flex items-center gap-2">
-            <ScrollText className="h-5 w-5 text-purple-600" />
+            <FileText className="h-5 w-5 text-purple-600" />
             <Title>Create Committee Resolution</Title>
           </div>
           <Description>
-            Draft the official committee resolution for this IGP project
-            proposal.
+            Upload the official committee resolution document for this IGP
+            project proposal.
           </Description>
         </Header>
 
@@ -93,53 +182,89 @@ export const CreateResolutionDialog = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="font-medium text-gray-600 text-xs">Project ID</p>
-                <p className="font-mono text-sm">{request.id}</p>
+                <p className="font-mono text-sm">{data.igp.id}</p>
               </div>
               <div>
                 <p className="font-medium text-gray-600 text-xs">
                   Project Lead
                 </p>
-                <p className="text-sm">{request.projectLead}</p>
+                <p className="text-sm">{data.igp.projectLeadData?.name}</p>
               </div>
               <div className="col-span-2">
                 <p className="font-medium text-gray-600 text-xs">
                   Project Title
                 </p>
-                <p className="font-medium text-sm">{request.projectTitle}</p>
+                <p className="font-medium text-sm">{data.igp.igpName}</p>
               </div>
             </div>
           </div>
 
-          {/* Resolution Content */}
+          {/* Resolution Document Upload */}
           {!isRejecting ? (
-            <div>
-              <span className="mb-2 block font-medium text-gray-700 text-sm">
-                Resolution Content *
+            <div className="space-y-2">
+              <span className="block font-medium text-gray-700 text-sm">
+                Resolution Document (PDF) *
               </span>
-              <Textarea
-                placeholder="WHEREAS, the committee has reviewed the IGP project proposal...&#10;&#10;NOW THEREFORE, BE IT RESOLVED that..."
-                value={resolutionContent}
-                onChange={(e) => setResolutionContent(e.target.value)}
-                rows={8}
-                className="font-mono text-sm"
-              />
-              <p className="mt-1 text-gray-500 text-xs">
-                Draft the official committee resolution approving this project
-                proposal.
-              </p>
+              {!pdfPreviewUrl ? (
+                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-6">
+                  <Upload className="mb-2 h-8 w-8 text-gray-400" />
+                  <p className="mb-2 text-sm text-gray-600">
+                    Upload resolution document PDF
+                  </p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="application/pdf"
+                    onChange={handlePdfUpload}
+                    className="hidden"
+                    id="pdf-upload"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading || updateIgp.isPending}
+                  >
+                    {isUploading ? "Uploading..." : "Select PDF File"}
+                  </Button>
+                  <p className="mt-2 text-xs text-gray-500">
+                    Only PDF files are accepted
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between rounded-md bg-gray-50 p-3">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-red-500" />
+                      <span className="text-sm font-medium">
+                        {pdfFile?.name}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={removePdf}
+                      className="text-red-600 hover:text-red-700"
+                      disabled={isUploading || updateIgp.isPending}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+
+                  {pdfPreviewUrl && <PDFViewer file={pdfPreviewUrl} />}
+                </div>
+              )}
             </div>
           ) : (
-            <div>
-              <span className="mb-2 block font-medium text-red-700 text-sm">
-                Rejection Reason *
+            <div className="space-y-2">
+              <span className="block font-medium text-red-700 text-sm">
+                Confirm Rejection
               </span>
-              <Textarea
-                placeholder="Please provide a reason for rejection..."
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                rows={4}
-                className="border-red-300 focus:border-red-500 focus:ring-red-500"
-              />
+              <div className="rounded-lg border border-red-300 bg-red-50 p-4">
+                <p className="text-sm text-red-800">
+                  Are you sure you want to reject this proposal? This action
+                  cannot be undone.
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -147,27 +272,35 @@ export const CreateResolutionDialog = () => {
         <Footer className="flex flex-col gap-2 sm:flex-row">
           {!isRejecting ? (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(true)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRejecting(true)}
+                disabled={isUploading || updateIgp.isPending}
+              >
                 Reject Proposal
               </Button>
               <Button
                 onClick={handleCreateResolution}
-                disabled={!resolutionContent.trim()}
+                disabled={!pdfFile || isUploading || updateIgp.isPending}
               >
-                Create Resolution & Submit
+                {isUploading ? "Uploading..." : "Submit Resolution Document"}
               </Button>
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={() => setIsRejecting(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsRejecting(false)}
+                disabled={updateIgp.isPending}
+              >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleReject}
-                disabled={!rejectionReason.trim()}
+                disabled={updateIgp.isPending}
               >
-                Reject Proposal
+                {updateIgp.isPending ? "Processing..." : "Confirm Rejection"}
               </Button>
             </>
           )}

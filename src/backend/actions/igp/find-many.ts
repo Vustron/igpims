@@ -205,7 +205,7 @@ export async function preFindManyIgp(filters: IgpFilters = {}) {
 
     return queryOptions({
       queryKey: [
-        "igp",
+        "igps",
         {
           page,
           limit,
@@ -240,7 +240,7 @@ export const useFindManyIgp = (filters: IgpFilters = {}) => {
 
   return useQuery<PaginatedIgpResponse>({
     queryKey: [
-      "igp",
+      "igps",
       {
         page,
         limit,

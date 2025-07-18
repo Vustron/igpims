@@ -91,7 +91,7 @@ export const igp = sqliteTable(
     notes: text("notes", { length: 2000 }),
     reviewerComments: text("reviewerComments", { length: 2000 }),
     projectDocument: text("projectDocument", { length: 2000 }),
-    resolutionDocument: text("projectDocument", { length: 2000 }),
+    resolutionDocument: text("resolutionDocument", { length: 2000 }),
     submissionDate: integer("submissionDate", {
       mode: "timestamp",
     }),

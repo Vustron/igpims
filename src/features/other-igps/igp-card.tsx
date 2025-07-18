@@ -22,7 +22,6 @@ import {
   Printer,
   Store,
   Tag,
-  Wrench,
 } from "lucide-react"
 import Link from "next/link"
 import { BiDonateHeart } from "react-icons/bi"
@@ -149,7 +148,18 @@ export function IgpCard({
   }
 
   const getStatusStyles = () => {
-    if (status === "pending") {
+    if (status !== "completed") {
+      let statusText = "Pending"
+      switch (status) {
+        case "rejected":
+          statusText = "Rejected"
+          break
+        case "in_progress":
+          statusText = "In Pending"
+          break
+        default:
+          statusText = "Pending"
+      }
       return {
         iconBg: "bg-blue-100",
         iconColor: "text-blue-700",
@@ -157,53 +167,28 @@ export function IgpCard({
         badgeBg: "bg-blue-50",
         badgeText: "text-blue-700",
         statusIcon: Clock,
-        statusText: "Pending",
+        statusText,
         cardBorder: "border-blue-200",
         cardOverlay: false,
       }
     }
 
-    switch (type) {
-      case "permanent":
-        return {
-          iconBg: "bg-emerald-100",
-          iconColor: "text-emerald-700",
-          badgeBorder: "border-emerald-200",
-          badgeBg: "bg-emerald-50",
-          badgeText: "text-emerald-700",
-          statusIcon: CheckCircle,
-          statusText: "Permanent",
-          cardBorder: "border-slate-200",
-        }
-      case "maintenance":
-        return {
-          iconBg: "bg-red-100",
-          iconColor: "text-red-700",
-          badgeBorder: "border-red-200",
-          badgeBg: "bg-red-50",
-          badgeText: "text-red-700",
-          statusIcon: Wrench,
-          statusText: "Maintenance",
-          cardBorder: "border-red-200",
-          cardOverlay: true,
-        }
-      default:
-        return {
-          iconBg: "bg-amber-100",
-          iconColor: "text-amber-700",
-          badgeBorder: "border-amber-200",
-          badgeBg: "bg-amber-50",
-          badgeText: "text-amber-700",
-          statusIcon: Clock,
-          statusText: "Temporary",
-          cardBorder: "border-slate-200",
-        }
+    return {
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-700",
+      badgeBorder: "border-emerald-200",
+      badgeBg: "bg-emerald-50",
+      badgeText: "text-emerald-700",
+      statusIcon: CheckCircle,
+      statusText: "Completed",
+      cardBorder: "border-slate-200",
+      cardOverlay: false,
     }
   }
 
   const statusStyles = getStatusStyles()
   const StatusIcon = statusStyles.statusIcon
-  const projectStatusLink = status === "pending" ? "/project-approval" : href
+  const projectStatusLink = status !== "completed" ? "/project-approval" : href
 
   return (
     <motion.div
@@ -217,17 +202,12 @@ export function IgpCard({
         className={cn(
           "flex h-full flex-col overflow-hidden transition-all hover:shadow-md",
           statusStyles.cardBorder,
-          status === "pending"
-            ? "hover:border-blue-300"
-            : type === "maintenance"
-              ? "hover:border-red-300"
-              : "hover:border-slate-300",
+          status === "completed"
+            ? "hover:border-emerald-300"
+            : "hover:border-blue-300",
         )}
       >
-        {type === "maintenance" && status !== "pending" && (
-          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-blue-red/5 to-blue-red/10" />
-        )}
-        {status === "pending" && type !== "maintenance" && (
+        {status !== "completed" && (
           <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-blue-50/5 to-blue-50/10" />
         )}
 
@@ -262,8 +242,8 @@ export function IgpCard({
 
                   {type === "maintenance" &&
                     maintenanceDate &&
-                    status !== "pending" && (
-                      <span className="ml-1.5 text-[10px] text-red-600">
+                    status !== "completed" && (
+                      <span className="ml-1.5 text-[10px] text-blue-600">
                         Until {formatDateFromTimestamp(maintenanceDate)}
                       </span>
                     )}
@@ -274,21 +254,14 @@ export function IgpCard({
 
           <p className="line-clamp-2 text-slate-600 text-xs">{description}</p>
 
-          {type === "maintenance" && status !== "pending" ? (
+          {status === "rejected" ? (
             <div className="flex items-center gap-2 rounded-md border border-red-100 bg-red-50 px-3 py-2">
               <AlertTriangle className="h-4 w-4 text-red-600" />
               <p className="text-red-700 text-xs">
-                This IGP is currently unavailable due to maintenance work.
+                This IGP has been rejected.
               </p>
             </div>
-          ) : status === "pending" ? (
-            <div className="flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2">
-              <Clock className="h-4 w-4 text-blue-600" />
-              <p className="text-blue-700 text-xs">
-                This IGP is pending approval.
-              </p>
-            </div>
-          ) : (
+          ) : status === "completed" ? (
             <div className="mt-auto grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <p className="text-slate-500 text-xs">Total Sold</p>
@@ -309,17 +282,20 @@ export function IgpCard({
                 </div>
               </div>
             </div>
+          ) : (
+            <div className="flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2">
+              <Clock className="h-4 w-4 text-blue-600" />
+              <p className="text-blue-700 text-xs">
+                This IGP is pending approval.
+              </p>
+            </div>
           )}
         </CardContent>
 
         <CardFooter
           className={cn(
             "border-t p-4",
-            type === "maintenance" && status !== "pending"
-              ? "bg-red-50"
-              : status === "pending"
-                ? "bg-blue-50"
-                : "bg-slate-50",
+            status === "completed" ? "bg-slate-50" : "bg-blue-50",
           )}
         >
           <Link href={projectStatusLink} className="w-full">
@@ -327,19 +303,15 @@ export function IgpCard({
               variant="outline"
               className={cn(
                 "w-full bg-white",
-                type === "maintenance" && status !== "pending"
-                  ? "border-red-300 hover:bg-red-50"
-                  : status === "pending"
-                    ? "border-blue-300 hover:bg-blue-50"
-                    : "border-slate-300 hover:bg-slate-100",
+                status === "completed"
+                  ? "border-slate-300 hover:bg-slate-100"
+                  : "border-blue-300 hover:bg-blue-50",
               )}
             >
               <span className="mr-1">
-                {type === "maintenance" && status !== "pending"
-                  ? "View Maintenance Details"
-                  : status === "pending"
-                    ? "View Pending Request"
-                    : "View Details"}
+                {status === "completed"
+                  ? "View Details"
+                  : "View Pending Request"}
               </span>
               <ChevronRight className="h-3.5 w-3.5" />
             </Button>

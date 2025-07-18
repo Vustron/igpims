@@ -16,6 +16,7 @@ const insertIgpQuery = db
     igpStartDate: sql`${sql.placeholder("igpStartDate")}`,
     igpEndDate: sql`${sql.placeholder("igpEndDate")}`,
     requestDate: sql`${sql.placeholder("requestDate")}`,
+    dateNeeded: sql`${sql.placeholder("dateNeeded")}`,
     itemsToSell: sql`${sql.placeholder("itemsToSell")}`,
     assignedOfficers: sql`${sql.placeholder("assignedOfficers")}`,
     costPerItem: sql`${sql.placeholder("costPerItem")}`,

@@ -1,10 +1,12 @@
+import { igp } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { findIgpByIdQuery, updateIgpQuery } from "@/backend/queries/igp"
+import { findIgpByIdQuery } from "@/backend/queries/igp"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { UpdateIgpPayload, updateIgpSchema } from "@/validation/igp"
+import { eq } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function updateIgp(
@@ -42,7 +44,7 @@ export async function updateIgp(
         throw new Error("IGP not found")
       }
 
-      const updateValues = validationResult.data
+      const updateValues: Record<string, any> = {}
 
       if (data.igpName !== undefined) updateValues.igpName = data.igpName
       if (data.igpDescription !== undefined)
@@ -93,10 +95,7 @@ export async function updateIgp(
         updateValues.approvalDate = data.approvalDate
 
       if (Object.keys(updateValues).length > 0) {
-        await updateIgpQuery.execute({
-          ...updateValues,
-          id,
-        })
+        await db.update(igp).set(updateValues).where(eq(igp.id, id))
       }
     })
 

@@ -67,21 +67,20 @@ export const ProjectRequestCard = ({
         }
       case "in_review":
         return {
-          label: "Create Resolution",
-          action: () =>
-            onOpen("createResolution", { requestId: projectRequest.id }),
+          label: "Upload Resolution",
+          action: () => onOpen("createResolution", { igp: projectRequest }),
           color: "bg-purple-600 hover:bg-purple-700",
         }
       case "checking":
         return {
-          label: "Approve Project",
+          label: "Check submmitted documents",
           action: () =>
-            onOpen("approveProjectRequest", { requestId: projectRequest.id }),
+            onOpen("approveProjectRequest", { igp: projectRequest }),
           color: "bg-emerald-600 hover:bg-emerald-700",
         }
       case "approved":
         return {
-          label: "Start Implementation",
+          label: "Final administrative review",
           action: () =>
             onOpen("startImplementation", { requestId: projectRequest.id }),
           color: "bg-indigo-600 hover:bg-indigo-700",

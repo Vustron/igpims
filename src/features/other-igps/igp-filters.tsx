@@ -299,7 +299,7 @@ export function IgpFilters({
                 disabled={hasActiveProjects}
               >
                 <PlusCircleIcon className="h-4 w-4" />
-                <span>New IGP Proposal</span>
+                {hasActiveProjects ? "Pending approval" : "New IGP Proposal"}
               </Button>
             </TooltipTrigger>
 

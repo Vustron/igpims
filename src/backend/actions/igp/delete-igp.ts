@@ -22,7 +22,7 @@ export const useDeleteIgp = (id: string) => {
     },
     onMutate: async () => {
       await Promise.all([
-        queryClient.cancelQueries({ queryKey: ["igp"] }),
+        queryClient.cancelQueries({ queryKey: ["igps"] }),
         queryClient.cancelQueries({ queryKey: ["igp", id] }),
         queryClient.cancelQueries({ queryKey: ["igp-infinite"] }),
       ])
@@ -99,7 +99,7 @@ export const useDeleteIgp = (id: string) => {
       catchError(error)
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["igp"] })
+      queryClient.invalidateQueries({ queryKey: ["igps"] })
       queryClient.invalidateQueries({ queryKey: ["igp", id] })
       queryClient.invalidateQueries({ queryKey: ["igp-infinite"] })
       router.refresh()
