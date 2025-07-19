@@ -50,19 +50,6 @@ export async function createExpenseTransaction(
       )
     }
 
-    const existingExpense = await db.query.expenseTransaction.findFirst({
-      where: (exp) =>
-        eq(exp.expenseName, expenseData.expenseName) &&
-        eq(exp.requestId, expenseData.requestId),
-    })
-
-    if (existingExpense) {
-      return NextResponse.json(
-        { error: "Expense with this name already exists" },
-        { status: 409 },
-      )
-    }
-
     const expense = await db.transaction(async (tx) => {
       const [insertResult] = await tx
         .insert(expenseTransaction)

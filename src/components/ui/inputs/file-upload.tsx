@@ -116,6 +116,7 @@ export const FileUpload = ({
         publicKey,
         file,
         fileName: file.name,
+        folder: "/igpmis/",
         onProgress: (event) => {
           setUploadProgress((event.loaded / event.total) * 100)
         },
