@@ -13,14 +13,17 @@ export const metadata: Metadata = {
 }
 
 interface PageProps {
-  params: { id: string }
-  searchParams: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{
     isOnSubmitReceipts?: string
     isValidateExpenses?: string
-  }
+  }>
 }
 
-function getPageTitle(searchParams: PageProps["searchParams"]) {
+function getPageTitle(searchParams: {
+  isOnSubmitReceipts?: string
+  isValidateExpenses?: string
+}) {
   if (searchParams.isOnSubmitReceipts === "true") {
     return "Confirm Receipts"
   }
@@ -34,21 +37,24 @@ export default async function ValidateFundRequestPage({
   params,
   searchParams,
 }: PageProps) {
-  const preFindFundRequest = await preFindFundRequestById(params.id)
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+
+  const preFindFundRequest = await preFindFundRequestById(resolvedParams.id)
 
   const validateFundRequestItems: BreadcrumbItemProps[] = [
     { label: "Dashboard", href: "/" },
     { label: "Fund Request", href: "/fund-request" },
-    { label: `${params.id}` },
+    { label: `${resolvedParams.id}` },
   ]
 
-  const title = getPageTitle(searchParams)
+  const title = getPageTitle(resolvedSearchParams)
 
   return (
     <QueryHydrator prefetchFns={[preFindFundRequest]}>
       <ContentLayout title={title}>
         <DynamicBreadcrumb items={validateFundRequestItems} />
-        <ExpenseTransactionClient id={params.id} />
+        <ExpenseTransactionClient id={resolvedParams.id} />
       </ContentLayout>
     </QueryHydrator>
   )
