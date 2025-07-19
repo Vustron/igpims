@@ -47,6 +47,17 @@ export const Actions = ({
     }
   }
 
+  const handleReject = async () => {
+    const confirmed = await confirm(
+      "Reject fund request",
+      "Are you sure you want to reject this fund request? This action cannot be undone.",
+    )
+
+    if (confirmed) {
+      onOpen("rejectReason", { expenseTransaction: transaction })
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,7 +66,7 @@ export const Actions = ({
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-[200px]">
         <DropdownMenuLabel className="text-xs">Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
@@ -64,6 +75,13 @@ export const Actions = ({
         >
           <FilePen className="mr-2 h-3.5 w-3.5" />
           Edit Transaction
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer text-xs"
+          onClick={handleReject}
+        >
+          <FilePen className="mr-2 h-3.5 w-3.5" />
+          Reject Fund Request
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer text-xs"

@@ -81,15 +81,13 @@ export const ProjectRequestCard = ({
       case "approved":
         return {
           label: "Final administrative review",
-          action: () =>
-            onOpen("startImplementation", { requestId: projectRequest.id }),
+          action: () => onOpen("startImplementation", { igp: projectRequest }),
           color: "bg-indigo-600 hover:bg-indigo-700",
         }
       case "in_progress":
         return {
           label: "Mark Completed",
-          action: () =>
-            onOpen("completeProject", { requestId: projectRequest.id }),
+          action: () => onOpen("completeProject", { igp: projectRequest }),
           color: "bg-green-600 hover:bg-green-700",
         }
       default:

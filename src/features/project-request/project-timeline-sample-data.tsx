@@ -16,7 +16,6 @@ export interface TimelineStepType {
   rejectionReason?: string
 }
 
-// Timeline steps definition
 export const timelineSteps: TimelineStepType[] = [
   {
     id: 1,

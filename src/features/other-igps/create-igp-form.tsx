@@ -68,13 +68,6 @@ export const CreateIgpForm = ({
     return () => subscription.unsubscribe()
   }, [form, users?.data])
 
-  const igpNameOptions = [
-    { label: "Food Sale", value: "foodSale" },
-    { label: "Merchandise Sale", value: "merchandiseSale" },
-    { label: "School Supplies", value: "schoolSupplies" },
-    { label: "Fundraising Event", value: "fundraisingEvent" },
-  ]
-
   const semesterOptions = [
     {
       label: `1st Semester ${currentYear}-${currentYear + 1}`,
@@ -88,10 +81,9 @@ export const CreateIgpForm = ({
   ]
 
   const igpTypeOptions = [
-    { label: "Food", value: "food" },
-    { label: "Merchandise", value: "merchandise" },
-    { label: "Service", value: "service" },
-    { label: "Event", value: "event" },
+    { label: "Permanent", value: "permanent" },
+    { label: "Temporary", value: "temporary" },
+    { label: "Maintenance", value: "maintenance" },
   ]
 
   const iconTypeOptions = [
@@ -160,11 +152,10 @@ export const CreateIgpForm = ({
     },
     {
       name: "igpName",
-      type: "select",
+      type: "text",
       label: "IGP Name",
-      placeholder: "Select IGP type",
-      description: "Type of Income Generating Project",
-      options: igpNameOptions,
+      placeholder: "Input IGP Name",
+      description: "",
       required: true,
     },
     {
@@ -189,7 +180,7 @@ export const CreateIgpForm = ({
       name: "igpDescription",
       type: "textarea",
       label: "IGP Description",
-      placeholder: "Enter IGP description",
+      placeholder: "Enter details",
       description: "Detailed description of the IGP",
       required: true,
     },

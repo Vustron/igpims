@@ -9,29 +9,46 @@ import { QueryHydrator } from "@/utils/query-hydrator"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Validate Fund Request",
+  title: "Fund Request",
 }
 
 interface PageProps {
-  params: Promise<{ id: string }>
+  params: { id: string }
+  searchParams: {
+    isOnSubmitReceipts?: string
+    isValidateExpenses?: string
+  }
 }
 
-export default async function ValidateFundRequestPage({ params }: PageProps) {
-  const [resolvedParams, preFindFundRequest] = await Promise.all([
-    params,
-    preFindFundRequestById((await params).id),
-  ])
-  const { id } = resolvedParams
+function getPageTitle(searchParams: PageProps["searchParams"]) {
+  if (searchParams.isOnSubmitReceipts === "true") {
+    return "Confirm Receipts"
+  }
+  if (searchParams.isValidateExpenses === "true") {
+    return "Validate Expenses"
+  }
+  return "Fund Request Details"
+}
+
+export default async function ValidateFundRequestPage({
+  params,
+  searchParams,
+}: PageProps) {
+  const preFindFundRequest = await preFindFundRequestById(params.id)
+
   const validateFundRequestItems: BreadcrumbItemProps[] = [
     { label: "Dashboard", href: "/" },
     { label: "Fund Request", href: "/fund-request" },
-    { label: `${id}` },
+    { label: `${params.id}` },
   ]
+
+  const title = getPageTitle(searchParams)
+
   return (
     <QueryHydrator prefetchFns={[preFindFundRequest]}>
-      <ContentLayout title="Validate Fund Request">
+      <ContentLayout title={title}>
         <DynamicBreadcrumb items={validateFundRequestItems} />
-        <ExpenseTransactionClient id={id} />
+        <ExpenseTransactionClient id={params.id} />
       </ContentLayout>
     </QueryHydrator>
   )

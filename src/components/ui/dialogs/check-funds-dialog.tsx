@@ -23,10 +23,17 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawers"
 import { Textarea } from "@/components/ui/inputs"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/selects"
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { catchError } from "@/utils/catch-error"
-import { format } from "date-fns"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { AnimatePresence, motion } from "framer-motion"
 import { AlertTriangle, Calendar, Loader2, PiggyBank } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -38,6 +45,7 @@ export const CheckFundsDialog = () => {
   const [isRejecting, setIsRejecting] = useState(false)
   const [rejectionReason, setRejectionReason] = useState("")
   const [showWarning, setShowWarning] = useState(false)
+  const [budgetSource, setBudgetSource] = useState<string>("")
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const fundRequest =
     data && "fundRequest" in data
@@ -65,6 +73,11 @@ export const CheckFundsDialog = () => {
 
     if (isInsufficientFunds) {
       toast.error("The amount requested exceeds the available budget")
+      return
+    }
+
+    if (!budgetSource) {
+      toast.error("Please select a budget source")
       return
     }
 
@@ -119,6 +132,7 @@ export const CheckFundsDialog = () => {
     setNotes("")
     setRejectionReason("")
     setIsRejecting(false)
+    setBudgetSource("")
   }
 
   const formatCurrency = (amount: number) => {
@@ -148,9 +162,15 @@ export const CheckFundsDialog = () => {
     )
   }
 
+  const hasFundsData =
+    fundRequestData?.profitData?.netProfit !== undefined &&
+    fundRequestData?.profitData?.netProfit !== null
+
   return (
     <DialogContent_Component open={isDialogOpen} onOpenChange={onClose}>
-      <Content className={isDesktop ? "max-w-2xl" : ""}>
+      <Content
+        className={isDesktop ? "max-h-[95vh] max-w-4xl overflow-y-auto" : ""}
+      >
         <Header>
           <div className="flex items-center gap-2">
             <PiggyBank className="h-5 w-5 text-purple-600" />
@@ -167,12 +187,32 @@ export const CheckFundsDialog = () => {
               className="flex flex-col items-center"
             >
               <span className="font-bold">
-                Current IGP Funds:{" "}
-                {isLoading
-                  ? "Loading..."
-                  : fundRequestData?.profitData?.netProfit !== undefined
-                    ? formatCurrency(fundRequestData.profitData.netProfit)
-                    : "N/A"}
+                {!hasFundsData ? (
+                  <div className="flex items-center justify-center p-8">
+                    <Loader2 className="size-8 animate-spin text-primary" />
+                    <span className="ml-2">Loading funds data...</span>
+                  </div>
+                ) : (
+                  <span>
+                    Current IGP Funds:{" "}
+                    {formatCurrency(
+                      fundRequestData?.profitData?.netProfit || 0,
+                    )}
+                  </span>
+                )}
+              </span>
+
+              <span className="font-bold">
+                {!hasFundsData ? (
+                  <div className="flex items-center justify-center p-8">
+                    <Loader2 className="size-8 animate-spin text-primary" />
+                    <span className="ml-2">Loading funds data...</span>
+                  </div>
+                ) : (
+                  <span>
+                    Allocated Funds: {formatCurrency(fundRequest?.amount || 0)}
+                  </span>
+                )}
               </span>
 
               <AnimatePresence>
@@ -234,7 +274,7 @@ export const CheckFundsDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {format(new Date(fundRequest.requestDate), "MMM d, yyyy")}
+                    {formatDateFromTimestamp(fundRequest.requestDate)}
                   </p>
                 </div>
               </div>
@@ -243,13 +283,38 @@ export const CheckFundsDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-gray-400" />
                   <p className="text-sm">
-                    {fundRequest.dateNeeded
-                      ? format(new Date(fundRequest.dateNeeded), "MMM d, yyyy")
-                      : "Not specified"}
+                    {formatDateFromTimestamp(fundRequest.dateNeeded)}
                   </p>
                 </div>
               </div>
             </div>
+          </motion.div>
+
+          {/* Budget Source Selector */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+            className="mt-4"
+          >
+            <span className="mb-2 block font-medium text-gray-700 text-sm">
+              Budget Source *
+            </span>
+            <Select
+              value={budgetSource}
+              onValueChange={setBudgetSource}
+              disabled={isPending || isRejecting}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select budget source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="locker">Locker</SelectItem>
+                <SelectItem value="water-vendo">Water Vendo</SelectItem>
+                <SelectItem value="igp">IGP</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
           </motion.div>
 
           {!isRejecting ? (
@@ -258,7 +323,7 @@ export const CheckFundsDialog = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="mt-2 mb-2 block font-medium text-gray-700 text-sm">
+              <span className="mt-4 mb-2 block font-medium text-gray-700 text-sm">
                 Allocation Notes (Optional)
               </span>
               <Textarea
@@ -275,7 +340,7 @@ export const CheckFundsDialog = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="mt-2 mb-2 block font-medium text-red-700 text-sm">
+              <span className="mt-4 mb-2 block font-medium text-red-700 text-sm">
                 Rejection Reason *
               </span>
               <Textarea
@@ -314,7 +379,7 @@ export const CheckFundsDialog = () => {
               >
                 <Button
                   onClick={handleApprove}
-                  disabled={isPending || isInsufficientFunds}
+                  disabled={isPending || isInsufficientFunds || !budgetSource}
                   className={
                     isInsufficientFunds ? "opacity-50 cursor-not-allowed" : ""
                   }

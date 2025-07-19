@@ -130,8 +130,8 @@ export const igpTransactions = sqliteTable(
       .references(() => igp.id, { onDelete: "cascade" }),
     purchaserName: text("purchaserName", { length: 255 }).notNull(),
     courseAndSet: text("courseAndSet", { length: 100 }).notNull(),
-    batch: integer("batch").notNull(),
-    quantity: integer("quantity").notNull(),
+    batch: text("batch").default("N/A"),
+    quantity: integer("quantity").default(0).notNull(),
     dateBought: integer("dateBought", { mode: "timestamp" })
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),

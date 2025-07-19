@@ -8,11 +8,11 @@ import {
 } from "@/components/ui/tooltips"
 import { cn } from "@/utils/cn"
 import { motion } from "framer-motion"
-import { Check, X } from "lucide-react"
+import { Check, MessageCircleWarning, X } from "lucide-react"
 import React, { ReactElement } from "react"
 import { TimelineStepType } from "./project-timeline-sample-data"
 
-export const TimelineStep = ({
+export const ProjectTimelineStep = ({
   step,
   isCompleted,
   isCurrent,
@@ -26,7 +26,9 @@ export const TimelineStep = ({
   isMobile?: boolean
 }) => {
   const showTooltip =
-    !isCurrent && (step.description || (isRejected && step.rejectionReason))
+    !isCurrent &&
+    !isCompleted &&
+    (step.description || (isRejected && step.rejectionReason))
 
   return (
     <TooltipProvider>
@@ -44,7 +46,6 @@ export const TimelineStep = ({
             transition={{ duration: 0.3 }}
             whileHover={{ scale: 1.05 }}
           >
-            {/* Step circle */}
             <motion.div
               className={cn(
                 "z-10 flex size-6 shrink-0 items-center justify-center rounded-full border-2 sm:size-8",
@@ -75,10 +76,12 @@ export const TimelineStep = ({
                 duration: 2,
               }}
             >
-              {isRejected ? (
-                <X className="size-3 sm:size-4" />
+              {isCurrent && !isRejected ? (
+                <MessageCircleWarning className="size-3 sm:size-4" />
               ) : isCompleted ? (
                 <Check className="size-3 sm:size-4" />
+              ) : isRejected ? (
+                <X className="size-3 sm:size-4" />
               ) : React.isValidElement(step.icon) ? (
                 React.cloneElement(
                   step.icon as ReactElement<{ className?: string }>,
@@ -99,21 +102,16 @@ export const TimelineStep = ({
                       : "text-slate-500",
               )}
             >
-              <p
-                className={cn(
-                  "whitespace-nowrap font-medium",
-                  isMobile ? "text-sm" : "text-xs sm:text-sm",
-                )}
-              >
+              <p className={cn("whitespace-nowrap font-medium")}>
                 {isMobile ? step.name : step.shortName}
               </p>
-              {(isCurrent || isRejected) && (
+              {(isCurrent || isRejected || isCompleted) && (
                 <p
                   className={cn(
+                    "text-[9px] line-clamp-2 h-8",
                     isRejected ? "text-red-500" : "text-slate-500",
-                    isMobile
-                      ? "mt-1 text-xs sm:text-sm"
-                      : "mx-auto mt-0.5 max-w-20 text-[10px] sm:text-xs",
+                    isMobile ? "mt-1" : "mx-auto mt-0.5 w-24",
+                    isCompleted && "line-clamp-none h-auto",
                   )}
                 >
                   {isRejected && step.rejectionReason
@@ -135,7 +133,7 @@ export const TimelineStep = ({
                 ? "bg-red-800 text-white"
                 : isCompleted
                   ? "bg-green-800 text-white"
-                  : "text-white",
+                  : "bg-slate-800 text-white",
             )}
           >
             {isRejected && step.rejectionReason ? (

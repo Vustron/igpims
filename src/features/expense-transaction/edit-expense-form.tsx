@@ -12,6 +12,7 @@ import {
 } from "@/validation/expense-transaction"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
+import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
@@ -30,6 +31,10 @@ export const EditExpenseForm = ({
   const updateExpense = useUpdateExpenseTransaction(initialData.id)
   const [isFormReady, setIsFormReady] = useState(false)
   const [, setCurrentReceipt] = useState<string | null>(initialData.receipt)
+  const searchParams = useSearchParams()
+
+  const isOnSubmitReceipts = searchParams.get("isOnSubmitReceipts") === "true"
+  const isValidateExpenses = searchParams.get("isValidateExpenses") === "true"
 
   const {
     data: fundRequestsData,
@@ -77,7 +82,7 @@ export const EditExpenseForm = ({
     { value: "rejected", label: "Rejected" },
   ]
 
-  const expenseFields: FieldConfig<UpdateExpenseTransaction>[] = [
+  const baseFields: FieldConfig<UpdateExpenseTransaction>[] = [
     {
       name: "requestId",
       type: "select",
@@ -112,6 +117,16 @@ export const EditExpenseForm = ({
       required: true,
     },
     {
+      name: "receipt",
+      type: "image",
+      label: "Receipt",
+      placeholder: "",
+      required: false,
+    },
+  ]
+
+  const statusFields: FieldConfig<UpdateExpenseTransaction>[] = [
+    {
       name: "status",
       type: "select",
       label: "Status",
@@ -127,16 +142,15 @@ export const EditExpenseForm = ({
       description: "Required if status is rejected",
       placeholder: "",
       required: form.watch("status") === "rejected",
-      hidden: form.watch("status") !== "rejected",
-    },
-    {
-      name: "receipt",
-      type: "image",
-      label: "Receipt",
-      placeholder: "",
-      required: false,
     },
   ]
+
+  // Determine which fields to show based on URL params
+  const expenseFields = isOnSubmitReceipts
+    ? baseFields
+    : isValidateExpenses
+      ? [...baseFields, ...statusFields]
+      : baseFields
 
   const onSubmit = async (values: UpdateExpenseTransaction) => {
     if (values?.amount! <= 0) {

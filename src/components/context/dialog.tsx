@@ -214,6 +214,11 @@ const EditExpenseDialog = dynamic(() =>
     (mod) => mod.EditExpenseDialog,
   ),
 )
+const RejectReasonDialog = dynamic(() =>
+  import("@/components/ui/dialogs/reject-reason-dialog").then(
+    (mod) => mod.RejectReasonDialog,
+  ),
+)
 
 export const DialogProvider = () => {
   const isMounted = useMounted()
@@ -264,6 +269,7 @@ export const DialogProvider = () => {
         <CreateExpenseDialog />
         <ViewImageDialog />
         <EditExpenseDialog />
+        <RejectReasonDialog />
       </Suspense>
     </>
   )

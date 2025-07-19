@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.170",
+  "version": "1.0.171",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -46,7 +46,7 @@
     "@radix-ui/react-tabs": "1.1.12",
     "@radix-ui/react-tooltip": "1.2.7",
     "@radix-ui/react-visually-hidden": "1.2.3",
-    "@react-email/components": "0.3.1",
+    "@react-email/components": "0.3.2",
     "@react-pdf/renderer": "4.3.0",
     "@t3-oss/env-nextjs": "0.13.8",
     "@tanstack/react-query": "5.83.0",
@@ -72,7 +72,7 @@
     "isomorphic-dompurify": "2.26.0",
     "lucide-react": "0.525.0",
     "nanoid": "5.1.5",
-    "next": "15.4.1",
+    "next": "15.4.2",
     "next-nprogress-bar": "2.4.7",
     "next-themes": "0.4.6",
     "nodemailer": "7.0.5",
@@ -100,7 +100,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@next/bundle-analyzer": "15.4.1",
+    "@next/bundle-analyzer": "15.4.2",
     "@tailwindcss/postcss": "4.1.11",
     "@types/nodemailer": "6.4.17",
     "@types/pdfjs-dist": "2.10.378",
@@ -115,10 +115,13 @@
     "husky": "9.1.7",
     "postcss": "8.5.6",
     "tailwindcss": "4.1.11",
-    "turbo": "^2.5.5",
+    "turbo": "2.5.5",
     "typescript": "5.8.3"
   },
   "packageManager": "bun@1.2.19",
+  "engines": {
+    "node": "22.x"
+  },
   "trustedDependencies": [
     "@biomejs/biome",
     "@tailwindcss/oxide",

@@ -1,8 +1,6 @@
 "use client"
 
-import { format } from "date-fns"
-import { Calendar, Play } from "lucide-react"
-import { useState } from "react"
+import { useUpdateIgp } from "@/backend/actions/igp/update-igp"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -20,32 +18,52 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
-import { Textarea } from "@/components/ui/inputs"
-import { useProjectRequestStore } from "@/features/project-request/project-request-store"
-import { isProjectRequestData, useDialog } from "@/hooks/use-dialog"
+import { isIgpData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { catchError } from "@/utils/catch-error"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
+import { Calendar, Play } from "lucide-react"
+import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
+import { PDFViewer } from "../pdf/pdf-viewer"
 
 export const StartImplementationDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()
-  const { getRequestById, approveRequest } = useProjectRequestStore()
-  const [implementationNotes, setImplementationNotes] = useState("")
   const isDesktop = useMediaQuery("(min-width: 768px)")
+  const [igpId, setIgpId] = useState("")
 
-  const isDialogOpen = isOpen && type === "startImplementation"
-  const request =
-    isProjectRequestData(data) && data.requestId
-      ? getRequestById(data.requestId)
-      : null
-
-  const handleStartImplementation = () => {
-    if (request) {
-      approveRequest(request.id, implementationNotes)
-      onClose()
-      setImplementationNotes("")
+  useEffect(() => {
+    if (isIgpData(data) && data.igp) {
+      setIgpId(data.igp.id)
     }
+  }, [data])
+
+  const updateIgp = useUpdateIgp(igpId)
+
+  const isDialogOpen = isOpen && type === "startImplementation" && igpId !== ""
+
+  if (!isDialogOpen) {
+    return null
   }
 
-  if (!request) return null
+  if (!isIgpData(data) || !data.igp) {
+    return null
+  }
+
+  const handleStartImplementation = async () => {
+    await toast.promise(
+      updateIgp.mutateAsync({
+        status: "in_progress",
+        currentStep: 5,
+      }),
+      {
+        loading: "Starting implementation...",
+        success: "Implementation started successfully",
+        error: (error) => catchError(error),
+      },
+    )
+    onClose()
+  }
 
   const DialogContent_Component = isDesktop ? Dialog : Drawer
   const Content = isDesktop ? DialogContent : DrawerContent
@@ -57,7 +75,7 @@ export const StartImplementationDialog = () => {
   return (
     <DialogContent_Component open={isDialogOpen} onOpenChange={onClose}>
       <Content
-        className={isDesktop ? "h-[90vh] max-w-2xl overflow-y-auto" : ""}
+        className={isDesktop ? "max-h-[95vh] max-w-4xl overflow-y-auto" : ""}
       >
         <Header>
           <div className="flex items-center gap-2">
@@ -77,21 +95,21 @@ export const StartImplementationDialog = () => {
                 <p className="font-medium text-indigo-800 text-sm">
                   Project ID
                 </p>
-                <p className="font-mono text-indigo-900 text-sm">
-                  {request.id}
-                </p>
+                <p className="font-mono text-indigo-900 text-sm">{igpId}</p>
               </div>
               <div>
                 <p className="font-medium text-indigo-800 text-sm">
                   Project Lead
                 </p>
-                <p className="text-indigo-900 text-sm">{request.projectLead}</p>
+                <p className="text-indigo-900 text-sm">
+                  {data.igp.projectLead}
+                </p>
               </div>
               <div>
                 <p className="font-medium text-indigo-800 text-sm">
                   Department
                 </p>
-                <p className="text-indigo-900 text-sm">{request.department}</p>
+                <p className="text-indigo-900 text-sm">{data.igp.department}</p>
               </div>
               <div>
                 <p className="font-medium text-indigo-800 text-sm">
@@ -100,9 +118,7 @@ export const StartImplementationDialog = () => {
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3 w-3 text-indigo-600" />
                   <p className="text-indigo-900 text-sm">
-                    {request.approvalDate
-                      ? format(new Date(request.approvalDate), "MMM d, yyyy")
-                      : format(new Date(), "MMM d, yyyy")}
+                    {formatDateFromTimestamp(data.igp.approvalDate)}
                   </p>
                 </div>
               </div>
@@ -111,29 +127,30 @@ export const StartImplementationDialog = () => {
                   Project Title
                 </p>
                 <p className="font-semibold text-indigo-900 text-sm">
-                  {request.projectTitle}
+                  {data.igp.igpName}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Implementation Notes */}
-          <div>
-            <span className="mb-2 block font-medium text-gray-700 text-sm">
-              Implementation Notes (Optional)
-            </span>
-            <Textarea
-              placeholder="Add any notes about starting the implementation..."
-              value={implementationNotes}
-              onChange={(e) => setImplementationNotes(e.target.value)}
-              rows={4}
-            />
-            <p className="mt-1 text-gray-500 text-xs">
-              Record any important information about the implementation start.
-            </p>
-          </div>
+          {data.igp.projectDocument && (
+            <div className="space-y-2">
+              <span className="block font-medium text-gray-700 text-sm">
+                Project Document
+              </span>
+              <PDFViewer file={data.igp.projectDocument} />
+            </div>
+          )}
 
-          {/* Implementation Checklist */}
+          {data.igp.resolutionDocument && (
+            <div className="space-y-2">
+              <span className="block font-medium text-gray-700 text-sm">
+                Committee Resolution
+              </span>
+              <PDFViewer file={data.igp.resolutionDocument} />
+            </div>
+          )}
+
           <div className="rounded-lg border bg-gray-50 p-4">
             <h3 className="mb-2 font-medium text-gray-900 text-sm">
               Implementation Checklist
@@ -154,8 +171,9 @@ export const StartImplementationDialog = () => {
           <Button
             onClick={handleStartImplementation}
             className="bg-indigo-600 hover:bg-indigo-700"
+            disabled={updateIgp.isPending}
           >
-            Start Implementation
+            {updateIgp.isPending ? "Processing..." : "Start Implementation"}
           </Button>
         </Footer>
       </Content>

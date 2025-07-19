@@ -26,8 +26,8 @@ import { useRouter } from "next-nprogress-bar"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import { timelineSteps } from "./fund-request-interface"
-import { Timeline } from "./timeline"
-import { TimelineStatusBadge } from "./timeline-status"
+import { FundRequestTimeline } from "./fund-request-timeline"
+import { FundRequestStatusBadge } from "./fund-request-timeline-status"
 
 interface FundRequestCardProps {
   fundRequest: FundRequestWithUser
@@ -76,6 +76,8 @@ export const FundRequestCard = ({
       (fundRequest.utilizedFunds / fundRequest.allocatedFunds) * 100,
     ) || 0
 
+  const isFundsUtilized = utilizationPercentage === 100
+
   const getStatusAction = () => {
     switch (fundRequest.status) {
       case "pending":
@@ -112,14 +114,20 @@ export const FundRequestCard = ({
         }
       case "received":
         return {
-          label: "Submit Receipt",
-          action: () => router.push(`/fund-request/${fundRequest.id}`),
+          label: isFundsUtilized ? "Confirm receipts" : "Add receipts",
+          action: () =>
+            router.push(
+              `/fund-request/${fundRequest.id}?isOnSubmitReceipts=true&isValidateExpenses=false`,
+            ),
           color: "bg-teal-600 hover:bg-teal-700",
         }
       case "receipted":
         return {
           label: "Validate Expense",
-          action: () => router.push(`/fund-request/${fundRequest.id}`),
+          action: () =>
+            router.push(
+              `/fund-request/${fundRequest.id}?isOnSubmitReceipts=false&isValidateExpenses=true`,
+            ),
           color: "bg-green-600 hover:bg-green-700",
         }
       default:
@@ -203,7 +211,7 @@ export const FundRequestCard = ({
           <div className="col-span-2 space-y-0.5 sm:col-span-3 md:col-span-1">
             <p className="text-slate-500 text-xs">Status</p>
             <div className="flex items-center gap-2">
-              <TimelineStatusBadge status={fundRequest.status} />
+              <FundRequestStatusBadge status={fundRequest.status} />
               <Button
                 variant="ghost"
                 size="icon"
@@ -282,7 +290,7 @@ export const FundRequestCard = ({
 
       <CardContent className={contentClass}>
         <div className="mb-3 hidden rounded-md bg-slate-50 p-4 sm:block">
-          <Timeline
+          <FundRequestTimeline
             currentStep={fundRequest.currentStep}
             steps={timelineSteps}
             isRejected={fundRequest.isRejected}
@@ -293,7 +301,7 @@ export const FundRequestCard = ({
 
         <div className="mb-3 rounded-md bg-slate-50 p-3 sm:hidden">
           <div className="flex flex-col">
-            <Timeline
+            <FundRequestTimeline
               currentStep={fundRequest.currentStep}
               isMobile={true}
               steps={timelineSteps}

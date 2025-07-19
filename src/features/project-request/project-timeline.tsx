@@ -2,7 +2,7 @@
 
 import { cn } from "@/utils/cn"
 import { TimelineStepType } from "./project-timeline-sample-data"
-import { TimelineStep } from "./project-timeline-step"
+import { ProjectTimelineStep } from "./project-timeline-step"
 
 export const ProjectTimeline = ({
   currentStep,
@@ -51,11 +51,11 @@ export const ProjectTimeline = ({
       />
 
       {steps.map((step) => (
-        <TimelineStep
+        <ProjectTimelineStep
           key={step.id}
           step={step}
           isCompleted={step.id <= currentStep}
-          isCurrent={false}
+          isCurrent={step.id === currentStep}
           isMobile={isMobile}
           isRejected={isRejected && step.id === rejectionStep}
         />

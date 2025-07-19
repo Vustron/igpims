@@ -59,6 +59,7 @@ export type DialogType =
   | "createExpense"
   | "editExpense"
   | "viewImage"
+  | "rejectReason"
 
 interface ConfirmDialogData {
   title?: string

@@ -90,7 +90,7 @@ export const CreateFundRequestForm = ({
     },
     {
       name: "amount",
-      type: "number",
+      type: "currency",
       label: "Amount (PHP)",
       placeholder: "Enter amount",
       description: "Amount of funds requested in Philippine Pesos",
