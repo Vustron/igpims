@@ -1,4 +1,3 @@
-import { igp } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import {
@@ -13,7 +12,6 @@ import {
   CreateIgpTransactionPayload,
   createIgpTransactionSchema,
 } from "@/validation/igp-transaction"
-import { eq, sql } from "drizzle-orm"
 import { nanoid } from "nanoid"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -48,7 +46,7 @@ export async function createIgpTransaction(
       return NextResponse.json({ error: "IGP not found" }, { status: 404 })
     }
 
-    const newTransaction = await db.transaction(async (tx) => {
+    const newTransaction = await db.transaction(async (_tx) => {
       const [insertedTransaction] = await insertIgpTransactionQuery.execute({
         id: nanoid(15),
         igpId: transactionData.igpId,
@@ -59,15 +57,6 @@ export async function createIgpTransaction(
         dateBought: transactionData.dateBought,
         itemReceived: transactionData.itemReceived,
       })
-
-      await tx
-        .update(igp)
-        .set({
-          totalSold: sql`${existingIgp.totalSold} + ${transactionData.quantity}`,
-          igpRevenue: sql`${existingIgp.igpRevenue} + (${transactionData.quantity} * ${existingIgp.costPerItem})`,
-        })
-        .where(eq(igp.id, transactionData.igpId))
-        .execute()
 
       return insertedTransaction
     })

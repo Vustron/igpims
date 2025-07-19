@@ -1,7 +1,5 @@
 "use client"
 
-import { Boxes, Store } from "lucide-react"
-import { useEffect, useState } from "react"
 import { MobileTabNav, TabItem } from "@/components/ui/separators/mobile-tab"
 import {
   Tabs,
@@ -11,8 +9,10 @@ import {
 } from "@/components/ui/separators/tabs"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { cn } from "@/utils/cn"
-import { IgpManagement } from "./igp-management"
-import { IgpSupply } from "./igp-supply"
+import { Boxes, Store } from "lucide-react"
+import { useEffect, useState } from "react"
+import { IgpSupplyClient } from "../supply/client"
+import { IgpTransactionsClient } from "./client"
 
 interface IgpTabsProps {
   igpTab?: string
@@ -106,14 +106,14 @@ export const IgpTabs = ({
         value={igpTab}
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <IgpManagement />
+        <IgpTransactionsClient />
       </TabsContent>
 
       <TabsContent
         value="supply"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <IgpSupply />
+        <IgpSupplyClient />
       </TabsContent>
     </Tabs>
   )

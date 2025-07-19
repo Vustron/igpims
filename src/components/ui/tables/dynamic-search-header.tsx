@@ -25,6 +25,7 @@ interface DynamicSearchHeaderProps<TData> {
   isOnExpense?: boolean
   isBudgetFullyUtilized?: boolean
   requestId?: string
+  isOnIgpTransaction?: boolean
 }
 
 export const DynamicSearchHeader = <TData,>({
@@ -45,6 +46,7 @@ export const DynamicSearchHeader = <TData,>({
   isOnExpense,
   isBudgetFullyUtilized,
   requestId,
+  isOnIgpTransaction,
 }: DynamicSearchHeaderProps<TData>) => {
   return (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -75,6 +77,7 @@ export const DynamicSearchHeader = <TData,>({
         isOnExpense={isOnExpense}
         isBudgetFullyUtilized={isBudgetFullyUtilized}
         requestId={requestId}
+        isOnIgpTransaction={isOnIgpTransaction}
       />
     </div>
   )

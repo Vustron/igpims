@@ -12,23 +12,29 @@ import { Check, MessageCircleWarning, X } from "lucide-react"
 import React, { ReactElement } from "react"
 import { TimelineStepType } from "./project-timeline-sample-data"
 
-export const ProjectTimelineStep = ({
-  step,
-  isCompleted,
-  isCurrent,
-  isRejected,
-  isMobile = false,
-}: {
+interface ProjectTimelineStepProps {
   step: TimelineStepType
-  isCompleted: boolean
+  isFinished: boolean
   isCurrent: boolean
   isRejected?: boolean
   isMobile?: boolean
-}) => {
+  isCompleted?: boolean
+  onStepClick?: (stepId: number) => void
+}
+
+export const ProjectTimelineStep = ({
+  step,
+  isFinished,
+  isCurrent,
+  isRejected,
+  isMobile = false,
+  isCompleted,
+  onStepClick,
+}: ProjectTimelineStepProps) => {
   const showTooltip =
-    !isCurrent &&
-    !isCompleted &&
-    (step.description || (isRejected && step.rejectionReason))
+    !isCurrent && (step.description || (isRejected && step.rejectionReason))
+
+  const isClickable = isFinished && onStepClick
 
   return (
     <TooltipProvider>
@@ -40,45 +46,55 @@ export const ProjectTimelineStep = ({
               isMobile
                 ? "w-full items-start gap-3 py-2 pl-12"
                 : "flex-col items-center rounded-xl bg-background p-1 sm:p-2",
+              isClickable && "cursor-pointer",
             )}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: isClickable ? 1.05 : 1 }}
+            onClick={() => isClickable && onStepClick(step.id)}
           >
             <motion.div
               className={cn(
                 "z-10 flex size-6 shrink-0 items-center justify-center rounded-full border-2 sm:size-8",
-                isRejected
-                  ? "border-red-500 bg-red-500 text-white"
-                  : isCompleted
-                    ? "border-green-500 bg-green-500 text-white"
+                isCompleted
+                  ? "border-green-500 bg-green-500 text-white"
+                  : isRejected
+                    ? "border-red-500 bg-red-500 text-white"
                     : isCurrent
                       ? "border-blue-500 bg-blue-500 text-white"
-                      : "border-slate-200 bg-white text-slate-400",
+                      : isFinished
+                        ? "border-green-500 bg-green-500 text-white"
+                        : "border-slate-200 bg-white text-slate-400",
                 "transition-transform duration-200 group-hover:scale-110",
               )}
               whileHover={{ scale: 1.05 }}
               animate={
-                isCurrent && !isRejected
-                  ? {
-                      scale: [1, 1.1, 1],
-                      boxShadow: "0 0 0 4px rgba(59, 130, 246, 0.3)",
-                    }
-                  : isRejected
-                    ? { boxShadow: "0 0 0 4px rgba(239, 68, 68, 0.3)" }
-                    : isCompleted
-                      ? { boxShadow: "0 0 0 4px rgba(34, 197, 94, 0.3)" }
-                      : {}
+                isCompleted
+                  ? { boxShadow: "0 0 0 4px rgba(34, 197, 94, 0.3)" }
+                  : isCurrent && !isRejected
+                    ? {
+                        scale: [1, 1.1, 1],
+                        boxShadow: "0 0 0 4px rgba(59, 130, 246, 0.3)",
+                      }
+                    : isRejected
+                      ? { boxShadow: "0 0 0 4px rgba(239, 68, 68, 0.3)" }
+                      : isFinished
+                        ? { boxShadow: "0 0 0 4px rgba(34, 197, 94, 0.3)" }
+                        : {}
               }
               transition={{
-                repeat: isCurrent && !isRejected ? Number.POSITIVE_INFINITY : 0,
+                repeat:
+                  isCurrent && !isRejected && !isCompleted
+                    ? Number.POSITIVE_INFINITY
+                    : 0,
                 duration: 2,
               }}
             >
               {isCurrent && !isRejected ? (
                 <MessageCircleWarning className="size-3 sm:size-4" />
-              ) : isCompleted ? (
+              ) : (isCompleted && !isRejected) ||
+                (isFinished && !isRejected) ? (
                 <Check className="size-3 sm:size-4" />
               ) : isRejected ? (
                 <X className="size-3 sm:size-4" />
@@ -93,25 +109,26 @@ export const ProjectTimelineStep = ({
             <div
               className={cn(
                 isMobile ? "mt-0" : "mt-1 text-center",
-                isRejected
-                  ? "text-red-700"
-                  : isCompleted
-                    ? "text-green-700"
+                isCompleted
+                  ? "text-green-700"
+                  : isRejected
+                    ? "text-red-700"
                     : isCurrent
                       ? "font-medium text-blue-700"
-                      : "text-slate-500",
+                      : isFinished
+                        ? "text-green-700"
+                        : "text-slate-500",
               )}
             >
               <p className={cn("whitespace-nowrap font-medium")}>
                 {isMobile ? step.name : step.shortName}
               </p>
-              {(isCurrent || isRejected || isCompleted) && (
+              {(isCurrent || isRejected || isCompleted || isFinished) && (
                 <p
                   className={cn(
                     "text-[9px] line-clamp-2 h-8",
                     isRejected ? "text-red-500" : "text-slate-500",
                     isMobile ? "mt-1" : "mx-auto mt-0.5 w-24",
-                    isCompleted && "line-clamp-none h-auto",
                   )}
                 >
                   {isRejected && step.rejectionReason
@@ -129,10 +146,10 @@ export const ProjectTimelineStep = ({
             align={isMobile ? "start" : "center"}
             className={cn(
               "max-w-xs",
-              isRejected
-                ? "bg-red-800 text-white"
-                : isCompleted
-                  ? "bg-green-800 text-white"
+              isCompleted
+                ? "bg-green-800 text-white"
+                : isRejected
+                  ? "bg-red-800 text-white"
                   : "bg-slate-800 text-white",
             )}
           >

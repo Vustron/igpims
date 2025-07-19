@@ -2,7 +2,7 @@ import { preFindManyIgp } from "@/backend/actions/igp/find-many"
 import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
 import { ContentLayout } from "@/features/layouts/content-layout"
-import { OtherIgpsClient } from "@/features/other-igps/client"
+import { OtherIgpsClient } from "@/features/other-igps/igp/client"
 import { QueryHydrator } from "@/utils/query-hydrator"
 import { Metadata } from "next"
 

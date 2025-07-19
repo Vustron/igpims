@@ -248,6 +248,7 @@ export const ProjectRequestCard = ({
             steps={timelineSteps}
             isRejected={projectRequest.isRejected ?? undefined}
             rejectionStep={projectRequest.rejectionStep ?? undefined}
+            isCompleted={projectRequest.status === "completed"}
           />
         </div>
 

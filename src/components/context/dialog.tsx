@@ -219,6 +219,16 @@ const RejectReasonDialog = dynamic(() =>
     (mod) => mod.RejectReasonDialog,
   ),
 )
+const CreateIgpTransactionDialog = dynamic(() =>
+  import("@/components/ui/dialogs/create-igp-transaction-dialog").then(
+    (mod) => mod.CreateIgpTransactionDialog,
+  ),
+)
+const EditIgpTransactionDialog = dynamic(() =>
+  import("@/components/ui/dialogs/edit-igp-transaction-dialog").then(
+    (mod) => mod.EditIgpTransactionDialog,
+  ),
+)
 
 export const DialogProvider = () => {
   const isMounted = useMounted()
@@ -270,6 +280,8 @@ export const DialogProvider = () => {
         <ViewImageDialog />
         <EditExpenseDialog />
         <RejectReasonDialog />
+        <CreateIgpTransactionDialog />
+        <EditIgpTransactionDialog />
       </Suspense>
     </>
   )

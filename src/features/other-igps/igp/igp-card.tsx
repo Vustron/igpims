@@ -42,6 +42,7 @@ import {
 import { IoFastFoodOutline } from "react-icons/io5"
 import { LuNewspaper } from "react-icons/lu"
 import {
+  MdDevicesOther,
   MdOutlineEventAvailable,
   MdOutlineSportsBasketball,
 } from "react-icons/md"
@@ -51,7 +52,7 @@ export interface IgpCardProps {
   id: string
   name: string
   description: string
-  type: "temporary" | "permanent" | "maintenance"
+  type: "temporary" | "permanent" | "maintenance" | "other"
   iconType?:
     | "store"
     | "card"
@@ -111,6 +112,11 @@ const typeIcons = {
     icon: Printer,
     color: "text-blue-600",
     bg: "bg-blue-100",
+  },
+  other: {
+    icon: MdDevicesOther,
+    color: "text-gray-600",
+    bg: "bg-gray-100",
   },
 }
 

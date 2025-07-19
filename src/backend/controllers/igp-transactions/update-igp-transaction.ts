@@ -37,6 +37,15 @@ export async function updateIgpTransaction(
 
     const data =
       await requestJson<Partial<UpdateIgpTransactionPayload>>(request)
+
+    if (data.dateBought !== undefined) {
+      if (typeof data.dateBought === "number") {
+        data.dateBought = new Date(data.dateBought)
+      } else if (typeof data.dateBought === "string") {
+        data.dateBought = new Date(data.dateBought)
+      }
+    }
+
     const validationResult = await updateIgpTransactionSchema
       .partial()
       .safeParseAsync(data)
@@ -51,6 +60,7 @@ export async function updateIgpTransaction(
     const [existingTransaction] = await findIgpTransactionByIdQuery.execute({
       id,
     })
+
     if (!existingTransaction) {
       return NextResponse.json(
         { error: "Transaction not found" },
@@ -61,6 +71,7 @@ export async function updateIgpTransaction(
     const [igpData] = await findIgpByIdQuery.execute({
       id: existingTransaction.igpId,
     })
+
     if (!igpData) {
       return NextResponse.json(
         { error: "Associated IGP not found" },
@@ -71,6 +82,7 @@ export async function updateIgpTransaction(
     const updatedTransaction = await db.transaction(async (tx) => {
       const updateValues: Partial<UpdateIgpTransactionPayload> = {}
 
+      if (data.igpId !== undefined) updateValues.igpId = data.igpId
       if (data.purchaserName !== undefined)
         updateValues.purchaserName = data.purchaserName
       if (data.courseAndSet !== undefined)
@@ -82,29 +94,51 @@ export async function updateIgpTransaction(
       if (data.itemReceived !== undefined)
         updateValues.itemReceived = data.itemReceived
 
-      if (Object.keys(updateValues).length > 0) {
-        const [updated] = await tx
-          .update(igpTransactions)
-          .set(updateValues)
-          .where(eq(igpTransactions.id, id))
-          .returning()
-
-        if (data.quantity !== undefined) {
-          const quantityDiff = data.quantity - existingTransaction.quantity
-          await tx
-            .update(igp)
-            .set({
-              totalSold: sql`${igpData.totalSold} + ${quantityDiff}`,
-              igpRevenue: sql`${igpData.igpRevenue} + (${quantityDiff} * ${igpData.costPerItem})`,
-            })
-            .where(eq(igp.id, existingTransaction.igpId))
-            .execute()
-        }
-
-        return updated
+      if (Object.keys(updateValues).length === 0) {
+        return existingTransaction
       }
 
-      return existingTransaction
+      const [updated] = await tx
+        .update(igpTransactions)
+        .set(updateValues)
+        .where(eq(igpTransactions.id, id))
+        .returning()
+
+      if (!updated) {
+        throw new Error("Failed to update transaction")
+      }
+
+      if (
+        data.itemReceived === "received" &&
+        existingTransaction.itemReceived !== "received"
+      ) {
+        const quantityToAdd =
+          data.quantity !== undefined
+            ? data.quantity
+            : existingTransaction.quantity
+
+        await tx
+          .update(igp)
+          .set({
+            totalSold: sql`${igpData.totalSold} + ${quantityToAdd}`,
+            igpRevenue: sql`${igpData.igpRevenue} + (${quantityToAdd} * ${igpData.costPerItem})`,
+          })
+          .where(eq(igp.id, existingTransaction.igpId))
+      } else if (
+        data.quantity !== undefined &&
+        existingTransaction.itemReceived === "received"
+      ) {
+        const quantityDiff = data.quantity - existingTransaction.quantity
+        await tx
+          .update(igp)
+          .set({
+            totalSold: sql`${igpData.totalSold} + ${quantityDiff}`,
+            igpRevenue: sql`${igpData.igpRevenue} + (${quantityDiff} * ${igpData.costPerItem})`,
+          })
+          .where(eq(igp.id, existingTransaction.igpId))
+      }
+
+      return updated
     })
 
     const [newTransactionData] = await findIgpTransactionByIdQuery.execute({
@@ -113,7 +147,7 @@ export async function updateIgpTransaction(
 
     if (!newTransactionData) {
       return NextResponse.json(
-        { error: "Transaction not found" },
+        { error: "Transaction not found after update" },
         { status: 404 },
       )
     }

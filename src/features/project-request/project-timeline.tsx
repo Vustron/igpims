@@ -4,19 +4,23 @@ import { cn } from "@/utils/cn"
 import { TimelineStepType } from "./project-timeline-sample-data"
 import { ProjectTimelineStep } from "./project-timeline-step"
 
+interface ProjectTimelineProps {
+  currentStep: number
+  steps: TimelineStepType[]
+  isMobile?: boolean
+  isRejected?: boolean
+  rejectionStep?: number
+  isCompleted?: boolean
+}
+
 export const ProjectTimeline = ({
   currentStep,
   steps,
   isMobile = false,
   isRejected,
   rejectionStep,
-}: {
-  currentStep: number
-  steps: TimelineStepType[]
-  isMobile?: boolean
-  isRejected?: boolean
-  rejectionStep?: number
-}) => {
+  isCompleted,
+}: ProjectTimelineProps) => {
   return (
     <div
       className={cn(
@@ -54,10 +58,11 @@ export const ProjectTimeline = ({
         <ProjectTimelineStep
           key={step.id}
           step={step}
-          isCompleted={step.id <= currentStep}
-          isCurrent={step.id === currentStep}
+          isFinished={isCompleted ? true : step.id <= currentStep}
+          isCurrent={isCompleted ? false : step.id === currentStep}
           isMobile={isMobile}
           isRejected={isRejected && step.id === rejectionStep}
+          isCompleted={isCompleted}
         />
       ))}
     </div>

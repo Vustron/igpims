@@ -84,6 +84,7 @@ export const CreateIgpForm = ({
     { label: "Permanent", value: "permanent" },
     { label: "Temporary", value: "temporary" },
     { label: "Maintenance", value: "maintenance" },
+    { label: "Other", value: "other" },
   ]
 
   const iconTypeOptions = [

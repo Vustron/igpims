@@ -144,7 +144,6 @@ export const igpTransactions = sqliteTable(
   (t) => [
     index("igTransactions_igp_id_idx").on(t.igpId),
     index("igTransactions_purchaser_idx").on(t.purchaserName),
-    index("igTransactions_date_bought_idx").on(t.dateBought),
     index("igTransactions_item_received_idx").on(t.itemReceived),
   ],
 )

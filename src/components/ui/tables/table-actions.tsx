@@ -34,6 +34,7 @@ interface TableActionsProps<TData> {
   isOnExpense?: boolean
   isBudgetFullyUtilized?: boolean
   requestId?: string
+  isOnIgpTransaction?: boolean
 }
 
 export function TableActions<TData>({
@@ -51,6 +52,7 @@ export function TableActions<TData>({
   isOnExpense,
   isBudgetFullyUtilized,
   requestId,
+  isOnIgpTransaction,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
   const hasExpenseTransactions = tableData.length > 0
@@ -153,6 +155,7 @@ export function TableActions<TData>({
         isOnInspection ||
         isOnWaterSupply ||
         isOnWaterFund ||
+        isOnIgpTransaction ||
         (isOnExpense && !isBudgetFullyUtilized)) && (
         <motion.div
           key="add-button"
@@ -179,7 +182,9 @@ export function TableActions<TData>({
                           ? "createWaterFund"
                           : isOnExpense
                             ? "createExpense"
-                            : "createRent",
+                            : isOnIgpTransaction
+                              ? "createIgpTransaction"
+                              : "createRent",
                 isOnViolations
                   ? {
                       violation: tableData[0] as ViolationWithRenters,
@@ -206,7 +211,9 @@ export function TableActions<TData>({
                       ? "Create water fund"
                       : isOnExpense
                         ? "Create expense"
-                        : "Create rent"}
+                        : isOnIgpTransaction
+                          ? "Create IGP transaction"
+                          : "Create rent"}
           </Button>
         </motion.div>
       )}

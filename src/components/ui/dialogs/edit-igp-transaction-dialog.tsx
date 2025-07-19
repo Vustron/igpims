@@ -14,17 +14,21 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
-import { CreateIgpForm } from "@/features/other-igps/igp/create-igp-form"
-import { useDialog } from "@/hooks/use-dialog"
+import { UpdateIgpTransactionForm } from "@/features/other-igps/transactions/edit-igp-transaction-form"
+import { isIgpTransactionData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
-export const CreateIgpDialog = () => {
-  const { isOpen, onClose, type } = useDialog()
+export const EditIgpTransactionDialog = () => {
+  const { isOpen, onClose, type, data } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
-  const isDialogOpen = isOpen && type === "createIgp"
+  const isDialogOpen = isOpen && type === "editIgpTransaction"
 
   const handleClose = () => {
     onClose()
+  }
+
+  if (!isDialogOpen || !isIgpTransactionData(data) || !data.igpTransaction) {
+    return null
   }
 
   if (isDesktop) {
@@ -32,16 +36,15 @@ export const CreateIgpDialog = () => {
       <Dialog open={isDialogOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px]">
           <DialogHeader>
-            <DialogTitle>Create new IGP</DialogTitle>
+            <DialogTitle>Create new igp transaction</DialogTitle>
             <DialogDescription>
-              Fill in the details below to create a new Income Generating
-              Project.
+              Fill in the details below to create a new igp transaction.
             </DialogDescription>
           </DialogHeader>
-          <CreateIgpForm
+          <UpdateIgpTransactionForm
+            initialData={data.igpTransaction}
             onSuccess={handleClose}
             onError={handleClose}
-            onClose={handleClose}
           />
         </DialogContent>
       </Dialog>
@@ -52,16 +55,16 @@ export const CreateIgpDialog = () => {
     <Drawer open={isDialogOpen} onOpenChange={onClose}>
       <DrawerContent className="max-h-[90%]">
         <DrawerHeader className="px-6">
-          <DrawerTitle>Create new IGP</DrawerTitle>
+          <DrawerTitle>Create new igp transaction</DrawerTitle>
           <DrawerDescription>
-            Fill in the details below to create a new Income Generating Project.
+            Fill in the details below to create a new igp transaction.
           </DrawerDescription>
         </DrawerHeader>
         <div className="px-6 pb-6">
-          <CreateIgpForm
+          <UpdateIgpTransactionForm
+            initialData={data.igpTransaction}
             onSuccess={handleClose}
             onError={handleClose}
-            onClose={handleClose}
           />
         </div>
       </DrawerContent>
