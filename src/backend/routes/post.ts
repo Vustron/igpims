@@ -1,6 +1,7 @@
 import { sendRentLockerConfirm } from "../controllers/email/send-rent-locker-confirm.ts"
 import { createExpenseTransaction } from "../controllers/expense-transaction/create-expense"
 import { createFundRequest } from "../controllers/fund-request/create-fund-request"
+import { createIgpSupply } from "../controllers/igp-supply/create-igp-supply"
 import { createIgpTransaction } from "../controllers/igp-transactions/create-igp-transaction"
 import { createIgp } from "../controllers/igp/create-igp"
 import { createInspection } from "../controllers/inspection/create-inspection"
@@ -62,6 +63,10 @@ export const postRoutes: Route[] = [
   {
     path: "/api/v1/igp-transactions/create-igp-transaction",
     handler: createIgpTransaction,
+  },
+  {
+    path: "/api/v1/igp-supplies/create-igp-supply",
+    handler: createIgpSupply,
   },
   // Add more POST routes here
 ]

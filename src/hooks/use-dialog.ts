@@ -1,5 +1,6 @@
 import { ExpenseTransactionWithRequestor } from "@/backend/actions/expense-transaction/find-many"
 import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
+import { IgpSupplyWithRelations } from "@/backend/actions/igp-supply/find-by-id"
 import { IgpTransactionWithIgp } from "@/backend/actions/igp-transaction/find-many"
 import { IgpWithProjectLeadData } from "@/backend/actions/igp/find-many"
 import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
@@ -63,6 +64,8 @@ export type DialogType =
   | "rejectReason"
   | "createIgpTransaction"
   | "editIgpTransaction"
+  | "createIgpSupply"
+  | "editIgpSupply"
 
 interface ConfirmDialogData {
   title?: string
@@ -125,6 +128,10 @@ interface IgpTransactionData {
   igpTransaction?: IgpTransactionWithIgp
 }
 
+interface IgpSupplyData {
+  igpSupply?: IgpSupplyWithRelations
+}
+
 interface DialogStore {
   type: DialogType | null
   data: DialogData | null
@@ -147,6 +154,7 @@ export type DialogData =
   | ViewImageData
   | IgpData
   | IgpTransactionData
+  | IgpSupplyData
 
 export const isConfirmData = (
   data: DialogData | null,
@@ -206,6 +214,10 @@ export const isIgpData = (data: any): data is IgpData => {
 
 export const isIgpTransactionData = (data: any): data is IgpTransactionData => {
   return data && data.igpTransaction !== undefined
+}
+
+export const isIgpSupplyData = (data: any): data is IgpSupplyData => {
+  return data && data.igpSupply !== undefined
 }
 
 export const useDialog = create<DialogStore>((set) => ({

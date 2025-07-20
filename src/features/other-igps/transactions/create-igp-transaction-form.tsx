@@ -1,5 +1,6 @@
 "use client"
 
+import { useFindManyIgpSupply } from "@/backend/actions/igp-supply/find-many"
 import { useCreateIgpTransaction } from "@/backend/actions/igp-transaction/create-igp-transaction"
 import { useFindManyIgp } from "@/backend/actions/igp/find-many"
 import { DynamicForm } from "@/components/ui/forms"
@@ -21,8 +22,11 @@ export const CreateIgpTransactionForm = ({
   onSuccess?: () => void
   onError?: () => void
 }) => {
-  const { data: igps, isLoading } = useFindManyIgp()
+  const { data: igps, isLoading: loadingIgp } = useFindManyIgp()
+  const { data: igpSupply, isLoading: loadingIgpSupply } =
+    useFindManyIgpSupply()
   const createIgpTransaction = useCreateIgpTransaction()
+  const isLoading = loadingIgp || loadingIgpSupply
 
   const form = useForm<CreateIgpTransactionPayload>({
     resolver: zodResolver(createIgpTransactionSchema),
@@ -48,6 +52,18 @@ export const CreateIgpTransactionForm = ({
         options: igps?.data?.map((igp) => ({
           label: igp.igpName,
           value: igp.id,
+        })),
+        required: true,
+      },
+      {
+        name: "igpSupplyId",
+        type: "select",
+        label: "Igp Supply",
+        placeholder: "Select Igp Supply",
+        description: "Select the Igp Supply this transaction belongs to",
+        options: igpSupply?.data?.map((supply) => ({
+          label: `Supply ${new Date(supply.supplyDate).toLocaleDateString()} (${supply.quantity - supply.quantitySold} available)`,
+          value: supply.id,
         })),
         required: true,
       },
@@ -108,6 +124,18 @@ export const CreateIgpTransactionForm = ({
     ]
 
   const onSubmit = async (values: CreateIgpTransactionPayload) => {
+    const selectedSupply = igpSupply?.data?.find(
+      (supply) => supply.id === values.igpSupplyId,
+    )
+
+    if (
+      selectedSupply &&
+      selectedSupply.quantity - selectedSupply.quantitySold <= 0
+    ) {
+      toast.error("This IGP supply has no available quantity")
+      return
+    }
+
     const processedValues = {
       ...values,
       quantity: Number(values.quantity),

@@ -38,6 +38,7 @@ export const useUpdateIgpTransaction = (id: string, igpId?: string) => {
     onMutate: async (updatedData) => {
       await Promise.all([
         queryClient.cancelQueries({ queryKey: ["igp-transactions", id] }),
+        queryClient.cancelQueries({ queryKey: ["igp-supplies"] }),
         queryClient.cancelQueries({ queryKey: ["igp-transactions"] }),
         queryClient.cancelQueries({ queryKey: ["igp", igpId] }),
         queryClient.cancelQueries({ queryKey: ["igps"] }),
@@ -136,6 +137,7 @@ export const useUpdateIgpTransaction = (id: string, igpId?: string) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["igp-transactions", id] })
+      queryClient.invalidateQueries({ queryKey: ["igp-supplies"] })
       queryClient.invalidateQueries({ queryKey: ["igp-transactions"] })
       queryClient.invalidateQueries({ queryKey: ["igp", igpId] })
       queryClient.invalidateQueries({ queryKey: ["igps"] })

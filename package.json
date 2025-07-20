@@ -1,10 +1,10 @@
 {
   "name": "igpims",
-  "version": "1.0.174",
+  "version": "1.0.175",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build",
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "bunx @biomejs/biome lint --write --unsafe src",

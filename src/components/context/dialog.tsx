@@ -49,11 +49,6 @@ const CreateFundRequestDialog = dynamic(() =>
     (mod) => mod.CreateFundRequestDialog,
   ),
 )
-const CreateProjectRequestDialog = dynamic(() =>
-  import("@/components/ui/dialogs/create-project-request-dialog").then(
-    (mod) => mod.CreateProjectRequestDialog,
-  ),
-)
 const CreateLockerRentDialog = dynamic(() =>
   import("@/components/ui/dialogs/create-rent-dialog").then(
     (mod) => mod.CreateLockerRentDialog,
@@ -229,6 +224,16 @@ const EditIgpTransactionDialog = dynamic(() =>
     (mod) => mod.EditIgpTransactionDialog,
   ),
 )
+const CreateIgpSupplyDialog = dynamic(() =>
+  import("@/components/ui/dialogs/create-igp-supply-dialog").then(
+    (mod) => mod.CreateIgpSupplyDialog,
+  ),
+)
+const EditIgpSupplyDialog = dynamic(() =>
+  import("@/components/ui/dialogs/edit-igp-supply-dialog").then(
+    (mod) => mod.EditIgpSupplyDialog,
+  ),
+)
 
 export const DialogProvider = () => {
   const isMounted = useMounted()
@@ -246,7 +251,6 @@ export const DialogProvider = () => {
         <CreateWaterFundDialog />
         <CreateIgpDialog />
         <CreateFundRequestDialog />
-        <CreateProjectRequestDialog />
         <CreateLockerRentDialog />
         <CreateUserDialog />
         <ReviewFundRequestDialog />
@@ -282,6 +286,8 @@ export const DialogProvider = () => {
         <RejectReasonDialog />
         <CreateIgpTransactionDialog />
         <EditIgpTransactionDialog />
+        <CreateIgpSupplyDialog />
+        <EditIgpSupplyDialog />
       </Suspense>
     </>
   )

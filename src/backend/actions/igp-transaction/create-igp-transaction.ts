@@ -109,6 +109,7 @@ export const useCreateIgpTransaction = (igpId?: string) => {
       queryClient.invalidateQueries({
         queryKey: ["igp-transactions", variables?.igpId],
       })
+      queryClient.invalidateQueries({ queryKey: ["igp-supplies"] })
       queryClient.invalidateQueries({ queryKey: ["igp-transactions"] })
       queryClient.invalidateQueries({ queryKey: ["igp", igpId] })
       queryClient.invalidateQueries({ queryKey: ["igps"] })

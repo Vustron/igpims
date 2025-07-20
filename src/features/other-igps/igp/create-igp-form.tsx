@@ -51,7 +51,7 @@ export const CreateIgpForm = ({
       projectTitle: "",
       purpose: "",
       requestDate: new Date(),
-      dateNeeded: new Date(),
+      igpDateNeeded: new Date(),
     },
   })
   useEffect(() => {
@@ -252,7 +252,7 @@ export const CreateIgpForm = ({
         igpStartDate: new Date(values.igpStartDate).setHours(0, 0, 0, 0),
         igpEndDate: new Date(values.igpEndDate).setHours(0, 0, 0, 0),
         requestDate: new Date(values.igpStartDate).setHours(0, 0, 0, 0),
-        dateNeeded: new Date(values.dateNeeded).setHours(0, 0, 0, 0),
+        igpDateNeeded: new Date(values.igpDateNeeded).setHours(0, 0, 0, 0),
       }
 
       await toast.promise(createIgp.mutateAsync(formData), {

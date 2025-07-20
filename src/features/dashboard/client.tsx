@@ -1,76 +1,41 @@
 "use client"
 
-import dynamic from "next/dynamic"
-import { Suspense } from "react"
+import { useFindTotalProfit } from "@/backend/actions/analytics/find-total-profit"
 import { GiClothes, GiDroplets, GiLockers } from "react-icons/gi"
-
-const DashboardCard = dynamic(
-  () => import("./dashboard-card").then((mod) => mod.DashboardCard),
-  {
-    loading: () => (
-      <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
-    ),
-    ssr: false,
-  },
-)
-
-const IgpPerformance = dynamic(
-  () => import("./igp-performance").then((mod) => mod.IgpPerformance),
-  {
-    loading: () => (
-      <div className="h-[400px] animate-pulse rounded-lg bg-muted/50" />
-    ),
-    ssr: false,
-  },
-)
-
-const RevenueAnalytics = dynamic(
-  () => import("./revenue-analytics").then((mod) => mod.RevenueAnalytics),
-  {
-    loading: () => (
-      <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
-    ),
-    ssr: false,
-  },
-)
-
-const SalesOverview = dynamic(
-  () => import("./sales-overview").then((mod) => mod.SalesOverview),
-  {
-    loading: () => (
-      <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
-    ),
-    ssr: false,
-  },
-)
+import { DashboardCard } from "./dashboard-card"
+import { IgpPerformance } from "./igp-performance"
+import { RevenueAnalytics } from "./revenue-analytics"
+import { SalesOverview } from "./sales-overview"
 
 export const DashboardClient = () => {
+  const { data, isLoading } = useFindTotalProfit()
+
   const dashboardItems = [
     {
       id: "1",
       title: "Locker Rentals",
-      amount: "₱6,500",
-      metric: "52 Active Lockers",
-      percentageChange: "+5.4%",
-      trendDescription: "Per Semester Growth",
+      amount: `₱${data?.data.totalLockerRevenue.toLocaleString() ?? "0"}`,
+      metric: `${data?.data.activeLockersCount ?? 0} Active Lockers`,
+      percentageChange: data?.data.activeLockersPercentageChange ?? "+0%",
+      trendDescription: "Active Lockers",
       icon: <GiLockers className="size-8 text-muted-foreground" />,
     },
     {
       id: "2",
       title: "Water Vendo",
-      amount: "₱4,500",
-      metric: "4 Active Machines",
-      percentageChange: "+3.8%",
-      trendDescription: "Weekly Growth",
+      amount: `₱${data?.data.totalWaterRevenue.toLocaleString() ?? "0"}`,
+      metric: `${data?.data.activeMachinesCount ?? 0} Active Machines`,
+      percentageChange: data?.data.activeMachinesPercentageChange ?? "+0%",
+      trendDescription: "Active Machines",
       icon: <GiDroplets className="size-8 text-muted-foreground" />,
     },
     {
       id: "3",
       title: "Other IGPs",
-      amount: "₱5,300",
-      metric: "3 Total Items",
-      percentageChange: "+4.5%",
-      trendDescription: "Monthly Growth",
+      amount: `₱${data?.data.totalIgpRevenue.toLocaleString() ?? "0"}`,
+      metric: `${data?.data.totalIgpSold ?? 0} Total Items`,
+      percentageChange: data?.data.igpPercentageChange ?? "+0%",
+      trendDescription: "Revenue",
       icon: <GiClothes className="size-8 text-muted-foreground" />,
     },
   ]
@@ -78,46 +43,19 @@ export const DashboardClient = () => {
   return (
     <div className="p-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Suspense
-          fallback={[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="h-[200px] animate-pulse rounded-lg bg-muted/50"
-            />
-          ))}
-        >
-          <DashboardCard items={dashboardItems} />
-        </Suspense>
+        <DashboardCard items={dashboardItems} />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-5">
         <div className="md:col-span-3">
-          <Suspense
-            fallback={
-              <div className="h-[400px] animate-pulse rounded-lg bg-muted/50" />
-            }
-          >
-            <IgpPerformance />
-          </Suspense>
+          <IgpPerformance profitData={data} isLoading={isLoading} />
         </div>
         <div className="md:col-span-2">
           <div className="mb-2">
-            <Suspense
-              fallback={
-                <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
-              }
-            >
-              <RevenueAnalytics />
-            </Suspense>
+            <RevenueAnalytics analyticsData={data} />
           </div>
           <div className="mb-2">
-            <Suspense
-              fallback={
-                <div className="h-[200px] animate-pulse rounded-lg bg-muted/50" />
-              }
-            >
-              <SalesOverview />
-            </Suspense>
+            <SalesOverview analyticsData={data} />
           </div>
         </div>
       </div>

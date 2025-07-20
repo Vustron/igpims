@@ -1,12 +1,13 @@
 import { db } from "@/config/drizzle"
 import { eq, sql } from "drizzle-orm"
-import { igp, igpTransactions, user } from "../db/schemas"
+import { igp, igpSupply, igpTransactions, user } from "../db/schemas"
 
 const insertIgpTransactionQuery = db
   .insert(igpTransactions)
   .values({
     id: sql`${sql.placeholder("id")}`,
     igpId: sql`${sql.placeholder("igpId")}`,
+    igpSupplyId: sql`${sql.placeholder("igpSupplyId")}`,
     purchaserName: sql`${sql.placeholder("purchaserName")}`,
     courseAndSet: sql`${sql.placeholder("courseAndSet")}`,
     batch: sql`${sql.placeholder("batch")}`,
@@ -21,6 +22,7 @@ const findIgpTransactionByIdQuery = db
   .select({
     id: igpTransactions.id,
     igpId: igpTransactions.igpId,
+    igpSupplyId: igpTransactions.igpSupplyId,
     purchaserName: igpTransactions.purchaserName,
     courseAndSet: igpTransactions.courseAndSet,
     batch: igpTransactions.batch,
@@ -34,9 +36,18 @@ const findIgpTransactionByIdQuery = db
       igpName: igp.igpName,
       costPerItem: igp.costPerItem,
     },
+    supplyData: {
+      id: igpSupply.id,
+      quantity: igpSupply.quantity,
+      quantitySold: igpSupply.quantitySold,
+      unitPrice: igpSupply.unitPrice,
+      expenses: igpSupply.expenses,
+      totalRevenue: igpSupply.totalRevenue,
+    },
   })
   .from(igpTransactions)
   .leftJoin(igp, eq(igpTransactions.igpId, igp.id))
+  .leftJoin(igpSupply, eq(igpTransactions.igpSupplyId, igpSupply.id))
   .where(eq(igpTransactions.id, sql.placeholder("id")))
   .limit(1)
   .prepare()
@@ -45,6 +56,7 @@ const findIgpTransactionByIdWithIgpQuery = db
   .select({
     id: igpTransactions.id,
     igpId: igpTransactions.igpId,
+    igpSupplyId: igpTransactions.igpSupplyId,
     purchaserName: igpTransactions.purchaserName,
     courseAndSet: igpTransactions.courseAndSet,
     batch: igpTransactions.batch,
@@ -58,10 +70,20 @@ const findIgpTransactionByIdWithIgpQuery = db
       igpName: igp.igpName,
       costPerItem: igp.costPerItem,
     },
+    supply: {
+      id: igpSupply.id,
+      supplyDate: sql<number>`${igpSupply.supplyDate}`,
+      quantity: igpSupply.quantity,
+      quantitySold: igpSupply.quantitySold,
+      unitPrice: igpSupply.unitPrice,
+      expenses: igpSupply.expenses,
+      totalRevenue: igpSupply.totalRevenue,
+    },
     totalAmount: sql<number>`${igpTransactions.quantity} * ${igp.costPerItem}`,
   })
   .from(igpTransactions)
   .leftJoin(igp, eq(igpTransactions.igpId, igp.id))
+  .leftJoin(igpSupply, eq(igpTransactions.igpSupplyId, igpSupply.id))
   .leftJoin(user, eq(igp.projectLead, user.id))
   .where(eq(igpTransactions.id, sql.placeholder("id")))
   .limit(1)

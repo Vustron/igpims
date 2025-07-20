@@ -41,8 +41,7 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.js",
-    ".next/types/**/*.ts",
-    "src/backend/controllers/inspection"
-, "src/features/fund-request/validate-expense.tsx"  ],
+    ".next/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

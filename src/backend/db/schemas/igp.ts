@@ -128,6 +128,9 @@ export const igpTransactions = sqliteTable(
     igpId: text("igpId")
       .notNull()
       .references(() => igp.id, { onDelete: "cascade" }),
+    igpSupplyId: text("igpSupplyId")
+      .notNull()
+      .references(() => igpSupply.id, { onDelete: "cascade" }),
     purchaserName: text("purchaserName", { length: 255 }).notNull(),
     courseAndSet: text("courseAndSet", { length: 100 }).notNull(),
     batch: text("batch").default("N/A"),
@@ -154,6 +157,12 @@ export const igpTransactionsRelations = relations(
     igp: one(igp, {
       fields: [igpTransactions.igpId],
       references: [igp.id],
+      relationName: "transactions",
+    }),
+    supply: one(igpSupply, {
+      fields: [igpTransactions.igpSupplyId],
+      references: [igpSupply.id],
+      relationName: "supplyTransactions",
     }),
   }),
 )
@@ -170,8 +179,10 @@ export const igpSupply = sqliteTable(
     supplyDate: integer("supplyDate", { mode: "timestamp" })
       .notNull()
       .default(sql`CURRENT_TIMESTAMP`),
+    quantity: integer("quantity").default(0).notNull(),
     quantitySold: integer("quantitySold").notNull().default(0),
     unitPrice: integer("unitPrice").notNull(),
+    expenses: integer("expenses").notNull().default(0),
     totalRevenue: integer("totalRevenue").notNull().default(0),
     ...timestamp,
   },
@@ -181,11 +192,13 @@ export const igpSupply = sqliteTable(
   ],
 )
 
-export const igpSupplyRelations = relations(igpSupply, ({ one }) => ({
+export const igpSupplyRelations = relations(igpSupply, ({ one, many }) => ({
   igp: one(igp, {
     fields: [igpSupply.igpId],
     references: [igp.id],
+    relationName: "supplies",
   }),
+  transactions: many(igpTransactions),
 }))
 
 export type Igp = InferSelectModel<typeof igp>

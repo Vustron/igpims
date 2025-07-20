@@ -1,10 +1,9 @@
-import { igp, igpTransactions } from "@/backend/db/schemas"
+import { igp, igpSupply, igpTransactions } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import {
-  findIgpByIdQuery,
-  findIgpTransactionByIdQuery,
-} from "@/backend/queries/igp"
+import { findIgpByIdQuery } from "@/backend/queries/igp"
+import { findIgpSupplyByIdWithIgpQuery } from "@/backend/queries/igp-supply"
+import { findIgpTransactionByIdWithIgpQuery } from "@/backend/queries/igp-transaction"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
@@ -57,9 +56,10 @@ export async function updateIgpTransaction(
       )
     }
 
-    const [existingTransaction] = await findIgpTransactionByIdQuery.execute({
-      id,
-    })
+    const [existingTransaction] =
+      await findIgpTransactionByIdWithIgpQuery.execute({
+        id,
+      })
 
     if (!existingTransaction) {
       return NextResponse.json(
@@ -75,6 +75,17 @@ export async function updateIgpTransaction(
     if (!igpData) {
       return NextResponse.json(
         { error: "Associated IGP not found" },
+        { status: 404 },
+      )
+    }
+
+    const [supply] = await findIgpSupplyByIdWithIgpQuery.execute({
+      id: existingTransaction.igpSupplyId,
+    })
+
+    if (!supply) {
+      return NextResponse.json(
+        { error: "Associated supply not found" },
         { status: 404 },
       )
     }
@@ -98,6 +109,28 @@ export async function updateIgpTransaction(
         return existingTransaction
       }
 
+      const currentQuantity = Number(existingTransaction.quantity)
+      const newQuantity =
+        data.quantity !== undefined ? Number(data.quantity) : currentQuantity
+      const quantityDiff = newQuantity - currentQuantity
+
+      if (data.quantity !== undefined) {
+        const availableQuantity =
+          Number(supply.quantity) - Number(supply.quantitySold)
+        if (quantityDiff > 0 && quantityDiff > availableQuantity) {
+          throw new Error("Not enough items available in this supply")
+        }
+      }
+
+      if (data.quantity !== undefined) {
+        await tx
+          .update(igpSupply)
+          .set({
+            quantitySold: sql`${igpSupply.quantitySold} + ${quantityDiff}`,
+          })
+          .where(eq(igpSupply.id, existingTransaction.igpSupplyId))
+      }
+
       const [updated] = await tx
         .update(igpTransactions)
         .set(updateValues)
@@ -108,42 +141,37 @@ export async function updateIgpTransaction(
         throw new Error("Failed to update transaction")
       }
 
-      if (
-        data.itemReceived === "received" &&
-        existingTransaction.itemReceived !== "received"
-      ) {
-        const quantityToAdd =
-          data.quantity !== undefined
-            ? data.quantity
-            : existingTransaction.quantity
+      const receivedTransactions = await tx.query.igpTransactions.findMany({
+        where: (transactions, { and, eq }) =>
+          and(
+            eq(transactions.igpId, existingTransaction.igpId),
+            eq(transactions.itemReceived, "received"),
+          ),
+      })
 
-        await tx
-          .update(igp)
-          .set({
-            totalSold: sql`${igpData.totalSold} + ${quantityToAdd}`,
-            igpRevenue: sql`${igpData.igpRevenue} + (${quantityToAdd} * ${igpData.costPerItem})`,
-          })
-          .where(eq(igp.id, existingTransaction.igpId))
-      } else if (
-        data.quantity !== undefined &&
-        existingTransaction.itemReceived === "received"
-      ) {
-        const quantityDiff = data.quantity - existingTransaction.quantity
-        await tx
-          .update(igp)
-          .set({
-            totalSold: sql`${igpData.totalSold} + ${quantityDiff}`,
-            igpRevenue: sql`${igpData.igpRevenue} + (${quantityDiff} * ${igpData.costPerItem})`,
-          })
-          .where(eq(igp.id, existingTransaction.igpId))
-      }
+      const totalRevenue = receivedTransactions.reduce((sum, transaction) => {
+        return sum + Number(transaction.quantity) * Number(igpData.costPerItem)
+      }, 0)
+
+      const totalSold = receivedTransactions.reduce((sum, transaction) => {
+        return sum + Number(transaction.quantity)
+      }, 0)
+
+      await tx
+        .update(igp)
+        .set({
+          totalSold,
+          igpRevenue: totalRevenue,
+        })
+        .where(eq(igp.id, existingTransaction.igpId))
 
       return updated
     })
 
-    const [newTransactionData] = await findIgpTransactionByIdQuery.execute({
-      id: updatedTransaction?.id,
-    })
+    const [newTransactionData] =
+      await findIgpTransactionByIdWithIgpQuery.execute({
+        id: updatedTransaction?.id,
+      })
 
     if (!newTransactionData) {
       return NextResponse.json(

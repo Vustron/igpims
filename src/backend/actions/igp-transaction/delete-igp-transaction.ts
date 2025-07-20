@@ -26,6 +26,7 @@ export const useDeleteIgpTransaction = (id: string, igpId?: string) => {
     onMutate: async () => {
       await Promise.all([
         queryClient.cancelQueries({ queryKey: ["igp-transaction", id] }),
+        queryClient.cancelQueries({ queryKey: ["igp-supplies"] }),
         queryClient.cancelQueries({ queryKey: ["igp-transactions", igpId] }),
         queryClient.cancelQueries({ queryKey: ["igp", igpId] }),
         queryClient.cancelQueries({ queryKey: ["igps"] }),
@@ -99,6 +100,7 @@ export const useDeleteIgpTransaction = (id: string, igpId?: string) => {
     onSuccess: (_data, _variables, _context) => {
       queryClient.invalidateQueries({ queryKey: ["igp-transactions", id] })
       queryClient.invalidateQueries({ queryKey: ["igp-transactions"] })
+      queryClient.invalidateQueries({ queryKey: ["igp-supplies"] })
       queryClient.invalidateQueries({ queryKey: ["igp", igpId] })
       queryClient.invalidateQueries({ queryKey: ["igps"] })
     },

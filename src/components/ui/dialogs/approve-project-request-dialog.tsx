@@ -56,6 +56,7 @@ export const ApproveProjectRequestDialog = () => {
       updateIgp.mutateAsync({
         status: "approved",
         currentStep: 4,
+        submissionDate: new Date().setHours(0, 0, 0, 0),
       }),
       {
         loading: "Approving project...",

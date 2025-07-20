@@ -102,7 +102,6 @@ export async function findManyIgp(
         status: igp.status,
         currentStep: igp.currentStep,
         requestDate: sql<number>`${igp.requestDate}`,
-        dateNeeded: sql<number>`${igp.dateNeeded}`,
         isRejected: igp.isRejected,
         rejectionStep: igp.rejectionStep,
         rejectionReason: igp.rejectionReason,

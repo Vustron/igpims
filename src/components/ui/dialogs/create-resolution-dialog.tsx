@@ -89,6 +89,7 @@ export const CreateResolutionDialog = () => {
         publicKey,
         file,
         fileName: `resolution_document_${Date.now()}.pdf`,
+        folder: "/igpmis/",
         useUniqueFileName: true,
       })
 

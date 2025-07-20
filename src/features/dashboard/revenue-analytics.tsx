@@ -1,5 +1,8 @@
 "use client"
 
+import { ProfitData } from "@/backend/actions/analytics/find-total-profit"
+import { Card } from "@/components/ui/cards"
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 import { TrendingUp } from "lucide-react"
 import { useId, useMemo } from "react"
 import {
@@ -13,96 +16,62 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { Card } from "@/components/ui/cards"
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 
-export const RevenueAnalytics = () => {
+interface RevenueAnalyticsProps {
+  analyticsData: ProfitData | undefined
+}
+
+export const RevenueAnalytics = ({ analyticsData }: RevenueAnalyticsProps) => {
   const colorIdRentals = useId()
   const colorIdWaterVendo = useId()
-  const colorIdMerchandise = useId()
-
-  const rawData = [
-    {
-      month: "Jan",
-      lockerRentals: 1800,
-      waterVendo: 1200,
-      merchandise: 900,
-    },
-    {
-      month: "Feb",
-      lockerRentals: 2200,
-      waterVendo: 1400,
-      merchandise: 1100,
-    },
-    {
-      month: "Mar",
-      lockerRentals: 1900,
-      waterVendo: 1300,
-      merchandise: 1000,
-    },
-    {
-      month: "Apr",
-      lockerRentals: 2800,
-      waterVendo: 1600,
-      merchandise: 1800,
-    },
-    {
-      month: "May",
-      lockerRentals: 2400,
-      waterVendo: 1500,
-      merchandise: 1700,
-    },
-    {
-      month: "Jun",
-      lockerRentals: 2700,
-      waterVendo: 1700,
-      merchandise: 1900,
-    },
-  ]
+  const colorIdIgp = useId()
 
   const data = useMemo(() => {
-    return rawData
-  }, [rawData])
+    if (!analyticsData?.monthlyRevenue) return []
+
+    const currentDate = new Date()
+    return analyticsData.monthlyRevenue.slice(0, currentDate.getMonth() + 1)
+  }, [analyticsData?.monthlyRevenue])
 
   const totalRevenue = useMemo(() => {
-    return rawData.reduce((acc, item) => {
-      return acc + item.lockerRentals + item.waterVendo + item.merchandise
+    return data.reduce((acc, item) => {
+      return acc + item.lockerRentals + item.waterVendo + item.igpRevenue
     }, 0)
-  }, [rawData])
+  }, [data])
 
   const averageMonthlyRevenue = useMemo(() => {
-    return Math.round(totalRevenue / rawData.length)
-  }, [totalRevenue, rawData.length])
+    return data.length > 0 ? Math.round(totalRevenue / data.length) : 0
+  }, [totalRevenue, data.length])
 
   const growthPercentage = useMemo(() => {
-    if (rawData.length < 2) return 0
+    if (data.length < 2) return 0
 
-    const firstMonth = rawData[0]
-    const lastMonth = rawData[rawData.length - 1]
+    const firstMonth = data[0]
+    const lastMonth = data[data.length - 1]
 
     const firstTotal =
       (firstMonth?.lockerRentals || 0) +
       (firstMonth?.waterVendo || 0) +
-      (firstMonth?.merchandise || 0)
+      (firstMonth?.igpRevenue || 0)
     const lastTotal =
       (lastMonth?.lockerRentals || 0) +
       (lastMonth?.waterVendo || 0) +
-      (lastMonth?.merchandise || 0)
+      (lastMonth?.igpRevenue || 0)
 
     return firstTotal === 0
       ? 0
       : Math.round(((lastTotal - firstTotal) / firstTotal) * 100)
-  }, [rawData])
+  }, [data])
 
   const yDomain = useMemo(() => {
-    const maxValues = rawData.map((item) =>
-      Math.max(item.lockerRentals, item.waterVendo, item.merchandise),
+    const maxValues = data.map((item) =>
+      Math.max(item.lockerRentals, item.waterVendo, item.igpRevenue),
     )
     const max = Math.max(...maxValues)
     const min = 0
     const padding = max * 0.1
     return [min, Math.ceil((max + padding) / 1000) * 1000]
-  }, [rawData])
+  }, [data])
 
   const chartConfig = {
     lockerRentals: {
@@ -113,8 +82,8 @@ export const RevenueAnalytics = () => {
       label: "Water Vendo",
       color: "#38B2AC",
     },
-    merchandise: {
-      label: "Merchandise",
+    igpRevenue: {
+      label: "Other IGPs",
       color: "#2C7A7B",
     },
   }
@@ -148,7 +117,6 @@ export const RevenueAnalytics = () => {
               }}
             >
               <defs>
-                {/* Gradient definitions for lines */}
                 <linearGradient id={colorIdRentals} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3182CE" stopOpacity={0.8} />
                   <stop offset="95%" stopColor="#3182CE" stopOpacity={0.1} />
@@ -163,13 +131,7 @@ export const RevenueAnalytics = () => {
                   <stop offset="5%" stopColor="#38B2AC" stopOpacity={0.8} />
                   <stop offset="95%" stopColor="#38B2AC" stopOpacity={0.1} />
                 </linearGradient>
-                <linearGradient
-                  id={colorIdMerchandise}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
+                <linearGradient id={colorIdIgp} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#2C7A7B" stopOpacity={0.8} />
                   <stop offset="95%" stopColor="#2C7A7B" stopOpacity={0.1} />
                 </linearGradient>
@@ -204,11 +166,11 @@ export const RevenueAnalytics = () => {
                     type ValidKeys =
                       | "lockerRentals"
                       | "waterVendo"
-                      | "merchandise"
+                      | "igpRevenue"
                     const labels: Record<ValidKeys, string> = {
                       lockerRentals: "Locker Rentals",
                       waterVendo: "Water Vendo",
-                      merchandise: "Merchandise",
+                      igpRevenue: "Other IGPs",
                     }
 
                     const formattedName =
@@ -260,7 +222,7 @@ export const RevenueAnalytics = () => {
                 dataKey="lockerRentals"
                 stroke="#3182CE"
                 strokeWidth={2}
-                fill="url(#colorLockerRentals)"
+                fill={`url(#${colorIdRentals})`}
                 fillOpacity={0.3}
                 name="lockerRentals"
                 dot={false}
@@ -278,7 +240,7 @@ export const RevenueAnalytics = () => {
                 dataKey="waterVendo"
                 stroke="#38B2AC"
                 strokeWidth={2}
-                fill="url(#colorWaterVendo)"
+                fill={`url(#${colorIdWaterVendo})`}
                 fillOpacity={0.3}
                 name="waterVendo"
                 dot={false}
@@ -293,12 +255,12 @@ export const RevenueAnalytics = () => {
 
               <Area
                 type="monotone"
-                dataKey="merchandise"
+                dataKey="igpRevenue"
                 stroke="#2C7A7B"
                 strokeWidth={2}
-                fill="url(#colorMerchandise)"
+                fill={`url(#${colorIdIgp})`}
                 fillOpacity={0.3}
-                name="merchandise"
+                name="igpRevenue"
                 dot={false}
                 activeDot={{
                   r: 5,

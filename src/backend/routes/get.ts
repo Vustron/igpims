@@ -1,8 +1,10 @@
+import { findTotalProfit } from "../controllers/analytics/total-profit"
 import { findExpenseTransactionById } from "../controllers/expense-transaction/find-by-id"
 import { findManyExpenseTransaction } from "../controllers/expense-transaction/find-many"
 import { findFundRequestById } from "../controllers/fund-request/find-by-id"
 import { findManyFundRequest } from "../controllers/fund-request/find-many"
-import { findTotalProfit } from "../controllers/fund-request/total-profit"
+import { findIgpSupplyById } from "../controllers/igp-supply/find-by-id"
+import { findManyIgpSupply } from "../controllers/igp-supply/find-many"
 import { findIgpTransactionById } from "../controllers/igp-transactions/find-by-id"
 import { findManyIgpTransactions } from "../controllers/igp-transactions/find-many"
 import { findIgpById } from "../controllers/igp/find-by-id"
@@ -47,7 +49,6 @@ export const getRoutes: Route[] = [
   { path: "/api/v1/water-supplies/find-by-id", handler: findWaterSupplyById },
   { path: "/api/v1/water-funds/find-many", handler: findManyWaterFunds },
   { path: "/api/v1/water-funds/find-by-id", handler: findWaterFundById },
-  { path: "/api/v1/fund-requests/find-total-profit", handler: findTotalProfit },
   { path: "/api/v1/fund-requests/find-many", handler: findManyFundRequest },
   { path: "/api/v1/fund-requests/find-by-id", handler: findFundRequestById },
   {
@@ -68,6 +69,18 @@ export const getRoutes: Route[] = [
   {
     path: "/api/v1/igp-transactions/find-by-id",
     handler: findIgpTransactionById,
+  },
+  {
+    path: "/api/v1/igp-supplies/find-many",
+    handler: findManyIgpSupply,
+  },
+  {
+    path: "/api/v1/igp-supplies/find-by-id",
+    handler: findIgpSupplyById,
+  },
+  {
+    path: "/api/v1/analytics/find-total-profit",
+    handler: findTotalProfit,
   },
   // Add more GET routes here
 ]

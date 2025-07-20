@@ -44,3 +44,5 @@ migrations*
 # local.db
 # local.db-shm
 # local.db-wal
+
+user_roles.pdf

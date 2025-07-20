@@ -27,6 +27,23 @@ export async function updateIgp(
     }
 
     const data = await requestJson<Partial<UpdateIgpPayload>>(request)
+
+    if (data.approvalDate !== undefined) {
+      if (typeof data.approvalDate === "number") {
+        data.approvalDate = new Date(data.approvalDate)
+      } else if (typeof data.approvalDate === "string") {
+        data.approvalDate = new Date(data.approvalDate)
+      }
+    }
+
+    if (data.submissionDate !== undefined) {
+      if (typeof data.submissionDate === "number") {
+        data.submissionDate = new Date(data.submissionDate)
+      } else if (typeof data.submissionDate === "string") {
+        data.submissionDate = new Date(data.submissionDate)
+      }
+    }
+
     const validationResult = await updateIgpSchema
       .partial()
       .safeParseAsync(data)
@@ -74,8 +91,8 @@ export async function updateIgp(
         updateValues.currentStep = data.currentStep
       if (data.requestDate !== undefined)
         updateValues.requestDate = data.requestDate
-      if (data.dateNeeded !== undefined)
-        updateValues.dateNeeded = data.dateNeeded
+      if (data.igpDateNeeded !== undefined)
+        updateValues.igpDateNeeded = data.igpDateNeeded
       if (data.isRejected !== undefined)
         updateValues.isRejected = data.isRejected
       if (data.rejectionStep !== undefined)

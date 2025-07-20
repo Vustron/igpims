@@ -109,6 +109,7 @@ export const ReviewProjectRequestDialog = () => {
         signature,
         publicKey,
         file,
+        folder: "/igpmis/",
         fileName: `project_doc_${Date.now()}.pdf`,
         useUniqueFileName: true,
       })

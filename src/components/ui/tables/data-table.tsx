@@ -78,6 +78,7 @@ interface DataTableProps<TData, TValue> {
     | "water-funds"
     | "expense-transactions"
     | "igp-transactions"
+    | "igp-supplies"
   resultLabel?: string
   isOnViolations?: boolean
   isOnInspection?: boolean
@@ -87,6 +88,7 @@ interface DataTableProps<TData, TValue> {
   isBudgetFullyUtilized?: boolean
   requestId?: string
   isOnIgpTransaction?: boolean
+  isOnIgpSupplies?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -134,6 +136,7 @@ export function DataTable<TData, TValue>({
   isBudgetFullyUtilized = false,
   requestId,
   isOnIgpTransaction,
+  isOnIgpSupplies,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -197,6 +200,7 @@ export function DataTable<TData, TValue>({
             isBudgetFullyUtilized={isBudgetFullyUtilized}
             requestId={requestId}
             isOnIgpTransaction={isOnIgpTransaction}
+            isOnIgpSupplies={isOnIgpSupplies}
           />
         )}
 

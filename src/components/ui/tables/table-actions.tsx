@@ -2,6 +2,7 @@
 
 import { ExpenseTransactionWithRequestor } from "@/backend/actions/expense-transaction/find-many"
 import { useUpdateFundRequest } from "@/backend/actions/fund-request/update-fund-request"
+import { IgpSupplyWithRelations } from "@/backend/actions/igp-supply/find-by-id"
 import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { Button } from "@/components/ui/buttons"
 import {
@@ -35,6 +36,7 @@ interface TableActionsProps<TData> {
   isBudgetFullyUtilized?: boolean
   requestId?: string
   isOnIgpTransaction?: boolean
+  isOnIgpSupplies?: boolean
 }
 
 export function TableActions<TData>({
@@ -53,12 +55,14 @@ export function TableActions<TData>({
   isBudgetFullyUtilized,
   requestId,
   isOnIgpTransaction,
+  isOnIgpSupplies,
 }: TableActionsProps<TData>) {
   const { onOpen } = useDialog()
   const hasExpenseTransactions = tableData.length > 0
   const fundRequestData = tableData[0] as
     | ExpenseTransactionWithRequestor
     | undefined
+  const igpSupplyData = tableData[0] as IgpSupplyWithRelations | undefined
   const confirm = useConfirm()
   const updateFundRequest = useUpdateFundRequest(
     fundRequestData?.requestId || "",
@@ -156,6 +160,7 @@ export function TableActions<TData>({
         isOnWaterSupply ||
         isOnWaterFund ||
         isOnIgpTransaction ||
+        isOnIgpSupplies ||
         (isOnExpense && !isBudgetFullyUtilized)) && (
         <motion.div
           key="add-button"
@@ -184,7 +189,9 @@ export function TableActions<TData>({
                             ? "createExpense"
                             : isOnIgpTransaction
                               ? "createIgpTransaction"
-                              : "createRent",
+                              : isOnIgpSupplies
+                                ? "createIgpSupply"
+                                : "createRent",
                 isOnViolations
                   ? {
                       violation: tableData[0] as ViolationWithRenters,
@@ -193,7 +200,11 @@ export function TableActions<TData>({
                     ? {
                         requestId: requestId,
                       }
-                    : undefined,
+                    : isOnIgpSupplies
+                      ? {
+                          requestId: igpSupplyData?.igpId,
+                        }
+                      : undefined,
               )
             }
             disabled={isOnExpense && isBudgetFullyUtilized}
@@ -213,7 +224,9 @@ export function TableActions<TData>({
                         ? "Create expense"
                         : isOnIgpTransaction
                           ? "Create IGP transaction"
-                          : "Create rent"}
+                          : isOnIgpSupplies
+                            ? "Create igp supply"
+                            : "Create rent"}
           </Button>
         </motion.div>
       )}

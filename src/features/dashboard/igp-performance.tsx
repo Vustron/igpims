@@ -1,5 +1,9 @@
 "use client"
 
+import { ProfitData } from "@/backend/actions/analytics/find-total-profit"
+import { Card } from "@/components/ui/cards"
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
+import { Loader2 } from "lucide-react"
 import { useMemo } from "react"
 import {
   Bar,
@@ -12,8 +16,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { Card } from "@/components/ui/cards"
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
   return (
@@ -33,16 +35,28 @@ const CustomXAxisTick = ({ x, y, payload }: any) => {
   )
 }
 
-export const IgpPerformance = () => {
-  const data = [
-    { name: "Kalibulong Tshirts", value: 3000 },
-    { name: "Button Pins", value: 1800 },
-    { name: "Water Vendo", value: 4500 },
-    { name: "Locker Rentals", value: 6500 },
-  ]
+interface IgpPerformanceProps {
+  profitData: ProfitData | undefined
+  isLoading: boolean
+}
+
+export const IgpPerformance = ({
+  profitData,
+  isLoading,
+}: IgpPerformanceProps) => {
+  const chartData = useMemo(() => {
+    if (!profitData?.igpRevenues) return []
+
+    return profitData.igpRevenues
+      .filter((igp) => igp.revenue >= 0)
+      .map((igp) => ({
+        name: igp.name,
+        value: igp.revenue,
+      }))
+  }, [profitData])
 
   const { yAxisDomain, yAxisTicks } = useMemo(() => {
-    const maxValue = Math.max(...data.map((item) => item.value))
+    const maxValue = Math.max(1000, ...chartData.map((item) => item.value))
     const upperLimit = Math.ceil(maxValue / 200) * 200
 
     let tickSpacing: any
@@ -66,19 +80,23 @@ export const IgpPerformance = () => {
       yAxisDomain: [0, upperLimit],
       yAxisTicks: ticks,
     }
-  }, [data])
+  }, [chartData])
 
-  const getBarColors = () => {
+  const getBarColors = useMemo(() => {
     const baseColor = "#76E4F7"
     const highlightColor = "#0BC5EA"
 
-    return data.map((_, index) => {
-      const maxValueIndex = data.findIndex(
-        (item) => item.value === Math.max(...data.map((d) => d.value)),
+    if (chartData.every((item) => item.value === 0)) {
+      return chartData.map(() => baseColor)
+    }
+
+    return chartData.map((_, index) => {
+      const maxValueIndex = chartData.findIndex(
+        (item) => item.value === Math.max(...chartData.map((d) => d.value)),
       )
       return index === maxValueIndex ? highlightColor : baseColor
     })
-  }
+  }, [chartData])
 
   const chartConfig = {
     performance: {
@@ -87,13 +105,21 @@ export const IgpPerformance = () => {
     },
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full w-full">
+        <Loader2 className="animate-spin size-8" />
+      </div>
+    )
+  }
+
   return (
-    <Card className="col-span-full h-full w-full bg-background p-6">
+    <Card className="col-span-full h-full w-full bg-background p-5">
       <h3 className="mb-6 font-semibold text-lg">IGP Income Performance</h3>
       <ChartContainer config={chartConfig} className="h-full w-full">
         <ResponsiveContainer width="100%" height={350}>
           <BarChart
-            data={data}
+            data={chartData}
             margin={{
               top: 20,
               right: 20,
@@ -145,10 +171,10 @@ export const IgpPerformance = () => {
               }}
             />
             <Bar dataKey="value" name="Sales Income" radius={[8, 8, 0, 0]}>
-              {data.map((_, index) => (
+              {chartData.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={getBarColors()[index]}
+                  fill={getBarColors[index]}
                   filter="drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.1))"
                 />
               ))}

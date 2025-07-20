@@ -1,9 +1,7 @@
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import {
-  findFundRequestByIdQuery,
-  getTotalProfit,
-} from "@/backend/queries/fund-request"
+import { getTotalProfit } from "@/backend/queries/analytics"
+import { findFundRequestByIdQuery } from "@/backend/queries/fund-request"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { NextRequest, NextResponse } from "next/server"

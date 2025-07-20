@@ -16,7 +16,7 @@ const insertIgpQuery = db
     igpStartDate: sql`${sql.placeholder("igpStartDate")}`,
     igpEndDate: sql`${sql.placeholder("igpEndDate")}`,
     requestDate: sql`${sql.placeholder("requestDate")}`,
-    dateNeeded: sql`${sql.placeholder("dateNeeded")}`,
+    igpDateNeeded: sql`${sql.placeholder("igpDateNeeded")}`,
     itemsToSell: sql`${sql.placeholder("itemsToSell")}`,
     assignedOfficers: sql`${sql.placeholder("assignedOfficers")}`,
     costPerItem: sql`${sql.placeholder("costPerItem")}`,
@@ -127,68 +127,6 @@ const findIgpByIdQuery = db
   .limit(1)
   .prepare()
 
-const insertIgpTransactionQuery = db
-  .insert(igpTransactions)
-  .values({
-    id: sql`${sql.placeholder("id")}`,
-    igpId: sql`${sql.placeholder("igpId")}`,
-    purchaserName: sql`${sql.placeholder("purchaserName")}`,
-    courseAndSet: sql`${sql.placeholder("courseAndSet")}`,
-    batch: sql`${sql.placeholder("batch")}`,
-    quantity: sql`${sql.placeholder("quantity")}`,
-    dateBought: sql`${sql.placeholder("dateBought")}`,
-    itemReceived: sql`${sql.placeholder("itemReceived")}`,
-  })
-  .returning()
-  .prepare()
-
-const findIgpTransactionByIdQuery = db
-  .select({
-    id: igpTransactions.id,
-    igpId: igpTransactions.igpId,
-    purchaserName: igpTransactions.purchaserName,
-    courseAndSet: igpTransactions.courseAndSet,
-    batch: igpTransactions.batch,
-    quantity: igpTransactions.quantity,
-    dateBought: sql<number>`${igpTransactions.dateBought}`,
-    itemReceived: igpTransactions.itemReceived,
-    createdAt: sql<number>`${igpTransactions.createdAt}`,
-    updatedAt: sql<number>`${igpTransactions.updatedAt}`,
-  })
-  .from(igpTransactions)
-  .where(eq(igpTransactions.id, sql.placeholder("id")))
-  .limit(1)
-  .prepare()
-
-const insertIgpSupplyQuery = db
-  .insert(igpSupply)
-  .values({
-    id: sql`${sql.placeholder("id")}`,
-    igpId: sql`${sql.placeholder("igpId")}`,
-    supplyDate: sql`${sql.placeholder("supplyDate")}`,
-    quantitySold: sql`${sql.placeholder("quantitySold")}`,
-    unitPrice: sql`${sql.placeholder("unitPrice")}`,
-    totalRevenue: sql`${sql.placeholder("totalRevenue")}`,
-  })
-  .returning()
-  .prepare()
-
-const findIgpSupplyByIdQuery = db
-  .select({
-    id: igpSupply.id,
-    igpId: igpSupply.igpId,
-    supplyDate: sql<number>`${igpSupply.supplyDate}`,
-    quantitySold: igpSupply.quantitySold,
-    unitPrice: igpSupply.unitPrice,
-    totalRevenue: igpSupply.totalRevenue,
-    createdAt: sql<number>`${igpSupply.createdAt}`,
-    updatedAt: sql<number>`${igpSupply.updatedAt}`,
-  })
-  .from(igpSupply)
-  .where(eq(igpSupply.id, sql.placeholder("id")))
-  .limit(1)
-  .prepare()
-
 const updateIgpQuery = db
   .update(igp)
   .set({
@@ -209,7 +147,7 @@ const updateIgpQuery = db
     status: sql`${sql.placeholder("status")}`,
     currentStep: sql`${sql.placeholder("currentStep")}`,
     requestDate: sql`${sql.placeholder("requestDate")}`,
-    dateNeeded: sql`${sql.placeholder("dateNeeded")}`,
+    igpDateNeeded: sql`${sql.placeholder("igpDateNeeded")}`,
     isRejected: sql`${sql.placeholder("isRejected")}`,
     rejectionStep: sql`${sql.placeholder("rejectionStep")}`,
     rejectionReason: sql`${sql.placeholder("rejectionReason")}`,
@@ -224,12 +162,4 @@ const updateIgpQuery = db
   .returning()
   .prepare()
 
-export {
-  insertIgpQuery,
-  findIgpByIdQuery,
-  insertIgpTransactionQuery,
-  findIgpTransactionByIdQuery,
-  insertIgpSupplyQuery,
-  findIgpSupplyByIdQuery,
-  updateIgpQuery,
-}
+export { insertIgpQuery, findIgpByIdQuery, updateIgpQuery }

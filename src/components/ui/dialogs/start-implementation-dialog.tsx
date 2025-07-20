@@ -55,6 +55,7 @@ export const StartImplementationDialog = () => {
       updateIgp.mutateAsync({
         status: "in_progress",
         currentStep: 5,
+        approvalDate: new Date().setHours(0, 0, 0, 0),
       }),
       {
         loading: "Starting implementation...",

@@ -1,5 +1,6 @@
 "use client"
 
+import { useFindManyIgpSupply } from "@/backend/actions/igp-supply/find-many"
 import { IgpTransactionWithIgp } from "@/backend/actions/igp-transaction/find-many"
 import { useUpdateIgpTransaction } from "@/backend/actions/igp-transaction/update-igp-transaction"
 import { useFindManyIgp } from "@/backend/actions/igp/find-many"
@@ -12,7 +13,6 @@ import {
 } from "@/validation/igp-transaction"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 
@@ -27,12 +27,14 @@ export const UpdateIgpTransactionForm = ({
   onSuccess,
   onError,
 }: UpdateIgpTransactionFormProps) => {
-  const { data: igps, isLoading: isLoadingIgps } = useFindManyIgp()
+  const { data: igps, isLoading: loadingIgp } = useFindManyIgp()
+  const { data: igpSupply, isLoading: loadingIgpSupply } =
+    useFindManyIgpSupply()
   const updateTransaction = useUpdateIgpTransaction(
     initialData.id,
     initialData.igpId,
   )
-  const [isFormReady, setIsFormReady] = useState(false)
+  const isLoading = loadingIgp || loadingIgpSupply
 
   const getInitialDate = (timestamp: any) => {
     return new Date(timestamp * 1000).toISOString().split("T")[0]
@@ -50,12 +52,6 @@ export const UpdateIgpTransactionForm = ({
       itemReceived: initialData.itemReceived,
     },
   })
-
-  useEffect(() => {
-    if (!isLoadingIgps) {
-      setIsFormReady(true)
-    }
-  }, [isLoadingIgps])
 
   const igpOptions =
     igps?.data?.map((igp) => ({
@@ -132,6 +128,18 @@ export const UpdateIgpTransactionForm = ({
   ]
 
   const onSubmit = async (values: UpdateIgpTransactionPayload) => {
+    const selectedSupply = igpSupply?.data?.find(
+      (supply) => supply.id === values.igpSupplyId,
+    )
+
+    if (
+      selectedSupply &&
+      selectedSupply.quantity - selectedSupply.quantitySold <= 0
+    ) {
+      toast.error("This IGP supply has no available quantity")
+      return
+    }
+
     const processedValues = {
       ...values,
       quantity: Number(values.quantity),
@@ -151,7 +159,7 @@ export const UpdateIgpTransactionForm = ({
     }
   }
 
-  if (isLoadingIgps || !isFormReady) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="size-8 animate-spin text-primary" />

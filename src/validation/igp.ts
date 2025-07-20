@@ -23,7 +23,7 @@ export const createIgpSchema = z.object({
   projectTitle: z.string().optional(),
   purpose: z.string().optional(),
   requestDate: z.any().optional(),
-  dateNeeded: z.any().optional(),
+  igpDateNeeded: z.any().optional(),
 })
 
 export const updateIgpSchema = z.object({
@@ -55,7 +55,7 @@ export const updateIgpSchema = z.object({
     .optional(),
   currentStep: z.number().optional(),
   requestDate: z.number().optional(),
-  dateNeeded: z.number().optional(),
+  igpDateNeeded: z.any().optional(),
   isRejected: z.boolean().optional(),
   rejectionStep: z.number().optional(),
   rejectionReason: z.string().optional(),

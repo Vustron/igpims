@@ -1,4 +1,4 @@
-import { igp, igpTransactions } from "@/backend/db/schemas"
+import { igp, igpSupply, igpTransactions } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
@@ -29,6 +29,7 @@ export async function deleteIgpTransaction(
         where: eq(igpTransactions.id, transactionId),
         with: {
           igp: true,
+          supply: true,
         },
       })
 
@@ -40,23 +41,72 @@ export async function deleteIgpTransaction(
         throw new Error("Associated IGP not found")
       }
 
+      if (!existingTransaction.supply) {
+        throw new Error("Associated supply not found")
+      }
+
       await tx
         .delete(igpTransactions)
         .where(eq(igpTransactions.id, transactionId))
 
       if (existingTransaction.quantity > 0) {
+        const quantity = Number(existingTransaction.quantity)
+        const costPerItem = Number(existingTransaction.igp.costPerItem)
+        const wasReceived = existingTransaction.itemReceived === "received"
+
         await tx
-          .update(igp)
+          .update(igpSupply)
           .set({
-            totalSold: sql`${existingTransaction.igp.totalSold} - ${existingTransaction.quantity}`,
-            igpRevenue: sql`${existingTransaction.igp.igpRevenue} - (${existingTransaction.quantity} * ${existingTransaction.igp.costPerItem})`,
+            quantitySold: sql`${igpSupply.quantitySold} - ${quantity}`,
           })
-          .where(eq(igp.id, existingTransaction.igpId))
+          .where(eq(igpSupply.id, existingTransaction.igpSupplyId))
+
+        if (wasReceived) {
+          const receivedTransactions = await tx.query.igpTransactions.findMany({
+            where: (transactions, { and, eq }) =>
+              and(
+                eq(transactions.igpId, existingTransaction.igpId),
+                eq(transactions.itemReceived, "received"),
+              ),
+          })
+
+          const totalRevenue = receivedTransactions.reduce(
+            (sum, transaction) => {
+              return sum + Number(transaction.quantity) * costPerItem
+            },
+            0,
+          )
+
+          const totalSold = receivedTransactions.reduce((sum, transaction) => {
+            return sum + Number(transaction.quantity)
+          }, 0)
+
+          await tx
+            .update(igp)
+            .set({
+              totalSold,
+              igpRevenue: totalRevenue,
+            })
+            .where(eq(igp.id, existingTransaction.igpId))
+        } else {
+          await tx
+            .update(igp)
+            .set({
+              totalSold: sql`${igp.totalSold} - ${quantity}`,
+            })
+            .where(eq(igp.id, existingTransaction.igpId))
+        }
       }
     })
 
     return NextResponse.json({ status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: catchError(error) }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: catchError(error),
+        message: "Failed to delete transaction. Please try again.",
+      },
+      { status: 500 },
+    )
   }
 }

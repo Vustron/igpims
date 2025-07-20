@@ -44,7 +44,7 @@ export async function createIgp(
         igpEndDate: igpData.igpEndDate,
         itemsToSell: igpData.itemsToSell,
         requestDate: igpData.requestDate,
-        dateNeeded: igpData.dateNeeded,
+        igpDateNeeded: igpData.igpDateNeeded,
         assignedOfficers: JSON.stringify(igpData.assignedOfficers),
         costPerItem: igpData.costPerItem,
         projectLead: igpData.projectLead,

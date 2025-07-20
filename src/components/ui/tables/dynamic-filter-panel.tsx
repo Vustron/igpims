@@ -46,6 +46,7 @@ interface DynamicFiltersPanelProps {
     | "water-funds"
     | "expense-transactions"
     | "igp-transactions"
+    | "igp-supplies"
 }
 
 export const DynamicFiltersPanel = ({

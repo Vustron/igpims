@@ -1,14 +1,31 @@
 "use client"
 
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
+import { ProfitData } from "@/backend/actions/analytics/find-total-profit"
 import { Card } from "@/components/ui/cards"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 
-export const SalesOverview = () => {
+interface SalesOverviewProps {
+  analyticsData: ProfitData | undefined
+}
+
+export const SalesOverview = ({ analyticsData }: SalesOverviewProps) => {
   const data = [
-    { name: "Locker Rentals", value: 6500, color: "#3182CE" },
-    { name: "Water Vendo", value: 4500, color: "#4FD1C5" },
-    { name: "Other IGPs", value: 5300, color: "#319795" },
+    {
+      name: "Locker Rentals",
+      value: analyticsData?.data.totalLockerRevenue || 0,
+      color: "#3182CE",
+    },
+    {
+      name: "Water Vendo",
+      value: analyticsData?.data.totalWaterRevenue || 0,
+      color: "#4FD1C5",
+    },
+    {
+      name: "Other IGPs",
+      value: analyticsData?.data.totalIgpRevenue || 0,
+      color: "#319795",
+    },
   ]
 
   const chartConfig = {
