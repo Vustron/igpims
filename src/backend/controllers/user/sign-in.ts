@@ -1,7 +1,3 @@
-import { compare } from "bcrypt-ts"
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
-import { getClientIp } from "request-ip"
 import { Account, User } from "@/backend/db/schemas"
 import { handleOTP } from "@/backend/helpers/handle-otp"
 import {
@@ -17,6 +13,10 @@ import { getSession } from "@/config/session"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { SignInPayload, signInSchema } from "@/validation/user"
+import { compare } from "bcrypt-ts"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
+import { getClientIp } from "request-ip"
 
 export async function signInUser(
   request: NextRequest,
@@ -119,6 +119,7 @@ export async function signInUser(
           expiresAt: new Date(expiresAt),
           ipAddress: clientIp,
           userAgent: request.headers.get("user-agent") ?? "",
+          userRole: existingUser?.user.role,
         }),
         accountQuery.updateAccountSessionQuery.execute({
           userId: existingUser?.user.id,
@@ -137,6 +138,7 @@ export async function signInUser(
         updatedAt: new Date(timestamp),
         ipAddress: clientIp,
         userAgent: request.headers.get("user-agent") ?? "",
+        userRole: existingUser?.user.role,
       })
 
       await currentSession.save()

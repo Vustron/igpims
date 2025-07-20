@@ -96,7 +96,6 @@ export interface IgpCardProps {
     | "rejected"
 }
 
-// Add type icons mapping
 const typeIcons = {
   permanent: {
     icon: CheckCircle,

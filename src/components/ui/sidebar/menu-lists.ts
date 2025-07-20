@@ -1,3 +1,4 @@
+import { UserRole } from "@/types/user"
 import { LayoutGrid, LucideIcon, User } from "lucide-react"
 import { FaMoneyBillTransfer } from "react-icons/fa6"
 import { GiClothes } from "react-icons/gi"
@@ -25,7 +26,7 @@ interface Group {
   menus: Menu[]
 }
 
-export function getMenuList(pathname: string): Group[] {
+export function getMenuList(pathname: string, userRole: UserRole): Group[] {
   return [
     {
       groupLabel: "",
@@ -91,17 +92,21 @@ export function getMenuList(pathname: string): Group[] {
         },
       ],
     },
-    {
-      groupLabel: "User Management",
-      menus: [
-        {
-          href: "/users",
-          label: "Users",
-          active: pathname.includes("/users"),
-          icon: User,
-          submenus: [],
-        },
-      ],
-    },
+    ...(userRole === "admin" || userRole === "ssc_president"
+      ? [
+          {
+            groupLabel: "User Management",
+            menus: [
+              {
+                href: "/users",
+                label: "Users",
+                active: pathname.includes("/users"),
+                icon: User,
+                submenus: [],
+              },
+            ],
+          },
+        ]
+      : []),
   ]
 }

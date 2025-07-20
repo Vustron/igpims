@@ -1,5 +1,5 @@
-import { z } from "zod"
 import { passwordValidator } from "@/validation/utils"
+import { z } from "zod"
 
 export const signUpSchema = z.object({
   name: z
@@ -94,7 +94,8 @@ export const updateUserSchema = z.object({
       "ssc_treasurer",
       "ssc_auditor",
       "chief_legislator",
-      "ssc_secretary",
+      "legislative_secretary",
+      "ssc_officer",
       "student",
     ])
     .default("user")

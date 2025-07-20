@@ -3,7 +3,6 @@
 import { ProfitData } from "@/backend/actions/analytics/find-total-profit"
 import { Card } from "@/components/ui/cards"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
-import { Loader2 } from "lucide-react"
 import { useMemo } from "react"
 import {
   Bar,
@@ -37,13 +36,9 @@ const CustomXAxisTick = ({ x, y, payload }: any) => {
 
 interface IgpPerformanceProps {
   profitData: ProfitData | undefined
-  isLoading: boolean
 }
 
-export const IgpPerformance = ({
-  profitData,
-  isLoading,
-}: IgpPerformanceProps) => {
+export const IgpPerformance = ({ profitData }: IgpPerformanceProps) => {
   const chartData = useMemo(() => {
     if (!profitData?.igpRevenues) return []
 
@@ -103,14 +98,6 @@ export const IgpPerformance = ({
       label: "Revenue",
       color: "#76E4F7",
     },
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full w-full">
-        <Loader2 className="animate-spin size-8" />
-      </div>
-    )
   }
 
   return (

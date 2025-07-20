@@ -28,6 +28,7 @@ interface CreateFundRequestDialogData {
     expiresAt: Date
     userAgent: string
     ipAddress: string
+    userRole: string
   }
   fundRequest?: any
 }

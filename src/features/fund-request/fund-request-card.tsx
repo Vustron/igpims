@@ -10,8 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
+import { useCheckRoleStore } from "@/hooks/use-check-role"
 import { useConfirm } from "@/hooks/use-confirm"
 import { useDialog } from "@/hooks/use-dialog"
+import { UserRole } from "@/types/user"
 import { catchError } from "@/utils/catch-error"
 import {
   CheckCircle,
@@ -45,6 +47,7 @@ export const FundRequestCard = ({
   const confirm = useConfirm()
   const deleteFundRequest = useDeleteFundRequest(fundRequest.id)
   const router = useRouter()
+  const userRole = useCheckRoleStore((state) => state.userRole) as UserRole
 
   const handleDelete = async () => {
     const confirmed = await confirm(
@@ -86,12 +89,14 @@ export const FundRequestCard = ({
           action: () =>
             onOpen("reviewFundRequest", { fundRequest: fundRequest }),
           color: "bg-blue-600 hover:bg-blue-700",
+          disabled: false,
         }
       case "in_review":
         return {
           label: "Check Funds",
           action: () => onOpen("checkFunds", { fundRequest: fundRequest }),
           color: "bg-purple-600 hover:bg-purple-700",
+          disabled: userRole !== "ssc_treasurer",
         }
       case "checking":
         return {
@@ -99,18 +104,21 @@ export const FundRequestCard = ({
           action: () =>
             onOpen("approveFundRequest", { fundRequest: fundRequest }),
           color: "bg-emerald-600 hover:bg-emerald-700",
+          disabled: userRole !== "ssc_treasurer",
         }
       case "approved":
         return {
           label: "Disburse Funds",
           action: () => onOpen("disburseFunds", { fundRequest: fundRequest }),
           color: "bg-indigo-600 hover:bg-indigo-700",
+          disabled: false,
         }
       case "disbursed":
         return {
           label: "Mark as Received",
           action: () => onOpen("receiveFunds", { fundRequest: fundRequest }),
           color: "bg-sky-600 hover:bg-sky-700",
+          disabled: userRole !== "ssc_treasurer",
         }
       case "received":
         return {
@@ -120,6 +128,7 @@ export const FundRequestCard = ({
               `/fund-request/${fundRequest.id}?isOnSubmitReceipts=true&isValidateExpenses=false`,
             ),
           color: "bg-teal-600 hover:bg-teal-700",
+          disabled: false,
         }
       case "receipted":
         return {
@@ -129,6 +138,7 @@ export const FundRequestCard = ({
               `/fund-request/${fundRequest.id}?isOnSubmitReceipts=false&isValidateExpenses=true`,
             ),
           color: "bg-green-600 hover:bg-green-700",
+          disabled: false,
         }
       default:
         return null
@@ -263,6 +273,8 @@ export const FundRequestCard = ({
 
         {/* Action Button */}
         {statusAction &&
+          userRole !== "dpdm_secretary" &&
+          userRole !== "dpdm_officers" &&
           fundRequest.status !== "validated" &&
           fundRequest.status !== "rejected" && (
             <div className="mt-3 flex justify-end">
@@ -270,6 +282,7 @@ export const FundRequestCard = ({
                 size="sm"
                 className={`gap-2 ${statusAction.color}`}
                 onClick={statusAction.action}
+                disabled={statusAction.disabled}
               >
                 <Play className="h-3 w-3" />
                 {statusAction.label}

@@ -1,9 +1,5 @@
 "use client"
 
-import { Ellipsis } from "lucide-react"
-import Link from "next/link"
-// import { useSignOutUser } from "@/backend/actions/user/sign-out"
-import { usePathname } from "next/navigation"
 import { Button, CollapseMenuButton } from "@/components/ui/buttons"
 import { ScrollArea } from "@/components/ui/scrollareas"
 import { getMenuList } from "@/components/ui/sidebar"
@@ -13,9 +9,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
+import { useCheckRoleStore } from "@/hooks/use-check-role"
+import { UserRole } from "@/types/user"
 // import { catchError } from "@/utils/catch-error"
 // import toast from "react-hot-toast"
 import { cn } from "@/utils/cn"
+import { Ellipsis } from "lucide-react"
+import Link from "next/link"
+// import { useSignOutUser } from "@/backend/actions/user/sign-out"
+import { usePathname } from "next/navigation"
 
 interface MenuProps {
   isOpen: boolean | undefined
@@ -24,7 +26,8 @@ interface MenuProps {
 export const Menu = ({ isOpen }: MenuProps) => {
   const pathname = usePathname()
   // const signOut = useSignOutUser()
-  const menuList = getMenuList(pathname)
+  const userRole = useCheckRoleStore((state) => state.userRole) as UserRole
+  const menuList = getMenuList(pathname, userRole)
 
   // const handleLogout = async () => {
   //   await toast.promise(signOut.mutateAsync(), {

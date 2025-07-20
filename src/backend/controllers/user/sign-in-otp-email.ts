@@ -1,6 +1,3 @@
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
-import { getClientIp } from "request-ip"
 import { Account, OtpToken, User } from "@/backend/db/schemas"
 import { CompatibleRequest } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
@@ -12,6 +9,9 @@ import { getSession } from "@/config/session"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { SignInOtpEmailPayload, signInOtpEmailSchema } from "@/validation/user"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
+import { getClientIp } from "request-ip"
 
 export async function signInOtpEmail(
   request: NextRequest,
@@ -53,6 +53,18 @@ export async function signInOtpEmail(
       } as CompatibleRequest
       const clientIp = getClientIp(compatibleRequest) || "unknown"
 
+      const userResult = await userQuery.findByUserIdQuery.execute({
+        userId: otpData.userId,
+      })
+      userData = userResult[0] as User
+
+      const accountResult = await accountQuery.findByAccountUserIdQuery.execute(
+        {
+          accountUserId: otpData.userId,
+        },
+      )
+      accountData = accountResult[0] as Account
+
       await Promise.all([
         sessionQuery.insertSessionQuery.execute({
           id: sessionId,
@@ -61,6 +73,7 @@ export async function signInOtpEmail(
           expiresAt: new Date(expiresAt),
           ipAddress: clientIp,
           userAgent: request.headers.get("user-agent") ?? "",
+          userRole: userData.role,
         }),
         accountQuery.updateAccountSessionQuery.execute({
           userId: otpData.userId,
@@ -74,18 +87,6 @@ export async function signInOtpEmail(
         }),
       ])
 
-      const userResult = await userQuery.findByUserIdQuery.execute({
-        userId: otpData.userId,
-      })
-      userData = userResult[0] as User
-
-      const accountResult = await accountQuery.findByAccountUserIdQuery.execute(
-        {
-          accountUserId: otpData.userId,
-        },
-      )
-      accountData = accountResult[0] as Account
-
       const currentSession = await getSession()
       Object.assign(currentSession, {
         id: sessionId,
@@ -96,6 +97,7 @@ export async function signInOtpEmail(
         updatedAt: new Date(timestamp),
         ipAddress: clientIp,
         userAgent: request.headers.get("user-agent") ?? "",
+        userRole: userData.role,
       })
 
       await currentSession.save()

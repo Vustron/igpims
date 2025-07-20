@@ -1,6 +1,7 @@
 "use client"
 
 import { useFindTotalProfit } from "@/backend/actions/analytics/find-total-profit"
+import { Loader2 } from "lucide-react"
 import { GiClothes, GiDroplets, GiLockers } from "react-icons/gi"
 import { DashboardCard } from "./dashboard-card"
 import { IgpPerformance } from "./igp-performance"
@@ -40,6 +41,14 @@ export const DashboardClient = () => {
     },
   ]
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full w-full">
+        <Loader2 className="animate-spin size-8" />
+      </div>
+    )
+  }
+
   return (
     <div className="p-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -48,7 +57,7 @@ export const DashboardClient = () => {
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-5">
         <div className="md:col-span-3">
-          <IgpPerformance profitData={data} isLoading={isLoading} />
+          <IgpPerformance profitData={data} />
         </div>
         <div className="md:col-span-2">
           <div className="mb-2">

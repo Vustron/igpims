@@ -8,11 +8,6 @@ import { igp } from "./igp"
 import { projectRequest } from "./project_request"
 import { session } from "./session"
 
-export const UserRole = {
-  ADMIN: "admin",
-  USER: "user",
-} as const
-
 export const user = sqliteTable(
   "user",
   {
@@ -33,7 +28,8 @@ export const user = sqliteTable(
         "ssc_treasurer",
         "ssc_auditor",
         "chief_legislator",
-        "ssc_secretary",
+        "legislative_secretary",
+        "ssc_officer",
         "student",
       ],
     })
@@ -59,4 +55,3 @@ export const userRelations = relations(user, ({ many }) => ({
 
 export type User = InferSelectModel<typeof user>
 export type NewUser = InferInsertModel<typeof user>
-export type UserRoleType = (typeof UserRole)[keyof typeof UserRole]

@@ -17,7 +17,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
+import { useCheckRoleStore } from "@/hooks/use-check-role"
 import { useDialog } from "@/hooks/use-dialog"
+import { UserRole } from "@/types/user"
 import { cn } from "@/utils/cn"
 import { AnimatePresence, motion } from "framer-motion"
 import {
@@ -67,6 +69,7 @@ export function IgpFilters({
   requests,
 }: IgpFiltersProps) {
   const { onOpen } = useDialog()
+  const userRole = useCheckRoleStore((state) => state.userRole) as UserRole
 
   const hasActiveProjects = requests.some(
     (request) =>
@@ -296,7 +299,12 @@ export function IgpFilters({
                   "flex items-center gap-1.5",
                   hasActiveProjects && "cursor-not-allowed opacity-50",
                 )}
-                disabled={hasActiveProjects}
+                disabled={
+                  hasActiveProjects ||
+                  userRole === "ssc_treasurer" ||
+                  userRole === "dpdm_secretary" ||
+                  userRole === "dpdm_officers"
+                }
               >
                 <PlusCircleIcon className="h-4 w-4" />
                 {hasActiveProjects ? "Pending approval" : "New IGP Proposal"}

@@ -1,7 +1,3 @@
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
-import { getClientIp } from "request-ip"
-import speakeasy from "speakeasy"
 import { Account, User } from "@/backend/db/schemas"
 import {
   CompatibleRequest,
@@ -18,6 +14,10 @@ import {
   SignInOtpAuthenticatorPayload,
   signInOtpAuthenticatorSchema,
 } from "@/validation/user"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
+import { getClientIp } from "request-ip"
+import speakeasy from "speakeasy"
 
 export async function signInOtpAuth(
   request: NextRequest,
@@ -104,6 +104,7 @@ export async function signInOtpAuth(
           expiresAt: new Date(expiresAt),
           ipAddress: clientIp,
           userAgent: request.headers.get("user-agent") ?? "",
+          userRole: userData.role,
         }),
         accountQuery.updateAccountSessionQuery.execute({
           userId: userData.id,
@@ -122,6 +123,7 @@ export async function signInOtpAuth(
         updatedAt: new Date(timestamp),
         ipAddress: clientIp,
         userAgent: request.headers.get("user-agent") ?? "",
+        userRole: userData.role,
       })
 
       await currentSession.save()

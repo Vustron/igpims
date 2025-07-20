@@ -1,7 +1,7 @@
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-import { timestamp } from "@/backend/helpers/schema-helpers"
 import { user } from "./user"
 
 export const session = sqliteTable(
@@ -17,6 +17,7 @@ export const session = sqliteTable(
     token: text("token", { length: 255 }).notNull().unique(),
     ipAddress: text("ipAddress", { length: 255 }),
     userAgent: text("userAgent", { length: 255 }),
+    userRole: text("userAgent", { length: 255 }),
     ...timestamp,
   },
   (t) => [

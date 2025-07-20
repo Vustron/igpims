@@ -1,8 +1,8 @@
-import { InferSelectModel } from "drizzle-orm"
-import { getIronSession, IronSession, SessionOptions } from "iron-session"
-import { cookies } from "next/headers"
 import { session } from "@/backend/db/schemas"
 import { env } from "@/config/env"
+import { InferSelectModel } from "drizzle-orm"
+import { IronSession, SessionOptions, getIronSession } from "iron-session"
+import { cookies } from "next/headers"
 
 export type SessionType = InferSelectModel<typeof session>
 
@@ -25,6 +25,7 @@ export const defaultSession: SessionType = {
   ipAddress: "",
   userAgent: "",
   userId: "",
+  userRole: "",
 }
 
 export const getSession = async (): Promise<IronSession<SessionType>> => {
@@ -42,6 +43,7 @@ export const getSession = async (): Promise<IronSession<SessionType>> => {
     session.ipAddress = defaultSession.ipAddress
     session.userAgent = defaultSession.userAgent
     session.userId = defaultSession.userId
+    session.userRole = defaultSession.userRole
   }
 
   return session
@@ -52,8 +54,10 @@ export const isEmptySession = (session: SessionType): boolean => {
     !session.id ||
     !session.token ||
     !session.userId ||
+    !session.userRole ||
     session.id === defaultSession.id ||
     session.token === defaultSession.token ||
-    session.userId === defaultSession.userId
+    session.userId === defaultSession.userId ||
+    session.userRole === defaultSession.userRole
   )
 }

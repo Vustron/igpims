@@ -10,8 +10,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdowns"
+import { useCheckRoleStore } from "@/hooks/use-check-role"
 import { useConfirm } from "@/hooks/use-confirm"
 import { useDialog } from "@/hooks/use-dialog"
+import { UserRole } from "@/types/user"
 import { catchError } from "@/utils/catch-error"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
 import {
@@ -39,6 +41,7 @@ export const ProjectRequestCard = ({
   const confirm = useConfirm()
   const deleteFundRequest = useDeleteIgp(projectRequest.id)
   const { onOpen } = useDialog()
+  const userRole = useCheckRoleStore((state) => state.userRole) as UserRole
 
   const handleDelete = async () => {
     const confirmed = await confirm(
@@ -216,6 +219,7 @@ export const ProjectRequestCard = ({
         )}
 
         {statusAction &&
+          userRole !== "dpdm_secretary" &&
           projectRequest.status !== "completed" &&
           projectRequest.status !== "rejected" && (
             <div className="mt-3 flex justify-end">

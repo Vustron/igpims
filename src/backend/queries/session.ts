@@ -1,6 +1,6 @@
-import { eq, inArray, sql } from "drizzle-orm"
 import { session } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
+import { eq, inArray, sql } from "drizzle-orm"
 
 const findBySessionIdQuery = db
   .select()
@@ -35,6 +35,7 @@ const insertSessionQuery = db
     expiresAt: sql.placeholder("expiresAt"),
     ipAddress: sql.placeholder("ipAddress"),
     userAgent: sql.placeholder("userAgent"),
+    userRole: sql.placeholder("userRole"),
   })
   .returning()
   .prepare()
