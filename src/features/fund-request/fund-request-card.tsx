@@ -96,7 +96,10 @@ export const FundRequestCard = ({
           label: "Check Funds",
           action: () => onOpen("checkFunds", { fundRequest: fundRequest }),
           color: "bg-purple-600 hover:bg-purple-700",
-          disabled: userRole !== "ssc_treasurer",
+          disabled:
+            userRole !== "ssc_treasurer" &&
+            userRole !== "admin" &&
+            userRole !== "ssc_president",
         }
       case "checking":
         return {
@@ -104,7 +107,10 @@ export const FundRequestCard = ({
           action: () =>
             onOpen("approveFundRequest", { fundRequest: fundRequest }),
           color: "bg-emerald-600 hover:bg-emerald-700",
-          disabled: userRole !== "ssc_treasurer",
+          disabled:
+            userRole !== "ssc_treasurer" &&
+            userRole !== "admin" &&
+            userRole !== "ssc_president",
         }
       case "approved":
         return {
@@ -118,7 +124,10 @@ export const FundRequestCard = ({
           label: "Mark as Received",
           action: () => onOpen("receiveFunds", { fundRequest: fundRequest }),
           color: "bg-sky-600 hover:bg-sky-700",
-          disabled: userRole !== "ssc_treasurer",
+          disabled:
+            userRole !== "ssc_treasurer" &&
+            userRole !== "admin" &&
+            userRole !== "ssc_president",
         }
       case "received":
         return {
@@ -138,7 +147,10 @@ export const FundRequestCard = ({
               `/fund-request/${fundRequest.id}?isOnSubmitReceipts=false&isValidateExpenses=true`,
             ),
           color: "bg-green-600 hover:bg-green-700",
-          disabled: false,
+          disabled:
+            userRole !== "ssc_auditor" &&
+            userRole !== "admin" &&
+            userRole !== "ssc_president",
         }
       default:
         return null
@@ -235,26 +247,29 @@ export const FundRequestCard = ({
                 )}
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="ml-auto size-6"
-                  >
-                    <MoreVertical className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={handleDelete}
-                    className="text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Request
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {userRole === "admin" ||
+                (userRole === "ssc_president" && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-auto size-6"
+                      >
+                        <MoreVertical className="size-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={handleDelete}
+                        className="text-red-600 focus:text-red-600"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Request
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ))}
             </div>
           </div>
         </div>

@@ -80,8 +80,14 @@ export async function signInOtpAuth(
         throw new Error("Invalid authentication code")
       }
 
-      if (!verified) {
-        throw new Error("Invalid authentication code")
+      if (userData.role === "student") {
+        return NextResponse.json(
+          {
+            error:
+              "Student is not allowed to login.Please contact the SSC for further information.",
+          },
+          { status: 404 },
+        )
       }
 
       const sessionToken = nanoid()

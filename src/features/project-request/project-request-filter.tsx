@@ -22,7 +22,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltips"
+import { useCheckRoleStore } from "@/hooks/use-check-role"
 import { useDialog } from "@/hooks/use-dialog"
+import { UserRole } from "@/types/user"
 import { cn } from "@/utils/cn"
 import { format } from "date-fns"
 import { CalendarIcon, PlusCircleIcon, Search, X } from "lucide-react"
@@ -59,6 +61,7 @@ export const ProjectRequestFilter = ({
   }>({ from: undefined, to: undefined })
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const { onOpen } = useDialog()
+  const userRole = useCheckRoleStore((state) => state.userRole) as UserRole
 
   const hasActiveProjects = requests.some(
     (request) =>
@@ -267,7 +270,7 @@ export const ProjectRequestFilter = ({
                 "flex items-center gap-1.5",
                 hasActiveProjects && "cursor-not-allowed opacity-50",
               )}
-              disabled={hasActiveProjects}
+              disabled={hasActiveProjects || userRole === "ssc_treasurer"}
             >
               <PlusCircleIcon className="h-4 w-4" />
               <span>New IGP Proposal</span>

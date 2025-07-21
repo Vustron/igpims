@@ -67,12 +67,18 @@ export const ProjectRequestCard = ({
           label: "Start Review",
           action: () => onOpen("reviewProjectRequest", { igp: projectRequest }),
           color: "bg-blue-600 hover:bg-blue-700",
+          disabled:
+            userRole === "chief_legislator" ||
+            userRole === "legislative_secretary",
         }
       case "in_review":
         return {
           label: "Upload Resolution",
           action: () => onOpen("createResolution", { igp: projectRequest }),
           color: "bg-purple-600 hover:bg-purple-700",
+          disabled:
+            userRole === "chief_legislator" ||
+            userRole === "legislative_secretary",
         }
       case "checking":
         return {
@@ -80,18 +86,23 @@ export const ProjectRequestCard = ({
           action: () =>
             onOpen("approveProjectRequest", { igp: projectRequest }),
           color: "bg-emerald-600 hover:bg-emerald-700",
+          disabled: false,
         }
       case "approved":
         return {
           label: "Final administrative review",
           action: () => onOpen("startImplementation", { igp: projectRequest }),
           color: "bg-indigo-600 hover:bg-indigo-700",
+          disabled: false,
         }
       case "in_progress":
         return {
           label: "Mark Completed",
           action: () => onOpen("completeProject", { igp: projectRequest }),
           color: "bg-green-600 hover:bg-green-700",
+          disabled:
+            userRole === "chief_legislator" ||
+            userRole === "legislative_secretary",
         }
       default:
         return null
@@ -181,27 +192,29 @@ export const ProjectRequestCard = ({
                 )}
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="ml-auto size-6"
-                  >
-                    <MoreVertical className="size-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={handleDelete}
-                    // disabled={!canDelete}
-                    className="text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Proposal
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {userRole === "admin" ||
+                (userRole === "ssc_president" && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-auto size-6"
+                      >
+                        <MoreVertical className="size-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={handleDelete}
+                        className="text-red-600 focus:text-red-600"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Proposal
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ))}
             </div>
           </div>
         </div>
@@ -220,6 +233,8 @@ export const ProjectRequestCard = ({
 
         {statusAction &&
           userRole !== "dpdm_secretary" &&
+          userRole !== "dpdm_officers" &&
+          userRole !== "ssc_treasurer" &&
           projectRequest.status !== "completed" &&
           projectRequest.status !== "rejected" && (
             <div className="mt-3 flex justify-end">
@@ -227,6 +242,7 @@ export const ProjectRequestCard = ({
                 size="sm"
                 className={`gap-2 ${statusAction.color}`}
                 onClick={statusAction.action}
+                disabled={statusAction.disabled}
               >
                 <Play className="h-3 w-3" />
                 {statusAction.label}

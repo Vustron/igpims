@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.177",
+  "version": "1.0.178",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -20,7 +20,7 @@
     "db-drop": "bunx drizzle-kit drop",
     "outdated-packages": "bun outdated",
     "update-packages": "bun update --latest",
-    "seed-admin": "bun run ./src/scripts/seed-admin.ts",
+    "seed-users": "bun run ./src/scripts/seed-users.ts",
     "check-bundle": "ANALYZE=true bun run build",
     "biome-migrate": "bunx --bun biome migrate --write"
   },

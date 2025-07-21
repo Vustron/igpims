@@ -78,6 +78,16 @@ export async function signInUser(
       )
     }
 
+    if (existingUser.user.role === "student") {
+      return NextResponse.json(
+        {
+          error:
+            "Student is not allowed to login.Please contact the SSC for further information.",
+        },
+        { status: 404 },
+      )
+    }
+
     if (existingUser.accounts[0].otpSignIn) {
       await handleOTP(existingUser.user)
       return NextResponse.json(existingUser.accounts[0], { status: 200 })

@@ -27,45 +27,52 @@ interface Group {
 }
 
 export function getMenuList(pathname: string, userRole: UserRole): Group[] {
-  return [
-    {
-      groupLabel: "",
-      menus: [
-        {
-          href: "/",
-          label: "Dashboard",
-          active: pathname === "/",
-          icon: LayoutGrid,
-          submenus: [],
-        },
-      ],
-    },
-    {
-      groupLabel: "IGP Managements",
-      menus: [
-        {
-          href: "/locker-rental",
-          label: "Locker Rental",
-          active: pathname.includes("/locker-rental"),
-          icon: PiLockers,
-          submenus: [],
-        },
-        {
-          href: "/water-vendo",
-          label: "Water Vendo",
-          active: pathname.includes("/water-vendo"),
-          icon: IoWaterOutline,
-          submenus: [],
-        },
-        {
-          href: "/other-igps",
-          label: "Other IGPs",
-          active: pathname.includes("/other-igps"),
-          icon: GiClothes,
-          submenus: [],
-        },
-      ],
-    },
+  const igpManagementMenus: Group[] =
+    userRole === "chief_legislator" ||
+    userRole === "legislative_secretary" ||
+    userRole === "ssc_officer"
+      ? []
+      : [
+          {
+            groupLabel: "",
+            menus: [
+              {
+                href: "/",
+                label: "Dashboard",
+                active: pathname === "/",
+                icon: LayoutGrid,
+                submenus: [],
+              },
+            ],
+          },
+          {
+            groupLabel: "IGP Managements",
+            menus: [
+              {
+                href: "/locker-rental",
+                label: "Locker Rental",
+                active: pathname.includes("/locker-rental"),
+                icon: PiLockers,
+                submenus: [],
+              },
+              {
+                href: "/water-vendo",
+                label: "Water Vendo",
+                active: pathname.includes("/water-vendo"),
+                icon: IoWaterOutline,
+                submenus: [],
+              },
+              {
+                href: "/other-igps",
+                label: "Other IGPs",
+                active: pathname.includes("/other-igps"),
+                icon: GiClothes,
+                submenus: [],
+              },
+            ],
+          },
+        ]
+  const operationManagementMenus: Group[] = [
     {
       groupLabel: "Operation Management",
       menus: [
@@ -76,23 +83,37 @@ export function getMenuList(pathname: string, userRole: UserRole): Group[] {
           icon: FaMoneyBillTransfer,
           submenus: [],
         },
-        {
-          href: "/project-approval",
-          label: "Project Approval",
-          active: pathname.includes("/project-approval"),
-          icon: RiFileList3Fill,
-          submenus: [],
-        },
-        {
-          href: "/report",
-          label: "Report",
-          active: pathname.includes("/report"),
-          icon: IoBarChartSharp,
-          submenus: [],
-        },
+        ...(userRole === "admin" ||
+        userRole === "ssc_president" ||
+        userRole === "dpdm_secretary" ||
+        userRole === "chief_legislator" ||
+        userRole === "legislative_secretary"
+          ? [
+              {
+                href: "/project-approval",
+                label: "Project Approval",
+                active: pathname.includes("/project-approval"),
+                icon: RiFileList3Fill,
+                submenus: [],
+              },
+            ]
+          : []),
+        ...(userRole === "admin" || userRole === "ssc_president"
+          ? [
+              {
+                href: "/report",
+                label: "Report",
+                active: pathname.includes("/report"),
+                icon: IoBarChartSharp,
+                submenus: [],
+              },
+            ]
+          : []),
       ],
     },
-    ...(userRole === "admin" || userRole === "ssc_president"
+  ]
+  const userManagementMenus: Group[] =
+    userRole === "admin" || userRole === "ssc_president"
       ? [
           {
             groupLabel: "User Management",
@@ -107,6 +128,10 @@ export function getMenuList(pathname: string, userRole: UserRole): Group[] {
             ],
           },
         ]
-      : []),
+      : []
+  return [
+    ...igpManagementMenus,
+    ...operationManagementMenus,
+    ...userManagementMenus,
   ]
 }

@@ -65,6 +65,16 @@ export async function signInOtpEmail(
       )
       accountData = accountResult[0] as Account
 
+      if (userData.role === "student") {
+        return NextResponse.json(
+          {
+            error:
+              "Student is not allowed to login.Please contact the SSC for further information.",
+          },
+          { status: 404 },
+        )
+      }
+
       await Promise.all([
         sessionQuery.insertSessionQuery.execute({
           id: sessionId,

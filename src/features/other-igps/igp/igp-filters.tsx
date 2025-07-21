@@ -301,6 +301,7 @@ export function IgpFilters({
                 )}
                 disabled={
                   hasActiveProjects ||
+                  userRole === "ssc_auditor" ||
                   userRole === "ssc_treasurer" ||
                   userRole === "dpdm_secretary" ||
                   userRole === "dpdm_officers"
