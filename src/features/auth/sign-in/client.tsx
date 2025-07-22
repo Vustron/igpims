@@ -1,8 +1,8 @@
 "use client"
 
-import Image from "next/image"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
 import { useOtpStore } from "@/hooks/use-otp-store"
+import Image from "next/image"
 import { SignInEmailForm } from "./email-signin-form"
 import { SignInOtpAuthenticatorForm } from "./otp-auth-signin-form"
 import { SignInOTPEmailForm } from "./otp-email-signin-form"

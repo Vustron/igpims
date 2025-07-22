@@ -1,4 +1,3 @@
-import { BarChart3, LineChart, PieChart, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/buttons"
 import {
   Select,
@@ -13,14 +12,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/separators"
+import { BarChart3, LineChart, PieChart, RefreshCw } from "lucide-react"
 import { SalesDetailsTab } from "./details-tab"
 import { SalesOverviewTab } from "./overview-tab"
-import {
-  IgpSummary,
-  MonthlySales,
-  SalesData,
-  TimeRange,
-} from "./sales-report-types"
+import { TimeRange } from "./sales-report-types"
 
 interface SalesReportTabsProps {
   selectedTab: "overview" | "details"
@@ -29,12 +24,12 @@ interface SalesReportTabsProps {
   onTimeRangeChange: (value: string) => void
   chartType: "bar" | "line" | "pie" | "area"
   onChartTypeChange: (value: string) => void
-  chartData: MonthlySales[]
+  chartData: any[]
   pieChartData: { name: string; value: number; color: string }[]
-  igpSummaries: IgpSummary[]
+  igpSummaries: any[]
   topSellingItems: { itemName: string; quantity: number; totalAmount: number }[]
-  filteredSalesData: SalesData[]
-  salesData: SalesData[]
+  filteredSalesData: any[]
+  salesData: any[]
   searchTerm: string
   onSearchTermChange: (value: string) => void
   formatCurrency: (amount: number) => string

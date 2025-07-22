@@ -301,3 +301,145 @@ export async function getTotalProfit() {
     activeMachinesPercentageChange,
   }
 }
+
+export async function getKeyMetrics() {
+  const [currentPeriodData, previousPeriodData, igpData, transactionCountData] =
+    await Promise.all([
+      db
+        .select({
+          currentIgpRevenue: sql<number>`COALESCE(SUM(${igp.igpRevenue}), 0)`,
+          currentLockerRevenue: sql<number>`COALESCE(SUM(${locker.lockerRentalPrice}), 0)`,
+          currentWaterRevenue: sql<number>`COALESCE(SUM(${waterFunds.waterFundsRevenue}), 0)`,
+          currentWaterProfit: sql<number>`COALESCE(SUM(${waterFunds.waterFundsProfit}), 0)`,
+        })
+        .from(igp)
+        .leftJoin(lockerRental, sql`1=1`)
+        .leftJoin(locker, sql`${lockerRental.lockerId} = ${locker.id}`)
+        .leftJoin(waterFunds, sql`1=1`)
+        .where(
+          sql`${igp.createdAt} >= datetime('now', '-30 days') 
+          AND ${lockerRental.paymentStatus} = 'paid'`,
+        )
+        .execute()
+        .then(
+          (res) =>
+            res[0] ?? {
+              currentIgpRevenue: 0,
+              currentLockerRevenue: 0,
+              currentWaterRevenue: 0,
+              currentWaterProfit: 0,
+            },
+        ),
+
+      db
+        .select({
+          prevIgpRevenue: sql<number>`COALESCE(SUM(${igp.igpRevenue}), 0)`,
+          prevLockerRevenue: sql<number>`COALESCE(SUM(${locker.lockerRentalPrice}), 0)`,
+          prevWaterRevenue: sql<number>`COALESCE(SUM(${waterFunds.waterFundsRevenue}), 0)`,
+          prevWaterProfit: sql<number>`COALESCE(SUM(${waterFunds.waterFundsProfit}), 0)`,
+        })
+        .from(igp)
+        .leftJoin(lockerRental, sql`1=1`)
+        .leftJoin(locker, sql`${lockerRental.lockerId} = ${locker.id}`)
+        .leftJoin(waterFunds, sql`1=1`)
+        .where(
+          sql`${igp.createdAt} BETWEEN datetime('now', '-60 days') AND datetime('now', '-30 days')
+          AND ${lockerRental.paymentStatus} = 'paid'`,
+        )
+        .execute()
+        .then(
+          (res) =>
+            res[0] ?? {
+              prevIgpRevenue: 0,
+              prevLockerRevenue: 0,
+              prevWaterRevenue: 0,
+              prevWaterProfit: 0,
+            },
+        ),
+
+      db
+        .select({
+          igpName: igp.igpName,
+          igpType: igp.igpType,
+          igpRevenue: sql<number>`SUM(${igp.igpRevenue})`,
+        })
+        .from(igp)
+        .where(sql`${igp.createdAt} >= datetime('now', '-30 days')`)
+        .groupBy(igp.id)
+        .orderBy(sql`SUM(${igp.igpRevenue}) DESC`)
+        .limit(1)
+        .execute()
+        .then((res) => res[0]),
+
+      db
+        .select({
+          count: sql<number>`COUNT(*)`,
+        })
+        .from(igp)
+        .where(sql`${igp.createdAt} >= datetime('now', '-30 days')`)
+        .execute()
+        .then((res) => res[0]?.count ?? 0),
+    ])
+
+  const totalRevenueData = await db
+    .select({
+      totalRevenue: sql<number>`
+        COALESCE(SUM(${igp.igpRevenue}), 0) + 
+        COALESCE((SELECT SUM(${locker.lockerRentalPrice}) 
+                 FROM ${lockerRental} 
+                 LEFT JOIN ${locker} ON ${lockerRental.lockerId} = ${locker.id}
+                 WHERE ${lockerRental.createdAt} >= datetime('now', '-30 days')
+                 AND ${lockerRental.paymentStatus} = 'paid'), 0) +
+        COALESCE(SUM(${waterFunds.waterFundsRevenue}), 0)
+      `,
+    })
+    .from(igp)
+    .leftJoin(waterFunds, sql`1=1`)
+    .where(sql`${igp.createdAt} >= datetime('now', '-30 days')`)
+    .execute()
+    .then((res) => res[0]?.totalRevenue ?? 0)
+
+  const currentTotalRevenue =
+    currentPeriodData.currentIgpRevenue +
+    currentPeriodData.currentLockerRevenue +
+    currentPeriodData.currentWaterRevenue
+  const currentTotalProfit =
+    currentPeriodData.currentIgpRevenue +
+    currentPeriodData.currentLockerRevenue +
+    currentPeriodData.currentWaterProfit
+
+  const prevTotalRevenue =
+    previousPeriodData.prevIgpRevenue +
+    previousPeriodData.prevLockerRevenue +
+    previousPeriodData.prevWaterRevenue
+  const prevTotalProfit =
+    previousPeriodData.prevIgpRevenue +
+    previousPeriodData.prevLockerRevenue +
+    previousPeriodData.prevWaterProfit
+
+  const calculateGrowth = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? 100 : 0
+    return ((current - previous) / previous) * 100
+  }
+
+  const salesGrowth = calculateGrowth(currentTotalRevenue, prevTotalRevenue)
+  const profitGrowth = calculateGrowth(currentTotalProfit, prevTotalProfit)
+
+  const topIgp = igpData
+    ? {
+        igpName: igpData.igpName,
+        igpType: igpData.igpType,
+        percentageOfTotal:
+          totalRevenueData > 0
+            ? (igpData.igpRevenue / totalRevenueData) * 100
+            : 0,
+      }
+    : undefined
+
+  return {
+    salesGrowth,
+    profitGrowth,
+    topIgp,
+    transactionCount: transactionCountData,
+  }
+}

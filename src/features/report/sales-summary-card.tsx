@@ -1,3 +1,5 @@
+import { Card, CardContent } from "@/components/ui/cards"
+import { cn } from "@/utils/cn"
 import { motion } from "framer-motion"
 import {
   ArrowDown,
@@ -7,9 +9,6 @@ import {
   LineChart,
   PieChart,
 } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/cards"
-import { cn } from "@/utils/cn"
-import { IgpSummary } from "./sales-report-types"
 
 const SummaryCard = ({
   title,
@@ -84,24 +83,48 @@ const SummaryCard = ({
 }
 
 interface SalesSummaryCardsProps {
-  totalSales: number
-  totalProfit: number
-  salesGrowth: number
-  profitGrowth: number
-  topIgp?: IgpSummary
-  transactionCount: number
+  totalSales?: number
+  totalProfit?: number
+  salesGrowth?: number
+  profitGrowth?: number
+  topIgp?: {
+    igpName: string
+    igpType: string
+    percentageOfTotal: number
+  }
+  transactionCount?: number
   formatCurrency: (amount: number) => string
+  isLoading?: boolean
 }
 
 export const SalesSummaryCards = ({
-  totalSales,
-  totalProfit,
-  salesGrowth,
-  profitGrowth,
+  totalSales = 0,
+  totalProfit = 0,
+  salesGrowth = 0,
+  profitGrowth = 0,
   topIgp,
-  transactionCount,
+  transactionCount = 0,
   formatCurrency,
+  isLoading = false,
 }: SalesSummaryCardsProps) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i}>
+            <CardContent className="pt-6">
+              <div className="animate-pulse">
+                <div className="h-4 w-1/2 rounded bg-gray-200" />
+                <div className="mt-2 h-6 w-3/4 rounded bg-gray-200" />
+                <div className="mt-2 h-3 w-full rounded bg-gray-200" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <SummaryCard
@@ -122,11 +145,7 @@ export const SalesSummaryCards = ({
       />
       <SummaryCard
         title="Top IGP"
-        value={
-          topIgp?.igpType
-            .replace(/([A-Z])/g, " $1")
-            .replace(/^./, (str) => str.toUpperCase()) || "N/A"
-        }
+        value={topIgp?.igpName || "N/A"}
         trend="neutral"
         trendPercentage={Math.round(topIgp?.percentageOfTotal || 0)}
         icon={<PieChart className="h-5 w-5 text-purple-700" />}
@@ -135,8 +154,8 @@ export const SalesSummaryCards = ({
       <SummaryCard
         title="Total Transactions"
         value={transactionCount.toString()}
-        trend="up"
-        trendPercentage={2.5} // Mock growth data
+        trend={transactionCount >= 0 ? "up" : "down"}
+        trendPercentage={0} // You can calculate this if you have previous data
         icon={<FileText className="h-5 w-5 text-amber-700" />}
         colorClass="text-amber-700"
       />

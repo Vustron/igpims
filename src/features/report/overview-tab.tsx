@@ -1,3 +1,11 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/cards"
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
 import { motion } from "framer-motion"
 import { useId } from "react"
 import {
@@ -19,19 +27,11 @@ import {
   YAxis,
 } from "recharts"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/cards"
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/charts"
-import {
-  chartConfig,
   IgpSummary,
   IgpType,
   MonthlySales,
   TimeRange,
+  chartConfig,
 } from "./sales-report-types"
 
 interface SalesOverviewTabProps {

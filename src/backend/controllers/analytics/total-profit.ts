@@ -2,6 +2,7 @@ import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import {
   getAllIgpRevenue,
+  getKeyMetrics,
   getMonthlyRevenueData,
   getTotalProfit,
 } from "@/backend/queries/analytics"
@@ -21,12 +22,14 @@ export async function findTotalProfit(
     const profitData = await getTotalProfit()
     const igpRevenues = await getAllIgpRevenue()
     const monthlyRevenue = await getMonthlyRevenueData()
+    const keyMetrics = await getKeyMetrics()
 
     return NextResponse.json(
       {
         data: profitData,
         igpRevenues,
         monthlyRevenue,
+        keyMetrics,
       },
       { status: 200 },
     )

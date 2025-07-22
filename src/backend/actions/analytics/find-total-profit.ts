@@ -18,6 +18,17 @@ export interface IgpRevenue {
   createdAt: number
 }
 
+export interface KeyMetrics {
+  salesGrowth: number
+  profitGrowth: number
+  topIgp?: {
+    igpName: string
+    igpType: string
+    percentageOfTotal: number
+  }
+  transactionCount: number
+}
+
 export interface ProfitData {
   data: {
     totalIgpRevenue: number
@@ -42,6 +53,7 @@ export interface ProfitData {
   }
   igpRevenues: IgpRevenue[]
   monthlyRevenue: MonthlyRevenueData[]
+  keyMetrics: KeyMetrics
 }
 
 export type TotalProfitResponse = ProfitData

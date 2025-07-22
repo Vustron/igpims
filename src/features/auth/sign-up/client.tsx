@@ -1,7 +1,5 @@
 "use client"
 
-import Image from "next/image"
-import Link from "next/link"
 import { DynamicButton } from "@/components/ui/buttons"
 import {
   Card,
@@ -10,6 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/cards"
+import Image from "next/image"
+import Link from "next/link"
 import SignUpForm from "./sign-up-form"
 
 const SignUpClient = () => {
