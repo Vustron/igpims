@@ -1,23 +1,5 @@
 "use client"
 
-import {
-  Document,
-  Page,
-  PDFDownloadLink,
-  pdf,
-  StyleSheet,
-  Text,
-  View,
-} from "@react-pdf/renderer"
-import {
-  BarChart3,
-  Download,
-  Eye,
-  Printer,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react"
-import toast from "react-hot-toast"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -35,26 +17,40 @@ import {
 } from "@/components/ui/drawers"
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { Image } from "@react-pdf/renderer"
+import {
+  Document,
+  PDFDownloadLink,
+  Page,
+  StyleSheet,
+  Text,
+  View,
+  pdf,
+} from "@react-pdf/renderer"
+import { BarChart3, Download, Eye, Printer } from "lucide-react"
+import NextImage from "next/image"
+import toast from "react-hot-toast"
 
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
     backgroundColor: "#FFFFFF",
-    padding: 20,
+    padding: 0,
     fontFamily: "Helvetica",
-  },
-  report: {
-    width: "100%",
-    margin: "0 auto",
-    border: "2px solid #000000",
-    padding: 20,
-    backgroundColor: "#ffffff",
   },
   header: {
     textAlign: "center",
-    marginBottom: 20,
-    paddingBottom: 15,
-    borderBottom: "2px solid #000000",
+    marginBottom: 0,
+    paddingBottom: 0,
+    marginTop: 10,
+    marginHorizontal: 10,
+  },
+  headerImage: {
+    width: "100%",
+    height: "auto",
+    maxHeight: 100,
+    marginBottom: 0,
+    objectFit: "contain",
   },
   schoolTitle: {
     fontSize: 18,
@@ -87,7 +83,6 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     padding: 15,
     backgroundColor: "#ffffff",
-    border: "2px solid #000000",
     pageBreakInside: "avoid",
     breakInside: "avoid",
   },
@@ -101,7 +96,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     backgroundColor: "#f5f5f5",
     padding: 8,
-    borderBottom: "1px solid #000000",
   },
   infoGrid: {
     flexDirection: "row",
@@ -115,7 +109,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 4,
-    borderBottom: "0.5px solid #cccccc",
   },
   infoLabel: {
     fontSize: 10,
@@ -131,7 +124,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     padding: 10,
     backgroundColor: "#f9f9f9",
-    border: "1px solid #cccccc",
   },
   transactionTitle: {
     fontSize: 12,
@@ -144,7 +136,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#e5e5e5",
     padding: 6,
-    borderBottom: "1px solid #000000",
   },
   tableHeaderText: {
     fontSize: 9,
@@ -156,7 +147,6 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: "row",
     padding: 4,
-    borderBottom: "0.5px solid #cccccc",
     minHeight: 20,
   },
   tableCell: {
@@ -172,7 +162,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 8,
     backgroundColor: "#f0f0f0",
-    border: "1px solid #000000",
   },
   summaryItem: {
     width: "30%",
@@ -195,7 +184,28 @@ const styles = StyleSheet.create({
     color: "#666666",
     fontStyle: "italic",
     paddingTop: 10,
-    borderTop: "1px solid #cccccc",
+  },
+  pageContainer: {
+    position: "relative",
+    height: "100%",
+  },
+  content: {
+    paddingBottom: 40,
+  },
+  footerContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    width: "100%",
+    marginBottom: 0,
+    paddingBottom: 0,
+  },
+  footerImage: {
+    width: "100%",
+    height: "auto",
+    maxHeight: 60,
+    marginBottom: 0,
   },
   pageBreak: {
     pageBreakBefore: "always",
@@ -203,7 +213,6 @@ const styles = StyleSheet.create({
   },
 })
 
-// Sample financial data for each IGP
 const igpFinancialData = {
   reportPeriod: "January 1, 2024 - December 31, 2024",
   dateGenerated: new Date().toLocaleDateString(),
@@ -559,7 +568,6 @@ const renderIgpContent = (igp: any) => (
       </View>
     </View>
 
-    {/* Recent Transactions */}
     <View style={styles.transactionSection}>
       <Text style={styles.transactionTitle}>Recent Transactions</Text>
 
@@ -594,60 +602,65 @@ const renderIgpContent = (igp: any) => (
 
 const IgpFinancialDocument = () => (
   <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.report}>
-        <View style={styles.header}>
-          <Text style={styles.schoolTitle}>DAVAO DEL NORTE STATE COLLEGE</Text>
-          <Text style={styles.subtitle}>Supreme Student Council</Text>
-          <Text style={styles.reportTitle}>IGP Financial Report</Text>
-          <Text style={styles.reportPeriod}>
-            {igpFinancialData.reportPeriod}
-          </Text>
+    <Page size="LETTER" style={styles.page}>
+      <View style={styles.pageContainer}>
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Image
+              style={styles.headerImage}
+              src="/images/header_letter_a4.png"
+            />
+            <Text style={styles.reportTitle}>IGP Financial Report</Text>
+            <Text style={styles.reportPeriod}>
+              {igpFinancialData.reportPeriod}
+            </Text>
+          </View>
+
+          {igpFinancialData.igps[0] && (
+            <View style={styles.igpSection}>
+              <Text style={styles.igpTitle}>
+                {igpFinancialData.igps[0].name} Financial Report
+              </Text>
+              {renderIgpContent(igpFinancialData.igps[0])}
+            </View>
+          )}
         </View>
 
-        {/* First IGP */}
-        {igpFinancialData.igps[0] && (
-          <View style={styles.igpSection}>
-            <Text style={styles.igpTitle}>
-              {igpFinancialData.igps[0].name} Financial Report
-            </Text>
-            {/* IGP content for first item */}
-            {renderIgpContent(igpFinancialData.igps[0])}
-          </View>
-        )}
-
-        <Text style={styles.footer}>
-          Generated on {igpFinancialData.dateGenerated} | This report contains
-          detailed financial data for each Income Generating Project
-        </Text>
+        <View style={styles.footerContainer}>
+          <Image
+            style={styles.footerImage}
+            src="/images/footer_letter_a4.png"
+          />
+        </View>
       </View>
     </Page>
 
-    {/* Subsequent pages for remaining IGPs */}
     {igpFinancialData.igps.slice(1).map((igp, index) => (
-      <Page key={index + 1} size="A4" style={styles.page}>
-        <View style={styles.report}>
-          {/* Compact header for subsequent pages */}
-          <View
-            style={[styles.header, { marginBottom: 15, paddingBottom: 10 }]}
-          >
-            <Text style={[styles.schoolTitle, { fontSize: 14 }]}>
-              DAVAO DEL NORTE STATE COLLEGE
-            </Text>
-            <Text style={[styles.subtitle, { fontSize: 10 }]}>
-              Supreme Student Council - IGP Financial Report
-            </Text>
+      <Page key={index + 1} size="LETTER" style={styles.page}>
+        <View style={styles.pageContainer}>
+          <View style={styles.content}>
+            <View style={styles.header}>
+              <Image
+                style={styles.headerImage}
+                src="/images/header_letter_a4.png"
+              />
+              <Text style={styles.reportTitle}>
+                IGP Financial Report (Continued)
+              </Text>
+            </View>
+
+            <View style={styles.igpSection}>
+              <Text style={styles.igpTitle}>{igp.name} Financial Report</Text>
+              {renderIgpContent(igp)}
+            </View>
           </View>
 
-          <View style={styles.igpSection}>
-            <Text style={styles.igpTitle}>{igp.name} Financial Report</Text>
-            {renderIgpContent(igp)}
+          <View style={styles.footerContainer}>
+            <Image
+              style={styles.footerImage}
+              src="/images/footer_letter_a4.png"
+            />
           </View>
-
-          <Text style={styles.footer}>
-            Generated on {igpFinancialData.dateGenerated} | Page {index + 2} of{" "}
-            {igpFinancialData.igps.length + 1}
-          </Text>
         </View>
       </Page>
     ))}
@@ -717,12 +730,20 @@ export const IgpFinancialReportDialog = () => {
       </div>
 
       <div className="w-full max-w-6xl">
-        <div className="mx-auto rounded-lg border-2 border-gray-300 bg-white p-6 shadow-lg">
-          <div className="mb-6 border-black border-b-2 pb-4 text-center">
-            <h3 className="font-bold text-lg">DAVAO DEL NORTE STATE COLLEGE</h3>
-            <p className="text-sm uppercase tracking-wider">
-              Supreme Student Council
-            </p>
+        <div
+          className="mx-auto bg-white shadow-lg"
+          style={{ width: "8.5in", minHeight: "11in" }}
+        >
+          {/* Header */}
+          <div className="text-center py-4 px-6 border-b-2 border-black">
+            <NextImage
+              src="/images/header_letter_a4.png"
+              alt="footer"
+              width={500}
+              height={150}
+              className="w-full max-h-24 object-contain mx-auto"
+              unoptimized
+            />
             <p className="mt-2 font-bold text-lg uppercase tracking-wide">
               IGP Financial Report
             </p>
@@ -731,80 +752,74 @@ export const IgpFinancialReportDialog = () => {
             </p>
           </div>
 
-          {/* IGP Cards */}
-          <div className="space-y-6">
+          <div className="p-6">
             {igpFinancialData.igps.map((igp, index) => (
-              <div
-                key={index}
-                className="rounded-lg border-2 border-gray-200 bg-white p-4"
-              >
-                <div className="mb-4 rounded bg-gray-100 p-3 text-center">
-                  <h4 className="font-bold text-lg uppercase tracking-wide">
+              <div key={index} className="mb-8">
+                <div className="mb-4 rounded bg-gray-100 p-2 text-center">
+                  <h4 className="font-bold text-sm uppercase tracking-wide">
                     {igp.name} Financial Report
                   </h4>
                 </div>
 
-                {/* Info Grid */}
-                <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3">
-                  <div className="flex justify-between border-gray-200 border-b pb-1">
-                    <span className="font-medium text-gray-600 text-xs">
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-xs font-medium">
                       Type:
                     </span>
-                    <span className="font-bold text-xs">{igp.type}</span>
+                    <span className="text-xs font-bold">{igp.type}</span>
                   </div>
-                  <div className="flex justify-between border-gray-200 border-b pb-1">
-                    <span className="font-medium text-gray-600 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-xs font-medium">
                       Start Date:
                     </span>
-                    <span className="font-bold text-xs">
+                    <span className="text-xs font-bold">
                       {formatDate(igp.startDate)}
                     </span>
                   </div>
-                  <div className="flex justify-between border-gray-200 border-b pb-1">
-                    <span className="font-medium text-gray-600 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-xs font-medium">
                       End Date:
                     </span>
-                    <span className="font-bold text-xs">
+                    <span className="text-xs font-bold">
                       {formatDate(igp.endDate)}
                     </span>
                   </div>
-                  <div className="flex justify-between border-gray-200 border-b pb-1">
-                    <span className="font-medium text-gray-600 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-xs font-medium">
                       Officers:
                     </span>
-                    <span className="font-bold text-xs">
+                    <span className="text-xs font-bold">
                       {igp.assignedOfficers.join(", ")}
                     </span>
                   </div>
-                  <div className="flex justify-between border-gray-200 border-b pb-1">
-                    <span className="font-medium text-gray-600 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-xs font-medium">
                       Transactions:
                     </span>
-                    <span className="font-bold text-xs">
+                    <span className="text-xs font-bold">
                       {igp.totalTransactions}
                     </span>
                   </div>
-                  <div className="flex justify-between border-gray-200 border-b pb-1">
-                    <span className="font-medium text-gray-600 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-xs font-medium">
                       Avg. Amount:
                     </span>
-                    <span className="font-bold text-xs">
+                    <span className="text-xs font-bold">
                       {formatCurrency(igp.averageTransaction)}
                     </span>
                   </div>
                 </div>
 
-                {/* Financial Summary */}
-                <div className="mb-4 grid grid-cols-3 gap-4 rounded bg-gray-50 p-3">
+                <div className="grid grid-cols-3 gap-2 bg-gray-50 p-2 rounded mb-4">
                   <div className="text-center">
                     <p className="text-gray-600 text-xs">Total Revenue</p>
-                    <p className="font-bold text-green-600">
+                    <p className="text-green-600 text-sm font-bold">
                       {formatCurrency(igp.totalRevenue)}
                     </p>
                   </div>
                   <div className="text-center">
                     <p className="text-gray-600 text-xs">Total Expenses</p>
-                    <p className="font-bold text-red-600">
+                    <p className="text-red-600 text-sm font-bold">
                       {formatCurrency(igp.totalExpenses)}
                     </p>
                   </div>
@@ -813,21 +828,17 @@ export const IgpFinancialReportDialog = () => {
                       Net Profit ({igp.profitMargin}%)
                     </p>
                     <p
-                      className={`font-bold ${igp.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}
+                      className={`text-sm font-bold ${
+                        igp.netProfit >= 0 ? "text-green-600" : "text-red-600"
+                      }`}
                     >
                       {formatCurrency(igp.netProfit)}
-                      {igp.netProfit >= 0 ? (
-                        <TrendingUp className="ml-1 inline h-3 w-3" />
-                      ) : (
-                        <TrendingDown className="ml-1 inline h-3 w-3" />
-                      )}
                     </p>
                   </div>
                 </div>
 
-                {/* Recent Transactions */}
-                <div className="rounded border border-gray-200 bg-gray-50 p-3">
-                  <h5 className="mb-3 text-center font-bold text-sm">
+                <div className="bg-gray-50 p-2 rounded">
+                  <h5 className="text-center text-sm font-bold mb-2">
                     Recent Transactions
                   </h5>
                   <div className="overflow-x-auto">
@@ -850,7 +861,7 @@ export const IgpFinancialReportDialog = () => {
                       </thead>
                       <tbody>
                         {igp.transactions.map((transaction, idx) => (
-                          <tr key={idx} className="hover:bg-gray-100">
+                          <tr key={idx}>
                             <td className="border border-gray-300 p-1 text-center">
                               {formatDate(transaction.date)}
                             </td>
@@ -859,10 +870,10 @@ export const IgpFinancialReportDialog = () => {
                             </td>
                             <td className="border border-gray-300 p-1 text-center">
                               <span
-                                className={`rounded px-1 py-0.5 text-xs ${
+                                className={`text-xs ${
                                   transaction.type === "Revenue"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
+                                    ? "text-green-800"
+                                    : "text-red-800"
                                 }`}
                               >
                                 {transaction.type}
@@ -888,9 +899,16 @@ export const IgpFinancialReportDialog = () => {
             ))}
           </div>
 
-          <div className="mt-6 border-gray-300 border-t pt-3 text-center text-gray-500 text-xs">
-            Generated on {igpFinancialData.dateGenerated} | Detailed financial
-            data for each Income Generating Project
+          {/* Footer */}
+          <div className="w-full">
+            <NextImage
+              src="/images/footer_letter_a4.png"
+              alt="footer"
+              width={550}
+              height={150}
+              className="w-full max-h-24 object-contain mx-auto"
+              unoptimized
+            />
           </div>
         </div>
       </div>
