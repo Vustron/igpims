@@ -1,8 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
-
 import { useFindTotalProfit } from "@/backend/actions/analytics/find-total-profit"
+import { formatCurrency } from "@/utils/currency"
+import { useMemo, useState } from "react"
 import { processChartData } from "./data-helpers"
 import { SalesReportHeader } from "./sales-report-header"
 import { SalesReportTabs } from "./sales-report-tabs"
@@ -37,14 +37,6 @@ export const ReportClient = () => {
       salesData: [],
     }
   }, [data, searchTerm, timeRange])
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-PH", {
-      style: "currency",
-      currency: "PHP",
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
 
   if (isLoading) return <div>Loading...</div>
 

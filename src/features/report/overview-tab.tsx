@@ -28,7 +28,6 @@ import {
 } from "recharts"
 import {
   IgpSummary,
-  IgpType,
   MonthlySales,
   TimeRange,
   chartConfig,
@@ -44,7 +43,7 @@ interface SalesOverviewTabProps {
   formatCurrency: (amount: number) => string
 }
 
-export const SalesOverviewTab = ({
+export const SalesOverview = ({
   chartType,
   chartData,
   pieChartData,
@@ -56,90 +55,109 @@ export const SalesOverviewTab = ({
   const colorRentalId = useId()
   const colorWaterVendoId = useId()
   const colorMerchandiseId = useId()
+
   return (
-    <>
-      {/* Main charts section */}
-      <Card className="overflow-hidden">
-        <CardHeader>
-          <CardTitle>
-            {timeRange.charAt(0).toUpperCase() + timeRange.slice(1)} Sales
-            Performance
-          </CardTitle>
-          <CardDescription>
-            Breakdown of sales performance across different IGPs
-          </CardDescription>
+    <div className="space-y-6">
+      {/* Main Chart Section */}
+      <Card className="overflow-hidden shadow-sm">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col space-y-1.5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle className="text-lg sm:text-xl">
+                {timeRange.charAt(0).toUpperCase() + timeRange.slice(1)} Sales
+                Performance
+              </CardTitle>
+              <CardDescription className="mt-1">
+                Breakdown of sales performance across different IGPs
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="h-[400px] w-full">
+        <CardContent className="pt-0">
+          <div className="h-[300px] w-full sm:h-[400px]">
             <ChartContainer config={chartConfig} className="h-full w-full">
               <ResponsiveContainer width="100%" height="100%">
                 {chartType === "bar" ? (
                   <BarChart
                     data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+                    margin={{ top: 20, right: 20, left: 0, bottom: 50 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
                       vertical={false}
                       opacity={0.1}
                     />
-                    <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12 }}
+                      tickMargin={10}
+                    />
                     <YAxis
                       tickFormatter={(value) =>
                         `₱${(value / 1000).toFixed(0)}k`
                       }
                       tick={{ fontSize: 12 }}
+                      width={60}
                     />
-                    <Tooltip content={<ChartTooltipContent />} />
-                    <Legend />
+                    <Tooltip
+                      content={<ChartTooltipContent />}
+                      wrapperStyle={{ zIndex: 100 }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: 20 }} />
                     <Bar
                       dataKey="lockerRental"
                       name="Locker Rental"
                       fill="#3182CE"
+                      radius={[4, 4, 0, 0]}
                     />
                     <Bar
                       dataKey="waterVendo"
                       name="Water Vendo"
                       fill="#38B2AC"
+                      radius={[4, 4, 0, 0]}
                     />
                     <Bar
-                      dataKey="merchandise"
-                      name="Merchandise"
+                      dataKey="igp"
+                      name="IGP"
                       fill="#805AD5"
+                      radius={[4, 4, 0, 0]}
                     />
-                    <Bar
-                      dataKey="buttonPins"
-                      name="Button Pins"
-                      fill="#D69E2E"
-                    />
-                    <Bar dataKey="tshirts" name="T-shirts" fill="#38A169" />
-                    <Bar dataKey="ecoBags" name="Eco Bags" fill="#4F46E5" />
                   </BarChart>
                 ) : chartType === "line" ? (
                   <LineChart
                     data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+                    margin={{ top: 20, right: 20, left: 0, bottom: 50 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
                       vertical={false}
                       opacity={0.1}
                     />
-                    <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12 }}
+                      tickMargin={10}
+                    />
                     <YAxis
                       tickFormatter={(value) =>
                         `₱${(value / 1000).toFixed(0)}k`
                       }
                       tick={{ fontSize: 12 }}
+                      width={60}
                     />
-                    <Tooltip content={<ChartTooltipContent />} />
-                    <Legend />
+                    <Tooltip
+                      content={<ChartTooltipContent />}
+                      wrapperStyle={{ zIndex: 100 }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: 20 }} />
                     <Line
                       type="monotone"
                       dataKey="lockerRental"
                       stroke="#3182CE"
                       name="Locker Rental"
                       strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
                     />
                     <Line
                       type="monotone"
@@ -147,34 +165,17 @@ export const SalesOverviewTab = ({
                       stroke="#38B2AC"
                       name="Water Vendo"
                       strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
                     />
                     <Line
                       type="monotone"
-                      dataKey="merchandise"
+                      dataKey="igp"
                       stroke="#805AD5"
-                      name="Merchandise"
+                      name="IGP"
                       strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="buttonPins"
-                      stroke="#D69E2E"
-                      name="Button Pins"
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="tshirts"
-                      stroke="#38A169"
-                      name="T-shirts"
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="ecoBags"
-                      stroke="#4F46E5"
-                      name="Eco Bags"
-                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                      activeDot={{ r: 6 }}
                     />
                     <ReferenceLine
                       y={
@@ -183,13 +184,18 @@ export const SalesOverviewTab = ({
                       }
                       stroke="#CBD5E0"
                       strokeDasharray="3 3"
-                      label="Average"
+                      label={{
+                        value: "Average",
+                        position: "right",
+                        fill: "#718096",
+                        fontSize: 12,
+                      }}
                     />
                   </LineChart>
                 ) : chartType === "area" ? (
                   <AreaChart
                     data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+                    margin={{ top: 20, right: 20, left: 0, bottom: 50 }}
                   >
                     <defs>
                       <linearGradient
@@ -252,21 +258,29 @@ export const SalesOverviewTab = ({
                       vertical={false}
                       opacity={0.1}
                     />
-                    <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12 }}
+                      tickMargin={10}
+                    />
                     <YAxis
                       tickFormatter={(value) =>
                         `₱${(value / 1000).toFixed(0)}k`
                       }
                       tick={{ fontSize: 12 }}
+                      width={60}
                     />
-                    <Tooltip content={<ChartTooltipContent />} />
-                    <Legend />
+                    <Tooltip
+                      content={<ChartTooltipContent />}
+                      wrapperStyle={{ zIndex: 100 }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: 20 }} />
                     <Area
                       type="monotone"
                       dataKey="lockerRental"
                       stroke="#3182CE"
                       fillOpacity={1}
-                      fill="url(#colorLockerRental)"
+                      fill={`url(#${colorRentalId})`}
                       name="Locker Rental"
                     />
                     <Area
@@ -274,21 +288,21 @@ export const SalesOverviewTab = ({
                       dataKey="waterVendo"
                       stroke="#38B2AC"
                       fillOpacity={1}
-                      fill="url(#colorWaterVendo)"
+                      fill={`url(#${colorWaterVendoId})`}
                       name="Water Vendo"
                     />
                     <Area
                       type="monotone"
-                      dataKey="merchandise"
+                      dataKey="igp"
                       stroke="#805AD5"
                       fillOpacity={1}
-                      fill="url(#colorMerchandise)"
-                      name="Merchandise"
+                      fill={`url(#${colorMerchandiseId})`}
+                      name="IGP"
                     />
                   </AreaChart>
                 ) : (
                   <PieChart
-                    margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+                    margin={{ top: 20, right: 20, left: 20, bottom: 50 }}
                   >
                     <Pie
                       data={pieChartData}
@@ -296,19 +310,12 @@ export const SalesOverviewTab = ({
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      outerRadius={120}
-                      label={(entry) => {
-                        const igpTypeName = entry.name as IgpType
-                        const igpNames: Record<IgpType, string> = {
-                          lockerRental: "Locker Rental",
-                          waterVendo: "Water Vendo",
-                          merchandise: "Merchandise",
-                          buttonPins: "Button Pins",
-                          tshirts: "T-shirts",
-                          ecoBags: "Eco Bags",
-                        }
-                        return igpNames[igpTypeName]
-                      }}
+                      outerRadius={80}
+                      innerRadius={40}
+                      label={({ name, percent }) =>
+                        `${name}: ${(percent! * 100).toFixed(0)}%`
+                      }
+                      labelLine={false}
                     >
                       {pieChartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -316,9 +323,14 @@ export const SalesOverviewTab = ({
                     </Pie>
                     <Tooltip
                       formatter={(value) => [
-                        `₱${Number(value).toLocaleString()}`,
+                        formatCurrency(Number(value)),
                         "Sales",
                       ]}
+                    />
+                    <Legend
+                      layout="horizontal"
+                      verticalAlign="bottom"
+                      wrapperStyle={{ paddingTop: 20 }}
                     />
                   </PieChart>
                 )}
@@ -328,11 +340,12 @@ export const SalesOverviewTab = ({
         </CardContent>
       </Card>
 
-      {/* Secondary charts (Sales by IGP & Top selling items) */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <Card>
+      {/* Stats Cards Section */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Sales by IGP Card */}
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Sales by IGP</CardTitle>
+            <CardTitle className="text-lg">Sales by IGP</CardTitle>
             <CardDescription>
               Breakdown of sales contribution by each IGP
             </CardDescription>
@@ -345,15 +358,17 @@ export const SalesOverviewTab = ({
                   .replace(/^./, (str) => str.toUpperCase())
 
                 return (
-                  <div key={summary.igpType} className="space-y-1">
+                  <div key={summary.igpType} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm">{igpName}</span>
-                      <span className="font-medium text-sm">
+                      <span className="text-sm font-medium text-foreground">
+                        {igpName}
+                      </span>
+                      <span className="text-sm font-medium">
                         {formatCurrency(summary.totalSales)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{
@@ -361,10 +376,10 @@ export const SalesOverviewTab = ({
                           }}
                           transition={{ duration: 1, ease: "easeOut" }}
                           style={{ backgroundColor: summary.color }}
-                          className="h-full"
+                          className="h-full rounded-full"
                         />
                       </div>
-                      <span className="w-12 text-muted-foreground text-xs">
+                      <span className="w-10 text-right text-sm text-muted-foreground">
                         {Math.round(summary.percentageOfTotal)}%
                       </span>
                     </div>
@@ -375,9 +390,10 @@ export const SalesOverviewTab = ({
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Top Selling Items Card */}
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Top Selling Items</CardTitle>
+            <CardTitle className="text-lg">Top Selling Items</CardTitle>
             <CardDescription>
               Items with the highest sales volume
             </CardDescription>
@@ -386,21 +402,23 @@ export const SalesOverviewTab = ({
             <div className="space-y-4">
               {topSellingItems.map((item, index) => (
                 <div
-                  key={item.itemName}
+                  key={`${item.itemName}-${index}`}
                   className="flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 font-medium text-xs">
+                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 font-medium text-primary">
                       {index + 1}
                     </div>
-                    <div>
-                      <p className="font-medium text-sm">{item.itemName}</p>
-                      <p className="text-muted-foreground text-xs">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {item.itemName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
                         {item.quantity} units sold
                       </p>
                     </div>
                   </div>
-                  <p className="font-medium text-sm">
+                  <p className="text-sm font-medium">
                     {formatCurrency(item.totalAmount)}
                   </p>
                 </div>
@@ -409,6 +427,6 @@ export const SalesOverviewTab = ({
           </CardContent>
         </Card>
       </div>
-    </>
+    </div>
   )
 }

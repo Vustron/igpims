@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/buttons"
 import {
   Select,
   SelectContent,
@@ -6,15 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/selects"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/separators"
-import { BarChart3, LineChart, PieChart, RefreshCw } from "lucide-react"
-import { SalesDetailsTab } from "./details-tab"
-import { SalesOverviewTab } from "./overview-tab"
+import { BarChart3, LineChart, PieChart } from "lucide-react"
+import { SalesOverview } from "./overview-tab"
 import { TimeRange } from "./sales-report-types"
 
 interface SalesReportTabsProps {
@@ -36,8 +28,6 @@ interface SalesReportTabsProps {
 }
 
 export const SalesReportTabs = ({
-  selectedTab,
-  onTabChange,
   timeRange,
   onTimeRangeChange,
   chartType,
@@ -46,10 +36,6 @@ export const SalesReportTabs = ({
   pieChartData,
   igpSummaries,
   topSellingItems,
-  filteredSalesData,
-  salesData,
-  searchTerm,
-  onSearchTermChange,
   formatCurrency,
 }: SalesReportTabsProps) => {
   // Chart type icons
@@ -61,20 +47,12 @@ export const SalesReportTabs = ({
   }
 
   return (
-    <Tabs value={selectedTab} onValueChange={onTabChange} className="w-full">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <TabsList className="mb-4 w-full sm:mb-0 sm:w-auto">
-          <TabsTrigger value="overview" className="flex-1 sm:flex-none">
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="details" className="flex-1 sm:flex-none">
-            Details
-          </TabsTrigger>
-        </TabsList>
-
-        <div className="flex space-x-2 print:hidden">
+    <div className="space-y-4">
+      {/* Controls Section */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2 print:hidden">
           <Select value={timeRange} onValueChange={onTimeRangeChange}>
-            <SelectTrigger className="h-8 w-[120px]">
+            <SelectTrigger className="h-9 w-[120px] sm:h-8">
               <SelectValue placeholder="Select range" />
             </SelectTrigger>
             <SelectContent>
@@ -87,7 +65,7 @@ export const SalesReportTabs = ({
           </Select>
 
           <Select value={chartType} onValueChange={onChartTypeChange}>
-            <SelectTrigger className="h-8 w-[120px]">
+            <SelectTrigger className="h-9 w-[120px] sm:h-8">
               <div className="flex items-center gap-2">
                 {chartIcons[chartType]}
                 <SelectValue placeholder="Chart type" />
@@ -95,28 +73,16 @@ export const SalesReportTabs = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="bar">Bar</SelectItem>
-              <SelectItem value="line" className="text-xs">
-                Line
-              </SelectItem>
-              <SelectItem value="area" className="text-xs">
-                Area
-              </SelectItem>
-              <SelectItem value="pie" className="text-xs">
-                Pie
-              </SelectItem>
+              <SelectItem value="line">Line</SelectItem>
+              <SelectItem value="area">Area</SelectItem>
+              <SelectItem value="pie">Pie</SelectItem>
             </SelectContent>
           </Select>
-
-          <Button variant="outline" size="icon" className="h-8 w-8">
-            <RefreshCw className="h-4 w-4" />
-            <span className="sr-only">Refresh data</span>
-          </Button>
         </div>
       </div>
 
-      {/* Tab contents */}
-      <TabsContent value="overview" className="mt-6 space-y-6">
-        <SalesOverviewTab
+      <div className="p-4">
+        <SalesOverview
           chartType={chartType}
           chartData={chartData}
           pieChartData={pieChartData}
@@ -125,17 +91,7 @@ export const SalesReportTabs = ({
           timeRange={timeRange}
           formatCurrency={formatCurrency}
         />
-      </TabsContent>
-
-      <TabsContent value="details" className="mt-6 space-y-6">
-        <SalesDetailsTab
-          filteredSalesData={filteredSalesData}
-          salesData={salesData}
-          searchTerm={searchTerm}
-          onSearchTermChange={onSearchTermChange}
-          formatCurrency={formatCurrency}
-        />
-      </TabsContent>
-    </Tabs>
+      </div>
+    </div>
   )
 }

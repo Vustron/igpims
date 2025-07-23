@@ -20,7 +20,7 @@ export const processChartData = (apiData: ProfitData) => {
       color: "#38B2AC",
     },
     {
-      name: "merchandise",
+      name: "igp",
       value: apiData.data.totalIgpRevenue,
       color: "#805AD5",
     },

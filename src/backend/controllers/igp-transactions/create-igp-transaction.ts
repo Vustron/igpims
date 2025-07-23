@@ -89,19 +89,21 @@ export async function createIgpTransaction(
         const revenueIncrease = transactionData.quantity * supply.unitPrice
         const netRevenue = revenueIncrease - (supply.expenses || 0)
 
-        await tx
-          .update(igpSupply)
-          .set({
-            totalRevenue: sql`${igpSupply.totalRevenue} + ${revenueIncrease}`,
-          })
-          .where(eq(igpSupply.id, transactionData.igpSupplyId))
-
-        await tx
-          .update(igp)
-          .set({
-            igpRevenue: sql`${igp.igpRevenue} + ${netRevenue}`,
-          })
-          .where(eq(igp.id, transactionData.igpId))
+        await Promise.all([
+          tx
+            .update(igpSupply)
+            .set({
+              totalRevenue: sql`${igpSupply.totalRevenue} + ${revenueIncrease}`,
+            })
+            .where(eq(igpSupply.id, transactionData.igpSupplyId)),
+          tx
+            .update(igp)
+            .set({
+              totalSold: sql`${igp.totalSold} + ${transactionData.quantity}`,
+              igpRevenue: sql`${igp.igpRevenue} + ${netRevenue}`,
+            })
+            .where(eq(igp.id, transactionData.igpId)),
+        ])
       }
 
       return insertedTransaction

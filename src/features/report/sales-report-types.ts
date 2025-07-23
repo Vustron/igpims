@@ -1,10 +1,4 @@
-export type IgpType =
-  | "lockerRental"
-  | "waterVendo"
-  | "merchandise"
-  | "buttonPins"
-  | "tshirts"
-  | "ecoBags"
+export type IgpType = "lockerRental" | "waterVendo" | "igp"
 
 export type TimeRange = "daily" | "weekly" | "monthly" | "quarterly" | "yearly"
 
@@ -33,10 +27,7 @@ export type MonthlySales = {
   month: string
   lockerRental: number
   waterVendo: number
-  merchandise: number
-  buttonPins: number
-  tshirts: number
-  ecoBags: number
+  igp: number
   total: number
 }
 
@@ -56,27 +47,18 @@ export type ProcessedSalesData = {
 export const chartConfig = {
   lockerRental: { label: "Locker Rental", color: "#3182CE" },
   waterVendo: { label: "Water Vendo", color: "#38B2AC" },
-  merchandise: { label: "Merchandise", color: "#805AD5" },
-  buttonPins: { label: "Button Pins", color: "#D69E2E" },
-  tshirts: { label: "T-shirts", color: "#38A169" },
-  ecoBags: { label: "Eco Bags", color: "#4F46E5" },
+  igp: { label: "Igp", color: "#805AD5" },
   total: { label: "Total", color: "#000000" },
 }
 
 export const igpColorMap: Record<IgpType, string> = {
   lockerRental: "#3182CE",
   waterVendo: "#38B2AC",
-  merchandise: "#805AD5",
-  buttonPins: "#D69E2E",
-  tshirts: "#38A169",
-  ecoBags: "#4F46E5",
+  igp: "#805AD5",
 }
 
 export const igpLabelMap: Record<IgpType, string> = {
   lockerRental: "Locker Rental",
   waterVendo: "Water Vendo",
-  merchandise: "Merchandise",
-  buttonPins: "Button Pins",
-  tshirts: "T-shirts",
-  ecoBags: "Eco Bags",
+  igp: "Igp",
 }

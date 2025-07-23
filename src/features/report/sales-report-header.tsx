@@ -1,5 +1,3 @@
-import { Plus, Printer } from "lucide-react"
-import { Button } from "@/components/ui/buttons"
 import {
   Select,
   SelectContent,
@@ -8,6 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/selects"
 import { useDialog } from "@/hooks/use-dialog"
+import { Printer } from "lucide-react"
 
 // interface SalesReportHeaderProps {
 //   onPrint: () => void
@@ -64,10 +63,6 @@ export const SalesReportHeader = () => {
             <SelectItem value="igp-status">IGP Statuses</SelectItem>
           </SelectContent>
         </Select>
-        <Button size="sm" className="h-8 gap-1">
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">New Sale</span>
-        </Button>
       </div>
     </div>
   )

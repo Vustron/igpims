@@ -155,7 +155,7 @@ export const SalesSummaryCards = ({
         title="Total Transactions"
         value={transactionCount.toString()}
         trend={transactionCount >= 0 ? "up" : "down"}
-        trendPercentage={0} // You can calculate this if you have previous data
+        trendPercentage={Math.round(topIgp?.percentageOfTotal || 0)}
         icon={<FileText className="h-5 w-5 text-amber-700" />}
         colorClass="text-amber-700"
       />
