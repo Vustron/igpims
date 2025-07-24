@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.0.181",
+  "version": "1.0.182",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -65,7 +65,7 @@
     "drizzle-erd": "0.0.1-alpha.11",
     "drizzle-orm": "0.44.3",
     "drizzle-zod": "0.8.2",
-    "framer-motion": "12.23.6",
+    "framer-motion": "12.23.9",
     "input-otp": "1.4.2",
     "ioredis": "5.6.1",
     "iron-session": "8.0.4",
@@ -84,11 +84,11 @@
     "react-dom": "19.1.0",
     "react-dropzone": "14.3.8",
     "react-error-boundary": "6.0.0",
-    "react-hook-form": "7.60.0",
+    "react-hook-form": "7.61.0",
     "react-hot-toast": "2.5.2",
     "react-icons": "5.5.0",
     "react-pdf": "10.0.1",
-    "react-signature-pad-wrapper": "^4.1.1",
+    "react-signature-pad-wrapper": "4.1.1",
     "recharts": "3.1.0",
     "request-ip": "3.3.0",
     "speakeasy": "2.0.0",
@@ -96,7 +96,7 @@
     "tailwind-merge": "3.3.1",
     "tailwindcss-animate": "1.0.7",
     "vaul": "1.1.2",
-    "zod": "4.0.5",
+    "zod": "4.0.7",
     "zustand": "5.0.6"
   },
   "devDependencies": {

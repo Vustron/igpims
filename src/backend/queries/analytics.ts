@@ -482,3 +482,73 @@ export async function getKeyMetrics() {
     transactionCount: transactionCountData,
   }
 }
+
+export async function getIgpFinancialData() {
+  const reportPeriod = new Date().getTime()
+
+  const igps = await db.query.igp.findMany({
+    with: {
+      supplies: true,
+      transactions: {
+        with: {
+          supply: true,
+        },
+      },
+    },
+  })
+
+  const formattedIgps = igps.map((igpData) => {
+    const revenue = igpData.transactions.reduce(
+      (sum, txn) => sum + txn.quantity * (txn.supply?.unitPrice || 0),
+      0,
+    )
+
+    const expenses = igpData.supplies.reduce(
+      (sum, supply) => sum + supply.expenses,
+      0,
+    )
+
+    const netProfit = revenue - expenses
+    const profitMargin =
+      revenue > 0 ? Math.round((netProfit / revenue) * 100) : 0
+    const totalTransactions = igpData.transactions.length
+    const avgTransaction =
+      totalTransactions > 0 ? Math.round(revenue / totalTransactions) : 0
+
+    const transactions = [
+      ...igpData.transactions.map((txn) => ({
+        date: txn.dateBought.getTime(),
+        description: `Purchase of ${igpData.igpName}`,
+        amount: txn.quantity * (txn.supply?.unitPrice || 0),
+        type: "Revenue" as const,
+      })),
+      ...igpData.supplies.map((supply) => ({
+        date: supply.supplyDate.getTime(),
+        description: "Supply Expense",
+        amount: -supply.expenses,
+        type: "Expense" as const,
+      })),
+    ]
+
+    return {
+      name: igpData.igpName,
+      type: igpData.iconType === "service" ? "Service" : "Product",
+      startDate: igpData.igpStartDate?.getTime() || 0,
+      endDate: igpData.igpEndDate?.getTime() || 0,
+      assignedOfficers: igpData.assignedOfficers || [],
+      totalRevenue: revenue,
+      totalExpenses: expenses,
+      netProfit,
+      totalTransactions,
+      averageTransaction: avgTransaction,
+      profitMargin,
+      transactions,
+    }
+  })
+
+  return {
+    reportPeriod,
+    dateGenerated: new Date().getTime(),
+    igps: formattedIgps,
+  }
+}

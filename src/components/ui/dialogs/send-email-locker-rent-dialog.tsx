@@ -1,10 +1,7 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, X } from "lucide-react"
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import toast from "react-hot-toast"
+import { useSendRentLockerConfirm } from "@/backend/actions/emails/send-rent-locker-confirm.ts"
+import { useFindManyRenterInfo } from "@/backend/actions/user/find-many-renter-info"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -21,12 +18,15 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawers"
 import { Label } from "@/components/ui/labels"
-import { useSendRentLockerConfirm } from "@/backend/actions/emails/send-rent-locker-confirm.ts"
-import { useFindManyRenterInfo } from "@/backend/actions/user/find-many-renter-info"
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { FieldConfig } from "@/interfaces/form"
 import { RecipientPayload, recipientSchema } from "@/validation/email"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2, X } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { DynamicForm } from "../forms"
 
 const DialogContent_Component = ({
@@ -137,7 +137,7 @@ export const SendEmailLockerRentDialog = () => {
     },
   })
 
-  const selectedRecipients = form.watch("recipients")
+  const selectedRecipients = form.watch("recipients") ?? []
   const [isLoading, setIsLoading] = useState(false)
 
   const handleClose = () => {
@@ -156,7 +156,7 @@ export const SendEmailLockerRentDialog = () => {
   const removeRecipient = (email: string) => {
     form.setValue(
       "recipients",
-      selectedRecipients.filter((recipient) => recipient !== email),
+      (selectedRecipients ?? []).filter((recipient) => recipient !== email),
     )
   }
 
@@ -233,7 +233,6 @@ export const SendEmailLockerRentDialog = () => {
           </div>
         ) : (
           <>
-            {/* Selected Recipients Preview */}
             {selectedRecipients.length > 0 && (
               <div className="rounded-lg border bg-muted/10 p-4">
                 <div className="mb-2 flex items-center justify-between">

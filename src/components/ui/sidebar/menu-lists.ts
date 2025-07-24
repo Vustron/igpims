@@ -74,21 +74,20 @@ export function getMenuList(pathname: string, userRole: UserRole): Group[] {
         ]
   const operationManagementMenus: Group[] = [
     {
-      groupLabel: "Operation Management",
+      groupLabel: "Operation Managements",
       menus: [
-        {
-          href: "/fund-request",
-          label: "Fund Request",
-          active: pathname.includes("/fund-request"),
-          icon: FaMoneyBillTransfer,
-          submenus: [],
-        },
         ...(userRole === "admin" ||
         userRole === "ssc_president" ||
-        userRole === "dpdm_secretary" ||
         userRole === "chief_legislator" ||
         userRole === "legislative_secretary"
           ? [
+              {
+                href: "/fund-request",
+                label: "Fund Request",
+                active: pathname.includes("/fund-request"),
+                icon: FaMoneyBillTransfer,
+                submenus: [],
+              },
               {
                 href: "/project-approval",
                 label: "Project Approval",

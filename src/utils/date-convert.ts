@@ -97,3 +97,11 @@ export const convertTimestampToDate = (timestamp: number | Date): Date => {
   // Handle milliseconds since epoch
   return new Date(timestamp)
 }
+
+export const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })
+}
