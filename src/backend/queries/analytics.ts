@@ -108,6 +108,13 @@ export async function getAllIgpRevenue() {
         sql<number>`sum(${igpSupply.quantity} - ${igpSupply.quantitySold})`.as(
           "remainingQuantity",
         ),
+      totalExpenses: sql<number>`sum(${igpSupply.expenses})`.as(
+        "totalExpenses",
+      ),
+      netProfit:
+        sql<number>`sum(${igpSupply.totalRevenue} - ${igpSupply.expenses})`.as(
+          "netProfit",
+        ),
     })
     .from(igp)
     .leftJoin(igpSupply, eq(igp.id, igpSupply.igpId))
@@ -120,6 +127,8 @@ export async function getAllIgpRevenue() {
     id: igp.id,
     name: igp.igpName,
     revenue: igp.igpRevenue,
+    expenses: igp.totalExpenses || 0,
+    netProfit: igp.netProfit || 0,
     totalSold: igp.totalSold,
     costPerItem: igp.costPerItem,
     status: igp.status,

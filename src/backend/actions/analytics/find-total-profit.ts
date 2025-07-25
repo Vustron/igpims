@@ -12,6 +12,8 @@ export interface IgpRevenue {
   id: string
   name: string
   revenue: number
+  expenses: number
+  netProfit: number
   totalSold: number
   costPerItem: number
   status: string

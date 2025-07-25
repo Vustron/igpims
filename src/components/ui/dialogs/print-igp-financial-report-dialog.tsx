@@ -506,7 +506,7 @@ export const IgpFinancialReportDialog = () => {
                 IGP Financial Report
               </p>
               <p className="mt-1 text-gray-600 text-xs">
-                {financialData.reportPeriod}
+                {formatDateFromTimestamp(financialData.reportPeriod)}
               </p>
             </div>
 

@@ -4,6 +4,7 @@ import { useFindTotalProfit } from "@/backend/actions/analytics/find-total-profi
 import { formatCurrency } from "@/utils/currency"
 import { useMemo, useState } from "react"
 import { processChartData } from "./data-helpers"
+import { ReportSkeleton } from "./report-skeleton"
 import { SalesReportHeader } from "./sales-report-header"
 import { SalesReportTabs } from "./sales-report-tabs"
 import { TimeRange } from "./sales-report-types"
@@ -38,7 +39,7 @@ export const ReportClient = () => {
     }
   }, [data, searchTerm, timeRange])
 
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return <ReportSkeleton />
 
   return (
     <div className="mx-auto space-y-6 print:px-4 print:py-0">
