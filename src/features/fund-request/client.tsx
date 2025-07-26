@@ -4,10 +4,10 @@ import { useFindManyFundRequests } from "@/backend/actions/fund-request/find-man
 import { FundRequest } from "@/backend/db/schemas"
 import { Button } from "@/components/ui/buttons"
 import { motion } from "framer-motion"
-import { Loader2 } from "lucide-react"
 import { useState } from "react"
 import { FundRequestCard } from "./fund-request-card"
 import { FundRequestFilter } from "./fund-request-filter"
+import { FundRequestSkeleton } from "./fund-request-skeleton"
 
 export const FundRequestClient = ({ isSidebarOpen = false }) => {
   const [selectedRequest, setSelectedRequest] = useState<string | null>(null)
@@ -88,6 +88,10 @@ export const FundRequestClient = ({ isSidebarOpen = false }) => {
     })
   }
 
+  if (isLoading) {
+    return <FundRequestSkeleton isSidebarOpen={isSidebarOpen} />
+  }
+
   return (
     <div
       className={`-mt-5 flex min-h-screen w-full flex-col ${containerPadding}`}
@@ -105,14 +109,6 @@ export const FundRequestClient = ({ isSidebarOpen = false }) => {
             : undefined
         }
       />
-
-      {isLoading && (
-        <div className="flex h-48 flex-col items-center justify-center">
-          <p className="text-center font-medium text-lg">
-            <Loader2 className="size-12 animate-spin" />
-          </p>
-        </div>
-      )}
 
       {error && (
         <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-4">

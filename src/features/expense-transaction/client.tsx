@@ -6,15 +6,12 @@ import {
 } from "@/backend/actions/expense-transaction/find-many"
 import { useFindFundRequestById } from "@/backend/actions/fund-request/find-by-id"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
-import {
-  Skeleton,
-  TableErrorState,
-  TableLoadingState,
-} from "@/components/ui/fallbacks"
+import { Skeleton, TableErrorState } from "@/components/ui/fallbacks"
 import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { expenseTransactionListColumn } from "./expense-transaction-column"
+import { ExpenseTransactionSkeleton } from "./expense-transaction-skeleton"
 
 interface ExpenseTransactionClientProps {
   id: string
@@ -158,7 +155,7 @@ export const ExpenseTransactionClient = ({
   }, [filters, debouncedSearch])
 
   if (isLoading || fundRequestLoading) {
-    return <TableLoadingState />
+    return <ExpenseTransactionSkeleton />
   }
 
   if (isError) {

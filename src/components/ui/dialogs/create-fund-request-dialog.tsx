@@ -29,6 +29,7 @@ interface CreateFundRequestDialogData {
     userAgent: string
     ipAddress: string
     userRole: string
+    userName: string
   }
   fundRequest?: any
 }

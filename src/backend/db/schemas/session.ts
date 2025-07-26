@@ -18,6 +18,7 @@ export const session = sqliteTable(
     ipAddress: text("ipAddress", { length: 255 }),
     userAgent: text("userAgent", { length: 255 }),
     userRole: text("userAgent", { length: 255 }),
+    userName: text("userName", { length: 255 }),
     ...timestamp,
   },
   (t) => [

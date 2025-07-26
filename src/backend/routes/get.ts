@@ -1,3 +1,4 @@
+import { duePayments } from "../controllers/analytics/due-payments"
 import { getFinancialData } from "../controllers/analytics/get-financial-data"
 import { findTotalProfit } from "../controllers/analytics/total-profit"
 import { findExpenseTransactionById } from "../controllers/expense-transaction/find-by-id"
@@ -87,5 +88,10 @@ export const getRoutes: Route[] = [
     path: "/api/v1/analytics/get-financial-data",
     handler: getFinancialData,
   },
+  {
+    path: "/api/v1/analytics/get-due-payments",
+    handler: duePayments,
+  },
+
   // Add more GET routes here
 ]

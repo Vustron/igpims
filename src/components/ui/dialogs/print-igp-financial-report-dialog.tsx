@@ -23,9 +23,9 @@ import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { formatPrintDocumentCurrency } from "@/utils/currency"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
-import { Image } from "@react-pdf/renderer"
 import {
   Document,
+  Image,
   PDFDownloadLink,
   Page,
   StyleSheet,

@@ -1,11 +1,12 @@
 "use client"
 
+import { useFindManyLockers } from "@/backend/actions/locker/find-many"
+import { Button } from "@/components/ui/buttons"
 import { motion } from "framer-motion"
 import { useState } from "react"
-import { Button } from "@/components/ui/buttons"
-import { useFindManyLockers } from "@/backend/actions/locker/find-many"
 import { LockerCard } from "./locker-card"
-import { getGridLayoutClass, LockerFilter } from "./locker-filter"
+import { LockerFilter, getGridLayoutClass } from "./locker-filter"
+import { LockersSkeleton } from "./lockers-skeleton"
 
 export const LockersClient = ({ isSidebarOpen = false }) => {
   const [selectedLocker, setSelectedLocker] = useState<string | null>(null)
@@ -104,6 +105,10 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
     ? "p-2 sm:p-2 md:p-3 lg:p-4"
     : "p-2 sm:p-3 md:p-4 lg:p-6"
 
+  if (isLoading) {
+    return <LockersSkeleton isSidebarOpen={isSidebarOpen} />
+  }
+
   return (
     <div
       className={`-mt-12 flex min-h-screen w-full flex-col ${containerPadding}`}
@@ -121,13 +126,6 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
         isSidebarOpen={isSidebarOpen}
         lockersResponse={lockersResponse}
       />
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex h-48 flex-col items-center justify-center">
-          <p className="text-center font-medium text-lg">Loading lockers...</p>
-        </div>
-      )}
 
       {/* Error State */}
       {error && (

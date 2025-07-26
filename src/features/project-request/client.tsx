@@ -1,10 +1,10 @@
 "use client"
 
 import { useFindManyIgp } from "@/backend/actions/igp/find-many"
-import { Loader2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { ProjectRequestCard } from "./project-request-card"
 import { ProjectRequestFilter } from "./project-request-filter"
+import { ProjectRequestSkeleton } from "./project-request-skeleton"
 
 type StatusOption =
   | "pending"
@@ -45,11 +45,7 @@ export const ProjectRequestClient = () => {
   }, [requests])
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="size-8 animate-spin text-primary" />
-      </div>
-    )
+    return <ProjectRequestSkeleton />
   }
 
   return (

@@ -84,6 +84,7 @@ export async function signInOtpEmail(
           ipAddress: clientIp,
           userAgent: request.headers.get("user-agent") ?? "",
           userRole: userData.role,
+          userName: userData.name,
         }),
         accountQuery.updateAccountSessionQuery.execute({
           userId: otpData.userId,
@@ -108,6 +109,7 @@ export async function signInOtpEmail(
         ipAddress: clientIp,
         userAgent: request.headers.get("user-agent") ?? "",
         userRole: userData.role,
+        userName: userData.name,
       })
 
       await currentSession.save()

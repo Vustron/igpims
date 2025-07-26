@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { useState } from "react"
 import { IgpCard, IgpCardProps } from "./igp-card"
 import { IgpFilters, SortOption } from "./igp-filters"
+import { OtherIgpsSkeleton } from "./igp-skeleton"
 
 export const OtherIgpsClient = () => {
   const [searchTerm, setSearchTerm] = useState("")
@@ -89,11 +90,7 @@ export const OtherIgpsClient = () => {
     sortOption !== "name-asc"
 
   if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <p className="text-muted-foreground">Loading IGPs...</p>
-      </div>
-    )
+    return <OtherIgpsSkeleton />
   }
 
   if (error) {

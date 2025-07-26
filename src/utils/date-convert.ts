@@ -105,3 +105,11 @@ export const formatDate = (dateString: string) => {
     day: "numeric",
   })
 }
+
+export const calculateDayDifference = (
+  dateDue: number,
+  dateGenerated: number,
+) => {
+  const differenceInMs = dateDue - dateGenerated
+  return Math.ceil(differenceInMs / (1000 * 60 * 60 * 24))
+}

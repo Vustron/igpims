@@ -1,15 +1,19 @@
 "use client"
 
 import { useFindTotalProfit } from "@/backend/actions/analytics/find-total-profit"
-import { Loader2 } from "lucide-react"
 import { GiClothes, GiDroplets, GiLockers } from "react-icons/gi"
 import { DashboardCard } from "./dashboard-card"
+import { DashboardSkeleton } from "./dashboard-skeleton"
 import { IgpPerformance } from "./igp-performance"
 import { RevenueAnalytics } from "./revenue-analytics"
 import { SalesOverview } from "./sales-overview"
 
 export const DashboardClient = () => {
   const { data, isLoading } = useFindTotalProfit()
+
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
 
   const dashboardItems = [
     {
@@ -40,14 +44,6 @@ export const DashboardClient = () => {
       icon: <GiClothes className="size-8 text-muted-foreground" />,
     },
   ]
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full w-full">
-        <Loader2 className="animate-spin size-8" />
-      </div>
-    )
-  }
 
   return (
     <div className="p-5">

@@ -26,6 +26,7 @@ export const defaultSession: SessionType = {
   userAgent: "",
   userId: "",
   userRole: "",
+  userName: "",
 }
 
 export const getSession = async (): Promise<IronSession<SessionType>> => {
@@ -44,6 +45,7 @@ export const getSession = async (): Promise<IronSession<SessionType>> => {
     session.userAgent = defaultSession.userAgent
     session.userId = defaultSession.userId
     session.userRole = defaultSession.userRole
+    session.userName = defaultSession.userName
   }
 
   return session
@@ -55,9 +57,11 @@ export const isEmptySession = (session: SessionType): boolean => {
     !session.token ||
     !session.userId ||
     !session.userRole ||
+    !session.userName ||
     session.id === defaultSession.id ||
     session.token === defaultSession.token ||
     session.userId === defaultSession.userId ||
-    session.userRole === defaultSession.userRole
+    session.userRole === defaultSession.userRole ||
+    session.userName === defaultSession.userName
   )
 }

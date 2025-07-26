@@ -9,7 +9,7 @@ import {
   waterVendo,
 } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
-import { eq, sql } from "drizzle-orm"
+import { and, eq, isNotNull, or, sql } from "drizzle-orm"
 
 export async function getMonthlyRevenueData() {
   const currentYear = new Date().getFullYear()
@@ -559,5 +559,92 @@ export async function getIgpFinancialData() {
     reportPeriod,
     dateGenerated: new Date().getTime(),
     igps: formattedIgps,
+  }
+}
+
+export async function getDuePayments() {
+  const currentDate = new Date()
+
+  const allRentals = await db
+    .select({
+      id: lockerRental.id,
+      lockerId: lockerRental.lockerId,
+      renterId: lockerRental.renterId,
+      renterName: lockerRental.renterName,
+      courseAndSet: lockerRental.courseAndSet,
+      rentalStatus: lockerRental.rentalStatus,
+      paymentStatus: lockerRental.paymentStatus,
+      dateDue: lockerRental.dateDue,
+      renterEmail: lockerRental.renterEmail,
+      lockerPrice: locker.lockerRentalPrice,
+      lockerName: locker.lockerName,
+    })
+    .from(lockerRental)
+    .leftJoin(locker, eq(lockerRental.lockerId, locker.id))
+    .where(
+      and(
+        isNotNull(lockerRental.dateDue),
+        or(
+          eq(lockerRental.paymentStatus, "unpaid"),
+          eq(lockerRental.paymentStatus, "pending"),
+        ),
+      ),
+    )
+    .all()
+
+  const overdueStudents = []
+  const dueStudents = []
+
+  for (const rental of allRentals) {
+    if (!rental.dateDue) continue
+
+    const dueDate = new Date(rental.dateDue)
+
+    if (Number.isNaN(dueDate.getTime())) {
+      continue
+    }
+
+    const startOfCurrentDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate(),
+    )
+    const startOfDueDate = new Date(
+      dueDate.getFullYear(),
+      dueDate.getMonth(),
+      dueDate.getDate(),
+    )
+
+    const timeDifference =
+      startOfDueDate.getTime() - startOfCurrentDate.getTime()
+    const daysDifference = Math.round(timeDifference / (1000 * 60 * 60 * 24))
+
+    const studentData = {
+      studentId: rental.renterId,
+      studentName: rental.renterName,
+      courseAndSet: rental.courseAndSet,
+      igpType: "Locker Rental",
+      lockerId: rental.lockerName || rental.lockerId,
+      amountDue: rental.lockerPrice || 0,
+      dateDue: dueDate.getTime(),
+      contactEmail: rental.renterEmail || "",
+    }
+
+    if (daysDifference < 0) {
+      overdueStudents.push({
+        ...studentData,
+      })
+    } else {
+      dueStudents.push({
+        ...studentData,
+      })
+    }
+  }
+
+  return {
+    reportPeriod: currentDate.getTime(),
+    dateGenerated: new Date().getTime(),
+    overdueStudents,
+    dueStudents,
   }
 }

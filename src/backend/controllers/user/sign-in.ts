@@ -130,6 +130,7 @@ export async function signInUser(
           ipAddress: clientIp,
           userAgent: request.headers.get("user-agent") ?? "",
           userRole: existingUser?.user.role,
+          userName: existingUser?.user.name,
         }),
         accountQuery.updateAccountSessionQuery.execute({
           userId: existingUser?.user.id,
@@ -149,6 +150,7 @@ export async function signInUser(
         ipAddress: clientIp,
         userAgent: request.headers.get("user-agent") ?? "",
         userRole: existingUser?.user.role,
+        userName: existingUser?.user.name,
       })
 
       await currentSession.save()

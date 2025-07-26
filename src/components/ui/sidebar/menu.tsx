@@ -82,7 +82,7 @@ export const Menu = ({ isOpen }: MenuProps) => {
                               <Link href={href}>
                                 <span
                                   className={cn(
-                                    isOpen === false ? "ml-0" : "mr-1",
+                                    isOpen === false ? "-ml-1" : "mr-1",
                                   )}
                                 >
                                   <Icon size={18} />
