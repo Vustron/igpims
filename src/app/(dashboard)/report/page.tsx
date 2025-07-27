@@ -1,3 +1,4 @@
+import { preFetchDuePayments } from "@/backend/actions/analytics/due-payments"
 import { preFindTotalProfit } from "@/backend/actions/analytics/find-total-profit"
 import { BreadcrumbItemProps } from "@/components/ui/breadcrumbs"
 import { DynamicBreadcrumb } from "@/components/ui/breadcrumbs/dynamic-breadcrumb"
@@ -11,13 +12,16 @@ export const metadata: Metadata = {
 }
 
 export default async function SalesReportPage() {
-  const [preFindProfitData] = await Promise.all([preFindTotalProfit()])
+  const [preFindProfitData, preFetchDuePaymentsData] = await Promise.all([
+    preFindTotalProfit(),
+    preFetchDuePayments(),
+  ])
   const salesReportItems: BreadcrumbItemProps[] = [
     { label: "Dashboard", href: "/" },
     { label: "Report" },
   ]
   return (
-    <QueryHydrator prefetchFns={[preFindProfitData]}>
+    <QueryHydrator prefetchFns={[preFindProfitData, preFetchDuePaymentsData]}>
       <ContentLayout title="Report">
         <DynamicBreadcrumb items={salesReportItems} />
         <ReportClient />

@@ -1,3 +1,5 @@
+import { getRemainingDays } from "./locker-rental-utils"
+
 export const toTimestamp = (date: any): number => {
   if (date instanceof Date) {
     return date.getTime()
@@ -112,4 +114,10 @@ export const calculateDayDifference = (
 ) => {
   const differenceInMs = dateDue - dateGenerated
   return Math.ceil(differenceInMs / (1000 * 60 * 60 * 24))
+}
+
+export const returnDateDue = (value: number) => {
+  const timestamp = normalizeTimestampToMillis(value)
+  const daysRemaining = getRemainingDays(timestamp)
+  return daysRemaining
 }

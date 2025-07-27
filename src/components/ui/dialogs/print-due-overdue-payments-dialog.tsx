@@ -1,5 +1,9 @@
 "use client"
 
+import {
+  StudentDuesReport,
+  useGetDuePayments,
+} from "@/backend/actions/analytics/due-payments"
 import { Button } from "@/components/ui/buttons"
 import {
   Dialog,
@@ -15,10 +19,11 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawers"
+import { Skeleton } from "@/components/ui/fallbacks"
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { formatPrintDocumentCurrency } from "@/utils/currency"
-import { formatDate } from "@/utils/date-convert"
+import { formatDateFromTimestamp, returnDateDue } from "@/utils/date-convert"
 import {
   Document,
   Image,
@@ -223,126 +228,11 @@ const styles = StyleSheet.create({
   },
 })
 
-const dueOverdueData = {
-  reportPeriod: "08/26/2025",
-  dateGenerated: new Date().toLocaleDateString(),
-  overdueStudents: [
-    {
-      studentId: "2023-45678",
-      studentName: "John Dela Cruz",
-      courseAndSet: "BSCS 3A",
-      igpType: "Locker Rental",
-      lockerId: "L-A101",
-      amountDue: 150,
-      dateDue: "2025-04-15",
-      daysOverdue: 41,
-      contactEmail: "johndelacruz@student.edu.ph",
-    },
-    {
-      studentId: "2023-56789",
-      studentName: "Maria Santos",
-      courseAndSet: "BSN 2B",
-      igpType: "Locker Rental",
-      lockerId: "L-B205",
-      amountDue: 200,
-      dateDue: "2025-03-30",
-      daysOverdue: 57,
-      contactEmail: "mariasantos@student.edu.ph",
-    },
-    {
-      studentId: "2023-67890",
-      studentName: "James Reyes",
-      courseAndSet: "BSIT 4A",
-      igpType: "Violation Fine",
-      lockerId: "L-C310",
-      amountDue: 300,
-      dateDue: "2025-04-01",
-      daysOverdue: 55,
-      contactEmail: "jamesreyes@student.edu.ph",
-    },
-    {
-      studentId: "2023-78901",
-      studentName: "Sofia Mendoza",
-      courseAndSet: "BSBA 1C",
-      igpType: "Locker Rental",
-      lockerId: "L-D415",
-      amountDue: 175,
-      dateDue: "2025-04-20",
-      daysOverdue: 36,
-      contactEmail: "sofiamendoza@student.edu.ph",
-    },
-    {
-      studentId: "2023-89012",
-      studentName: "Antonio Villanueva",
-      courseAndSet: "BSEE 3D",
-      igpType: "Violation Fine",
-      lockerId: "L-E520",
-      amountDue: 400,
-      dateDue: "2025-03-25",
-      daysOverdue: 62,
-      contactEmail: "antoniovillanueva@student.edu.ph",
-    },
-  ],
-  dueStudents: [
-    {
-      studentId: "2024-12345",
-      studentName: "Elena Garcia",
-      courseAndSet: "BSCS 2A",
-      igpType: "Locker Rental",
-      lockerId: "L-F625",
-      amountDue: 150,
-      dateDue: "2025-05-30",
-      daysUntilDue: 4,
-      contactEmail: "elenagarcia@student.edu.ph",
-    },
-    {
-      studentId: "2024-23456",
-      studentName: "Miguel Torres",
-      courseAndSet: "BSN 1A",
-      igpType: "Locker Rental",
-      lockerId: "L-G730",
-      amountDue: 175,
-      dateDue: "2025-06-05",
-      daysUntilDue: 10,
-      contactEmail: "migueltorres@student.edu.ph",
-    },
-    {
-      studentId: "2024-34567",
-      studentName: "Carmen Rodriguez",
-      courseAndSet: "BSIT 3B",
-      igpType: "Locker Rental",
-      lockerId: "L-H835",
-      amountDue: 200,
-      dateDue: "2025-06-01",
-      daysUntilDue: 6,
-      contactEmail: "carmenrodriguez@student.edu.ph",
-    },
-    {
-      studentId: "2024-45678",
-      studentName: "Rafael Cruz",
-      courseAndSet: "BSBA 2C",
-      igpType: "Locker Rental",
-      lockerId: "L-I940",
-      amountDue: 150,
-      dateDue: "2025-05-28",
-      daysUntilDue: 2,
-      contactEmail: "rafaelcruz@student.edu.ph",
-    },
-    {
-      studentId: "2024-56789",
-      studentName: "Isabella Martinez",
-      courseAndSet: "BSEE 1B",
-      igpType: "Locker Rental",
-      lockerId: "L-J045",
-      amountDue: 175,
-      dateDue: "2025-06-10",
-      daysUntilDue: 15,
-      contactEmail: "isabellamartinez@student.edu.ph",
-    },
-  ],
-}
+const DueOverdueDocument = ({ data }: { data: StudentDuesReport }) => {
+  const reportPeriod = data?.reportPeriod
+    ? new Date(data.reportPeriod)
+    : new Date()
 
-const DueOverdueDocument = () => {
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
@@ -357,7 +247,7 @@ const DueOverdueDocument = () => {
                 Due & Overdue Payments Report
               </Text>
               <Text style={styles.reportPeriod}>
-                {dueOverdueData.reportPeriod}
+                {formatDateFromTimestamp(reportPeriod)}
               </Text>
             </View>
 
@@ -365,7 +255,7 @@ const DueOverdueDocument = () => {
               {/* Overdue Students Section */}
               <View style={styles.section}>
                 <Text style={[styles.sectionTitle]}>
-                  Overdue Payments ({dueOverdueData.overdueStudents.length}{" "}
+                  Overdue Payments ({data?.overdueStudents?.length || 0}{" "}
                   Students)
                 </Text>
 
@@ -390,17 +280,11 @@ const DueOverdueDocument = () => {
                   </Text>
                 </View>
 
-                {dueOverdueData.overdueStudents.map((student, index) => (
+                {data?.overdueStudents?.map((student: any, index: number) => (
                   <View key={index} style={styles.overdueRow}>
                     <View style={[styles.tableCellLeft, { width: "25%" }]}>
                       <Text style={{ fontSize: 8, fontWeight: "bold" }}>
                         {student.studentName}
-                      </Text>
-                      <Text style={{ fontSize: 7, color: "#666666" }}>
-                        {student.studentId}
-                      </Text>
-                      <Text style={{ fontSize: 7, color: "#666666" }}>
-                        {student.lockerId}
                       </Text>
                     </View>
                     <Text style={[styles.tableCell, { width: "12%" }]}>
@@ -418,7 +302,7 @@ const DueOverdueDocument = () => {
                       {student.amountDue}
                     </Text>
                     <Text style={[styles.tableCell, { width: "15%" }]}>
-                      {formatDate(student.dateDue)}
+                      {formatDateFromTimestamp(student.dateDue)}
                     </Text>
                     <Text
                       style={[
@@ -426,7 +310,7 @@ const DueOverdueDocument = () => {
                         { fontWeight: "bold", width: "21%" },
                       ]}
                     >
-                      {student.daysOverdue} days
+                      {returnDateDue(student.dateDue)} days
                     </Text>
                   </View>
                 ))}
@@ -435,7 +319,7 @@ const DueOverdueDocument = () => {
               {/* Due Students Section */}
               <View style={[styles.section, { marginTop: 15 }]}>
                 <Text style={[styles.sectionTitle]}>
-                  Upcoming Due Payments ({dueOverdueData.dueStudents.length}{" "}
+                  Upcoming Due Payments ({data?.dueStudents?.length || 0}{" "}
                   Students)
                 </Text>
 
@@ -460,14 +344,12 @@ const DueOverdueDocument = () => {
                   </Text>
                 </View>
 
-                {dueOverdueData.dueStudents.map((student, index) => (
+                {data?.dueStudents?.map((student: any, index: number) => (
                   <View key={index} style={styles.dueRow}>
                     <View style={[styles.tableCellLeft, { width: "25%" }]}>
                       <Text style={{ fontSize: 8, fontWeight: "bold" }}>
                         {student.studentName}
                       </Text>
-                      <Text style={{ fontSize: 7 }}>{student.studentId}</Text>
-                      <Text style={{ fontSize: 7 }}>{student.lockerId}</Text>
                     </View>
                     <Text style={[styles.tableCell, { width: "12%" }]}>
                       {student.courseAndSet}
@@ -484,7 +366,7 @@ const DueOverdueDocument = () => {
                       {student.amountDue}
                     </Text>
                     <Text style={[styles.tableCell, { width: "15%" }]}>
-                      {formatDate(student.dateDue)}
+                      {formatDateFromTimestamp(student.dateDue)}
                     </Text>
                     <Text
                       style={[
@@ -492,7 +374,7 @@ const DueOverdueDocument = () => {
                         { fontWeight: "bold", width: "21%" },
                       ]}
                     >
-                      {student.daysUntilDue} days
+                      {returnDateDue(student.dateDue)} days
                     </Text>
                   </View>
                 ))}
@@ -516,10 +398,11 @@ export const DueOverduePaymentsDialog = () => {
   const { isOpen, onClose, type } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "printDueOverduePayments"
+  const { data, isLoading } = useGetDuePayments()
 
   const handlePrint = async () => {
     try {
-      const blob = await pdf(<DueOverdueDocument />).toBlob()
+      const blob = await pdf(<DueOverdueDocument data={data!} />).toBlob()
       const url = URL.createObjectURL(blob)
 
       const iframe = document.createElement("iframe")
@@ -562,261 +445,334 @@ export const DueOverduePaymentsDialog = () => {
     }
   }
 
-  const totalOverdueAmount = dueOverdueData.overdueStudents.reduce(
-    (sum, student) => sum + student.amountDue,
-    0,
-  )
-  const totalDueAmount = dueOverdueData.dueStudents.reduce(
-    (sum, student) => sum + student.amountDue,
-    0,
-  )
+  const totalOverdueAmount =
+    data?.overdueStudents?.reduce(
+      (sum: number, student: any) => sum + student.amountDue,
+      0,
+    ) || 0
 
-  const renderPreview = () => (
-    <div className="flex flex-col items-center space-y-6">
-      <div className="text-center">
-        <div className="mb-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm">
-          <Eye className="h-4 w-4" />
-          Due & Overdue Payments Preview
+  const totalDueAmount =
+    data?.dueStudents?.reduce(
+      (sum: number, student: any) => sum + student.amountDue,
+      0,
+    ) || 0
+
+  const renderPreview = () => {
+    if (isLoading) {
+      return (
+        <div className="flex flex-col items-center space-y-6">
+          <div className="text-center">
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm">
+              <Eye className="h-4 w-4" />
+              Due & Overdue Payments Preview
+            </div>
+            <p className="text-muted-foreground text-sm">
+              Loading payment data...
+            </p>
+          </div>
+
+          <div className="w-full max-w-6xl">
+            <div
+              className="mx-auto bg-white shadow-lg"
+              style={{ width: "8.5in", minHeight: "11in" }}
+            >
+              <div className="p-6 space-y-6">
+                {/* Loading skeletons for summary cards */}
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-24 rounded-lg" />
+                  ))}
+                </div>
+
+                {/* Loading skeleton for total outstanding */}
+                <Skeleton className="h-20 rounded-lg" />
+
+                {/* Loading skeletons for tables */}
+                <div className="space-y-6">
+                  <Skeleton className="h-10 w-1/3 rounded" />
+                  <Skeleton className="h-64 rounded" />
+                  <Skeleton className="h-10 w-1/3 rounded" />
+                  <Skeleton className="h-64 rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <p className="text-muted-foreground text-sm">
-          Preview of students with due and overdue payment obligations
-        </p>
-      </div>
+      )
+    }
 
-      <div className="w-full max-w-6xl">
-        <div
-          className="mx-auto bg-white shadow-lg"
-          style={{ width: "8.5in", minHeight: "11in" }}
-        >
-          {/* Header Image */}
-          <div>
-            <div className="relative h-24 w-full">
+    const reportPeriod = new Date(data?.reportPeriod || Date.now())
+
+    return (
+      <div className="flex flex-col items-center space-y-6">
+        <div className="text-center">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm">
+            <Eye className="h-4 w-4" />
+            Due & Overdue Payments Preview
+          </div>
+          <p className="text-muted-foreground text-sm">
+            Preview of students with due and overdue payment obligations
+          </p>
+        </div>
+
+        <div className="w-full max-w-6xl">
+          <div
+            className="mx-auto bg-white shadow-lg relative min-h-[11in]"
+            style={{ width: "8.5in" }}
+          >
+            {/* Header Image */}
+            <div>
+              <div className="relative h-24 w-full">
+                <NextImage
+                  src="/images/header_letter_a4.png"
+                  alt="DNSC Header"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="pb-4 text-center">
+                <p className="mt-2 font-bold text-lg uppercase tracking-wide">
+                  Due & Overdue Payments Report
+                </p>
+                <p className="mt-1 text-gray-600 text-xs">
+                  {formatDateFromTimestamp(reportPeriod)}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 pb-24">
+              {/* Summary Cards */}
+              <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+                <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 text-red-600">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span className="font-bold text-sm">Overdue</span>
+                  </div>
+                  <p className="font-bold text-lg text-red-700">
+                    {data?.overdueStudents?.length || 0}
+                  </p>
+                  <p className="text-red-600 text-xs">Students</p>
+                </div>
+                <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
+                  <span className="font-bold text-red-600 text-sm">Amount</span>
+                  <p className="font-bold text-lg text-red-700">
+                    {formatPrintDocumentCurrency(totalOverdueAmount)}
+                  </p>
+                  <p className="text-red-600 text-xs">Overdue</p>
+                </div>
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 text-amber-600">
+                    <Clock className="h-4 w-4" />
+                    <span className="font-bold text-sm">Due Soon</span>
+                  </div>
+                  <p className="font-bold text-amber-700 text-lg">
+                    {data?.dueStudents?.length || 0}
+                  </p>
+                  <p className="text-amber-600 text-xs">Students</p>
+                </div>
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
+                  <span className="font-bold text-amber-600 text-sm">
+                    Amount
+                  </span>
+                  <p className="font-bold text-amber-700 text-lg">
+                    {formatPrintDocumentCurrency(totalDueAmount)}
+                  </p>
+                  <p className="text-amber-600 text-xs">Due</p>
+                </div>
+              </div>
+
+              {/* Total Outstanding */}
+              <div className="mb-6 rounded-lg border-2 border-gray-300 bg-gray-100 p-4 text-center">
+                <span className="font-bold text-gray-700">
+                  TOTAL OUTSTANDING AMOUNT
+                </span>
+                <p className="font-bold text-2xl text-gray-900">
+                  {formatPrintDocumentCurrency(
+                    totalOverdueAmount + totalDueAmount,
+                  )}
+                </p>
+              </div>
+
+              {/* Overdue Students Table */}
+              {data?.overdueStudents?.length ? (
+                <div className="mb-6">
+                  <div className="mb-3 flex items-center gap-2 rounded bg-red-100 p-3">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                    <h4 className="font-bold text-red-800 uppercase">
+                      Overdue Payments ({data.overdueStudents.length} Students)
+                    </h4>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-red-100">
+                          <th className="border border-gray-300 p-2 text-left">
+                            Student Details
+                          </th>
+                          <th className="border border-gray-300 p-2">Course</th>
+                          <th className="border border-gray-300 p-2">
+                            IGP Type
+                          </th>
+                          <th className="border border-gray-300 p-2">Amount</th>
+                          <th className="border border-gray-300 p-2">
+                            Due Date
+                          </th>
+                          <th className="border border-gray-300 p-2">
+                            Days Overdue
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.overdueStudents.map(
+                          (student: any, index: number) => (
+                            <tr
+                              key={index}
+                              className="bg-red-50 hover:bg-red-100"
+                            >
+                              <td className="border border-gray-300 p-2">
+                                <div>
+                                  <p className="font-bold">
+                                    {student.studentName}
+                                  </p>
+                                </div>
+                              </td>
+                              <td className="border border-gray-300 p-2 text-center">
+                                {student.courseAndSet}
+                              </td>
+                              <td className="border border-gray-300 p-2 text-center">
+                                {student.igpType}
+                              </td>
+                              <td className="border border-gray-300 p-2 text-center font-bold text-red-600">
+                                {formatPrintDocumentCurrency(student.amountDue)}
+                              </td>
+                              <td className="border border-gray-300 p-2 text-center">
+                                {formatDateFromTimestamp(student.dateDue)}
+                              </td>
+                              <td className="border border-gray-300 p-2 text-center font-bold text-red-600">
+                                {returnDateDue(student.dateDue)} days
+                              </td>
+                            </tr>
+                          ),
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
+                  <p className="text-gray-500">No overdue payments found</p>
+                </div>
+              )}
+
+              {/* Due Students Table */}
+              {data?.dueStudents?.length ? (
+                <div className="mb-6">
+                  <div className="mb-3 flex items-center gap-2 rounded bg-amber-100 p-3">
+                    <Clock className="h-5 w-5 text-amber-600" />
+                    <h4 className="font-bold text-amber-800 uppercase">
+                      Upcoming Due Payments ({data.dueStudents.length} Students)
+                    </h4>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-amber-100">
+                          <th className="border border-gray-300 p-2 text-left">
+                            Student Details
+                          </th>
+                          <th className="border border-gray-300 p-2">Course</th>
+                          <th className="border border-gray-300 p-2">
+                            IGP Type
+                          </th>
+                          <th className="border border-gray-300 p-2">Amount</th>
+                          <th className="border border-gray-300 p-2">
+                            Due Date
+                          </th>
+                          <th className="border border-gray-300 p-2">
+                            Days Until Due
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.dueStudents.map((student: any, index: number) => (
+                          <tr
+                            key={index}
+                            className="bg-amber-50 hover:bg-amber-100"
+                          >
+                            <td className="border border-gray-300 p-2">
+                              <div>
+                                <p className="font-bold">
+                                  {student.studentName}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 p-2 text-center">
+                              {student.courseAndSet}
+                            </td>
+                            <td className="border border-gray-300 p-2 text-center">
+                              {student.igpType}
+                            </td>
+                            <td className="border border-gray-300 p-2 text-center font-bold text-amber-600">
+                              {formatPrintDocumentCurrency(student.amountDue)}
+                            </td>
+                            <td className="border border-gray-300 p-2 text-center">
+                              {formatDateFromTimestamp(student.dateDue)}
+                            </td>
+                            <td className="border border-gray-300 p-2 text-center font-bold text-amber-600">
+                              {returnDateDue(student.dateDue)} days
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
+                  <p className="text-gray-500">
+                    No upcoming due payments found
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Image */}
+            <div className="absolute bottom-0 w-full">
               <NextImage
-                src="/images/header_letter_a4.png"
-                alt="DNSC Header"
-                fill
-                className="object-contain"
+                src="/images/footer_letter_a4.png"
+                alt="footer"
+                width={1000}
+                height={50}
+                className="w-full max-h-24 object-contain"
+                unoptimized
               />
             </div>
-            <div className="pb-4 text-center">
-              <p className="mt-2 font-bold text-lg uppercase tracking-wide">
-                Due & Overdue Payments Report
-              </p>
-              <p className="mt-1 text-gray-600 text-xs">
-                {dueOverdueData.reportPeriod}
-              </p>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {/* Summary Cards */}
-            <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-              <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
-                <div className="flex items-center justify-center gap-1 text-red-600">
-                  <AlertTriangle className="h-4 w-4" />
-                  <span className="font-bold text-sm">Overdue</span>
-                </div>
-                <p className="font-bold text-lg text-red-700">
-                  {dueOverdueData.overdueStudents.length}
-                </p>
-                <p className="text-red-600 text-xs">Students</p>
-              </div>
-              <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
-                <span className="font-bold text-red-600 text-sm">Amount</span>
-                <p className="font-bold text-lg text-red-700">
-                  {formatPrintDocumentCurrency(totalOverdueAmount)}
-                </p>
-                <p className="text-red-600 text-xs">Overdue</p>
-              </div>
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
-                <div className="flex items-center justify-center gap-1 text-amber-600">
-                  <Clock className="h-4 w-4" />
-                  <span className="font-bold text-sm">Due Soon</span>
-                </div>
-                <p className="font-bold text-amber-700 text-lg">
-                  {dueOverdueData.dueStudents.length}
-                </p>
-                <p className="text-amber-600 text-xs">Students</p>
-              </div>
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
-                <span className="font-bold text-amber-600 text-sm">Amount</span>
-                <p className="font-bold text-amber-700 text-lg">
-                  {formatPrintDocumentCurrency(totalDueAmount)}
-                </p>
-                <p className="text-amber-600 text-xs">Due</p>
-              </div>
-            </div>
-
-            {/* Total Outstanding */}
-            <div className="mb-6 rounded-lg border-2 border-gray-300 bg-gray-100 p-4 text-center">
-              <span className="font-bold text-gray-700">
-                TOTAL OUTSTANDING AMOUNT
-              </span>
-              <p className="font-bold text-2xl text-gray-900">
-                {formatPrintDocumentCurrency(
-                  totalOverdueAmount + totalDueAmount,
-                )}
-              </p>
-            </div>
-
-            {/* Overdue Students Table */}
-            <div className="mb-6">
-              <div className="mb-3 flex items-center gap-2 rounded bg-red-100 p-3">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
-                <h4 className="font-bold text-red-800 uppercase">
-                  Overdue Payments ({dueOverdueData.overdueStudents.length}{" "}
-                  Students)
-                </h4>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-xs">
-                  <thead>
-                    <tr className="bg-red-100">
-                      <th className="border border-gray-300 p-2 text-left">
-                        Student Details
-                      </th>
-                      <th className="border border-gray-300 p-2">Course</th>
-                      <th className="border border-gray-300 p-2">IGP Type</th>
-                      <th className="border border-gray-300 p-2">Amount</th>
-                      <th className="border border-gray-300 p-2">Due Date</th>
-                      <th className="border border-gray-300 p-2">
-                        Days Overdue
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dueOverdueData.overdueStudents.map((student, index) => (
-                      <tr key={index} className="bg-red-50 hover:bg-red-100">
-                        <td className="border border-gray-300 p-2">
-                          <div>
-                            <p className="font-bold">{student.studentName}</p>
-                            <p className="text-gray-600 text-xs">
-                              {student.studentId}
-                            </p>
-                            <p className="text-gray-600 text-xs">
-                              {student.lockerId}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center">
-                          {student.courseAndSet}
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center">
-                          {student.igpType}
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center font-bold text-red-600">
-                          {formatPrintDocumentCurrency(student.amountDue)}
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center">
-                          {formatDate(student.dateDue)}
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center font-bold text-red-600">
-                          {student.daysOverdue} days
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Due Students Table */}
-            <div className="mb-6">
-              <div className="mb-3 flex items-center gap-2 rounded bg-amber-100 p-3">
-                <Clock className="h-5 w-5 text-amber-600" />
-                <h4 className="font-bold text-amber-800 uppercase">
-                  Upcoming Due Payments ({dueOverdueData.dueStudents.length}{" "}
-                  Students)
-                </h4>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-xs">
-                  <thead>
-                    <tr className="bg-amber-100">
-                      <th className="border border-gray-300 p-2 text-left">
-                        Student Details
-                      </th>
-                      <th className="border border-gray-300 p-2">Course</th>
-                      <th className="border border-gray-300 p-2">IGP Type</th>
-                      <th className="border border-gray-300 p-2">Amount</th>
-                      <th className="border border-gray-300 p-2">Due Date</th>
-                      <th className="border border-gray-300 p-2">
-                        Days Until Due
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dueOverdueData.dueStudents.map((student, index) => (
-                      <tr
-                        key={index}
-                        className="bg-amber-50 hover:bg-amber-100"
-                      >
-                        <td className="border border-gray-300 p-2">
-                          <div>
-                            <p className="font-bold">{student.studentName}</p>
-                            <p className="text-gray-600 text-xs">
-                              {student.studentId}
-                            </p>
-                            <p className="text-gray-600 text-xs">
-                              {student.lockerId}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center">
-                          {student.courseAndSet}
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center">
-                          {student.igpType}
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center font-bold text-amber-600">
-                          {formatPrintDocumentCurrency(student.amountDue)}
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center">
-                          {formatDate(student.dateDue)}
-                        </td>
-                        <td className="border border-gray-300 p-2 text-center font-bold text-amber-600">
-                          {student.daysUntilDue} days
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer Image */}
-          <div className="w-full">
-            <NextImage
-              src="/images/footer_letter_a4.png"
-              alt="footer"
-              width={1000}
-              height={50}
-              className="w-full max-h-24 object-contain"
-              unoptimized
-            />
           </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   const renderFooter = () => (
     <div className="flex w-full gap-3">
       <PDFDownloadLink
-        document={<DueOverdueDocument />}
+        document={<DueOverdueDocument data={data!} />}
         fileName={`due-overdue-payments-${new Date().toISOString().split("T")[0]}.pdf`}
         className="flex-1"
       >
         {({ loading }) => (
-          <Button variant="outline" className="w-full" disabled={loading}>
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={loading || isLoading}
+          >
             <Download className="mr-2 h-4 w-4" />
             {loading ? "Generating PDF..." : "Download PDF"}
           </Button>
         )}
       </PDFDownloadLink>
 
-      <Button className="flex-1" onClick={handlePrint}>
+      <Button className="flex-1" onClick={handlePrint} disabled={isLoading}>
         <Printer className="mr-2 h-4 w-4" />
         Print Report
       </Button>

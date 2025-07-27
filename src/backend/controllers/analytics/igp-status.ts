@@ -1,10 +1,10 @@
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
-import { getDuePayments } from "@/backend/queries/analytics"
+import { getIgpStatus } from "@/backend/queries/analytics"
 import { catchError } from "@/utils/catch-error"
 import { NextRequest, NextResponse } from "next/server"
 
-export async function duePayments(
+export async function igpStatus(
   request: NextRequest,
 ): Promise<NextResponse<unknown>> {
   try {
@@ -14,9 +14,9 @@ export async function duePayments(
     const currentSession = await checkAuth()
     if (currentSession instanceof NextResponse) return currentSession
 
-    const duePayments = await getDuePayments()
+    const igpStatus = await getIgpStatus()
 
-    return NextResponse.json(duePayments, { status: 200 })
+    return NextResponse.json(igpStatus, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

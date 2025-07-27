@@ -14,7 +14,7 @@ export interface StudentDueInfo {
 
 export interface StudentDuesReport {
   reportPeriod: number
-  dateGenerated: any
+  dateGenerated: number
   overdueStudents: StudentDueInfo[]
   dueStudents: StudentDueInfo[]
 }

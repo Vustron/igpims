@@ -3,13 +3,16 @@ import {
   fundRequest,
   igp,
   igpSupply,
+  igpTransactions,
   locker,
   lockerRental,
+  user,
   waterFunds,
   waterVendo,
 } from "@/backend/db/schemas"
 import { db } from "@/config/drizzle"
 import { and, eq, isNotNull, or, sql } from "drizzle-orm"
+import { getAssignedOfficers } from "../helpers/find-assigned-officers"
 
 export async function getMonthlyRevenueData() {
   const currentYear = new Date().getFullYear()
@@ -646,5 +649,134 @@ export async function getDuePayments() {
     dateGenerated: new Date().getTime(),
     overdueStudents,
     dueStudents,
+  }
+}
+
+export async function getIgpStatus() {
+  const currentYear = new Date().getFullYear()
+  const reportPeriod = `Academic Year ${currentYear}-${currentYear + 1}`
+
+  const allUsers = await db.select().from(user).all()
+  const userMap = new Map(allUsers.map((u) => [u.id, u]))
+
+  const activeIgps = await db
+    .select({
+      id: igp.id,
+      name: igp.igpName,
+      type: sql<string>`CASE WHEN ${igp.iconType} = 'service' THEN 'Service' ELSE 'Product' END`,
+      description: igp.igpDescription,
+      startDate: sql<number>`${igp.igpStartDate}`,
+      assignedOfficers: igp.assignedOfficers,
+      revenue: sql<number>`COALESCE(SUM(${igpTransactions.quantity} * ${igpSupply.unitPrice}), 0)`,
+      status: sql<string>`CASE 
+        WHEN ${igp.status} = 'completed' THEN 'Operational'
+        WHEN ${igp.status} = 'in_progress' THEN 'Operational'
+        ELSE 'Pending'
+      END`,
+    })
+    .from(igp)
+    .leftJoin(igpSupply, eq(igp.id, igpSupply.igpId))
+    .leftJoin(igpTransactions, eq(igpSupply.id, igpTransactions.igpSupplyId))
+    .where(
+      and(
+        isNotNull(igp.igpStartDate),
+        or(eq(igp.status, "completed"), eq(igp.status, "in_progress")),
+      ),
+    )
+    .groupBy(igp.id)
+    .orderBy(igp.igpName)
+    .all()
+
+  const objectives = await db
+    .select({
+      id: igp.id,
+      name: igp.igpName,
+      type: sql<string>`CASE WHEN ${igp.iconType} = 'service' THEN 'Service' ELSE 'Product' END`,
+      description: igp.igpDescription,
+      dateCompleted: sql<number>`${igp.igpEndDate}`,
+      igpRevenue: sql<number>`COALESCE(${igp.igpRevenue}, 0)`,
+      progress: sql<number>`CASE
+        WHEN ${igp.status} = 'pending' THEN 20
+        WHEN ${igp.status} = 'approved' THEN 50
+        WHEN ${igp.status} = 'in_review' THEN 75
+        ELSE 0
+      END`,
+      status: sql<string>`CASE
+        WHEN ${igp.status} = 'pending' THEN 'In Planning'
+        WHEN ${igp.status} = 'approved' THEN 'In Development'
+        WHEN ${igp.status} = 'in_review' THEN 'Ready to Launch'
+        ELSE 'Pending'
+      END`,
+    })
+    .from(igp)
+    .where(
+      and(
+        isNotNull(igp.igpEndDate),
+        or(
+          eq(igp.status, "pending"),
+          eq(igp.status, "approved"),
+          eq(igp.status, "in_review"),
+        ),
+      ),
+    )
+    .orderBy(igp.igpName)
+    .all()
+
+  const forRepair = await db
+    .select({
+      id: igp.id,
+      name: igp.igpName,
+      type: sql<string>`CASE WHEN ${igp.iconType} = 'service' THEN 'Service' ELSE 'Product' END`,
+      description: igp.igpDescription,
+      issueDate: sql<string>`strftime('%Y-%m-%d', datetime(${igp.updatedAt}, 'unixepoch'))`,
+      expectedRepair: sql<string>`strftime('%Y-%m-%d', datetime(${igp.igpEndDate}, 'unixepoch'))`,
+      lastRevenue: sql<number>`COALESCE(SUM(${igpTransactions.quantity} * ${igpSupply.unitPrice}), 0)`,
+      status: sql<string>`CASE
+        WHEN ${igp.status} = 'rejected' THEN 'Design Revision'
+        WHEN ${igp.igpType} = 'maintenance' THEN 'Under Maintenance'
+        ELSE 'Equipment Repair'
+      END`,
+    })
+    .from(igp)
+    .leftJoin(igpSupply, eq(igp.id, igpSupply.igpId))
+    .leftJoin(igpTransactions, eq(igpSupply.id, igpTransactions.igpSupplyId))
+    .where(or(eq(igp.status, "rejected"), eq(igp.igpType, "maintenance")))
+    .groupBy(igp.id)
+    .orderBy(igp.igpName)
+    .all()
+
+  return {
+    reportPeriod,
+    dateGenerated: new Date().toLocaleDateString(),
+    active: activeIgps.map((igp) => ({
+      id: igp.id,
+      name: igp.name,
+      type: igp.type,
+      description: igp.description || "",
+      startDate: igp.startDate,
+      assignedOfficers: getAssignedOfficers(igp.assignedOfficers, userMap),
+      revenue: igp.revenue,
+      status: igp.status,
+    })),
+    objectives: objectives.map((obj) => ({
+      id: obj.id,
+      name: obj.name,
+      type: obj.type,
+      description: obj.description || "",
+      dateCompleted: obj.dateCompleted,
+      igpRevenue: obj.igpRevenue,
+      progress: obj.progress,
+      status: obj.status,
+    })),
+    forRepair: forRepair.map((repair) => ({
+      id: repair.id,
+      name: repair.name,
+      type: repair.type,
+      description: repair.description || "",
+      issueDate: repair.issueDate,
+      expectedRepair: repair.expectedRepair,
+      lastRevenue: repair.lastRevenue,
+      status: repair.status,
+    })),
   }
 }
