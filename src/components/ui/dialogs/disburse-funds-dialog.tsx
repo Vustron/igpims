@@ -23,10 +23,13 @@ import { Textarea } from "@/components/ui/inputs"
 import { useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { catchError } from "@/utils/catch-error"
+import { formatCurrency } from "@/utils/currency"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
-import { Calendar, DollarSign } from "lucide-react"
+import { Image } from "@imagekit/next"
+import { Calendar, DollarSign, FileText, ImageIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "react-hot-toast"
+import { PDFViewer } from "../pdf/pdf-viewer"
 
 export const DisburseFundsDialog = () => {
   const { type, data, isOpen, onClose } = useDialog()
@@ -48,7 +51,7 @@ export const DisburseFundsDialog = () => {
         updateRequest({
           status: "disbursed",
           notes: disbursementNotes,
-          disbursementDate: new Date().toISOString(),
+          disbursementDate: new Date().setHours(0, 0, 0, 0),
           currentStep: fundRequest?.currentStep
             ? fundRequest.currentStep + 1
             : 5,
@@ -66,14 +69,6 @@ export const DisburseFundsDialog = () => {
     }
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-PH", {
-      style: "currency",
-      currency: "PHP",
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
-
   const isDialogOpen = isOpen && type === "disburseFunds"
 
   if (!isDialogOpen || !fundRequest) return null
@@ -87,7 +82,9 @@ export const DisburseFundsDialog = () => {
 
   return (
     <DialogContent_Component open={isDialogOpen} onOpenChange={onClose}>
-      <Content className={isDesktop ? "max-w-2xl" : ""}>
+      <Content
+        className={isDesktop ? "max-h-[95vh] max-w-4xl overflow-y-auto" : ""}
+      >
         <Header>
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-indigo-600" />
@@ -98,7 +95,7 @@ export const DisburseFundsDialog = () => {
           </Description>
         </Header>
 
-        <div className="p-6">
+        <div className="p-6 space-y-4">
           {/* Request Summary */}
           <div className="rounded-lg border bg-gray-50 p-4">
             <div className="grid grid-cols-2 gap-4">
@@ -147,8 +144,58 @@ export const DisburseFundsDialog = () => {
             </div>
           </div>
 
+          {/* Digital Signature Section */}
+          {fundRequest.digitalSignature && (
+            <div className="space-y-2">
+              <span className="block font-medium text-gray-700 text-sm">
+                Digital Signature
+              </span>
+              <div className="border rounded-lg overflow-hidden bg-gray-50">
+                <div className="relative h-40 w-full">
+                  <Image
+                    src={fundRequest.digitalSignature}
+                    alt="Digital Signature"
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
+                <div className="p-2 border-t flex justify-between items-center bg-white">
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4 text-blue-500" />
+                    <span className="text-xs text-gray-700">
+                      Digital Signature - Image
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Audit Certification Section */}
+          {fundRequest.auditCertification && (
+            <div className="space-y-2">
+              <span className="block font-medium text-gray-700 text-sm">
+                Audit Certification
+              </span>
+              <div className="border rounded-lg overflow-hidden bg-gray-50">
+                <div className="h-[400px] w-full">
+                  <PDFViewer file={fundRequest.auditCertification} />
+                </div>
+                <div className="p-2 border-t flex justify-between items-center bg-white">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-red-500" />
+                    <span className="text-xs text-gray-700">
+                      Audit Certification - PDF
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Disbursement Notes */}
-          <div className="mt-4">
+          <div>
             <span className="mb-2 block font-medium text-gray-700 text-sm">
               Disbursement Notes (Optional)
             </span>

@@ -53,6 +53,8 @@ export const updateFundRequestSchema = z.object({
   validationDate: z.any().optional(),
   receipts: z.any().optional(),
   approvedBy: z.string().optional(),
+  digitalSignature: z.string().nullish().optional(),
+  auditCertification: z.string().nullish().optional(),
 })
 
 export type CreateFundRequest = z.infer<typeof createFundRequestSchema>

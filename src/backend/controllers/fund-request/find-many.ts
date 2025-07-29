@@ -81,6 +81,8 @@ export async function findManyFundRequest(
         validationDate: sql<number>`${fundRequest.validationDate}`,
         receipts: fundRequest.receipts,
         approvedBy: fundRequest.approvedBy,
+        digitalSignature: fundRequest.digitalSignature,
+        auditCertification: fundRequest.auditCertification,
         createdAt: sql<number>`${fundRequest.createdAt}`,
         updatedAt: sql<number>`${fundRequest.updatedAt}`,
         requestorData: {

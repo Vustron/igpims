@@ -62,6 +62,8 @@ export const fundRequest = sqliteTable(
     approvedBy: text("approvedBy").references(() => user.id, {
       onDelete: "set null",
     }),
+    digitalSignature: text("digitalSignature", { length: 2000 }),
+    auditCertification: text("auditCertification", { length: 2000 }),
     ...timestamp,
   },
   (t) => [

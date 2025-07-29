@@ -112,6 +112,10 @@ export async function updateFundRequest(
         updateValues.receiptDate = handleDateField(updateData.receiptDate)
       if (updateData.validationDate !== undefined)
         updateValues.validationDate = handleDateField(updateData.validationDate)
+      if (updateData.digitalSignature !== undefined)
+        updateValues.digitalSignature = updateData.digitalSignature
+      if (updateData.auditCertification !== undefined)
+        updateValues.auditCertification = updateData.auditCertification
 
       if (Object.keys(updateValues).length > 0) {
         await db

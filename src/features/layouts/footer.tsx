@@ -8,7 +8,7 @@ export const Footer = () => {
       return `${currentYear}-${currentYear + 1}`
     }
 
-    return `${currentYear - 1}-${currentYear}`
+    return `${currentYear}-${currentYear + 1}`
   }
 
   return (
