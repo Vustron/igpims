@@ -33,25 +33,23 @@ export const IgpSupplyClient = () => {
     data: suppliesResponse,
     isLoading,
     isError,
-    error,
     refetch,
+    error,
     isFetching,
   } = useFindManyIgpSupply(finalFilters)
 
   useEffect(() => {
-    if (debouncedSearch !== searchValue) return
-    if (filters.page !== 1 && debouncedSearch !== filters.search) {
-      setFilters((prev) => ({ ...prev, page: 1 }))
+    if (debouncedSearch && debouncedSearch !== filters.search) {
+      setFilters((prev) => ({ ...prev, page: 1, search: debouncedSearch }))
     }
-  }, [debouncedSearch, filters.page, filters.search, searchValue])
+  }, [debouncedSearch, filters.search])
 
   const updateFilters = useCallback((newFilters: Partial<IgpSupplyFilters>) => {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
       page:
-        newFilters.page ??
-        (Object.keys(newFilters).some((key) => key !== "page") ? 1 : prev.page),
+        newFilters.page ?? (Object.keys(newFilters).length > 1 ? 1 : prev.page),
     }))
   }, [])
 
@@ -60,13 +58,12 @@ export const IgpSupplyClient = () => {
   }, [])
 
   const goToPage = useCallback(
-    (page: number) => {
-      updateFilters({ page })
-    },
+    (page: number) => updateFilters({ page }),
     [updateFilters],
   )
 
   const goToFirstPage = useCallback(() => goToPage(1), [goToPage])
+
   const goToLastPage = useCallback(() => {
     if (suppliesResponse?.meta.totalPages) {
       goToPage(suppliesResponse.meta.totalPages)
@@ -74,24 +71,27 @@ export const IgpSupplyClient = () => {
   }, [goToPage, suppliesResponse?.meta.totalPages])
 
   const goToPreviousPage = useCallback(() => {
-    if (suppliesResponse?.meta.hasPrevPage) {
-      goToPage((filters.page ?? 1) - 1)
+    const currentPage = filters.page || 1
+    if (currentPage > 1) {
+      goToPage(currentPage - 1)
     }
-  }, [goToPage, filters.page, suppliesResponse?.meta.hasPrevPage])
+  }, [goToPage, filters.page])
 
   const goToNextPage = useCallback(() => {
-    if (suppliesResponse?.meta.hasNextPage) {
-      goToPage((filters.page ?? 1) + 1)
+    const currentPage = filters.page || 1
+    const totalPages = suppliesResponse?.meta.totalPages || 1
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1)
     }
-  }, [goToPage, filters.page, suppliesResponse?.meta.hasNextPage])
+  }, [goToPage, filters.page, suppliesResponse?.meta.totalPages])
 
+  // Page size change handler
   const handlePageSizeChange = useCallback(
-    (newLimit: number) => {
-      updateFilters({ limit: newLimit, page: 1 })
-    },
+    (newLimit: number) => updateFilters({ limit: newLimit, page: 1 }),
     [updateFilters],
   )
 
+  // Reset all filters
   const resetFilters = useCallback(() => {
     setFilters({ page: 1, limit: 10 })
     setSearchValue("")
@@ -104,21 +104,19 @@ export const IgpSupplyClient = () => {
     if (filters.endDate) count++
     if (debouncedSearch) count++
     return count
-  }, [filters, debouncedSearch])
+  }, [filters.igpId, filters.startDate, filters.endDate, debouncedSearch])
 
-  if (isLoading) {
-    return <TableLoadingState />
-  }
+  if (isLoading) return <TableLoadingState />
 
-  if (isError) {
+  if (isError)
     return <TableErrorState error={error} onRetry={() => refetch()} />
-  }
 
-  const currentPage = suppliesResponse?.meta.page || 1
+  const currentPage = filters.page || 1
   const totalPages = suppliesResponse?.meta.totalPages || 1
   const totalItems = suppliesResponse?.meta.totalItems || 0
-  const hasNextPage = suppliesResponse?.meta.hasNextPage || false
-  const hasPrevPage = suppliesResponse?.meta.hasPrevPage || false
+  const hasNextPage =
+    suppliesResponse?.meta.hasNextPage ?? currentPage < totalPages
+  const hasPrevPage = suppliesResponse?.meta.hasPrevPage ?? currentPage > 1
 
   return (
     <div className="space-y-6">
@@ -127,12 +125,13 @@ export const IgpSupplyClient = () => {
         data={suppliesResponse?.data || []}
         placeholder="Search supplies..."
         isLoading={isFetching}
-        onRefetch={refetch}
         isFetching={isFetching}
+        onRefetch={refetch}
         isDynamic={true}
-        // Dynamic props
+        // Search props
         searchValue={searchValue}
         onSearchChange={handleSearch}
+        // Filter props
         showFilters={showFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
         activeFiltersCount={activeFiltersCount}
@@ -140,6 +139,7 @@ export const IgpSupplyClient = () => {
         onUpdateFilters={updateFilters}
         onResetFilters={resetFilters}
         onClose={() => setShowFilters(false)}
+        // Pagination props
         totalItems={totalItems}
         currentDataLength={suppliesResponse?.data.length || 0}
         currentPage={currentPage}

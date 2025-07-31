@@ -1,14 +1,14 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
-import { DataTable } from "@/components/ui/tables"
-import {
-  useFindManyViolations,
+import { useFindManyViolations } from "@/backend/actions/violation/find-many"
+import type {
   ViolationFilters,
   ViolationWithRenters,
 } from "@/backend/actions/violation/find-many"
+import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
+import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { violationListColumns } from "./violation-list-column"
 
 export const ViolationClient = () => {
@@ -39,47 +39,44 @@ export const ViolationClient = () => {
     isFetching,
   } = useFindManyViolations(finalFilters)
 
-  const transformedData = useMemo(() => {
+  const transformedData = useMemo<ViolationWithRenters[]>(() => {
     if (!violationsResponse?.data) return []
 
     return violationsResponse.data
       .filter((violation) => violation.id)
-      .map(
-        (violation): ViolationWithRenters => ({
-          id: violation.id!,
-          lockerId: violation.lockerId,
-          inspectionId: violation.inspectionId,
-          studentName: violation.studentName,
-          violations: Array.isArray(violation.violations)
-            ? violation.violations
-            : violation.violations
-              ? [violation.violations]
-              : [],
-          dateOfInspection: violation.dateOfInspection,
-          datePaid: violation.datePaid,
-          totalFine: violation.totalFine,
-          fineStatus: violation.fineStatus || "unpaid",
-          createdAt: violation.createdAt,
-          updatedAt: violation.updatedAt,
-          renters: violation.renters,
-        }),
-      )
+      .map((violation) => ({
+        id: violation.id!,
+        lockerId: violation.lockerId,
+        inspectionId: violation.inspectionId,
+        studentName: violation.studentName,
+        violations: Array.isArray(violation.violations)
+          ? violation.violations
+          : violation.violations
+            ? [violation.violations]
+            : [],
+        dateOfInspection: violation.dateOfInspection,
+        datePaid: violation.datePaid,
+        totalFine: violation.totalFine,
+        fineStatus: violation.fineStatus || "unpaid",
+        createdAt: violation.createdAt,
+        updatedAt: violation.updatedAt,
+        renters: violation.renters,
+      }))
   }, [violationsResponse?.data])
 
+  // Reset to page 1 when search term changes
   useEffect(() => {
-    if (debouncedSearch !== searchValue) return
-    if (filters.page !== 1 && debouncedSearch !== filters.search) {
-      setFilters((prev) => ({ ...prev, page: 1 }))
+    if (debouncedSearch && debouncedSearch !== filters.search) {
+      setFilters((prev) => ({ ...prev, page: 1, search: debouncedSearch }))
     }
-  }, [debouncedSearch, filters.page, filters.search, searchValue])
+  }, [debouncedSearch, filters.search])
 
   const updateFilters = useCallback((newFilters: Partial<ViolationFilters>) => {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
       page:
-        newFilters.page ??
-        (Object.keys(newFilters).some((key) => key !== "page") ? 1 : prev.page),
+        newFilters.page ?? (Object.keys(newFilters).length > 1 ? 1 : prev.page),
     }))
   }, [])
 
@@ -88,13 +85,12 @@ export const ViolationClient = () => {
   }, [])
 
   const goToPage = useCallback(
-    (page: number) => {
-      updateFilters({ page })
-    },
+    (page: number) => updateFilters({ page }),
     [updateFilters],
   )
 
   const goToFirstPage = useCallback(() => goToPage(1), [goToPage])
+
   const goToLastPage = useCallback(() => {
     if (violationsResponse?.meta.totalPages) {
       goToPage(violationsResponse.meta.totalPages)
@@ -102,21 +98,23 @@ export const ViolationClient = () => {
   }, [goToPage, violationsResponse?.meta.totalPages])
 
   const goToPreviousPage = useCallback(() => {
-    if (violationsResponse?.meta.hasPrevPage) {
-      goToPage((filters.page ?? 1) - 1)
+    const currentPage = filters.page || 1
+    if (currentPage > 1) {
+      goToPage(currentPage - 1)
     }
-  }, [goToPage, filters.page, violationsResponse?.meta.hasPrevPage])
+  }, [goToPage, filters.page])
 
   const goToNextPage = useCallback(() => {
-    if (violationsResponse?.meta.hasNextPage) {
-      goToPage((filters.page ?? 1) + 1)
+    const currentPage = filters.page || 1
+    const totalPages = violationsResponse?.meta.totalPages || 1
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1)
     }
-  }, [goToPage, filters.page, violationsResponse?.meta.hasNextPage])
+  }, [goToPage, filters.page, violationsResponse?.meta.totalPages])
 
+  // Page size change handler
   const handlePageSizeChange = useCallback(
-    (newLimit: number) => {
-      updateFilters({ limit: newLimit, page: 1 })
-    },
+    (newLimit: number) => updateFilters({ limit: newLimit, page: 1 }),
     [updateFilters],
   )
 
@@ -133,21 +131,24 @@ export const ViolationClient = () => {
     if (filters.toDate) count++
     if (debouncedSearch) count++
     return count
-  }, [filters, debouncedSearch])
+  }, [
+    filters.violationType,
+    filters.fineStatus,
+    filters.fromDate,
+    filters.toDate,
+    debouncedSearch,
+  ])
 
-  if (isLoading) {
-    return <TableLoadingState />
-  }
-
-  if (isError) {
+  if (isLoading) return <TableLoadingState />
+  if (isError)
     return <TableErrorState error={error} onRetry={() => refetch()} />
-  }
 
-  const currentPage = violationsResponse?.meta.currentPage || 1
+  const currentPage = filters.page || 1
   const totalPages = violationsResponse?.meta.totalPages || 1
   const totalItems = violationsResponse?.meta.totalItems || 0
-  const hasNextPage = currentPage < totalPages
-  const hasPrevPage = currentPage > 1
+  const hasNextPage =
+    violationsResponse?.meta.hasNextPage ?? currentPage < totalPages
+  const hasPrevPage = violationsResponse?.meta.hasPrevPage ?? currentPage > 1
 
   return (
     <div className="mt-2">
@@ -157,12 +158,12 @@ export const ViolationClient = () => {
         placeholder="Search violations..."
         isLockerRental={true}
         isLoading={isFetching}
-        onRefetch={refetch}
         isFetching={isFetching}
         isDynamic={true}
-        // Dynamic props
+        // Search props
         searchValue={searchValue}
         onSearchChange={handleSearch}
+        // Filter props
         showFilters={showFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
         activeFiltersCount={activeFiltersCount}
@@ -170,8 +171,9 @@ export const ViolationClient = () => {
         onUpdateFilters={updateFilters}
         onResetFilters={resetFilters}
         onClose={() => setShowFilters(false)}
+        // Pagination props
         totalItems={totalItems}
-        currentDataLength={violationsResponse?.data.length || 0}
+        currentDataLength={transformedData.length}
         currentPage={currentPage}
         totalPages={totalPages}
         limit={filters.limit || 10}

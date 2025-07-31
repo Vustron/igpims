@@ -1,13 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
-import { DataTable } from "@/components/ui/tables"
 import {
   RentalFilters,
   useFindManyRentals,
 } from "@/backend/actions/locker-rental/find-many"
+import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
+import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { lockerRentalListColumns } from "./locker-rental-list-columns"
 
 export const LockerRentClient = () => {
@@ -39,19 +39,17 @@ export const LockerRentClient = () => {
   } = useFindManyRentals(finalFilters)
 
   useEffect(() => {
-    if (debouncedSearch !== searchValue) return
-    if (filters.page !== 1 && debouncedSearch !== filters.search) {
-      setFilters((prev) => ({ ...prev, page: 1 }))
+    if (debouncedSearch && debouncedSearch !== filters.search) {
+      setFilters((prev) => ({ ...prev, page: 1, search: debouncedSearch }))
     }
-  }, [debouncedSearch, filters.page, filters.search, searchValue])
+  }, [debouncedSearch, filters.search])
 
   const updateFilters = useCallback((newFilters: Partial<RentalFilters>) => {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
       page:
-        newFilters.page ??
-        (Object.keys(newFilters).some((key) => key !== "page") ? 1 : prev.page),
+        newFilters.page ?? (Object.keys(newFilters).length > 1 ? 1 : prev.page),
     }))
   }, [])
 
@@ -60,13 +58,12 @@ export const LockerRentClient = () => {
   }, [])
 
   const goToPage = useCallback(
-    (page: number) => {
-      updateFilters({ page })
-    },
+    (page: number) => updateFilters({ page }),
     [updateFilters],
   )
 
   const goToFirstPage = useCallback(() => goToPage(1), [goToPage])
+
   const goToLastPage = useCallback(() => {
     if (rentalsResponse?.meta.totalPages) {
       goToPage(rentalsResponse.meta.totalPages)
@@ -74,21 +71,22 @@ export const LockerRentClient = () => {
   }, [goToPage, rentalsResponse?.meta.totalPages])
 
   const goToPreviousPage = useCallback(() => {
-    if (rentalsResponse?.meta.hasPrevPage) {
-      goToPage((filters.page ?? 1) - 1)
+    const currentPage = filters.page || 1
+    if (currentPage > 1) {
+      goToPage(currentPage - 1)
     }
-  }, [goToPage, filters.page, rentalsResponse?.meta.hasPrevPage])
+  }, [goToPage, filters.page])
 
   const goToNextPage = useCallback(() => {
-    if (rentalsResponse?.meta.hasNextPage) {
-      goToPage((filters.page ?? 1) + 1)
+    const currentPage = filters.page || 1
+    const totalPages = rentalsResponse?.meta.totalPages || 1
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1)
     }
-  }, [goToPage, filters.page, rentalsResponse?.meta.hasNextPage])
+  }, [goToPage, filters.page, rentalsResponse?.meta.totalPages])
 
   const handlePageSizeChange = useCallback(
-    (newLimit: number) => {
-      updateFilters({ limit: newLimit, page: 1 })
-    },
+    (newLimit: number) => updateFilters({ limit: newLimit, page: 1 }),
     [updateFilters],
   )
 
@@ -105,21 +103,18 @@ export const LockerRentClient = () => {
     if (filters.courseAndSet) count++
     if (debouncedSearch) count++
     return count
-  }, [filters, debouncedSearch])
+  }, [
+    filters.rentalStatus,
+    filters.paymentStatus,
+    filters.renterName,
+    filters.courseAndSet,
+    debouncedSearch,
+  ])
 
-  if (isLoading) {
-    return <TableLoadingState />
-  }
+  if (isLoading) return <TableLoadingState />
 
-  if (isError) {
+  if (isError)
     return <TableErrorState error={error} onRetry={() => refetch()} />
-  }
-
-  const currentPage = rentalsResponse?.meta.page || 1
-  const totalPages = rentalsResponse?.meta.totalPages || 1
-  const totalItems = rentalsResponse?.meta.totalItems || 0
-  const hasNextPage = rentalsResponse?.meta.hasNextPage || false
-  const hasPrevPage = rentalsResponse?.meta.hasPrevPage || false
 
   return (
     <div className="mt-2">
@@ -129,12 +124,13 @@ export const LockerRentClient = () => {
         placeholder="Search rentals..."
         isLockerRental={true}
         isLoading={isFetching}
-        onRefetch={refetch}
         isFetching={isFetching}
+        onRefetch={refetch}
         isDynamic={true}
-        // Dynamic props
+        // Search props
         searchValue={searchValue}
         onSearchChange={handleSearch}
+        // Filter props
         showFilters={showFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
         activeFiltersCount={activeFiltersCount}
@@ -142,14 +138,15 @@ export const LockerRentClient = () => {
         onUpdateFilters={updateFilters}
         onResetFilters={resetFilters}
         onClose={() => setShowFilters(false)}
-        totalItems={totalItems}
+        // Pagination props
+        totalItems={rentalsResponse?.meta.totalItems || 0}
         currentDataLength={rentalsResponse?.data.length || 0}
-        currentPage={currentPage}
-        totalPages={totalPages}
+        currentPage={filters.page || 1}
+        totalPages={rentalsResponse?.meta.totalPages || 1}
         limit={filters.limit || 10}
         onPageSizeChange={handlePageSizeChange}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
+        hasNextPage={rentalsResponse?.meta.hasNextPage || false}
+        hasPrevPage={rentalsResponse?.meta.hasPrevPage || false}
         onGoToFirstPage={goToFirstPage}
         onGoToPreviousPage={goToPreviousPage}
         onGoToNextPage={goToNextPage}

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/cards"
 import { Skeleton, TableErrorState } from "@/components/ui/fallbacks"
 import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
+import { formatCurrency } from "@/utils/currency"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { expenseTransactionListColumn } from "./expense-transaction-column"
 import { ExpenseTransactionSkeleton } from "./expense-transaction-skeleton"
@@ -70,14 +71,6 @@ export const ExpenseTransactionClient = ({
 
   const allocatedFunds = fundRequestData?.allocatedFunds || 0
   const isBudgetFullyUtilized = totalExpenses >= allocatedFunds
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-PH", {
-      style: "currency",
-      currency: "PHP",
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
 
   useEffect(() => {
     if (debouncedSearch !== searchValue) return

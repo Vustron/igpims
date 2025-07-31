@@ -16,7 +16,7 @@ export const LockersSkeleton = ({ isSidebarOpen = false }) => {
 
   return (
     <div
-      className={`-mt-12 flex min-h-screen w-full flex-col ${containerPadding}`}
+      className={`mt-12 flex min-h-screen w-full flex-col ${containerPadding}`}
     >
       {/* Filter Skeleton */}
       <div className="mb-6 space-y-4">

@@ -1,14 +1,13 @@
 "use client"
 
-import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
-import { DataTable } from "@/components/ui/tables"
-import { useCallback, useEffect, useMemo, useState } from "react"
-
 import {
   WaterFundFilters,
   useFindManyWaterFunds,
 } from "@/backend/actions/water-fund/find-many"
+import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
+import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { waterFundColumn } from "./water-fund-column"
 
 export const WaterFundsClient = () => {
@@ -39,28 +38,23 @@ export const WaterFundsClient = () => {
     isFetching,
   } = useFindManyWaterFunds(finalFilters)
 
-  const transformedData = useMemo(() => {
-    if (!fundsResponse?.data) return []
-
-    return fundsResponse.data.map((fund) => ({
-      ...fund,
-    }))
-  }, [fundsResponse?.data])
+  const transformedData = useMemo(
+    () => fundsResponse?.data ?? [],
+    [fundsResponse?.data],
+  )
 
   useEffect(() => {
-    if (debouncedSearch !== searchValue) return
-    if (filters.page !== 1 && debouncedSearch !== filters.search) {
-      setFilters((prev) => ({ ...prev, page: 1 }))
+    if (debouncedSearch && debouncedSearch !== filters.search) {
+      setFilters((prev) => ({ ...prev, page: 1, search: debouncedSearch }))
     }
-  }, [debouncedSearch, filters.page, filters.search, searchValue])
+  }, [debouncedSearch, filters.search])
 
   const updateFilters = useCallback((newFilters: Partial<WaterFundFilters>) => {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
       page:
-        newFilters.page ??
-        (Object.keys(newFilters).some((key) => key !== "page") ? 1 : prev.page),
+        newFilters.page ?? (Object.keys(newFilters).length > 1 ? 1 : prev.page),
     }))
   }, [])
 
@@ -69,13 +63,12 @@ export const WaterFundsClient = () => {
   }, [])
 
   const goToPage = useCallback(
-    (page: number) => {
-      updateFilters({ page })
-    },
+    (page: number) => updateFilters({ page }),
     [updateFilters],
   )
 
   const goToFirstPage = useCallback(() => goToPage(1), [goToPage])
+
   const goToLastPage = useCallback(() => {
     if (fundsResponse?.meta.totalPages) {
       goToPage(fundsResponse.meta.totalPages)
@@ -83,21 +76,22 @@ export const WaterFundsClient = () => {
   }, [goToPage, fundsResponse?.meta.totalPages])
 
   const goToPreviousPage = useCallback(() => {
-    if (fundsResponse?.meta.hasPrevPage) {
-      goToPage((filters.page ?? 1) - 1)
+    const currentPage = filters.page || 1
+    if (currentPage > 1) {
+      goToPage(currentPage - 1)
     }
-  }, [goToPage, filters.page, fundsResponse?.meta.hasPrevPage])
+  }, [goToPage, filters.page])
 
   const goToNextPage = useCallback(() => {
-    if (fundsResponse?.meta.hasNextPage) {
-      goToPage((filters.page ?? 1) + 1)
+    const currentPage = filters.page || 1
+    const totalPages = fundsResponse?.meta.totalPages || 1
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1)
     }
-  }, [goToPage, filters.page, fundsResponse?.meta.hasNextPage])
+  }, [goToPage, filters.page, fundsResponse?.meta.totalPages])
 
   const handlePageSizeChange = useCallback(
-    (newLimit: number) => {
-      updateFilters({ limit: newLimit, page: 1 })
-    },
+    (newLimit: number) => updateFilters({ limit: newLimit, page: 1 }),
     [updateFilters],
   )
 
@@ -113,21 +107,18 @@ export const WaterFundsClient = () => {
     if (filters.vendoId) count++
     if (debouncedSearch) count++
     return count
-  }, [filters, debouncedSearch])
+  }, [filters.startDate, filters.endDate, filters.vendoId, debouncedSearch])
 
-  if (isLoading) {
-    return <TableLoadingState />
-  }
-
-  if (isError) {
+  if (isLoading) return <TableLoadingState />
+  if (isError)
     return <TableErrorState error={error} onRetry={() => refetch()} />
-  }
 
-  const currentPage = fundsResponse?.meta.page || 1
+  const currentPage = filters.page || 1
   const totalPages = fundsResponse?.meta.totalPages || 1
   const totalItems = fundsResponse?.meta.totalItems || 0
-  const hasNextPage = fundsResponse?.meta.hasNextPage || false
-  const hasPrevPage = fundsResponse?.meta.hasPrevPage || false
+  const hasNextPage =
+    fundsResponse?.meta.hasNextPage ?? currentPage < totalPages
+  const hasPrevPage = fundsResponse?.meta.hasPrevPage ?? currentPage > 1
 
   return (
     <div className="mt-2">
@@ -136,11 +127,13 @@ export const WaterFundsClient = () => {
         data={transformedData}
         placeholder="Search water funds..."
         isLoading={isFetching}
-        onRefetch={refetch}
         isFetching={isFetching}
+        onRefetch={refetch}
         isDynamic={true}
+        // Search props
         searchValue={searchValue}
         onSearchChange={handleSearch}
+        // Filter props
         showFilters={showFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
         activeFiltersCount={activeFiltersCount}
@@ -148,8 +141,9 @@ export const WaterFundsClient = () => {
         onUpdateFilters={updateFilters}
         onResetFilters={resetFilters}
         onClose={() => setShowFilters(false)}
+        // Pagination props
         totalItems={totalItems}
-        currentDataLength={fundsResponse?.data.length || 0}
+        currentDataLength={transformedData.length}
         currentPage={currentPage}
         totalPages={totalPages}
         limit={filters.limit || 10}

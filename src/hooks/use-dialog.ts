@@ -3,6 +3,7 @@ import { FundRequestWithUser } from "@/backend/actions/fund-request/find-by-id"
 import { IgpSupplyWithRelations } from "@/backend/actions/igp-supply/find-by-id"
 import { IgpTransactionWithIgp } from "@/backend/actions/igp-transaction/find-many"
 import { IgpWithProjectLeadData } from "@/backend/actions/igp/find-many"
+import { PaginatedRentalsResponse } from "@/backend/actions/locker-rental/find-many"
 import { ViolationWithRenters } from "@/backend/actions/violation/find-many"
 import { WaterFundWithVendoLocation } from "@/backend/actions/water-fund/find-by-id"
 import { WaterSupplyWithVendoLocation } from "@/backend/actions/water-supply/find-by-id"
@@ -90,6 +91,7 @@ interface RentalReceiptData {
 
 interface ViolationData {
   violation?: ViolationWithRenters
+  lockerRentalsData?: PaginatedRentalsResponse
 }
 
 interface InspectionData {

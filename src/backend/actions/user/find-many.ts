@@ -1,11 +1,11 @@
+import { User } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
 import {
   QueryClient,
   queryOptions,
   useInfiniteQuery,
   useQuery,
 } from "@tanstack/react-query"
-import { User } from "@/backend/db/schemas"
-import { api } from "@/backend/helpers/api-client"
 
 export type UserFilters = {
   page?: number
@@ -79,6 +79,10 @@ export const useFindManyUser = (filters: UserFilters = {}) => {
   return useQuery<PaginatedUsersResponse>({
     queryKey: ["users", { page, limit, search, role, excludeCurrentUser }],
     queryFn: async () => await findManyUser(filters),
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   })
 }
 

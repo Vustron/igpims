@@ -1,10 +1,10 @@
-import { and, between, eq, like, or, sql } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 import { lockerRental, violation } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { and, between, eq, like, or, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function findManyViolations(
   request: NextRequest,
@@ -146,6 +146,7 @@ export async function findManyViolations(
         const renters = await db
           .select({
             renterId: lockerRental.renterId,
+            lockerId: lockerRental.lockerId,
             renterName: lockerRental.renterName,
             courseAndSet: lockerRental.courseAndSet,
           })

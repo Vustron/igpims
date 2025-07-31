@@ -50,17 +50,13 @@ export const ViolationForm = ({
     data: lockersData,
     isLoading: isLoadingLockers,
     isError,
-  } = useFindManyLockers({
-    limit: 100,
-  })
+  } = useFindManyLockers()
 
   const {
     data: inspectionsData,
     isLoading: isLoadingInspections,
     isError: isInspectionsError,
-  } = useFindManyInspections({
-    limit: 100,
-  })
+  } = useFindManyInspections()
 
   const form = useForm<Omit<Violation, "id">>({
     resolver: zodResolver(ViolationSchema.omit({ id: true })),
@@ -82,10 +78,27 @@ export const ViolationForm = ({
     defaultValue: form.getValues("violations"),
   })
 
+  const currentStudentName = useWatch({
+    control: form.control,
+    name: "studentName",
+    defaultValue: form.getValues("studentName"),
+  })
+
   useEffect(() => {
     const totalFine = calculateTotalFine(currentViolations || [])
     form.setValue("totalFine", totalFine, { shouldValidate: true })
   }, [currentViolations, form])
+
+  useEffect(() => {
+    if (currentStudentName && violation?.renters) {
+      const renter = violation.renters.find(
+        (r) => r.renterName === currentStudentName,
+      )
+      if (renter?.lockerId) {
+        form.setValue("lockerId", renter.lockerId, { shouldValidate: true })
+      }
+    }
+  }, [currentStudentName, form, violation?.renters])
 
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
@@ -141,6 +154,7 @@ export const ViolationForm = ({
     violation?.renters?.map((renter) => ({
       value: renter.renterName,
       label: `${renter.renterName}`,
+      lockerId: renter.lockerId,
     })) || []
 
   const lockerOptions =

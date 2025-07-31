@@ -1,13 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
-import { DataTable } from "@/components/ui/tables"
 import {
   InspectionFilters,
   useFindManyInspections,
 } from "@/backend/actions/inspection/find-many"
+import { TableErrorState, TableLoadingState } from "@/components/ui/fallbacks"
+import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { inspectionColumn } from "./inspection-column"
 
 export const InspectionClient = () => {
@@ -38,40 +38,41 @@ export const InspectionClient = () => {
     isFetching,
   } = useFindManyInspections(finalFilters)
 
+  // Reset to page 1 when search term changes
   useEffect(() => {
-    if (debouncedSearch !== searchValue) return
-    if (filters.page !== 1 && debouncedSearch !== filters.search) {
-      setFilters((prev) => ({ ...prev, page: 1 }))
+    if (debouncedSearch && debouncedSearch !== filters.search) {
+      setFilters((prev) => ({ ...prev, page: 1, search: debouncedSearch }))
     }
-  }, [debouncedSearch, filters.page, filters.search, searchValue])
+  }, [debouncedSearch, filters.search])
 
+  // Handler for updating filters
   const updateFilters = useCallback(
     (newFilters: Partial<InspectionFilters>) => {
       setFilters((prev) => ({
         ...prev,
         ...newFilters,
+        // Reset to page 1 if any filter other than page changes
         page:
           newFilters.page ??
-          (Object.keys(newFilters).some((key) => key !== "page")
-            ? 1
-            : prev.page),
+          (Object.keys(newFilters).length > 1 ? 1 : prev.page),
       }))
     },
     [],
   )
 
+  // Search handler
   const handleSearch = useCallback((value: string) => {
     setSearchValue(value)
   }, [])
 
+  // Pagination handlers
   const goToPage = useCallback(
-    (page: number) => {
-      updateFilters({ page })
-    },
+    (page: number) => updateFilters({ page }),
     [updateFilters],
   )
 
   const goToFirstPage = useCallback(() => goToPage(1), [goToPage])
+
   const goToLastPage = useCallback(() => {
     if (inspectionsResponse?.meta.totalPages) {
       goToPage(inspectionsResponse.meta.totalPages)
@@ -79,21 +80,22 @@ export const InspectionClient = () => {
   }, [goToPage, inspectionsResponse?.meta.totalPages])
 
   const goToPreviousPage = useCallback(() => {
-    if (inspectionsResponse?.meta.hasPrevPage) {
-      goToPage((filters.page ?? 1) - 1)
+    const currentPage = filters.page || 1
+    if (currentPage > 1) {
+      goToPage(currentPage - 1)
     }
-  }, [goToPage, filters.page, inspectionsResponse?.meta.hasPrevPage])
+  }, [goToPage, filters.page])
 
   const goToNextPage = useCallback(() => {
-    if (inspectionsResponse?.meta.hasNextPage) {
-      goToPage((filters.page ?? 1) + 1)
+    const currentPage = filters.page || 1
+    const totalPages = inspectionsResponse?.meta.totalPages || 1
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1)
     }
-  }, [goToPage, filters.page, inspectionsResponse?.meta.hasNextPage])
+  }, [goToPage, filters.page, inspectionsResponse?.meta.totalPages])
 
   const handlePageSizeChange = useCallback(
-    (newLimit: number) => {
-      updateFilters({ limit: newLimit, page: 1 })
-    },
+    (newLimit: number) => updateFilters({ limit: newLimit, page: 1 }),
     [updateFilters],
   )
 
@@ -109,21 +111,11 @@ export const InspectionClient = () => {
     if (filters.sort) count++
     if (debouncedSearch) count++
     return count
-  }, [filters, debouncedSearch])
+  }, [filters.startDate, filters.endDate, filters.sort, debouncedSearch])
 
-  if (isLoading) {
-    return <TableLoadingState />
-  }
-
-  if (isError) {
+  if (isLoading) return <TableLoadingState />
+  if (isError)
     return <TableErrorState error={error} onRetry={() => refetch()} />
-  }
-
-  const currentPage = inspectionsResponse?.meta.page || 1
-  const totalPages = inspectionsResponse?.meta.totalPages || 1
-  const totalItems = inspectionsResponse?.meta.totalItems || 0
-  const hasNextPage = inspectionsResponse?.meta.hasNextPage || false
-  const hasPrevPage = inspectionsResponse?.meta.hasPrevPage || false
 
   return (
     <div className="mt-2">
@@ -132,12 +124,13 @@ export const InspectionClient = () => {
         data={inspectionsResponse?.data || []}
         placeholder="Search inspections..."
         isLoading={isFetching}
-        onRefetch={refetch}
         isFetching={isFetching}
+        onRefetch={refetch}
         isDynamic={true}
-        // Dynamic props
+        // Search props
         searchValue={searchValue}
         onSearchChange={handleSearch}
+        // Filter props
         showFilters={showFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
         activeFiltersCount={activeFiltersCount}
@@ -145,14 +138,15 @@ export const InspectionClient = () => {
         onUpdateFilters={updateFilters}
         onResetFilters={resetFilters}
         onClose={() => setShowFilters(false)}
-        totalItems={totalItems}
+        // Pagination props
+        totalItems={inspectionsResponse?.meta.totalItems || 0}
         currentDataLength={inspectionsResponse?.data.length || 0}
-        currentPage={currentPage}
-        totalPages={totalPages}
+        currentPage={filters.page || 1}
+        totalPages={inspectionsResponse?.meta.totalPages || 1}
         limit={filters.limit || 10}
         onPageSizeChange={handlePageSizeChange}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
+        hasNextPage={inspectionsResponse?.meta.hasNextPage || false}
+        hasPrevPage={inspectionsResponse?.meta.hasPrevPage || false}
         onGoToFirstPage={goToFirstPage}
         onGoToPreviousPage={goToPreviousPage}
         onGoToNextPage={goToNextPage}

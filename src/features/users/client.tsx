@@ -1,9 +1,9 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { DataTable } from "@/components/ui/tables"
 import { UserFilters, useFindManyUser } from "@/backend/actions/user/find-many"
+import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { usersColumns } from "./users-column"
 
 export const UsersClient = () => {
@@ -25,14 +25,13 @@ export const UsersClient = () => {
     [filters, debouncedSearch],
   )
 
-  const { data, isFetching, refetch } = useFindManyUser(queryFilters)
+  const { data, isFetching, refetch, isLoading } = useFindManyUser(queryFilters)
 
   useEffect(() => {
-    if (debouncedSearch !== searchValue) return
-    if (filters.page !== 1 && debouncedSearch !== filters.search) {
+    if (debouncedSearch !== undefined && debouncedSearch !== filters.search) {
       setFilters((prev) => ({ ...prev, page: 1 }))
     }
-  }, [debouncedSearch, filters.page, filters.search, searchValue])
+  }, [debouncedSearch, filters.search])
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchValue(value)
@@ -43,7 +42,7 @@ export const UsersClient = () => {
       setFilters((prev) => ({
         ...prev,
         ...newFilters,
-        page: newFilters.page ?? 1,
+        page: newFilters.page ?? prev.page,
       }))
     },
     [],
@@ -51,8 +50,8 @@ export const UsersClient = () => {
 
   const handleResetFilters = useCallback(() => {
     setSearchValue("")
-    setFilters({ page: 1, limit: filters.limit })
-  }, [filters.limit])
+    setFilters({ page: 1, limit: 10 }) // Reset to default limit
+  }, [])
 
   const handlePageSizeChange = useCallback((newLimit: number) => {
     setFilters((prev) => ({ ...prev, limit: newLimit, page: 1 }))
@@ -69,13 +68,18 @@ export const UsersClient = () => {
 
   const handleGoToPreviousPage = useCallback(() => {
     const currentPage = filters.page || 1
-    handleGoToPage(Math.max(1, currentPage - 1))
+    if (currentPage > 1) {
+      handleGoToPage(currentPage - 1)
+    }
   }, [handleGoToPage, filters.page])
 
   const handleGoToNextPage = useCallback(() => {
     const currentPage = filters.page || 1
-    handleGoToPage(currentPage + 1)
-  }, [handleGoToPage, filters.page])
+    const totalPages = data?.meta.totalPages || 1
+    if (currentPage < totalPages) {
+      handleGoToPage(currentPage + 1)
+    }
+  }, [handleGoToPage, filters.page, data?.meta.totalPages])
 
   const handleGoToLastPage = useCallback(() => {
     const totalPages = data?.meta.totalPages || 1
@@ -95,7 +99,7 @@ export const UsersClient = () => {
         columns={usersColumns}
         data={data?.data || []}
         placeholder="Search users by name or email..."
-        isLoading={isFetching}
+        isLoading={isLoading || isFetching}
         isDynamic={true}
         onRefetch={() => refetch()}
         isFetching={isFetching}
@@ -114,7 +118,7 @@ export const UsersClient = () => {
         // Pagination props
         totalItems={data?.meta.totalItems || 0}
         currentDataLength={data?.data?.length || 0}
-        currentPage={data?.meta.page || 1}
+        currentPage={filters.page || 1}
         totalPages={data?.meta.totalPages || 1}
         limit={filters.limit || 10}
         onPageSizeChange={handlePageSizeChange}

@@ -1,11 +1,11 @@
+import { api } from "@/backend/helpers/api-client"
+import { Violation } from "@/validation/violation"
 import {
   QueryClient,
   queryOptions,
   useInfiniteQuery,
   useQuery,
 } from "@tanstack/react-query"
-import { api } from "@/backend/helpers/api-client"
-import { Violation } from "@/validation/violation"
 
 export interface ViolationFilters {
   page?: number
@@ -23,6 +23,7 @@ export type ViolationWithRenters = Violation & {
 
 export interface Renter {
   renterId: string
+  lockerId: string
   renterName: string
   courseAndSet: string
 }

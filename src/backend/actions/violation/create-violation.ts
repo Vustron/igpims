@@ -1,9 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useRouter } from "next-nprogress-bar"
 import { api } from "@/backend/helpers/api-client"
 import { catchError } from "@/utils/catch-error"
 import { sanitizer } from "@/utils/sanitizer"
 import { Violation, ViolationSchema } from "@/validation/violation"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next-nprogress-bar"
 import { PaginatedViolationsResponse, ViolationFilters } from "./find-many"
 
 export async function createViolation(
@@ -241,6 +241,7 @@ export const useCreateViolation = () => {
       catchError(_error)
     },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["violations"] })
       router.refresh()
     },
   })
