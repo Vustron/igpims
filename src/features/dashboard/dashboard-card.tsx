@@ -1,5 +1,5 @@
-import { TrendingDown, TrendingUp } from "lucide-react"
 import { Card } from "@/components/ui/cards"
+import { TrendingDown, TrendingUp } from "lucide-react"
 
 interface DashboardCardItemProps {
   id: string
@@ -9,66 +9,64 @@ interface DashboardCardItemProps {
   percentageChange: string
   trendDescription?: string
   icon?: React.ReactNode
+  bgColor?: string
+  textColor?: string
 }
 
-interface DashboardCardProps {
-  items: DashboardCardItemProps[]
-}
+export const DashboardCard = ({ item }: { item: DashboardCardItemProps }) => {
+  const isPositive =
+    item.percentageChange.startsWith("+") ||
+    item.percentageChange.startsWith("0")
 
-export const DashboardCard = ({ items }: DashboardCardProps) => {
   return (
-    <>
-      {items.map((item) => (
-        <Card
-          key={item.id}
-          className="col-span-full bg-background p-3 sm:col-span-2 sm:p-4 md:p-6 lg:col-span-1"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="mb-1 font-medium text-gray-500 text-xs sm:text-sm">
-                {item.title}
-              </p>
-              <h2 className="font-bold text-base sm:text-lg md:text-xl">
-                {item.amount}
-              </h2>
-            </div>
-            {item.icon && (
-              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900">
-                {item.icon}
-              </div>
-            )}
-          </div>
+    <Card className="relative overflow-hidden bg-white p-5 shadow-sm transition-all hover:shadow-md dark:bg-gray-800">
+      {/* Background accent */}
+      <div
+        className={`absolute -right-10 -top-10 h-28 w-28 rounded-full ${item.bgColor} opacity-20`}
+      />
 
-          <div className="mt-3 sm:mt-4 md:mt-6">
-            <div className="flex items-center gap-1.5">
-              <span
-                className={`flex items-center gap-1 text-2xs sm:text-xs ${
-                  item.percentageChange.startsWith("+") ||
-                  item.percentageChange.startsWith("0")
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}
-              >
-                {item.percentageChange.startsWith("+") ||
-                item.percentageChange.startsWith("0") ? (
-                  <TrendingUp className="size-3 sm:size-4" />
-                ) : (
-                  <TrendingDown className="size-3 sm:size-4" />
-                )}
-                {item.percentageChange}
-              </span>
-              <span className="text-2xs text-gray-500 sm:text-xs">
-                {item.trendDescription || "vs previous period"}
-              </span>
-            </div>
-            {item.metric && (
-              <p className="mt-1 text-2xs text-gray-400 sm:text-xs">
-                {item.metric}
-              </p>
-            )}
+      <div className="relative z-10">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+              {item.title}
+            </p>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+              {item.amount}
+            </h2>
           </div>
-        </Card>
-      ))}
-    </>
+          {item.icon && (
+            <div className={`rounded-full ${item.bgColor} p-3`}>
+              {item.icon}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6">
+          <div className="flex items-center gap-2">
+            <span
+              className={`flex items-center gap-1 text-sm font-medium ${
+                isPositive ? "text-green-500" : "text-red-500"
+              }`}
+            >
+              {isPositive ? (
+                <TrendingUp className="size-4" />
+              ) : (
+                <TrendingDown className="size-4" />
+              )}
+              {item.percentageChange}
+            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {item.trendDescription || "vs previous period"}
+            </span>
+          </div>
+          {item.metric && (
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+              {item.metric}
+            </p>
+          )}
+        </div>
+      </div>
+    </Card>
   )
 }

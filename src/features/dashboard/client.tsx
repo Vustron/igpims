@@ -1,6 +1,7 @@
 "use client"
 
 import { useFindTotalProfit } from "@/backend/actions/analytics/find-total-profit"
+import { motion } from "framer-motion"
 import { GiClothes, GiDroplets, GiLockers } from "react-icons/gi"
 import { DashboardCard } from "./dashboard-card"
 import { DashboardSkeleton } from "./dashboard-skeleton"
@@ -15,6 +16,17 @@ export const DashboardClient = () => {
     return <DashboardSkeleton />
   }
 
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  }
+
   const dashboardItems = [
     {
       id: "1",
@@ -23,7 +35,9 @@ export const DashboardClient = () => {
       metric: `${data?.data.activeLockersCount ?? 0} Active Lockers`,
       percentageChange: data?.data.activeLockersPercentageChange ?? "+0%",
       trendDescription: "Active Lockers",
-      icon: <GiLockers className="size-8 text-muted-foreground" />,
+      icon: <GiLockers className="size-8 text-indigo-500" />,
+      bgColor: "bg-indigo-50",
+      textColor: "text-indigo-600",
     },
     {
       id: "2",
@@ -32,7 +46,9 @@ export const DashboardClient = () => {
       metric: `${data?.data.activeMachinesCount ?? 0} Active Machines`,
       percentageChange: data?.data.activeMachinesPercentageChange ?? "+0%",
       trendDescription: "Active Machines",
-      icon: <GiDroplets className="size-8 text-muted-foreground" />,
+      icon: <GiDroplets className="size-8 text-blue-500" />,
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-600",
     },
     {
       id: "3",
@@ -41,14 +57,19 @@ export const DashboardClient = () => {
       metric: `${data?.data.totalIgpSold ?? 0} Total Items`,
       percentageChange: data?.data.igpPercentageChange ?? "+0%",
       trendDescription: "Revenue",
-      icon: <GiClothes className="size-8 text-muted-foreground" />,
+      icon: <GiClothes className="size-8 text-emerald-500" />,
+      bgColor: "bg-emerald-50",
+      textColor: "text-emerald-600",
     },
   ]
-
   return (
     <div className="p-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <DashboardCard items={dashboardItems} />
+        {dashboardItems.map((item) => (
+          <motion.div key={item.id} variants={itemVariants}>
+            <DashboardCard item={item} />
+          </motion.div>
+        ))}
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-5">
