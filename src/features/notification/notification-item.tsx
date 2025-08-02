@@ -1,12 +1,14 @@
+// File: notification-item.tsx
 "use client"
 
 import { NotificationWithActorData } from "@/backend/actions/notification/find-many"
+import { useSession } from "@/components/context/session"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import { cn } from "@/utils/cn"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { motion } from "framer-motion"
-import { Check } from "lucide-react"
+import { Check, Loader2 } from "lucide-react"
 import {
   getActionColor,
   getActionIcon,
@@ -16,12 +18,20 @@ import {
 interface NotificationItemProps {
   notification: NotificationWithActorData
   onMarkAsRead: (id: string) => void
+  isUpdatingNotification?: boolean
 }
 
 export const NotificationItem = ({
   notification,
   onMarkAsRead,
+  isUpdatingNotification = false,
 }: NotificationItemProps) => {
+  const session = useSession()
+
+  const isRead = session?.userId
+    ? notification.status.includes(session.userId)
+    : false
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -30,7 +40,7 @@ export const NotificationItem = ({
       transition={{ duration: 0.2 }}
       className={cn(
         "relative mb-2 rounded-lg border p-4 transition-all hover:bg-slate-50",
-        notification.status === "unread"
+        !isRead
           ? "border-l-4 border-l-blue-500 bg-blue-50/30"
           : "border-slate-200",
       )}
@@ -86,13 +96,18 @@ export const NotificationItem = ({
         </div>
       </div>
 
-      {notification.status === "unread" && (
+      {!isRead && (
         <Button
           onClick={() => onMarkAsRead(notification.id)}
           variant={"outline"}
+          disabled={isUpdatingNotification}
           className="absolute top-12 right-8 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
         >
-          <Check className="h-4 w-4" />
+          {isUpdatingNotification ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Check className="h-4 w-4" />
+          )}
           <span className="sr-only">Mark as read</span>
         </Button>
       )}

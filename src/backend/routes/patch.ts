@@ -7,6 +7,7 @@ import { updateIgp } from "../controllers/igp/update-igp"
 import { updateInspection } from "../controllers/inspection/update-inspection"
 import { updateRental } from "../controllers/locker-rental/update-rental"
 import { updateLocker } from "../controllers/locker/update-locker"
+import { updateNotification } from "../controllers/notifications/update-notification"
 import { updateUserInfo } from "../controllers/user/update-info"
 import { updateViolation } from "../controllers/violation/update-violation"
 import { updateWaterFund } from "../controllers/water-funds/update-fund"
@@ -44,6 +45,10 @@ export const patchRoutes: Route[] = [
   {
     path: "/api/v1/igp-supplies/update-igp-supply",
     handler: updateIgpSupply,
+  },
+  {
+    path: "/api/v1/notifications/update-notification",
+    handler: updateNotification,
   },
   // Add more PATCH routes here
 ]

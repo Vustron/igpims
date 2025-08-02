@@ -1,5 +1,5 @@
 import { igp, igpSupply, igpTransactions } from "@/backend/db/schemas"
-import { createNotification } from "@/backend/helpers/notification-controller"
+import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
@@ -48,10 +48,9 @@ export async function deleteIgp(
       type: "igp",
       requestId: deletedIgpData.id,
       title: `IGP Deleted: ${deletedIgpData.igpName}`,
-      description: `The IGP "${deletedIgpData.igpName}" has been deleted`,
+      description: `The IGP "${deletedIgpData.igpName}" has been deleted by ${currentSession.userName}`,
       action: "rejected",
       actorId: currentSession.userId,
-      recipientId: deletedIgpData.projectLead!,
       details: "The IGP proposal had been deleted",
     })
 

@@ -7,12 +7,14 @@ interface NotificationDateGroupProps {
   date: string
   notifications: NotificationWithActorData[]
   onMarkAsRead: (id: string) => void
+  isUpdatingNotification?: boolean
 }
 
 export const NotificationDateGroup = ({
   date,
   notifications,
   onMarkAsRead,
+  isUpdatingNotification = false,
 }: NotificationDateGroupProps) => {
   return (
     <div className="space-y-2">
@@ -28,6 +30,7 @@ export const NotificationDateGroup = ({
             key={notification.id}
             notification={notification}
             onMarkAsRead={onMarkAsRead}
+            isUpdatingNotification={isUpdatingNotification}
           />
         ))}
       </AnimatePresence>

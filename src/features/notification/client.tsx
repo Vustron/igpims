@@ -1,12 +1,13 @@
 "use client"
 
 import { useFindManyNotifications } from "@/backend/actions/notification/find-many"
+import { useUpdateNotification } from "@/backend/actions/notification/update-notification"
 import { NotificationAction, NotificationType } from "@/backend/db/schemas"
 import { useSession } from "@/components/context/session"
 import { Button } from "@/components/ui/buttons"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { NotificationFilters } from "./notification-filters"
 import { NotificationHeader } from "./notification-header"
 import { useNotificationStore } from "./notification-store"
@@ -21,6 +22,7 @@ export const NotificationClient = () => {
   const [filterAction, setFilterAction] = useState<NotificationAction | "all">(
     "all",
   )
+  const updateNotificationMutation = useUpdateNotification()
   const [page, setPage] = useState(1)
   const limit = 10
 
@@ -35,13 +37,16 @@ export const NotificationClient = () => {
     search: searchTerm || undefined,
     type: filterType !== "all" ? filterType : undefined,
     action: filterAction !== "all" ? filterAction : undefined,
-    status: activeTab !== "all" ? (activeTab as "unread" | "read") : undefined,
-    recipientId: session?.userId,
   })
 
   const notifications = notificationsData?.data || []
   const meta = notificationsData?.meta
-  const unreadCount = notifications.filter((n) => n.status === "unread").length
+
+  const unreadCount = useMemo(() => {
+    if (!session?.userId) return 0
+    const userId = session.userId
+    return notifications.filter((n) => !n.status.includes(userId)).length
+  }, [notifications, session?.userId])
 
   useEffect(() => {
     if (activeTab === "all") {
@@ -49,20 +54,44 @@ export const NotificationClient = () => {
     }
   }, [unreadCount, activeTab, setUnreadCount])
 
-  const markAsRead = async (_notificationId: string) => {
+  const markAsRead = async (notificationId: string) => {
     try {
-      // await updateNotificationMutation.mutateAsync({ status: "read" })
-      refetch()
+      if (!session?.userId) return
+
+      const notification = notifications.find((n) => n.id === notificationId)
+      if (!notification) return
+
+      const updatedStatus = notification.status.includes(session.userId)
+        ? notification.status
+        : [...notification.status, session.userId]
+
+      await updateNotificationMutation.mutateAsync({
+        id: notificationId,
+        payload: { status: updatedStatus },
+      })
     } catch (error) {
       console.error("Failed to mark notification as read:", error)
     }
   }
 
   const markAllAsRead = async () => {
-    // Implement mark all as read functionality
     try {
-      // await Promise.all(unread notifications update mutations)
-      refetch()
+      if (!session?.userId) return
+
+      const userId = session.userId
+      const unreadNotifications = notifications.filter(
+        (n) => !n.status.includes(userId),
+      )
+
+      await Promise.all(
+        unreadNotifications.map((notification) => {
+          const updatedStatus = [...notification.status, userId]
+          return updateNotificationMutation.mutateAsync({
+            id: notification.id,
+            payload: { status: updatedStatus },
+          })
+        }),
+      )
     } catch (error) {
       console.error("Failed to mark all notifications as read:", error)
     }
@@ -124,6 +153,7 @@ export const NotificationClient = () => {
         unreadCount={unreadCount}
         onMarkAllAsRead={markAllAsRead}
         onRefresh={refreshNotifications}
+        isMarkingAllAsRead={updateNotificationMutation.isPending}
       />
 
       <NotificationFilters
@@ -148,6 +178,7 @@ export const NotificationClient = () => {
           setFilterAction("all")
           setPage(1)
         }}
+        isUpdatingNotification={updateNotificationMutation.isPending}
       />
 
       {meta && meta.totalPages > 1 && (

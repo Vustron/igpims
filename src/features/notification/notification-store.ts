@@ -1,6 +1,6 @@
 import { useFindManyNotifications } from "@/backend/actions/notification/find-many"
 import { useSession } from "@/components/context/session"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -25,17 +25,20 @@ export const useNotificationCount = () => {
   const session = useSession()
   const setUnreadCount = useNotificationStore((state) => state.setUnreadCount)
 
-  const { data: notificationsData } = useFindManyNotifications({
-    status: "unread",
-    recipientId: session?.userId,
-    limit: 1,
-  })
+  const { data: notificationsData } = useFindManyNotifications()
+
+  const unreadCount = useMemo(() => {
+    if (!notificationsData?.data || !session?.userId) return 0
+
+    const userId = session.userId
+    return notificationsData.data.filter(
+      (notification) => !notification.status.includes(userId),
+    ).length
+  }, [notificationsData?.data, session?.userId])
 
   useEffect(() => {
-    if (notificationsData?.meta?.totalItems !== undefined) {
-      setUnreadCount(notificationsData.meta.totalItems)
-    }
-  }, [notificationsData?.meta?.totalItems, setUnreadCount])
+    setUnreadCount(unreadCount)
+  }, [unreadCount, setUnreadCount])
 
-  return notificationsData?.meta?.totalItems || 0
+  return unreadCount
 }

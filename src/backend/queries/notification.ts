@@ -12,7 +12,6 @@ export const insertNotificationQuery = db
     status: sql`${sql.placeholder("status")}`,
     action: sql`${sql.placeholder("action")}`,
     actor: sql`${sql.placeholder("actor")}`,
-    recipientId: sql`${sql.placeholder("recipientId")}`,
     details: sql`${sql.placeholder("details")}`,
   })
   .prepare()

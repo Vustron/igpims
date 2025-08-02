@@ -13,7 +13,6 @@ export interface NotificationFilters {
   type?: string
   status?: string
   action?: string
-  recipientId?: string
 }
 
 export interface PaginatedNotificationResponse {
@@ -34,7 +33,7 @@ export interface NotificationWithActorData {
   requestId: string
   title: string
   description: string
-  status: "unread" | "read"
+  status: string[]
   action:
     | "created"
     | "updated"
@@ -65,15 +64,7 @@ export interface NotificationWithActorData {
 export async function findManyNotifications(
   filters: NotificationFilters = {},
 ): Promise<PaginatedNotificationResponse> {
-  const {
-    page = 1,
-    limit = 10,
-    search,
-    type,
-    status,
-    action,
-    recipientId,
-  } = filters
+  const { page = 1, limit = 10, search, type, status, action } = filters
 
   const params = new URLSearchParams()
   params.append("page", page.toString())
@@ -83,7 +74,6 @@ export async function findManyNotifications(
   if (type) params.append("type", type)
   if (status) params.append("status", status)
   if (action) params.append("action", action)
-  if (recipientId) params.append("recipientId", recipientId)
 
   const queryString = params.toString()
   return await api.get<PaginatedNotificationResponse>(
@@ -95,15 +85,7 @@ export async function preFindManyNotifications(
   filters: NotificationFilters = {},
 ) {
   return async (_queryClient: QueryClient) => {
-    const {
-      page = 1,
-      limit = 10,
-      search,
-      type,
-      status,
-      action,
-      recipientId,
-    } = filters
+    const { page = 1, limit = 10, search, type, status, action } = filters
 
     return queryOptions({
       queryKey: [
@@ -115,7 +97,6 @@ export async function preFindManyNotifications(
           type,
           status,
           action,
-          recipientId,
         },
       ],
       queryFn: async () => await findManyNotifications(filters),
@@ -124,15 +105,7 @@ export async function preFindManyNotifications(
 }
 
 export const useFindManyNotifications = (filters: NotificationFilters = {}) => {
-  const {
-    page = 1,
-    limit = 10,
-    search,
-    type,
-    status,
-    action,
-    recipientId,
-  } = filters
+  const { page = 1, limit = 10, search, type, status, action } = filters
 
   return useQuery<PaginatedNotificationResponse>({
     queryKey: [
@@ -144,7 +117,6 @@ export const useFindManyNotifications = (filters: NotificationFilters = {}) => {
         type,
         status,
         action,
-        recipientId,
       },
     ],
     queryFn: async () => await findManyNotifications(filters),
@@ -154,7 +126,7 @@ export const useFindManyNotifications = (filters: NotificationFilters = {}) => {
 export const useInfiniteFindManyNotifications = (
   filters: Omit<NotificationFilters, "page"> = {},
 ) => {
-  const { limit = 10, search, type, status, action, recipientId } = filters
+  const { limit = 10, search, type, status, action } = filters
 
   return useInfiniteQuery({
     queryKey: [
@@ -165,7 +137,6 @@ export const useInfiniteFindManyNotifications = (
         type,
         status,
         action,
-        recipientId,
       },
     ],
     queryFn: async ({ pageParam = 1 }) => {

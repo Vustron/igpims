@@ -114,6 +114,7 @@ export const useDeleteFundRequest = (id: string) => {
       queryClient.invalidateQueries({ queryKey: ["fund-requests"] })
       queryClient.invalidateQueries({ queryKey: ["fund-request", id] })
       queryClient.invalidateQueries({ queryKey: ["fund-requests-infinite"] })
+      queryClient.invalidateQueries({ queryKey: ["notifications"] })
       router.refresh()
     },
   })

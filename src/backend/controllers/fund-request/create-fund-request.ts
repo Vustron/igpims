@@ -1,4 +1,5 @@
 import { fundRequest } from "@/backend/db/schemas"
+import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import {
@@ -72,6 +73,17 @@ export async function createFundRequest(
 
     const [updatedRequest] = await findFundRequestByIdQuery.execute({
       id: fundRequestId,
+    })
+
+    await createNotification({
+      id: nanoid(15),
+      type: "fund_request",
+      requestId: updatedRequest?.id!,
+      title: `New Fund Request Created: ${updatedRequest?.purpose}`,
+      description: `A new Fund Request "${updatedRequest?.purpose}" has been created by ${currentSession.userName} and is pending review.`,
+      action: "created",
+      actorId: currentSession.userId,
+      details: "A new fund request",
     })
 
     return NextResponse.json(updatedRequest, { status: 200 })

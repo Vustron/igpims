@@ -22,9 +22,7 @@ export async function findManyNotifications(
     const offset = (page - 1) * limit
     const search = url.searchParams.get("search") || ""
     const type = url.searchParams.get("type") || undefined
-    const status = url.searchParams.get("status") || undefined
     const action = url.searchParams.get("action") || undefined
-    const recipientId = url.searchParams.get("recipientId") || undefined
 
     const whereConditions: any[] = []
 
@@ -47,10 +45,6 @@ export async function findManyNotifications(
       )
     }
 
-    if (status) {
-      whereConditions.push(eq(notification.status, status as "unread" | "read"))
-    }
-
     if (action) {
       whereConditions.push(
         eq(
@@ -72,10 +66,6 @@ export async function findManyNotifications(
       )
     }
 
-    if (recipientId) {
-      whereConditions.push(eq(notification.recipientId, recipientId))
-    }
-
     const query = db
       .select({
         id: notification.id,
@@ -83,10 +73,9 @@ export async function findManyNotifications(
         requestId: notification.requestId,
         title: notification.title,
         description: notification.description,
-        status: notification.status,
+        status: sql<string>`${notification.status}`,
         action: notification.action,
         actor: notification.actor,
-        recipientId: notification.recipientId,
         details: notification.details,
         createdAt: sql<number>`${notification.createdAt}`,
         updatedAt: sql<number>`${notification.updatedAt}`,
@@ -102,10 +91,15 @@ export async function findManyNotifications(
       .leftJoin(user, eq(notification.actor, user.id))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
 
-    const notificationData = await query
+    const rawData = await query
       .orderBy(sql`${notification.createdAt} DESC`)
       .limit(limit)
       .offset(offset)
+
+    const notificationData = rawData.map((item) => ({
+      ...item,
+      status: JSON.parse(item.status || "[]") as string[],
+    }))
 
     const countWhereConditions: any[] = []
 
@@ -128,12 +122,6 @@ export async function findManyNotifications(
       )
     }
 
-    if (status) {
-      countWhereConditions.push(
-        eq(notification.status, status as "unread" | "read"),
-      )
-    }
-
     if (action) {
       countWhereConditions.push(
         eq(
@@ -153,10 +141,6 @@ export async function findManyNotifications(
             | "resolution_created",
         ),
       )
-    }
-
-    if (recipientId) {
-      countWhereConditions.push(eq(notification.recipientId, recipientId))
     }
 
     const countQuery = db

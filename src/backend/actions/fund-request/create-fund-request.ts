@@ -215,6 +215,7 @@ export const useCreateFundRequest = () => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["fund-requests"] })
       queryClient.invalidateQueries({ queryKey: ["fund-requests-infinite"] })
+      queryClient.invalidateQueries({ queryKey: ["notifications"] })
       router.refresh()
     },
   })

@@ -1,6 +1,6 @@
 "use client"
 
-import { Check } from "lucide-react"
+import { NotificationWithActorData } from "@/backend/actions/notification/find-many"
 import { Badge } from "@/components/ui/badges"
 import { Card } from "@/components/ui/cards"
 import {
@@ -9,9 +9,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/separators"
+import { Check } from "lucide-react"
 import { NotificationDateGroup } from "./notification-date-group"
 import { NotificationEmptyState } from "./notification-empty-state"
-import { NotificationWithActorData } from "@/backend/actions/notification/find-many"
 
 interface NotificationTabsProps {
   activeTab: string
@@ -21,6 +21,7 @@ interface NotificationTabsProps {
   onMarkAsRead: (id: string) => void
   filteredCount: number
   onClearFilters: () => void
+  isUpdatingNotification?: boolean
 }
 
 export const NotificationTabs = ({
@@ -31,6 +32,7 @@ export const NotificationTabs = ({
   onMarkAsRead,
   filteredCount,
   onClearFilters,
+  isUpdatingNotification = false,
 }: NotificationTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
@@ -62,6 +64,7 @@ export const NotificationTabs = ({
                   date={date}
                   notifications={dateNotifications}
                   onMarkAsRead={onMarkAsRead}
+                  isUpdatingNotification={isUpdatingNotification}
                 />
               ),
             )}
@@ -84,6 +87,7 @@ export const NotificationTabs = ({
                   date={date}
                   notifications={dateNotifications}
                   onMarkAsRead={onMarkAsRead}
+                  isUpdatingNotification={isUpdatingNotification}
                 />
               ),
             )}

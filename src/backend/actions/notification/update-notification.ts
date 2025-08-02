@@ -25,20 +25,34 @@ export async function updateNotification(
   )
 }
 
-export const useUpdateNotification = (id: string) => {
+export const useUpdateNotification = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: ["update-notification", id],
-    mutationFn: async (payload: UpdateNotificationPayload) => {
+    mutationKey: ["update-notification"],
+    mutationFn: async ({
+      id,
+      payload,
+    }: { id: string; payload: UpdateNotificationPayload }) => {
+      const statusArray = Array.isArray(payload.status)
+        ? payload.status
+        : typeof payload.status === "string"
+          ? payload.status
+              .split(",")
+              .map((s) => s.trim())
+              .filter((s) => s)
+          : []
       const sanitizedData = sanitizer<UpdateNotificationPayload>(
-        payload,
+        {
+          ...payload,
+          status: statusArray,
+        },
         updateNotificationSchema,
       )
       return await updateNotification(id, sanitizedData)
     },
-    onMutate: async (updatedData) => {
+    onMutate: async ({ id, payload: updatedData }) => {
       await Promise.all([
         queryClient.cancelQueries({ queryKey: ["notification", id] }),
         queryClient.cancelQueries({ queryKey: ["notifications"] }),
@@ -104,7 +118,7 @@ export const useUpdateNotification = (id: string) => {
         previousNotificationsInfinite,
       }
     },
-    onSuccess: (updatedNotification: NotificationWithActorData) => {
+    onSuccess: (updatedNotification: NotificationWithActorData, { id }) => {
       queryClient.setQueryData(["notification", id], updatedNotification)
 
       queryClient.setQueriesData<PaginatedNotificationResponse>(
@@ -136,7 +150,7 @@ export const useUpdateNotification = (id: string) => {
         },
       )
     },
-    onError: (error, _variables, context) => {
+    onError: (error, { id }, context) => {
       if (context?.previousNotification) {
         queryClient.setQueryData(
           ["notification", id],
@@ -157,7 +171,7 @@ export const useUpdateNotification = (id: string) => {
       }
       catchError(error)
     },
-    onSettled: () => {
+    onSettled: (_, __, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] })
       queryClient.invalidateQueries({ queryKey: ["notification", id] })
       queryClient.invalidateQueries({ queryKey: ["notifications-infinite"] })

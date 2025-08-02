@@ -1,5 +1,5 @@
 import { igp } from "@/backend/db/schemas"
-import { createNotification } from "@/backend/helpers/notification-controller"
+import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { findIgpByIdQuery } from "@/backend/queries/igp"
@@ -133,10 +133,9 @@ export async function updateIgp(
         type: "igp",
         requestId: updatedIgp[0]?.id!,
         title: `IGP Status Updated: ${updatedIgp[0]?.igpName!}`,
-        description: `The IGP "${updatedIgp[0]?.igpName}!"s status been updated`,
+        description: `The IGP "${updatedIgp[0]?.igpName}!"s status been updated by ${currentSession.userName}`,
         action: "updated",
         actorId: currentSession.userId,
-        recipientId: updatedIgp[0]?.projectLead!,
         details: "The IGP proposal is updated",
       })
     }

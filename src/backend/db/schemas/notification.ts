@@ -16,10 +16,10 @@ export const notification = sqliteTable(
     requestId: text("requestId", { length: 15 }).notNull(),
     title: text("title", { length: 255 }).notNull(),
     description: text("description", { length: 1000 }).notNull(),
-    status: text("status", { length: 10 })
+    status: text("status", { mode: "json" })
       .notNull()
-      .default("unread")
-      .$type<"unread" | "read">(),
+      .default("[]")
+      .$type<string[]>(),
     action: text("action", { length: 20 })
       .notNull()
       .$type<
@@ -39,16 +39,11 @@ export const notification = sqliteTable(
     actor: text("actor", { length: 15 }).references(() => user.id, {
       onDelete: "set null",
     }),
-    recipientId: text("recipientId", { length: 15 })
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
     details: text("details", { length: 1000 }),
     ...timestamp,
   },
   (t) => [
     index("notification_type_idx").on(t.type),
-    index("notification_status_idx").on(t.status),
-    index("notification_recipient_idx").on(t.recipientId),
     index("notification_actor_idx").on(t.actor),
   ],
 )
@@ -58,11 +53,6 @@ export const notificationRelations = relations(notification, ({ one }) => ({
     fields: [notification.actor],
     references: [user.id],
     relationName: "actorNotifications",
-  }),
-  recipient: one(user, {
-    fields: [notification.recipientId],
-    references: [user.id],
-    relationName: "receivedNotifications",
   }),
 }))
 

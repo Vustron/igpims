@@ -102,6 +102,7 @@ export const useDeleteIgp = (id: string) => {
       queryClient.invalidateQueries({ queryKey: ["igps"] })
       queryClient.invalidateQueries({ queryKey: ["igp", id] })
       queryClient.invalidateQueries({ queryKey: ["igp-infinite"] })
+      queryClient.invalidateQueries({ queryKey: ["notifications"] })
       router.refresh()
     },
   })

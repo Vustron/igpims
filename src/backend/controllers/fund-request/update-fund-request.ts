@@ -1,4 +1,5 @@
 import { fundRequest } from "@/backend/db/schemas"
+import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { findFundRequestByIdQuery } from "@/backend/queries/fund-request"
@@ -10,6 +11,7 @@ import {
   updateFundRequestSchema,
 } from "@/validation/fund-request"
 import { eq } from "drizzle-orm"
+import { nanoid } from "nanoid"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function updateFundRequest(
@@ -142,6 +144,17 @@ export async function updateFundRequest(
         { status: 404 },
       )
     }
+
+    await createNotification({
+      id: nanoid(15),
+      type: "fund_request",
+      requestId: fundRequestData?.id!,
+      title: `Fund Request Updated: ${fundRequestData?.purpose}`,
+      description: `Fund Request "${fundRequestData?.purpose}" status has been updated by ${currentSession.userName}.`,
+      action: "updated",
+      actorId: currentSession.userId,
+      details: "The fund request have been updated",
+    })
 
     return NextResponse.json(fundRequestData, { status: 200 })
   } catch (error) {

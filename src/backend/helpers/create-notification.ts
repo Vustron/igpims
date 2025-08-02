@@ -12,7 +12,6 @@ interface CreateNotificationParams {
   description: string
   action: NotificationAction
   actorId?: string
-  recipientId: string
   details: string
 }
 
@@ -22,7 +21,7 @@ export async function createNotification(params: CreateNotificationParams) {
     const result = await insertNotificationQuery.execute({
       ...params,
       actor: params.actorId,
-      status: "unread",
+      status: [],
       createdAt: now,
       updatedAt: now,
     })
