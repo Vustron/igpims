@@ -35,7 +35,7 @@ export const DashboardClient = () => {
       metric: `${data?.data.activeLockersCount ?? 0} Active Lockers`,
       percentageChange: data?.data.activeLockersPercentageChange ?? "+0%",
       trendDescription: "Active Lockers",
-      icon: <GiLockers className="size-8 text-indigo-500" />,
+      icon: <GiLockers className="h-6 w-6 text-indigo-500" />,
       bgColor: "bg-indigo-50",
       textColor: "text-indigo-600",
     },
@@ -46,7 +46,7 @@ export const DashboardClient = () => {
       metric: `${data?.data.activeMachinesCount ?? 0} Active Machines`,
       percentageChange: data?.data.activeMachinesPercentageChange ?? "+0%",
       trendDescription: "Active Machines",
-      icon: <GiDroplets className="size-8 text-blue-500" />,
+      icon: <GiDroplets className="h-6 w-6 text-blue-500" />,
       bgColor: "bg-blue-50",
       textColor: "text-blue-600",
     },
@@ -57,20 +57,17 @@ export const DashboardClient = () => {
       metric: `${data?.data.totalIgpSold ?? 0} Total Items`,
       percentageChange: data?.data.igpPercentageChange ?? "+0%",
       trendDescription: "Revenue",
-      icon: <GiClothes className="size-8 text-emerald-500" />,
+      icon: <GiClothes className="h-6 w-6 text-emerald-500" />,
       bgColor: "bg-emerald-50",
       textColor: "text-emerald-600",
     },
   ]
+
   return (
     <div className="p-5">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {dashboardItems.map((item) => (
-          <motion.div key={item.id} variants={itemVariants}>
-            <DashboardCard item={item} />
-          </motion.div>
-        ))}
-      </div>
+      <motion.div variants={itemVariants}>
+        <DashboardCard items={dashboardItems} />
+      </motion.div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-5">
         <div className="md:col-span-3">
