@@ -140,6 +140,7 @@ export const useUpdateIgp = (id: string) => {
       queryClient.invalidateQueries({ queryKey: ["igps"] })
       queryClient.invalidateQueries({ queryKey: ["igp", id] })
       queryClient.invalidateQueries({ queryKey: ["igps-infinite"] })
+      queryClient.invalidateQueries({ queryKey: ["notifications"] })
       router.refresh()
     },
   })

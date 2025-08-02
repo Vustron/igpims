@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronDown, Filter, Search, X } from "lucide-react"
+import { NotificationAction, NotificationType } from "@/backend/db/schemas"
 import { Button } from "@/components/ui/buttons"
 import {
   DropdownMenu,
@@ -10,10 +10,7 @@ import {
 } from "@/components/ui/dropdowns"
 import { Input } from "@/components/ui/inputs"
 import { getActionLabel } from "@/features/notification/notification-helpers"
-import {
-  NotificationAction,
-  NotificationType,
-} from "@/features/notification/notification-types"
+import { ChevronDown, Filter, Search, X } from "lucide-react"
 
 interface NotificationFiltersProps {
   searchTerm: string

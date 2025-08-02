@@ -1,11 +1,11 @@
-import { AnimatePresence } from "framer-motion"
+import { NotificationWithActorData } from "@/backend/actions/notification/find-many"
 import { Badge } from "@/components/ui/badges"
+import { AnimatePresence } from "framer-motion"
 import { NotificationItem } from "./notification-item"
-import { Notification } from "./notification-types"
 
 interface NotificationDateGroupProps {
   date: string
-  notifications: Notification[]
+  notifications: NotificationWithActorData[]
   onMarkAsRead: (id: string) => void
 }
 

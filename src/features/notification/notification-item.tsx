@@ -1,20 +1,20 @@
 "use client"
 
-import { formatDistanceToNow } from "date-fns"
-import { motion } from "framer-motion"
-import { Check } from "lucide-react"
+import { NotificationWithActorData } from "@/backend/actions/notification/find-many"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import { cn } from "@/utils/cn"
+import { formatDateFromTimestamp } from "@/utils/date-convert"
+import { motion } from "framer-motion"
+import { Check } from "lucide-react"
 import {
   getActionColor,
   getActionIcon,
   getActionLabel,
 } from "./notification-helpers"
-import { Notification } from "./notification-types"
 
 interface NotificationItemProps {
-  notification: Notification
+  notification: NotificationWithActorData
   onMarkAsRead: (id: string) => void
 }
 
@@ -52,9 +52,7 @@ export const NotificationItem = ({
           <div className="flex items-start justify-between">
             <h4 className="font-medium text-sm">{notification.title}</h4>
             <span className="flex-shrink-0 text-slate-500 text-xs">
-              {formatDistanceToNow(notification.timestamp, {
-                addSuffix: true,
-              })}
+              {formatDateFromTimestamp(notification.createdAt)}
             </span>
           </div>
 

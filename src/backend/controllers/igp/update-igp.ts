@@ -1,4 +1,5 @@
 import { igp } from "@/backend/db/schemas"
+import { createNotification } from "@/backend/helpers/notification-controller"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { findIgpByIdQuery } from "@/backend/queries/igp"
@@ -7,6 +8,7 @@ import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { UpdateIgpPayload, updateIgpSchema } from "@/validation/igp"
 import { eq } from "drizzle-orm"
+import { nanoid } from "nanoid"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function updateIgp(
@@ -123,6 +125,20 @@ export async function updateIgp(
         { error: "IGP not found after update" },
         { status: 404 },
       )
+    }
+
+    if (data.status !== undefined) {
+      await createNotification({
+        id: nanoid(15),
+        type: "igp",
+        requestId: updatedIgp[0]?.id!,
+        title: `IGP Status Updated: ${updatedIgp[0]?.igpName!}`,
+        description: `The IGP "${updatedIgp[0]?.igpName}!"s status been updated`,
+        action: "updated",
+        actorId: currentSession.userId,
+        recipientId: updatedIgp[0]?.projectLead!,
+        details: "The IGP proposal is updated",
+      })
     }
 
     return NextResponse.json(updatedIgp[0], { status: 200 })

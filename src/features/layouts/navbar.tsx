@@ -1,13 +1,16 @@
 "use client"
 
-import { BellDot } from "lucide-react"
-import { useRouter } from "next-nprogress-bar"
-import React from "react"
 import { Badge } from "@/components/ui/badges"
 import { Button, ChangeThemeButton, UserButton } from "@/components/ui/buttons"
 import { SheetMenu } from "@/components/ui/sidebar"
-import { useNotificationStore } from "@/features/notification/notification-store"
+import {
+  useNotificationCount,
+  useNotificationStore,
+} from "@/features/notification/notification-store"
 import { cn } from "@/utils/cn"
+import { BellDot } from "lucide-react"
+import { useRouter } from "next-nprogress-bar"
+import React from "react"
 
 interface NavbarProps {
   title: string
@@ -24,6 +27,8 @@ const NavbarItem: React.FC<NavbarItemProps> = ({ children }) => (
 export const Navbar = ({ title }: NavbarProps) => {
   const router = useRouter()
   const unreadCount = useNotificationStore((state) => state.unreadCount)
+
+  useNotificationCount()
 
   return (
     <header className="sticky top-0 z-20 w-full bg-[#3D3A24] shadow-sm backdrop-blur-sm">

@@ -1,3 +1,4 @@
+import { createNotification } from "@/backend/helpers/notification-controller"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { findIgpByIdQuery, insertIgpQuery } from "@/backend/queries/igp"
@@ -54,6 +55,18 @@ export async function createIgp(
 
     const [igp] = await findIgpByIdQuery.execute({
       id: insertIgp[0]?.id,
+    })
+
+    await createNotification({
+      id: nanoid(15),
+      type: "igp",
+      requestId: igp?.id!,
+      title: `New IGP Created: ${igpData.igpName}`,
+      description: `A new IGP "${igpData.igpName}" has been created and is pending review.`,
+      action: "created",
+      actorId: currentSession.userId,
+      recipientId: igp?.projectLead!,
+      details: `${igpData.igpType} | ${igpData.semesterAndAcademicYear}`,
     })
 
     return NextResponse.json(igp, { status: 200 })

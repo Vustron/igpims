@@ -1,52 +1,41 @@
+import { useFindManyNotifications } from "@/backend/actions/notification/find-many"
+import { useSession } from "@/components/context/session"
+import { useEffect } from "react"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import type {
-  Notification,
-  NotificationStatus,
-} from "@/features/notification/notification-types"
 
 interface NotificationState {
-  notifications: Notification[]
   unreadCount: number
-  setNotifications: (notifications: Notification[]) => void
-  markAsRead: (id: string) => void
-  markAllAsRead: () => void
+  setUnreadCount: (count: number) => void
 }
 
 export const useNotificationStore = create<NotificationState>()(
   persist(
-    (set, get) => ({
-      notifications: [],
+    (set) => ({
       unreadCount: 0,
-      setNotifications: (notifications) => {
-        const unreadCount = notifications.filter(
-          (n) => n.status === "unread",
-        ).length
-        set({ notifications, unreadCount })
-      },
-      markAsRead: (id) => {
-        const { notifications } = get()
-        const updatedNotifications = notifications.map((notification) =>
-          notification.id === id
-            ? { ...notification, status: "read" as NotificationStatus }
-            : notification,
-        )
-        const unreadCount = updatedNotifications.filter(
-          (n) => n.status === "unread",
-        ).length
-        set({ notifications: updatedNotifications, unreadCount })
-      },
-      markAllAsRead: () => {
-        const { notifications } = get()
-        const updatedNotifications = notifications.map((notification) => ({
-          ...notification,
-          status: "read" as NotificationStatus,
-        }))
-        set({ notifications: updatedNotifications, unreadCount: 0 })
-      },
+      setUnreadCount: (count: number) => set({ unreadCount: count }),
     }),
     {
       name: "notification-storage",
     },
   ),
 )
+
+export const useNotificationCount = () => {
+  const session = useSession()
+  const setUnreadCount = useNotificationStore((state) => state.setUnreadCount)
+
+  const { data: notificationsData } = useFindManyNotifications({
+    status: "unread",
+    recipientId: session?.userId,
+    limit: 1,
+  })
+
+  useEffect(() => {
+    if (notificationsData?.meta?.totalItems !== undefined) {
+      setUnreadCount(notificationsData.meta.totalItems)
+    }
+  }, [notificationsData?.meta?.totalItems, setUnreadCount])
+
+  return notificationsData?.meta?.totalItems || 0
+}

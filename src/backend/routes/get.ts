@@ -19,6 +19,7 @@ import { findManyRents } from "../controllers/locker-rental/find-many"
 import { findRentById } from "../controllers/locker-rental/find-rent-by-id"
 import { findLockerById } from "../controllers/locker/find-by-id"
 import { findManyLockers } from "../controllers/locker/find-many"
+import { findManyNotifications } from "../controllers/notifications/find-many"
 import { findUserById } from "../controllers/user/find-by-id"
 import { findManyUser } from "../controllers/user/find-many"
 import { findManyRenterInfo } from "../controllers/user/find-many-renter-info"
@@ -96,6 +97,10 @@ export const getRoutes: Route[] = [
   {
     path: "/api/v1/analytics/get-igp-status",
     handler: igpStatus,
+  },
+  {
+    path: "/api/v1/notifications/find-many-notifications",
+    handler: findManyNotifications,
   },
   // Add more GET routes here
 ]

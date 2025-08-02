@@ -291,9 +291,6 @@ export const IgpPerformance = ({ profitData }: IgpPerformanceProps) => {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                LIVE
-              </span>
             </div>
             <div className="h-3 w-px bg-slate-300 dark:bg-slate-600" />
             <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">

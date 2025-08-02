@@ -11,12 +11,12 @@ import {
 } from "@/components/ui/separators"
 import { NotificationDateGroup } from "./notification-date-group"
 import { NotificationEmptyState } from "./notification-empty-state"
-import { Notification } from "./notification-types"
+import { NotificationWithActorData } from "@/backend/actions/notification/find-many"
 
 interface NotificationTabsProps {
   activeTab: string
   setActiveTab: (tab: string) => void
-  groupedNotifications: Record<string, Notification[]>
+  groupedNotifications: Record<string, NotificationWithActorData[]>
   unreadCount: number
   onMarkAsRead: (id: string) => void
   filteredCount: number

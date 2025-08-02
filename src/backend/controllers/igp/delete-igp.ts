@@ -1,9 +1,11 @@
 import { igp, igpSupply, igpTransactions } from "@/backend/db/schemas"
+import { createNotification } from "@/backend/helpers/notification-controller"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { eq } from "drizzle-orm"
+import { nanoid } from "nanoid"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteIgp(
@@ -23,7 +25,7 @@ export async function deleteIgp(
       return NextResponse.json({ error: "IGP ID is required" }, { status: 400 })
     }
 
-    await db.transaction(async (tx) => {
+    const deletedIgpData = await db.transaction(async (tx) => {
       const igpResult = await tx.query.igp.findFirst({
         where: eq(igp.id, igpId),
       })
@@ -37,6 +39,20 @@ export async function deleteIgp(
         tx.delete(igpSupply).where(eq(igpSupply.igpId, igpId)),
         tx.delete(igp).where(eq(igp.id, igpId)),
       ])
+
+      return igpResult
+    })
+
+    await createNotification({
+      id: nanoid(15),
+      type: "igp",
+      requestId: deletedIgpData.id,
+      title: `IGP Deleted: ${deletedIgpData.igpName}`,
+      description: `The IGP "${deletedIgpData.igpName}" has been deleted`,
+      action: "rejected",
+      actorId: currentSession.userId,
+      recipientId: deletedIgpData.projectLead!,
+      details: "The IGP proposal had been deleted",
     })
 
     return NextResponse.json({ status: 201 })
