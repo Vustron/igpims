@@ -15,12 +15,8 @@ export async function getFinancialData(
     if (currentSession instanceof NextResponse) return currentSession
 
     const financialData = await getIgpFinancialData()
-    return NextResponse.json(
-      {
-        data: financialData,
-      },
-      { status: 200 },
-    )
+
+    return NextResponse.json({ data: financialData }, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }

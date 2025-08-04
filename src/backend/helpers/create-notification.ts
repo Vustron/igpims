@@ -27,7 +27,7 @@ export async function createNotification(params: CreateNotificationParams) {
     })
     return result
   } catch (error) {
-    console.error("Database Error:", error)
+    console.error(`Failed to create notification: ${error}`)
     throw error
   }
 }

@@ -1,4 +1,5 @@
 import { fundRequest } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -41,16 +42,22 @@ export async function deleteFundRequest(
       return fundRequestResult
     })
 
-    await createNotification({
-      id: nanoid(15),
-      type: "fund_request",
-      requestId: deleteFundRequest?.id!,
-      title: `Fund Request Deleted: ${deleteFundRequest?.purpose}`,
-      description: `Fund Request "${deleteFundRequest?.purpose}" has been deleted by ${currentSession.userName}.`,
-      action: "rejected",
-      actorId: currentSession.userId,
-      details: "The fund request have been deleted",
-    })
+    await Promise.all([
+      createNotification({
+        id: nanoid(15),
+        type: "fund_request",
+        requestId: deleteFundRequest?.id!,
+        title: `Fund Request Deleted: ${deleteFundRequest?.purpose}`,
+        description: `Fund Request "${deleteFundRequest?.purpose}" has been deleted by ${currentSession.userName}.`,
+        action: "rejected",
+        actorId: currentSession.userId,
+        details: "The fund request have been deleted",
+      }),
+      activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has deleted a fund request: ${deleteFundRequest.purpose}`,
+      }),
+    ])
 
     return NextResponse.json({ status: 201 })
   } catch (error) {

@@ -1,4 +1,5 @@
 import { expenseTransaction, fundRequest } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import {
@@ -106,6 +107,11 @@ export async function createExpenseTransaction(
         { status: 404 },
       )
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has created an expense transaction: ${result.expenseName}`,
+    })
 
     return NextResponse.json(result, { status: 200 })
   } catch (error) {

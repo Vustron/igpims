@@ -1,14 +1,15 @@
-import { render } from "@react-email/components"
-import { format } from "date-fns"
-import { NextRequest, NextResponse } from "next/server"
-import { EmailTemplate } from "@/components/ui/email"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
+import { EmailTemplate } from "@/components/ui/email"
 import { env } from "@/config/env"
 import { transporter } from "@/config/nodemailer"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { lockerRentRecipientSchema } from "@/validation/email"
+import { render } from "@react-email/components"
+import { format } from "date-fns"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function sendRentLockerConfirm(
   request: NextRequest,
@@ -83,6 +84,11 @@ export async function sendRentLockerConfirm(
         subject: subjectMap[notificationType!],
         html: emailContent,
       }
+
+      await activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has sent ${notificationType} email`,
+      })
 
       return transporter.sendMail(mailOptions)
     })

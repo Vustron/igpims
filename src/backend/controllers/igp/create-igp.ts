@@ -1,3 +1,4 @@
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -57,16 +58,22 @@ export async function createIgp(
       id: insertIgp[0]?.id,
     })
 
-    await createNotification({
-      id: nanoid(15),
-      type: "igp",
-      requestId: igp?.id!,
-      title: `New IGP Created: ${igpData.igpName}`,
-      description: `A new IGP "${igpData.igpName}" has been created by ${currentSession.userName} and is pending review.`,
-      action: "created",
-      actorId: currentSession.userId,
-      details: `${igpData.igpType} | ${igpData.semesterAndAcademicYear}`,
-    })
+    await Promise.all([
+      createNotification({
+        id: nanoid(15),
+        type: "igp",
+        requestId: igp?.id!,
+        title: `New IGP Created: ${igpData.igpName}`,
+        description: `A new IGP "${igpData.igpName}" has been created by ${currentSession.userName} and is pending review.`,
+        action: "created",
+        actorId: currentSession.userId,
+        details: `${igpData.igpType} | ${igpData.semesterAndAcademicYear}`,
+      }),
+      activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has has created an igp: ${igpData.igpName}`,
+      }),
+    ])
 
     return NextResponse.json(igp, { status: 200 })
   } catch (error) {

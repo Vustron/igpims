@@ -1,4 +1,5 @@
 import { fundRequest } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -145,16 +146,22 @@ export async function updateFundRequest(
       )
     }
 
-    await createNotification({
-      id: nanoid(15),
-      type: "fund_request",
-      requestId: fundRequestData?.id!,
-      title: `Fund Request Updated: ${fundRequestData?.purpose}`,
-      description: `Fund Request "${fundRequestData?.purpose}" status has been updated by ${currentSession.userName}.`,
-      action: "updated",
-      actorId: currentSession.userId,
-      details: "The fund request have been updated",
-    })
+    await Promise.all([
+      createNotification({
+        id: nanoid(15),
+        type: "fund_request",
+        requestId: fundRequestData?.id!,
+        title: `Fund Request Updated: ${fundRequestData?.purpose}`,
+        description: `Fund Request "${fundRequestData?.purpose}" status has been updated by ${currentSession.userName}.`,
+        action: "updated",
+        actorId: currentSession.userId,
+        details: "The fund request have been updated",
+      }),
+      activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has updated a fund request:${fundRequestData.purpose}`,
+      }),
+    ])
 
     return NextResponse.json(fundRequestData, { status: 200 })
   } catch (error) {

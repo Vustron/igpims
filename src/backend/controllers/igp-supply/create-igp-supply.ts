@@ -1,3 +1,4 @@
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { findIgpByIdQuery } from "@/backend/queries/igp"
@@ -70,6 +71,11 @@ export async function createIgpSupply(
         { status: 404 },
       )
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has created an igp supply: ${newSupplyData.igp?.igpName}`,
+    })
 
     return NextResponse.json(newSupplyData, { status: 200 })
   } catch (error) {

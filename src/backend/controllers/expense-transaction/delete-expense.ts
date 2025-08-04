@@ -1,4 +1,5 @@
 import { expenseTransaction, fundRequest } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
@@ -47,6 +48,11 @@ export async function deleteExpenseTransaction(
           })
           .where(eq(fundRequest.id, expenseResult.requestId))
       }
+
+      await activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has deleted an expense transaction: ${expenseResult.expenseName}`,
+      })
     })
 
     return NextResponse.json({ status: 201 })

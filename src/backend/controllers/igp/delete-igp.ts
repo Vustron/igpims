@@ -1,4 +1,5 @@
 import { igp, igpSupply, igpTransactions } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -43,16 +44,22 @@ export async function deleteIgp(
       return igpResult
     })
 
-    await createNotification({
-      id: nanoid(15),
-      type: "igp",
-      requestId: deletedIgpData.id,
-      title: `IGP Deleted: ${deletedIgpData.igpName}`,
-      description: `The IGP "${deletedIgpData.igpName}" has been deleted by ${currentSession.userName}`,
-      action: "rejected",
-      actorId: currentSession.userId,
-      details: "The IGP proposal had been deleted",
-    })
+    await Promise.all([
+      createNotification({
+        id: nanoid(15),
+        type: "igp",
+        requestId: deletedIgpData.id,
+        title: `IGP Deleted: ${deletedIgpData.igpName}`,
+        description: `The IGP "${deletedIgpData.igpName}" has been deleted by ${currentSession.userName}`,
+        action: "rejected",
+        actorId: currentSession.userId,
+        details: "The IGP proposal had been deleted",
+      }),
+      activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has has deleted an igp: ${deletedIgpData.igpName}`,
+      }),
+    ])
 
     return NextResponse.json({ status: 201 })
   } catch (error) {

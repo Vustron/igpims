@@ -1,4 +1,5 @@
 import { igp } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { createNotification } from "@/backend/helpers/create-notification"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -139,6 +140,11 @@ export async function updateIgp(
         details: "The IGP proposal is updated",
       })
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has updated an igp: ${updatedIgp[0]?.igpName}`,
+    })
 
     return NextResponse.json(updatedIgp[0], { status: 200 })
   } catch (error) {
