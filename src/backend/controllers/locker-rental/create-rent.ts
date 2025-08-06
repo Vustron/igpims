@@ -1,3 +1,4 @@
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { sendLockerEmail } from "@/backend/helpers/send-email"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -139,6 +140,11 @@ export async function createRent(
         createdAt: now,
         updatedAt: now,
       }
+    })
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has created a locker rent: ${newRental.renterName}`,
     })
 
     return NextResponse.json(newRental, { status: 200 })

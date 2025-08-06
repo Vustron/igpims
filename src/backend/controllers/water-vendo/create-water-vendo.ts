@@ -1,5 +1,4 @@
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as waterVendoQuery from "@/backend/queries/water-vendo"
@@ -9,6 +8,8 @@ import {
   CreateWaterVendoData,
   createWaterVendoSchema,
 } from "@/validation/water-vendo"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function createWaterVendo(request: NextRequest) {
   try {
@@ -48,6 +49,11 @@ export async function createWaterVendo(request: NextRequest) {
       gallonsUsed: vendoData.gallonsUsed,
       vendoStatus: vendoData.vendoStatus,
       waterRefillStatus: vendoData.waterRefillStatus,
+    })
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has created a water vendo for: ${result[0]?.waterVendoLocation!}`,
     })
 
     return NextResponse.json(result[0], {

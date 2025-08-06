@@ -1,6 +1,5 @@
-import { and, eq, not } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 import { waterSupply, waterVendo } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
@@ -10,6 +9,8 @@ import {
   UpdateWaterSupplyData,
   updateWaterSupplySchema,
 } from "@/validation/water-supply"
+import { and, eq, not } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function updateWaterSupply(
   request: NextRequest,
@@ -165,6 +166,11 @@ export async function updateWaterSupply(
       createdAt: Number(updatedSupply?.createdAt ?? 0),
       updatedAt: Number(updatedSupply?.updatedAt ?? 0),
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has updated a water supply for: ${responseSupply.vendoLocation}`,
+    })
 
     return NextResponse.json(responseSupply, { status: 200 })
   } catch (error) {

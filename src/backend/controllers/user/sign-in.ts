@@ -1,4 +1,5 @@
 import { Account, User } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { handleOTP } from "@/backend/helpers/handle-otp"
 import {
   CompatibleRequest,
@@ -154,6 +155,11 @@ export async function signInUser(
       })
 
       await currentSession.save()
+    })
+
+    await activityLogger({
+      userId: existingUser.user.id,
+      action: `${existingUser.user.name} has signed in`,
     })
 
     return NextResponse.json(

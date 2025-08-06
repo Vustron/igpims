@@ -1,10 +1,11 @@
-import { eq } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 import { waterSupply } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { eq } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteWaterSupply(
   request: NextRequest,
@@ -34,18 +35,17 @@ export async function deleteWaterSupply(
       if (!supplyResult) {
         throw new Error("Water supply not found")
       }
-
-      await tx.delete(waterSupply).where(eq(waterSupply.id, supplyId))
+      await Promise.all([
+        tx.delete(waterSupply).where(eq(waterSupply.id, supplyId)),
+        activityLogger({
+          userId: currentSession.userId,
+          action: `${currentSession.userName} has created a water supply for: ${supplyResult.waterVendoId}`,
+        }),
+      ])
     })
 
     return NextResponse.json({ status: 201 })
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: catchError(error),
-        message: "Failed to delete water supply",
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

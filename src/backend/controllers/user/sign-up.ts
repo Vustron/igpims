@@ -1,7 +1,5 @@
-import { genSalt, hash } from "bcrypt-ts"
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
 import { User } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as userQuery from "@/backend/queries/user"
@@ -10,6 +8,9 @@ import { env } from "@/config/env"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { SignUpPayload, signUpSchema } from "@/validation/user"
+import { genSalt, hash } from "bcrypt-ts"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function signUpUser(
   request: NextRequest,
@@ -82,6 +83,11 @@ export async function signUpUser(
       if (!newUser) {
         throw new Error("Failed to create user")
       }
+    })
+
+    await activityLogger({
+      userId: newUser?.id!,
+      action: `${newUser?.name!} has signed out`,
     })
 
     return NextResponse.json(newUser, { status: 200 })

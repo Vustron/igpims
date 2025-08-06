@@ -1,5 +1,3 @@
-import { genSalt, hash } from "bcrypt-ts"
-import { NextRequest, NextResponse } from "next/server"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as tokenQuery from "@/backend/queries/token"
@@ -8,6 +6,8 @@ import { env } from "@/config/env"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { ResetPasswordPayload, resetPasswordSchema } from "@/validation/user"
+import { genSalt, hash } from "bcrypt-ts"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function resetUserPassword(
   request: NextRequest,

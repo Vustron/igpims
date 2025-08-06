@@ -1,7 +1,5 @@
-import { NextRequest, NextResponse } from "next/server"
-import QRCode from "qrcode"
-import speakeasy from "speakeasy"
 import { Account, User } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as userQuery from "@/backend/queries/user"
@@ -9,6 +7,9 @@ import { db } from "@/config/drizzle"
 import { env } from "@/config/env"
 import { getSession } from "@/config/session"
 import { catchError } from "@/utils/catch-error"
+import { NextRequest, NextResponse } from "next/server"
+import QRCode from "qrcode"
+import speakeasy from "speakeasy"
 
 export async function generate2fa(
   request: NextRequest,
@@ -60,10 +61,16 @@ export async function generate2fa(
       length: 20,
     })
 
-    await accountQuery.updateAccountTwoFactorSecretQuery.execute({
-      userId: currentSession.userId,
-      twoFactorSecret: secret.base32,
-    })
+    await Promise.all([
+      accountQuery.updateAccountTwoFactorSecretQuery.execute({
+        userId: currentSession.userId,
+        twoFactorSecret: secret.base32,
+      }),
+      activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has generated a two factor auth`,
+      }),
+    ])
 
     const data = await QRCode.toDataURL(secret.otpauth_url as string)
     return NextResponse.json(data, { status: 200 })

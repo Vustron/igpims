@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { deleteInspectionQuery } from "@/backend/queries/inspection"
 import { catchError } from "@/utils/catch-error"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteInspection(
   request: NextRequest,
@@ -36,6 +37,11 @@ export async function deleteInspection(
         { status: 404 },
       )
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has deleted an inspection: ${result[0]?.dateOfInspection}`,
+    })
 
     return NextResponse.json(result[0], { status: 200 })
   } catch (error) {

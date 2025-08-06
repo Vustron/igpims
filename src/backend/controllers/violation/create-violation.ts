@@ -1,5 +1,4 @@
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as violationQuery from "@/backend/queries/violation"
@@ -7,6 +6,8 @@ import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { Violation, ViolationSchema } from "@/validation/violation"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function createViolation(
   request: NextRequest,
@@ -76,6 +77,11 @@ export async function createViolation(
         createdAt: now,
         updatedAt: now,
       }
+    })
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has created a violation for: ${newViolation.studentName}`,
     })
 
     return NextResponse.json(newViolation, { status: 200 })

@@ -1,10 +1,11 @@
-import { eq } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 import { waterFunds } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { eq } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteWaterFund(
   request: NextRequest,
@@ -35,17 +36,17 @@ export async function deleteWaterFund(
         throw new Error("Water fund not found")
       }
 
-      await tx.delete(waterFunds).where(eq(waterFunds.id, fundId))
+      await Promise.all([
+        tx.delete(waterFunds).where(eq(waterFunds.id, fundId)),
+        activityLogger({
+          userId: currentSession.userId,
+          action: `${currentSession.userName} has deleted a water fund for: ${fundResult.waterVendoLocation}`,
+        }),
+      ])
     })
 
     return NextResponse.json({ status: 201 })
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: catchError(error),
-        message: "Failed to delete water fund",
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

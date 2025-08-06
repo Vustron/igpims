@@ -1,4 +1,5 @@
 import { Account, User } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import {
   CompatibleRequest,
   httpRequestLimit,
@@ -140,6 +141,11 @@ export async function signInOtpAuth(
     if (!userData || !accountData) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
+
+    await activityLogger({
+      userId: userData.id,
+      action: `${userData.name} has signed in using otp`,
+    })
 
     return NextResponse.json(
       { otpSignIn: accountData.otpSignIn },

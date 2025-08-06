@@ -1,5 +1,4 @@
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as waterSupplyQuery from "@/backend/queries/water-supply"
@@ -10,6 +9,8 @@ import {
   CreateWaterSupplyData,
   createWaterSupplySchema,
 } from "@/validation/water-supply"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function createWaterSupply(
   request: NextRequest,
@@ -79,6 +80,11 @@ export async function createWaterSupply(
         { status: 404 },
       )
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has created a water supply for: ${supplyResult[0]?.vendoLocation}`,
+    })
 
     return NextResponse.json(supplyResult[0], {
       status: 200,

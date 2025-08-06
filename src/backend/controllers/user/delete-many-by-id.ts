@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
@@ -11,6 +11,7 @@ import {
   DeleteManyUserByIdPayload,
   deleteManyUserByIdSchema,
 } from "@/validation/user"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteManyUserById(
   request: NextRequest,
@@ -52,6 +53,11 @@ export async function deleteManyUserById(
         accountQuery.deleteByArrayUserIdsQuery.execute({ userIds }),
         userQuery.deleteByArrayUserIds.execute({ userIds }),
       ])
+
+      await activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has deleted many a users`,
+      })
     })
 
     return NextResponse.json({ deletedIds: userIds }, { status: 200 })

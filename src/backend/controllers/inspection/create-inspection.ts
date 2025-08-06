@@ -1,5 +1,4 @@
-import { nanoid } from "nanoid"
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as inspectionQuery from "@/backend/queries/inspection"
@@ -7,6 +6,8 @@ import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { Inspection, InspectionSchema } from "@/validation/inspection"
+import { nanoid } from "nanoid"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function createInspection(
   request: NextRequest,
@@ -56,6 +57,11 @@ export async function createInspection(
         violators: inspectionData.violators,
         totalFines: inspectionData.totalFines,
       }
+    })
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has created an inspection: ${newInspection.dateOfInspection}`,
     })
 
     return NextResponse.json(newInspection, { status: 200 })

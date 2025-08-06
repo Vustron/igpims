@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { updateInspectionQuery } from "@/backend/queries/inspection"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { Inspection, InspectionSchema } from "@/validation/inspection"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function updateInspection(
   request: NextRequest,
@@ -68,6 +69,11 @@ export async function updateInspection(
         { status: 404 },
       )
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has updated an inspection: ${result[0]?.dateOfInspection}`,
+    })
 
     return NextResponse.json(validationResult.data, { status: 200 })
   } catch (error) {

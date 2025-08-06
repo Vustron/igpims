@@ -1,3 +1,4 @@
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
@@ -30,6 +31,11 @@ export async function signOutUser(
         }),
       ])
       currentSession.destroy()
+    })
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has signed out`,
     })
 
     return NextResponse.json({ status: 201 })

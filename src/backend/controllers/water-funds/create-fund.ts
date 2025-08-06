@@ -1,3 +1,4 @@
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as waterFundQuery from "@/backend/queries/water-funds"
@@ -102,6 +103,11 @@ export async function createWaterFund(
         { status: 404 },
       )
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has created a water fund for: ${fundResult[0]?.vendoLocation}`,
+    })
 
     return NextResponse.json(fundResult[0], {
       status: 200,

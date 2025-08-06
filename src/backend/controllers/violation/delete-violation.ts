@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import {
@@ -7,6 +7,7 @@ import {
 } from "@/backend/queries/violation"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteViolation(
   request: NextRequest,
@@ -44,7 +45,13 @@ export async function deleteViolation(
         )
       }
 
-      await deleteViolationQuery.execute({ id: userId })
+      await Promise.all([
+        deleteViolationQuery.execute({ id: userId }),
+        activityLogger({
+          userId: currentSession.userId,
+          action: `${currentSession.userName} has delted a violation for: ${existingViolation[0]?.studentName}`,
+        }),
+      ])
 
       return NextResponse.json({ status: 201 })
     })

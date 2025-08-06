@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import {
@@ -9,6 +9,7 @@ import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { Violation, ViolationSchema } from "@/validation/violation"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function updateViolation(
   request: NextRequest,
@@ -67,6 +68,11 @@ export async function updateViolation(
         ...updateData,
         violations: JSON.stringify(updateData.violations || []),
       })
+    })
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has updated a violation for: ${validationResult.data.studentName}`,
     })
 
     return NextResponse.json(validationResult.data, { status: 200 })

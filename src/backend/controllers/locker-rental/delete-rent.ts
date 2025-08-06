@@ -1,4 +1,5 @@
 import { locker, lockerRental } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { getRentalByIdQuery } from "@/backend/queries/rental"
@@ -59,6 +60,11 @@ export async function deleteRentById(
 
     const rentalResult = await getRentalByIdQuery.execute({
       id: rentalId,
+    })
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has deleted a locker rent: ${rentalResult[0]?.renterName}`,
     })
 
     return NextResponse.json(rentalResult, { status: 200 })

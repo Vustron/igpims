@@ -1,4 +1,5 @@
 import { locker } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { sendLockerEmail } from "@/backend/helpers/send-email"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -238,6 +239,11 @@ export async function updateLocker(
         validationResult.data.lockerRentalPrice ??
         existingLocker.lockerRentalPrice,
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has updated a locker: ${updatedLocker.lockerName}`,
+    })
 
     return NextResponse.json(updatedLocker, { status: 200 })
   } catch (error) {

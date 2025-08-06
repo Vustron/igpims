@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
@@ -6,6 +6,7 @@ import * as sessionQuery from "@/backend/queries/session"
 import * as userQuery from "@/backend/queries/user"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteUserById(
   request: NextRequest,
@@ -47,6 +48,11 @@ export async function deleteUserById(
         accountQuery.deleteByUserIdQuery.execute({ userId }),
         userQuery.deleteByUserIdQuery.execute({ userId }),
       ])
+
+      await activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has deleted a user: ${findResult[0].name}`,
+      })
     })
 
     if (!exists) {

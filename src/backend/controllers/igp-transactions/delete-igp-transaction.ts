@@ -1,4 +1,5 @@
 import { igp, igpSupply, igpTransactions } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
@@ -97,16 +98,15 @@ export async function deleteIgpTransaction(
             .where(eq(igp.id, existingTransaction.igpId))
         }
       }
+
+      await activityLogger({
+        userId: currentSession.userId,
+        action: `${currentSession.userName} has deleted an igp transaction: ${existingTransaction.igp?.igpName}`,
+      })
     })
 
     return NextResponse.json({ status: 201 })
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: catchError(error),
-        message: "Failed to delete transaction. Please try again.",
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: catchError(error) }, { status: 500 })
   }
 }

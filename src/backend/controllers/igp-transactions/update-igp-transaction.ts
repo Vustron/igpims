@@ -1,4 +1,5 @@
 import { igp, igpSupply, igpTransactions } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { findIgpByIdQuery } from "@/backend/queries/igp"
@@ -179,6 +180,11 @@ export async function updateIgpTransaction(
         { status: 404 },
       )
     }
+
+    await activityLogger({
+      userId: currentSession.userId,
+      action: `${currentSession.userName} has updated an igp transaction: ${existingTransaction.igp?.igpName}`,
+    })
 
     return NextResponse.json(newTransactionData, { status: 200 })
   } catch (error) {

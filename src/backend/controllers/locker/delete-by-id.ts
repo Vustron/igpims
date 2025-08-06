@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as lockerQuery from "@/backend/queries/locker"
 import * as rentalQuery from "@/backend/queries/rental"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function deleteLockerById(
   request: NextRequest,
@@ -55,7 +56,13 @@ export async function deleteLockerById(
         }
       }
 
-      await lockerQuery.deleteLockerQuery.execute({ id: lockerId })
+      await Promise.all([
+        lockerQuery.deleteLockerQuery.execute({ id: lockerId }),
+        activityLogger({
+          userId: currentSession.userId,
+          action: `${currentSession.userName} has deleted a locker: ${deletedLocker.lockerName}`,
+        }),
+      ])
     })
 
     if (!deletedLocker) {

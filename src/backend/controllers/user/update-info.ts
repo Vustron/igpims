@@ -1,6 +1,5 @@
-import { compare, genSalt, hash } from "bcrypt-ts"
-import { NextRequest, NextResponse } from "next/server"
 import { User } from "@/backend/db/schemas"
+import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
@@ -10,6 +9,8 @@ import { env } from "@/config/env"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { UpdateUserPayload, updateUserSchema } from "@/validation/user"
+import { compare, genSalt, hash } from "bcrypt-ts"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function updateUserInfo(
   request: NextRequest,
@@ -162,6 +163,11 @@ export async function updateUserInfo(
     if (!userData) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
+
+    await activityLogger({
+      userId: userData.id,
+      action: `${userData.name} has updated user info`,
+    })
 
     return NextResponse.json(userData, { status: 200 })
   } catch (error) {
