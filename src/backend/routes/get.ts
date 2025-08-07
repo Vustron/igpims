@@ -1,3 +1,4 @@
+import { findManyActivity } from "../controllers/activity/find-many"
 import { duePayments } from "../controllers/analytics/due-payments"
 import { getFinancialData } from "../controllers/analytics/get-financial-data"
 import { igpStatus } from "../controllers/analytics/igp-status"
@@ -101,6 +102,10 @@ export const getRoutes: Route[] = [
   {
     path: "/api/v1/notifications/find-many-notifications",
     handler: findManyNotifications,
+  },
+  {
+    path: "/api/v1/activities/find-many-activity",
+    handler: findManyActivity,
   },
   // Add more GET routes here
 ]

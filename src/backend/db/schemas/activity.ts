@@ -1,5 +1,5 @@
 import { timestamp } from "@/backend/helpers/schema-helpers"
-import { relations } from "drizzle-orm"
+import { InferSelectModel, relations } from "drizzle-orm"
 import { index, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
 import { user } from "./user"
@@ -25,3 +25,5 @@ export const activityRelations = relations(activity, ({ one }) => ({
     references: [user.id],
   }),
 }))
+
+export type Activity = InferSelectModel<typeof activity>

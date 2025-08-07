@@ -29,13 +29,12 @@ export async function signOutUser(
         accountQuery.emptyAccountSessionQuery.execute({
           userId: currentSession.userId,
         }),
+        activityLogger({
+          userId: currentSession.userId,
+          action: `${currentSession.userName} has signed out`,
+        }),
       ])
       currentSession.destroy()
-    })
-
-    await activityLogger({
-      userId: currentSession.userId,
-      action: `${currentSession.userName} has signed out`,
     })
 
     return NextResponse.json({ status: 201 })
