@@ -7,6 +7,17 @@ import {
   useQuery,
 } from "@tanstack/react-query"
 
+export interface ActivityWithUser extends Omit<Activity, "createdAt"> {
+  createdAt: number
+  userData: {
+    id: string
+    name: string
+    email: string
+    role: string
+    image: string | null
+  } | null
+}
+
 export interface ActivityFilters {
   page?: number
   limit?: number
@@ -19,7 +30,7 @@ export interface ActivityFilters {
 }
 
 export interface PaginatedActivityResponse {
-  data: Activity[]
+  data: ActivityWithUser[]
   meta: {
     page: number
     limit: number
@@ -93,10 +104,7 @@ export async function preFindManyActivity(filters: ActivityFilters = {}) {
   }
 }
 
-export const useFindManyActivity = (
-  // Created useFindManyActivity hook
-  filters: ActivityFilters = {},
-) => {
+export const useFindManyActivity = (filters: ActivityFilters = {}) => {
   const {
     page = 1,
     limit = 10,

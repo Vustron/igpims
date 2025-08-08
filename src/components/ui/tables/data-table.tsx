@@ -79,6 +79,7 @@ interface DataTableProps<TData, TValue> {
     | "expense-transactions"
     | "igp-transactions"
     | "igp-supplies"
+    | "activities"
   resultLabel?: string
   isOnViolations?: boolean
   isOnInspection?: boolean

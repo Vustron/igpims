@@ -1,5 +1,5 @@
 import { UserRole } from "@/types/user"
-import { LayoutGrid, LucideIcon, User } from "lucide-react"
+import { ActivitySquareIcon, LayoutGrid, LucideIcon, User } from "lucide-react"
 import { FaMoneyBillTransfer } from "react-icons/fa6"
 import { GiClothes } from "react-icons/gi"
 import { IoBarChartSharp, IoWaterOutline } from "react-icons/io5"
@@ -104,6 +104,13 @@ export function getMenuList(pathname: string, userRole: UserRole): Group[] {
                 label: "Report",
                 active: pathname.includes("/report"),
                 icon: IoBarChartSharp,
+                submenus: [],
+              },
+              {
+                href: "/activity",
+                label: "Activty",
+                active: pathname.includes("/activity"),
+                icon: ActivitySquareIcon,
                 submenus: [],
               },
             ]

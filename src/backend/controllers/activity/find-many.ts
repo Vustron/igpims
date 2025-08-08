@@ -1,4 +1,4 @@
-import { activity } from "@/backend/db/schemas"
+import { activity, user } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
@@ -34,6 +34,8 @@ export async function findManyActivity(
           like(activity.id, `%${search}%`),
           like(activity.userId, `%${search}%`),
           like(activity.action, `%${search}%`),
+          like(user.name, `%${search}%`),
+          like(user.email, `%${search}%`),
         ),
       )
     }
@@ -68,8 +70,16 @@ export async function findManyActivity(
         userId: activity.userId,
         action: activity.action,
         createdAt: sql<number>`${activity.createdAt}`,
+        userData: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          image: user.image,
+        },
       })
       .from(activity)
+      .leftJoin(user, eq(activity.userId, user.id))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
 
     const activitiesData = await query
@@ -77,16 +87,11 @@ export async function findManyActivity(
       .limit(limit)
       .offset(offset)
 
-    const countWhereConditions: any[] = [...whereConditions]
-
     const countQuery = db
       .select({ count: sql<number>`count(*)` })
       .from(activity)
-      .where(
-        countWhereConditions.length > 0
-          ? and(...countWhereConditions)
-          : undefined,
-      )
+      .leftJoin(user, eq(activity.userId, user.id))
+      .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
 
     const countResult = await countQuery
     const totalItems = countResult[0]?.count || 0
