@@ -13,7 +13,7 @@ const ContentSecurityPolicy = `
     style-src 'self' 'unsafe-inline';
     img-src * blob: data:;
     media-src 'none';
-    connect-src 'self' blob: data: firestore.googleapis.com firebasestorage.googleapis.com upload.imagekit.io api.imagekit.io https://ik.imagekit.io;
+    connect-src 'self' blob: data: firestore.googleapis.com firebasestorage.googleapis.com upload.imagekit.io api.imagekit.io us.posthog.com https://ik.imagekit.io;
     font-src 'self' data: https://fonts.gstatic.com;
     frame-src 'self' blob: data: *.codesandbox.io vercel.live upload-widget.cloudinary.com https://ik.imagekit.io;
     base-uri 'self';
@@ -159,6 +159,23 @@ const nextConfig: import("next").NextConfig = {
       fullUrl: true,
     },
   },
+  async rewrites() {
+    return [
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://us-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://us.i.posthog.com/:path*",
+      },
+      {
+        source: "/ingest/decide",
+        destination: "https://us.i.posthog.com/decide",
+      },
+    ]
+  },
+  skipTrailingSlashRedirect: true,
 }
 
 export default withBundleAnalyzerConfig(nextConfig)

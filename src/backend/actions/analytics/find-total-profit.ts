@@ -73,9 +73,10 @@ export async function preFindTotalProfit() {
   }
 }
 
-export const useFindTotalProfit = () => {
+export const useFindTotalProfit = ({ isEnabled }: { isEnabled: boolean }) => {
   return useQuery({
     queryKey: ["total-profit"],
     queryFn: async () => await findTotalProfit(),
+    enabled: isEnabled,
   })
 }

@@ -1,29 +1,16 @@
-import RateLimiter from "async-ratelimiter"
-import { config } from "dotenv"
-import { Redis } from "ioredis"
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
+import { env } from "./env"
 
-config({ path: ".env.local" })
-
-const REDIS_CONFIG = {
-  connectTimeout: 10000,
-  retryStrategy: (times: number) => Math.min(times * 50, 2000),
-}
-
-const getRedisUrl = () => {
-  if (process.env.REDIS_URL) {
-    return process.env.REDIS_URL
-  }
-  throw new Error("REDIS_URL is not defined")
-}
-
-const redis = new Redis(getRedisUrl(), REDIS_CONFIG)
-redis.config("SET", "notify-keyspace-events", "Ex")
-
-export const rateLimiter = new RateLimiter({
-  db: redis,
-  max: 10,
-  duration: 10_000,
-  namespace: "rate-limiter",
+export const redis = new Redis({
+  url: env.REDIS_URL,
+  token: env.REDIS_TOKEN,
 })
 
-export default redis
+export const rateLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, "10 s"),
+})
+
+export const RATE_LIMIT_DURATION = 60 * 60 * 1000
+export const MAX_REQUESTS_PER_HOUR = 5

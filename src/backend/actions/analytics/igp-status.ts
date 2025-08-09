@@ -65,9 +65,10 @@ export async function preFetchIgpStatus() {
   }
 }
 
-export const useIgpStatus = () => {
+export const useIgpStatus = ({ isEnabled }: { isEnabled: boolean }) => {
   return useQuery({
     queryKey: ["igp-status"],
     queryFn: getIgpStatus,
+    enabled: isEnabled,
   })
 }

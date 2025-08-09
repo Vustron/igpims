@@ -78,7 +78,7 @@ export interface IgpWithProjectLeadData {
   id: string
   igpName: string
   igpDescription: string
-  igpType: "permanent" | "temporary" | "maintenance"
+  igpType: "permanent" | "temporary" | "maintenance" | "other"
   iconType:
     | "store"
     | "card"

@@ -35,6 +35,7 @@ import {
 } from "@react-pdf/renderer"
 import { BarChart3, Download, Eye, Printer } from "lucide-react"
 import NextImage from "next/image"
+import { usePathname } from "next/navigation"
 import toast from "react-hot-toast"
 
 const styles = StyleSheet.create({
@@ -388,7 +389,13 @@ export const IgpFinancialReportDialog = () => {
   const { isOpen, onClose, type } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "printIgpFinancialReport"
-  const { data: response, isLoading, error } = useGetFinancialData()
+  const pathname = usePathname()
+  const fetchFinancialData = pathname === "/report"
+  const {
+    data: response,
+    isLoading,
+    error,
+  } = useGetFinancialData({ isEnabled: fetchFinancialData })
   const financialData = response
 
   const handlePrint = async () => {

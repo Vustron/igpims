@@ -67,6 +67,7 @@ export type DialogType =
   | "editIgpTransaction"
   | "createIgpSupply"
   | "editIgpSupply"
+  | "editIgp"
 
 interface ConfirmDialogData {
   title?: string

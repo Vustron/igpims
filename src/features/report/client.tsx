@@ -2,6 +2,7 @@
 
 import { useFindTotalProfit } from "@/backend/actions/analytics/find-total-profit"
 import { formatCurrency } from "@/utils/currency"
+import { usePathname } from "next/navigation"
 import { useMemo, useState } from "react"
 import { processChartData } from "./data-helpers"
 import { ReportSkeleton } from "./report-skeleton"
@@ -11,7 +12,11 @@ import { TimeRange } from "./sales-report-types"
 import { SalesSummaryCards } from "./sales-summary-card"
 
 export const ReportClient = () => {
-  const { data, isLoading } = useFindTotalProfit()
+  const pathname = usePathname()
+  const fetchProfitLoss = pathname === "/report"
+  const { data, isLoading } = useFindTotalProfit({
+    isEnabled: fetchProfitLoss,
+  })
   const [timeRange, setTimeRange] = useState<TimeRange>("monthly")
   const [chartType, setChartType] = useState<"bar" | "line" | "pie" | "area">(
     "bar",

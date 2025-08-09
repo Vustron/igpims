@@ -2,6 +2,7 @@
 
 import { useFindTotalProfit } from "@/backend/actions/analytics/find-total-profit"
 import { motion } from "framer-motion"
+import { usePathname } from "next/navigation"
 import { GiClothes, GiDroplets, GiLockers } from "react-icons/gi"
 import { DashboardCard } from "./dashboard-card"
 import { DashboardSkeleton } from "./dashboard-skeleton"
@@ -10,7 +11,11 @@ import { RevenueAnalytics } from "./revenue-analytics"
 import { SalesOverview } from "./sales-overview"
 
 export const DashboardClient = () => {
-  const { data, isLoading } = useFindTotalProfit()
+  const pathname = usePathname()
+  const fetchProfitLoss = pathname === "/"
+  const { data, isLoading } = useFindTotalProfit({
+    isEnabled: fetchProfitLoss,
+  })
 
   if (isLoading) {
     return <DashboardSkeleton />

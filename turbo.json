@@ -9,13 +9,18 @@
         "TURSO_AUTH_TOKEN",
         "SECRET_KEY",
         "REDIS_URL",
+        "REDIS_TOKEN",
         "EMAIL",
         "PASS",
         "NEXT_PUBLIC_LOGO_URL",
         "TWO_FACTOR_SECRET",
         "IMAGEKIT_PRIVATE_KEY",
         "NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY",
-        "NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT"
+        "NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT",
+        "NEXT_PUBLIC_POSTHOG_KEY",
+        "POSTHOG_PERSONAL_API_KEY",
+        "NEXT_PUBLIC_POSTHOG_HOST",
+        "NEXT_PUBLIC_POSTHOG_PROJECT_ID"
       ],
       "inputs": [
         "$TURBO_DEFAULT$",

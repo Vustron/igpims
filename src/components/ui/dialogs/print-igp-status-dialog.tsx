@@ -41,6 +41,7 @@ import {
   Wrench,
 } from "lucide-react"
 import NextImage from "next/image"
+import { usePathname } from "next/navigation"
 import toast from "react-hot-toast"
 
 const styles = StyleSheet.create({
@@ -290,7 +291,11 @@ export const PrintIgpStatusDialog = () => {
   const { isOpen, onClose, type } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "printIgpStatus"
-  const { data, isLoading, error } = useIgpStatus()
+  const pathname = usePathname()
+  const fetchIgpStatus = pathname === "/report"
+  const { data, isLoading, error } = useIgpStatus({
+    isEnabled: fetchIgpStatus,
+  })
 
   const handlePrint = async () => {
     if (!data) return

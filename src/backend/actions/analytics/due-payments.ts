@@ -32,9 +32,10 @@ export async function preFetchDuePayments() {
   }
 }
 
-export const useGetDuePayments = () => {
+export const useGetDuePayments = ({ isEnabled }: { isEnabled: boolean }) => {
   return useQuery({
     queryKey: ["due-payments"],
     queryFn: getDuePayments,
+    enabled: isEnabled,
   })
 }

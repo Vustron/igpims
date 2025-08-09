@@ -1,9 +1,12 @@
 "use client"
 
+import { IgpWithProjectLeadData } from "@/backend/actions/igp/find-many"
 import { Badge } from "@/components/ui/badges"
 import { Button } from "@/components/ui/buttons"
 import { Card, CardContent, CardFooter } from "@/components/ui/cards"
+import { useDialog } from "@/hooks/use-dialog"
 import { cn } from "@/utils/cn"
+import { formatCurrency } from "@/utils/currency"
 import { formatDateFromTimestamp } from "@/utils/date-convert"
 import { motion } from "framer-motion"
 import {
@@ -16,6 +19,7 @@ import {
   ChevronRight,
   Clock,
   CreditCard,
+  Edit,
   HeartPulse,
   Laptop,
   Package,
@@ -94,6 +98,7 @@ export interface IgpCardProps {
     | "in_progress"
     | "completed"
     | "rejected"
+  igpData: IgpWithProjectLeadData
 }
 
 const typeIcons = {
@@ -272,7 +277,16 @@ export function IgpCard({
   maintenanceDate,
   href = `/other-igps/${name}`,
   status,
+  igpData,
 }: IgpCardProps) {
+  const { onOpen } = useDialog()
+
+  const handleEdit = () => {
+    onOpen("editIgp", {
+      igp: igpData,
+    })
+  }
+
   const icons = {
     store: Store,
     card: CreditCard,
@@ -309,14 +323,6 @@ export function IgpCard({
   const TypeIcon = typeIcons[type].icon
   const typeIconColor = typeIcons[type].color
   const typeIconBg = typeIcons[type].bg
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-PH", {
-      style: "currency",
-      currency: "PHP",
-      minimumFractionDigits: 2,
-    }).format(amount)
-  }
 
   const getStatusStyles = () => {
     switch (status) {
@@ -502,23 +508,37 @@ export function IgpCard({
             "transition-colors",
           )}
         >
-          <Link href={projectStatusLink} className="w-full">
+          <div className="flex w-full gap-2">
+            <Link href={projectStatusLink} className="flex-1">
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full bg-white/90 hover:bg-white",
+                  status === "completed"
+                    ? "border-slate-300 hover:border-slate-400"
+                    : "border-blue-300 hover:border-blue-400",
+                  "shadow-sm hover:shadow-md transition-all",
+                )}
+              >
+                <span className="mr-1">
+                  {status === "completed" ? "View Details" : "View Request"}
+                </span>
+                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
             <Button
               variant="outline"
+              size="sm"
+              onClick={handleEdit}
               className={cn(
-                "w-full bg-white/90 hover:bg-white",
-                status === "completed"
-                  ? "border-slate-300 hover:border-slate-400"
-                  : "border-blue-300 hover:border-blue-400",
+                "bg-white/90 hover:bg-white px-3",
+                "border-slate-300 hover:border-slate-400",
                 "shadow-sm hover:shadow-md transition-all",
               )}
             >
-              <span className="mr-1">
-                {status === "completed" ? "View Details" : "View Request"}
-              </span>
-              <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              <Edit className="h-4 w-4" />
             </Button>
-          </Link>
+          </div>
         </CardFooter>
       </Card>
     </motion.div>

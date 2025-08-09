@@ -234,6 +234,11 @@ const EditIgpSupplyDialog = dynamic(() =>
     (mod) => mod.EditIgpSupplyDialog,
   ),
 )
+const EditIgpDialog = dynamic(() =>
+  import("@/components/ui/dialogs/edit-igp-dialog").then(
+    (mod) => mod.EditIgpDialog,
+  ),
+)
 
 export const DialogProvider = () => {
   const isMounted = useMounted()
@@ -288,6 +293,7 @@ export const DialogProvider = () => {
         <EditIgpTransactionDialog />
         <CreateIgpSupplyDialog />
         <EditIgpSupplyDialog />
+        <EditIgpDialog />
       </Suspense>
     </>
   )

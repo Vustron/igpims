@@ -43,6 +43,7 @@ import {
   Printer,
 } from "lucide-react"
 import NextImage from "next/image"
+import { usePathname } from "next/navigation"
 import toast from "react-hot-toast"
 
 const styles = StyleSheet.create({
@@ -398,7 +399,9 @@ export const DueOverduePaymentsDialog = () => {
   const { isOpen, onClose, type } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "printDueOverduePayments"
-  const { data, isLoading } = useGetDuePayments()
+  const pathname = usePathname()
+  const fetchDuePayments = pathname === "/report"
+  const { data, isLoading } = useGetDuePayments({ isEnabled: fetchDuePayments })
 
   const handlePrint = async () => {
     try {

@@ -1,14 +1,12 @@
 import { Account, User } from "@/backend/db/schemas"
 import { activityLogger } from "@/backend/helpers/activity-logger"
-import {
-  CompatibleRequest,
-  httpRequestLimit,
-} from "@/backend/middlewares/http-request-limit"
+import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import * as accountQuery from "@/backend/queries/account"
 import * as sessionQuery from "@/backend/queries/session"
 import * as userQuery from "@/backend/queries/user"
 import { db } from "@/config/drizzle"
 import { getSession } from "@/config/session"
+import { CompatibleRequest } from "@/interfaces/request"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import {

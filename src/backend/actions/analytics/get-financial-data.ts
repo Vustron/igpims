@@ -38,7 +38,7 @@ export async function preFetchFinancialData() {
   }
 }
 
-export const useGetFinancialData = () => {
+export const useGetFinancialData = ({ isEnabled }: { isEnabled: boolean }) => {
   return useQuery({
     queryKey: ["financial-data"],
     queryFn: async () => {
@@ -47,5 +47,6 @@ export const useGetFinancialData = () => {
       )
       return response.data
     },
+    enabled: isEnabled,
   })
 }

@@ -31,6 +31,7 @@ import {
 } from "@react-pdf/renderer"
 import { Download, Eye, Printer, TrendingDown, TrendingUp } from "lucide-react"
 import NextImage from "next/image"
+import { usePathname } from "next/navigation"
 import toast from "react-hot-toast"
 
 const styles = StyleSheet.create({
@@ -327,7 +328,11 @@ export const ProfitLossDialog = () => {
   const { isOpen, onClose, type } = useDialog()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const isDialogOpen = isOpen && type === "printProfitLoss"
-  const { data: profitData } = useFindTotalProfit()
+  const pathname = usePathname()
+  const fetchProfitLoss = pathname === "/report"
+  const { data: profitData } = useFindTotalProfit({
+    isEnabled: fetchProfitLoss,
+  })
 
   const igpData =
     profitData?.igpRevenues.map((igp) => ({

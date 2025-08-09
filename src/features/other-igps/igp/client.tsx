@@ -121,6 +121,7 @@ export const OtherIgpsClient = () => {
     maintenanceDate:
       igp.igpType === "maintenance" ? (igp.igpEndDate ?? undefined) : undefined,
     status: igp.status,
+    igpData: igp,
   })
 
   return (
