@@ -106,7 +106,7 @@ export const activityLogColumn: ColumnDef<ActivityWithUser>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="ml-2 w-[80px] truncate sm:w-auto">
+      <div className="ml-5 w-[80px] truncate sm:w-auto">
         <Badge variant="outline" className="font-mono text-xs bg-gray-50">
           {row.getValue("id")}
         </Badge>
@@ -130,14 +130,13 @@ export const activityLogColumn: ColumnDef<ActivityWithUser>[] = [
       const timestamp = row.getValue("createdAt") as number
       return (
         <div className="flex items-center gap-2">
-          <CalendarDays className="h-4 w-4 shrink-0 text-blue-500" />
           <DateCell value={timestamp} />
         </div>
       )
     },
   },
   {
-    accessorKey: "userId", // Changed accessorKey to match sorting but display user data
+    accessorKey: "userId",
     header: ({ column }) => (
       <Button
         variant="ghost"
