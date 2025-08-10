@@ -39,6 +39,8 @@ export const LockerClient = ({ id }: { id: string }) => {
         "small",
       lockerName: locker?.lockerName || "",
       lockerRentalPrice: String(locker?.lockerRentalPrice) || "100",
+      clusterName: locker?.clusterName || "",
+      clusterId: locker?.clusterId || "",
       rentalId: locker?.rental?.id || "",
       lockerId: locker?.rental?.lockerId || "",
       renterId: locker?.rental?.renterId || "",
@@ -60,6 +62,13 @@ export const LockerClient = ({ id }: { id: string }) => {
       placeholder: "Enter locker name or number",
       description: "A unique identifier for the locker",
       required: true,
+    },
+    {
+      name: "clusterName",
+      type: "text",
+      label: "Cluster Name",
+      placeholder: "Cluster name",
+      description: "The cluster this locker belongs to",
     },
     {
       name: "lockerType",

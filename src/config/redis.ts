@@ -9,8 +9,8 @@ export const redis = new Redis({
 
 export const rateLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, "10 s"),
+  limiter: Ratelimit.slidingWindow(8, "10 s"),
 })
 
 export const RATE_LIMIT_DURATION = 60 * 60 * 1000
-export const MAX_REQUESTS_PER_HOUR = 5
+export const MAX_REQUESTS_PER_HOUR = 8

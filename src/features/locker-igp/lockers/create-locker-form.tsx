@@ -1,13 +1,16 @@
 "use client"
 
+import { useCreateLocker } from "@/backend/actions/locker/create-locker"
+import { DynamicForm } from "@/components/ui/forms"
+import { FieldConfig } from "@/interfaces/form"
+import { catchError } from "@/utils/catch-error"
+import {
+  CreateLockerForm as CreateLockerFormType,
+  createLockerFormSchema,
+} from "@/validation/locker"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-import { DynamicForm } from "@/components/ui/forms"
-import { useCreateLocker } from "@/backend/actions/locker/create-locker"
-import { FieldConfig } from "@/interfaces/form"
-import { catchError } from "@/utils/catch-error"
-import { Locker, lockerSchema } from "@/validation/locker"
 
 interface CreateLockerFormProps {
   onSuccess?: () => void
@@ -20,25 +23,36 @@ export const CreateLockerForm = ({
 }: CreateLockerFormProps) => {
   const createLocker = useCreateLocker()
 
-  const form = useForm<Locker>({
-    resolver: zodResolver(lockerSchema),
+  const form = useForm<CreateLockerFormType>({
+    resolver: zodResolver(createLockerFormSchema),
     defaultValues: {
       lockerStatus: "available",
       lockerType: "small",
-      lockerName: "",
       lockerLocation: "Academic Building 1st Floor (LEFT)",
       lockerRentalPrice: "100",
+      clusterName: "",
+      lockersPerCluster: 1,
     },
   })
 
-  const createLockerFields: FieldConfig<Locker>[] = [
+  const createLockerFields: FieldConfig<CreateLockerFormType>[] = [
     {
-      name: "lockerName",
+      name: "clusterName",
       type: "text",
-      label: "Locker Name/Number",
-      placeholder: "Enter locker name or number",
-      description: "A unique identifier for the locker",
+      label: "Cluster Name",
+      placeholder: "Enter cluster name (e.g., AB, CD, EF)",
+      description:
+        "Base name for the cluster - lockers will be named as ClusterName-1, ClusterName-2, etc.",
       required: true,
+    },
+    {
+      name: "lockersPerCluster",
+      type: "number",
+      label: "Number of Lockers",
+      placeholder: "Enter number of lockers to create",
+      description: "How many lockers to create in this cluster",
+      required: true,
+      min: 1,
     },
     {
       name: "lockerType",
@@ -107,10 +121,28 @@ export const CreateLockerForm = ({
     },
   ]
 
-  const onSubmit = async (values: Locker) => {
-    await toast.promise(createLocker.mutateAsync(values), {
-      loading: <span className="animate-pulse">Creating locker...</span>,
-      success: "Successfully created a locker",
+  const onSubmit = async (values: CreateLockerFormType) => {
+    const successMessage =
+      values.lockersPerCluster === 1
+        ? "Successfully created locker"
+        : `Successfully created ${values.lockersPerCluster} lockers in cluster ${values.clusterName}`
+
+    const createLockersPayload = {
+      ...values,
+      lockersPerCluster: Number(values.lockersPerCluster),
+    }
+
+    await toast.promise(createLocker.mutateAsync(createLockersPayload), {
+      loading: (
+        <span className="animate-pulse">
+          Creating{" "}
+          {values.lockersPerCluster === 1
+            ? "locker"
+            : `${values.lockersPerCluster} lockers`}
+          ...
+        </span>
+      ),
+      success: successMessage,
       error: (error: unknown) => catchError(error),
     })
     form.reset()
@@ -128,7 +160,7 @@ export const CreateLockerForm = ({
       onSubmit={onSubmit}
       fields={createLockerFields}
       mutation={createLocker}
-      submitButtonTitle="Create Locker"
+      submitButtonTitle="Create Cluster"
     />
   )
 }

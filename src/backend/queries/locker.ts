@@ -11,6 +11,8 @@ const createLockerQuery = db
     lockerName: sql.placeholder("lockerName"),
     lockerLocation: sql.placeholder("lockerLocation"),
     lockerRentalPrice: sql.placeholder("lockerRentalPrice"),
+    clusterName: sql.placeholder("clusterName"),
+    clusterId: sql.placeholder("clusterId"),
   })
   .prepare()
 
@@ -22,6 +24,8 @@ const getLockerByIdQuery = db
     lockerName: locker.lockerName,
     lockerLocation: locker.lockerLocation,
     lockerRentalPrice: sql<number>`${locker.lockerRentalPrice}`,
+    clusterName: locker.clusterName,
+    clusterId: locker.clusterId,
   })
   .from(locker)
   .where(sql`${locker.id} = ${sql.placeholder("id")}`)

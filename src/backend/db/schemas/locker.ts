@@ -1,7 +1,7 @@
+import { timestamp } from "@/backend/helpers/schema-helpers"
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm"
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { nanoid } from "nanoid"
-import { timestamp } from "@/backend/helpers/schema-helpers"
 import { user } from "./user"
 
 export const locker = sqliteTable(
@@ -20,12 +20,16 @@ export const locker = sqliteTable(
     lockerName: text("lockerName", { length: 255 }).notNull(),
     lockerLocation: text("lockerLocation", { length: 255 }).notNull(),
     lockerRentalPrice: integer("lockerRentalPrice").default(0).notNull(),
+    clusterName: text("clusterName", { length: 100 }).notNull(),
+    clusterId: text("clusterId", { length: 15 }).notNull(),
     ...timestamp,
   },
   (t) => [
     index("locker_type_idx").on(t.lockerType),
     index("locker_status_idx").on(t.lockerStatus),
     index("locker_rental_price_idx").on(t.lockerRentalPrice),
+    index("locker_cluster_name_idx").on(t.clusterName),
+    index("locker_cluster_id_idx").on(t.clusterId),
   ],
 )
 
