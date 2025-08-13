@@ -1,15 +1,17 @@
 "use client"
 
-import { AnimatePresence, motion } from "framer-motion"
-import { useRouter } from "next-nprogress-bar"
-import { Card } from "@/components/ui/cards"
-import { getStatusColor } from "@/utils/get-percentage-color"
+import { Badge } from "@/components/ui/badges"
+import { Card, CardContent } from "@/components/ui/cards"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltips"
+import { cn } from "@/utils/cn"
 import { Locker } from "@/validation/locker"
-import { LockerControls } from "./locker-controls"
-import { LockerDoor } from "./locker-door"
-import { LockerHeader } from "./locker-header"
-import { LockerStatusIndicator } from "./locker-status-indicator"
-import { MaintenanceTape } from "./maintainance-tape"
+import { AnimatePresence, motion } from "framer-motion"
+import { Lock, MapPin, Unlock, Wrench } from "lucide-react"
+import { useRouter } from "next-nprogress-bar"
 
 interface LockerCardProps {
   id: string
@@ -26,9 +28,7 @@ export const LockerCard: React.FC<LockerCardProps> = ({
   index,
   isSelected,
   onSelect,
-  compact = false,
 }) => {
-  // Convert API status to UI status
   const getUiStatus = (apiStatus: string | undefined) => {
     if (!apiStatus) return "active"
 
@@ -52,44 +52,219 @@ export const LockerCard: React.FC<LockerCardProps> = ({
     locker.lockerStatus === "out-of-service"
   const router = useRouter()
 
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case "active":
+        return {
+          badge: "bg-emerald-500 text-white",
+          icon: Unlock,
+          iconColor: "text-emerald-500",
+          border: "border-emerald-200/50",
+          bg: "bg-gradient-to-br from-emerald-50 to-green-50",
+          shadow: "shadow-emerald-100",
+          glow: "shadow-emerald-200/30",
+        }
+      case "inactive":
+        return {
+          badge: "bg-red-500 text-white",
+          icon: Lock,
+          iconColor: "text-red-500",
+          border: "border-red-200/50",
+          bg: "bg-gradient-to-br from-red-50 to-pink-50",
+          shadow: "shadow-red-100",
+          glow: "shadow-red-200/30",
+        }
+      case "under_maintenance":
+        return {
+          badge: "bg-amber-500 text-white",
+          icon: Wrench,
+          iconColor: "text-amber-500",
+          border: "border-amber-200/50",
+          bg: "bg-gradient-to-br from-amber-50 to-yellow-50",
+          shadow: "shadow-amber-100",
+          glow: "shadow-amber-200/30",
+        }
+      default:
+        return {
+          badge: "bg-gray-500 text-white",
+          icon: Lock,
+          iconColor: "text-gray-500",
+          border: "border-gray-200/50",
+          bg: "bg-gradient-to-br from-gray-50 to-slate-50",
+          shadow: "shadow-gray-100",
+          glow: "shadow-gray-200/30",
+        }
+    }
+  }
+
+  const statusConfig = getStatusConfig(uiStatus)
+  const StatusIcon = statusConfig.icon
+
+  // Get size variant for locker type
+  const getSizeVariant = (type: string) => {
+    switch (type) {
+      case "small":
+        return "text-blue-600 bg-blue-100"
+      case "medium":
+        return "text-purple-600 bg-purple-100"
+      case "large":
+        return "text-orange-600 bg-orange-100"
+      case "extra-large":
+        return "text-pink-600 bg-pink-100"
+      default:
+        return "text-gray-600 bg-gray-100"
+    }
+  }
+
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{
+          y: -4,
+          scale: 1.02,
+          transition: { type: "spring", stiffness: 300, damping: 20 },
+        }}
+        whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.3, delay: index * 0.05 }}
-        className={`relative ${compact ? "max-w-[100px]" : "max-w-[115px]"}`}
+        className="relative group"
         onClick={() => {
-          router.push(`/locker-rental/${id}`)
-          onSelect()
+          if (!isDisabled) {
+            router.push(`/locker-rental/${id}`)
+            onSelect()
+          }
         }}
       >
         <Card
-          className={`relative flex flex-col items-center justify-start overflow-hidden bg-gradient-to-br transition-all duration-300 ${
-            compact
-              ? "h-50 w-24 p-2"
-              : "h-50 w-28 p-2 sm:h-50 sm:w-30 sm:p-2.5 md:h-50 md:w-32 md:p-3"
-          } ${getStatusColor(uiStatus)} ${isDisabled ? "cursor-not-allowed opacity-90" : "cursor-pointer hover:shadow-lg"}`}
+          className={cn(
+            "relative overflow-hidden transition-all duration-300 cursor-pointer backdrop-blur-sm",
+            "w-full aspect-[3/4] min-w-[120px] max-w-[180px]",
+            "sm:min-w-[140px] sm:max-w-[200px]",
+            "md:min-w-[160px] md:max-w-[220px]",
+            statusConfig.bg,
+            statusConfig.border,
+            "border-2",
+            isSelected && "ring-4 ring-blue-400/50 ring-offset-2",
+            isDisabled && "cursor-not-allowed opacity-70",
+            !isDisabled &&
+              `hover:${statusConfig.shadow} hover:shadow-lg group-hover:${statusConfig.glow}`,
+          )}
         >
-          <LockerStatusIndicator status={uiStatus} />
+          {/* Status Badge - Top */}
+          <div className="absolute top-3 left-3 z-10">
+            <Badge
+              className={cn(
+                "text-xs font-semibold px-2 py-1 rounded-full shadow-sm",
+                statusConfig.badge,
+              )}
+            >
+              {locker.lockerStatus === "available"
+                ? "Available"
+                : locker.lockerStatus === "occupied"
+                  ? "Occupied"
+                  : locker.lockerStatus === "maintenance"
+                    ? "Maintenance"
+                    : locker.lockerStatus}
+            </Badge>
+          </div>
 
-          {isDisabled && <MaintenanceTape index={index} />}
+          {/* Status Icon - Top Right */}
+          <div className="absolute top-3 right-3 z-10">
+            <div
+              className={cn(
+                "p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-sm",
+                "group-hover:bg-white group-hover:shadow-md transition-all duration-200",
+              )}
+            >
+              <StatusIcon className={cn("h-4 w-4", statusConfig.iconColor)} />
+            </div>
+          </div>
 
-          <LockerHeader
-            name={locker.lockerName!}
-            status={uiStatus}
-            isSelected={isSelected}
+          <CardContent className="p-4 h-full flex flex-col justify-between">
+            {/* Main Content */}
+            <div className="space-y-3 flex-1 flex flex-col justify-center">
+              {/* Locker Name */}
+              <div className="text-center">
+                <h3 className="mt-6 text-lg sm:text-xl font-bold text-gray-800 tracking-tight">
+                  {locker.lockerName}
+                </h3>
+
+                {/* Locker Type */}
+                <div className="mt-2 flex justify-center">
+                  <span
+                    className={cn(
+                      "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
+                      getSizeVariant(locker.lockerType || "small"),
+                    )}
+                  >
+                    {locker.lockerType === "small"
+                      ? "Small"
+                      : locker.lockerType === "medium"
+                        ? "Medium"
+                        : locker.lockerType === "large"
+                          ? "Large"
+                          : locker.lockerType === "extra-large"
+                            ? "X-Large"
+                            : locker.lockerType}
+                  </span>
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-center justify-center gap-2 text-gray-600">
+                <MapPin className="h-4 w-4 flex-shrink-0" />
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-sm font-medium truncate max-w-[120px] cursor-help">
+                      {locker.lockerLocation?.split("-")[0]?.trim() ||
+                        locker.lockerLocation}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{locker.lockerLocation}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </div>
+
+            {/* Price - Bottom */}
+            {locker.lockerRentalPrice > 0 && (
+              <div className="mt-4 pt-3 border-t border-gray-200/50">
+                <div className="text-center">
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-xl sm:text-2xl font-bold text-gray-800">
+                      ₱{locker.lockerRentalPrice}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+
+          {/* Maintenance Overlay */}
+          {isDisabled && (
+            <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-10">
+              <div className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border">
+                <div className="flex items-center gap-2">
+                  <Wrench className="h-4 w-4 text-amber-600" />
+                  <span className="text-sm font-semibold text-gray-700">
+                    Under Maintenance
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Hover Glow Effect */}
+          <div
+            className={cn(
+              "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none",
+              "bg-gradient-to-t from-transparent via-white/5 to-white/10",
+            )}
           />
-
-          <LockerDoor status={uiStatus} isSelected={isSelected} />
-
-          <LockerControls status={uiStatus} />
         </Card>
-
-        {/* Shadow effect */}
-        <div
-          className={`-bottom-1 absolute inset-x-2 h-2 rounded-b-md blur-sm transition-opacity duration-300 ${isSelected ? "opacity-60" : "opacity-30"} ${getStatusColor(uiStatus).replace("to-", "").replace("from-", "")}`}
-        />
       </motion.div>
     </AnimatePresence>
   )

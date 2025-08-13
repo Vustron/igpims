@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/buttons"
 import { motion } from "framer-motion"
 import { useState } from "react"
 import { LockerCard } from "./locker-card"
-import { LockerFilter, getGridLayoutClass } from "./locker-filter"
+import { LockerFilter } from "./locker-filter"
 import { LockersSkeleton } from "./lockers-skeleton"
 
 export const LockersClient = ({ isSidebarOpen = false }) => {
@@ -13,8 +13,9 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [locationFilter, setLocationFilter] = useState<string>("all")
+  const [clusterFilter, setClusterFilter] = useState<string>("all")
   const [page, setPage] = useState(1)
-  const [limit] = useState(12)
+  const [limit] = useState(50)
 
   const getApiStatus = (uiStatus: string) => {
     switch (uiStatus) {
@@ -38,8 +39,38 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
     limit,
     status: statusFilter !== "all" ? getApiStatus(statusFilter) : undefined,
     location: locationFilter !== "all" ? locationFilter : undefined,
+    cluster: clusterFilter !== "all" ? clusterFilter : undefined,
     search: searchTerm || undefined,
   })
+
+  const groupedLockers =
+    lockersResponse?.data?.reduce(
+      (acc, locker) => {
+        const clusterKey = locker.clusterName || "Unassigned"
+        if (!acc[clusterKey]) {
+          acc[clusterKey] = {
+            clusterId: locker.clusterId,
+            lockers: [],
+          }
+        }
+        acc[clusterKey].lockers.push(locker)
+        return acc
+      },
+      {} as Record<
+        string,
+        { clusterId: string; lockers: typeof lockersResponse.data }
+      >,
+    ) || {}
+
+  const uniqueClusters = lockersResponse?.data
+    ? Array.from(
+        new Set(
+          lockersResponse.data
+            .map((locker) => locker.clusterName)
+            .filter(Boolean),
+        ),
+      )
+    : []
 
   const uniqueLocations = lockersResponse?.data
     ? Array.from(
@@ -64,6 +95,19 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
             lockersResponse.data.filter((l) =>
               l.lockerLocation ? l.lockerLocation.includes(location) : false,
             ).length,
+          ]),
+        ),
+      }
+    : { all: 0 }
+
+  const clusterCounts = lockersResponse?.data
+    ? {
+        all: lockersResponse.data.length,
+        ...Object.fromEntries(
+          uniqueClusters.map((cluster) => [
+            cluster,
+            lockersResponse.data.filter((l) => l.clusterName === cluster)
+              .length,
           ]),
         ),
       }
@@ -120,14 +164,17 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
         setStatusFilter={setStatusFilter}
         locationFilter={locationFilter}
         setLocationFilter={setLocationFilter}
+        clusterFilter={clusterFilter}
+        setClusterFilter={setClusterFilter}
         uniqueLocations={uniqueLocations}
+        uniqueClusters={uniqueClusters}
         statusCounts={statusCounts}
         locationCounts={locationCounts}
+        clusterCounts={clusterCounts}
         isSidebarOpen={isSidebarOpen}
         lockersResponse={lockersResponse}
       />
 
-      {/* Error State */}
       {error && (
         <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-4">
           <p className="text-center font-medium text-red-600">
@@ -143,42 +190,102 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
         </div>
       )}
 
-      {/* Locker Grid */}
       {!isLoading && !error && lockersResponse?.data && (
         <>
-          {lockersResponse.data.length > 0 ? (
-            <motion.div
-              className={getGridLayoutClass(
-                isSidebarOpen,
-                lockersResponse.data.length,
-              )}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {lockersResponse.data.map((locker, index) => (
-                <LockerCard
-                  key={`locker-${locker.id}-${index}`}
-                  locker={{
-                    ...locker,
-                    lockerType: locker.lockerType as
-                      | "small"
-                      | "medium"
-                      | "large"
-                      | "extra-large",
-                  }}
-                  index={index}
-                  isSelected={selectedLocker === locker.id}
-                  onSelect={() =>
-                    setSelectedLocker(
-                      selectedLocker === locker.id ? null : locker.id,
-                    )
-                  }
-                  compact={isSidebarOpen}
-                  id={locker.id}
-                />
-              ))}
-            </motion.div>
+          {Object.keys(groupedLockers).length > 0 ? (
+            <div className="space-y-8">
+              {Object.entries(groupedLockers)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([clusterName, { clusterId, lockers }], clusterIndex) => (
+                  <motion.div
+                    key={clusterId || clusterName}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: clusterIndex * 0.1 }}
+                    className="bg-card rounded-xl border shadow-sm p-6"
+                  >
+                    <div className="mb-6 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h2 className="text-2xl font-bold tracking-tight">
+                            {clusterName}
+                          </h2>
+                          <p className="text-muted-foreground text-sm">
+                            Cluster ID: {clusterId} • {lockers.length} lockers
+                          </p>
+                        </div>
+                        <div className="flex gap-4 text-sm">
+                          <span className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-500 rounded-full" />
+                            Available:{" "}
+                            {
+                              lockers.filter(
+                                (l) => getUiStatus(l.lockerStatus) === "active",
+                              ).length
+                            }
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-red-500 rounded-full" />
+                            Occupied:{" "}
+                            {
+                              lockers.filter(
+                                (l) =>
+                                  getUiStatus(l.lockerStatus) === "inactive",
+                              ).length
+                            }
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                            Maintenance:{" "}
+                            {
+                              lockers.filter(
+                                (l) =>
+                                  getUiStatus(l.lockerStatus) ===
+                                  "under_maintenance",
+                              ).length
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`grid gap-4 ${
+                        isSidebarOpen
+                          ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+                          : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10"
+                      }`}
+                    >
+                      {lockers
+                        .sort((a, b) =>
+                          a.lockerName.localeCompare(b.lockerName),
+                        )
+                        .map((locker, lockerIndex) => (
+                          <LockerCard
+                            key={`${clusterId}-${locker.id}`}
+                            locker={{
+                              ...locker,
+                              lockerType: locker.lockerType as
+                                | "small"
+                                | "medium"
+                                | "large"
+                                | "extra-large",
+                            }}
+                            index={clusterIndex * 100 + lockerIndex}
+                            isSelected={selectedLocker === locker.id}
+                            onSelect={() =>
+                              setSelectedLocker(
+                                selectedLocker === locker.id ? null : locker.id,
+                              )
+                            }
+                            compact={isSidebarOpen}
+                            id={locker.id}
+                          />
+                        ))}
+                    </div>
+                  </motion.div>
+                ))}
+            </div>
           ) : (
             <div className="flex h-48 flex-col items-center justify-center rounded-lg border border-dashed p-3 sm:p-4">
               <p className="mb-2 text-center font-medium text-lg sm:text-xl">
@@ -194,6 +301,7 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
                   setSearchTerm("")
                   setStatusFilter("all")
                   setLocationFilter("all")
+                  setClusterFilter("all")
                   setPage(1)
                 }}
               >
@@ -202,7 +310,6 @@ export const LockersClient = ({ isSidebarOpen = false }) => {
             </div>
           )}
 
-          {/* Pagination Controls */}
           {lockersResponse.meta.totalPages > 1 && (
             <div className="mt-6 flex justify-center gap-2">
               <Button

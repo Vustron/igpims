@@ -1,8 +1,10 @@
+import * as schema from "@/backend/db/schemas"
 import { config } from "dotenv"
 import { drizzle } from "drizzle-orm/libsql"
-import * as schema from "@/backend/db/schemas"
 
 config({ path: ".env.local" })
+
+const isOnDevelopment = process.env.NODE_ENV === "development"
 
 export const db = drizzle({
   connection: {
@@ -10,5 +12,5 @@ export const db = drizzle({
     authToken: process.env.TURSO_AUTH_TOKEN!,
   },
   schema,
-  logger: true,
+  logger: isOnDevelopment,
 })

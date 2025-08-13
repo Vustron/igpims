@@ -1,11 +1,11 @@
+import { Locker } from "@/backend/db/schemas"
+import { api } from "@/backend/helpers/api-client"
 import {
   QueryClient,
   queryOptions,
   useInfiniteQuery,
   useQuery,
 } from "@tanstack/react-query"
-import { Locker } from "@/backend/db/schemas"
-import { api } from "@/backend/helpers/api-client"
 
 export type LockerFilters = {
   page?: number
@@ -19,6 +19,7 @@ export type LockerFilters = {
   type?: string
   location?: string
   search?: string
+  cluster?: string
 }
 
 export type PaginatedLockersResponse = {
@@ -36,7 +37,15 @@ export type PaginatedLockersResponse = {
 export async function findManyLockers(
   filters: LockerFilters = {},
 ): Promise<PaginatedLockersResponse> {
-  const { page = 1, limit = 10, status, type, location, search } = filters
+  const {
+    page = 1,
+    limit = 10,
+    status,
+    type,
+    location,
+    search,
+    cluster,
+  } = filters
 
   const params = new URLSearchParams()
   params.append("page", page.toString())
@@ -46,6 +55,7 @@ export async function findManyLockers(
   if (type) params.append("type", type)
   if (location) params.append("location", location)
   if (search) params.append("search", search)
+  if (cluster) params.append("cluster", cluster)
 
   const queryString = params.toString()
   return await api.get<PaginatedLockersResponse>(
@@ -55,20 +65,42 @@ export async function findManyLockers(
 
 export async function preFindManyLockers(filters: LockerFilters = {}) {
   return async (_queryClient: QueryClient) => {
-    const { page = 1, limit = 10, status, type, location, search } = filters
+    const {
+      page = 1,
+      limit = 10,
+      status,
+      type,
+      location,
+      search,
+      cluster,
+    } = filters
 
     return queryOptions({
-      queryKey: ["lockers", { page, limit, status, type, location, search }],
+      queryKey: [
+        "lockers",
+        { page, limit, status, type, location, search, cluster },
+      ],
       queryFn: async () => await findManyLockers(filters),
     })
   }
 }
 
 export const useFindManyLockers = (filters: LockerFilters = {}) => {
-  const { page = 1, limit = 10, status, type, location, search } = filters
+  const {
+    page = 1,
+    limit = 10,
+    status,
+    type,
+    location,
+    search,
+    cluster,
+  } = filters
 
   return useQuery<PaginatedLockersResponse>({
-    queryKey: ["lockers", { page, limit, status, type, location, search }],
+    queryKey: [
+      "lockers",
+      { page, limit, status, type, location, search, cluster },
+    ],
     queryFn: async () => await findManyLockers(filters),
   })
 }
@@ -76,10 +108,13 @@ export const useFindManyLockers = (filters: LockerFilters = {}) => {
 export const useInfiniteLockers = (
   filters: Omit<LockerFilters, "page"> = {},
 ) => {
-  const { limit = 10, status, type, location, search } = filters
+  const { limit = 10, status, type, location, search, cluster } = filters
 
   return useInfiniteQuery({
-    queryKey: ["lockers-infinite", { limit, status, type, location, search }],
+    queryKey: [
+      "lockers-infinite",
+      { limit, status, type, location, search, cluster },
+    ],
     queryFn: async ({ pageParam = 1 }) => {
       return await findManyLockers({
         ...filters,

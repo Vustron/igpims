@@ -1,9 +1,9 @@
-import { and, eq, like, or, sql } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 import { locker } from "@/backend/db/schemas"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
+import { and, asc, eq, like, or, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function findManyLockers(
   request: NextRequest,
@@ -38,6 +38,7 @@ export async function findManyLockers(
     const type = searchParams.get("type") || undefined
     const location = searchParams.get("location") || undefined
     const search = searchParams.get("search") || undefined
+    const cluster = searchParams.get("cluster") || undefined
 
     const countResult = await db.transaction(async (_tx) => {
       const conditions = []
@@ -54,11 +55,16 @@ export async function findManyLockers(
         conditions.push(like(locker.lockerLocation, `%${location}%`))
       }
 
+      if (cluster) {
+        conditions.push(like(locker.clusterName, `%${cluster}%`))
+      }
+
       if (search) {
         conditions.push(
           or(
             like(locker.lockerName, `%${search}%`),
             like(locker.lockerLocation, `%${search}%`),
+            like(locker.clusterName, `%${search}%`),
           ),
         )
       }
@@ -87,11 +93,16 @@ export async function findManyLockers(
         conditions.push(like(locker.lockerLocation, `%${location}%`))
       }
 
+      if (cluster) {
+        conditions.push(like(locker.clusterName, `%${cluster}%`))
+      }
+
       if (search) {
         conditions.push(
           or(
             like(locker.lockerName, `%${search}%`),
             like(locker.lockerLocation, `%${search}%`),
+            like(locker.clusterName, `%${search}%`),
           ),
         )
       }
@@ -102,7 +113,12 @@ export async function findManyLockers(
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .limit(limit)
         .offset(offset)
-        .orderBy(locker.createdAt)
+        .orderBy(
+          asc(locker.clusterName),
+          sql`CAST(REGEXP_REPLACE(${locker.lockerName}, '[^0-9]', '') AS UNSIGNED) ASC`, // Added natural sorting for lockerName numeric part
+          asc(locker.lockerName), // Added fallback alphabetical sorting for lockerName
+          asc(locker.createdAt),
+        )
 
       return await query
     })

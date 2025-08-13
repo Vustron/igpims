@@ -1,6 +1,5 @@
 "use client"
 
-import { CheckCircle2, Filter, PlusCircleIcon, Search, X } from "lucide-react"
 import {
   Accordion,
   AccordionContent,
@@ -21,6 +20,7 @@ import {
 import { Separator } from "@/components/ui/separators"
 import { useDialog } from "@/hooks/use-dialog"
 import { getStatusColor, getStatusLabel } from "@/utils/get-percentage-color"
+import { CheckCircle2, Filter, PlusCircleIcon, Search, X } from "lucide-react"
 
 interface LockerFilterProps {
   searchTerm: string
@@ -29,9 +29,13 @@ interface LockerFilterProps {
   setStatusFilter: (status: string) => void
   locationFilter: string
   setLocationFilter: (location: string) => void
+  clusterFilter: string
+  setClusterFilter: (cluster: string) => void
   uniqueLocations: string[]
+  uniqueClusters: string[]
   statusCounts: Record<string, number>
   locationCounts: Record<string, number>
+  clusterCounts: Record<string, number>
   isSidebarOpen: boolean
   lockersResponse?: {
     data: any[]
@@ -48,24 +52,32 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
   setStatusFilter,
   locationFilter,
   setLocationFilter,
+  clusterFilter,
+  setClusterFilter,
   uniqueLocations,
+  uniqueClusters,
   statusCounts,
+  // locationCounts,
+  // clusterCounts,
   isSidebarOpen,
   lockersResponse,
 }) => {
   const showFilters =
-    searchTerm || statusFilter !== "all" || locationFilter !== "all"
+    searchTerm ||
+    statusFilter !== "all" ||
+    locationFilter !== "all" ||
+    clusterFilter !== "all"
   const { onOpen } = useDialog()
 
   const resetFilters = () => {
     setSearchTerm("")
     setStatusFilter("all")
     setLocationFilter("all")
+    setClusterFilter("all")
   }
 
   return (
     <div className="mb-1 space-y-4 sm:p-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {showFilters && (
@@ -90,7 +102,7 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
               <Search className="size-4 text-muted-foreground" />
             </div>
             <Input
-              placeholder="Search by name, ID, or location..."
+              placeholder="Search by name, ID, location, or cluster..." // Updated placeholder
               className="h-10 w-full pr-16 pl-9 text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -214,7 +226,7 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
           </div>
         )}
 
-        {/* Active filters chips */}
+        {/* Active filters chips - Updated to include cluster */}
         {showFilters && (
           <div className="flex flex-wrap gap-1.5 pt-1">
             {searchTerm && (
@@ -268,6 +280,23 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
                 </Button>
               </div>
             )}
+
+            {/* Added cluster filter chip */}
+            {clusterFilter !== "all" && (
+              <div className="flex items-center rounded-full bg-blue-500 px-2.5 py-1 text-white text-xs">
+                <span className="mr-1">Cluster:</span>
+                <span className="font-medium">{clusterFilter}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="ml-1 h-4 w-4 rounded-full bg-white/20 text-white hover:bg-white/30"
+                  onClick={() => setClusterFilter("all")}
+                >
+                  <X className="size-2.5" />
+                  <span className="sr-only">Clear cluster</span>
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -282,10 +311,12 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
                 <span>Filter Options</span>
                 {showFilters && (
                   <Badge className="ml-1 h-5 bg-primary px-1 text-[10px]">
+                    {/* Updated filter count to include cluster */}
                     {
                       Object.values([
                         statusFilter !== "all" ? 1 : 0,
                         locationFilter !== "all" ? 1 : 0,
+                        clusterFilter !== "all" ? 1 : 0,
                         searchTerm ? 1 : 0,
                       ]).filter(Boolean).length
                     }
@@ -338,6 +369,29 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
                   </Select>
                 </div>
 
+                {/* Added Cluster Select */}
+                <div className="space-y-1">
+                  <Label className="font-medium text-muted-foreground text-xs">
+                    Cluster
+                  </Label>
+                  <Select
+                    value={clusterFilter}
+                    onValueChange={setClusterFilter}
+                  >
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="Filter by cluster" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Clusters</SelectItem>
+                      {uniqueClusters.map((cluster) => (
+                        <SelectItem key={cluster} value={cluster}>
+                          {cluster}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Status Filter Pills */}
                 <div className="space-y-1">
                   <Label className="font-medium text-muted-foreground text-xs">
@@ -375,10 +429,10 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
         </Accordion>
       </div>
 
-      {/* Filters on Desktop: Horizontal layout */}
+      {/* Filters on Desktop: Horizontal layout - Updated to include cluster */}
       <div className="hidden sm:block">
         <div
-          className={`grid gap-3 ${isSidebarOpen ? "grid-cols-2" : "grid-cols-3"}`}
+          className={`grid gap-3 ${isSidebarOpen ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-4"}`}
         >
           {/* Status Select */}
           <div className="space-y-1">
@@ -430,7 +484,33 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
             </Select>
           </div>
 
-          {/* Active Filters Summary */}
+          {/* Added Cluster Select */}
+          <div className="space-y-1">
+            <Label className="flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
+              <span>Filter by Cluster</span>
+              {clusterFilter !== "all" && (
+                <Badge className="h-4 bg-primary px-1 text-[10px]">
+                  <CheckCircle2 className="mr-0.5 size-2" />
+                  Active
+                </Badge>
+              )}
+            </Label>
+            <Select value={clusterFilter} onValueChange={setClusterFilter}>
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Cluster" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Clusters</SelectItem>
+                {uniqueClusters.map((cluster) => (
+                  <SelectItem key={cluster} value={cluster}>
+                    {cluster}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Active Filters Summary - Updated to include cluster */}
           <div className="space-y-1">
             <Label className="font-medium text-muted-foreground text-xs">
               Active Filters
@@ -462,6 +542,14 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
                       {locationFilter.length > 15
                         ? `${locationFilter.substring(0, 15)}...`
                         : locationFilter}
+                    </Badge>
+                  )}
+                  {/* Added cluster filter badge */}
+                  {clusterFilter !== "all" && (
+                    <Badge className="bg-blue-500 px-1.5 text-[10px]">
+                      {clusterFilter.length > 15
+                        ? `${clusterFilter.substring(0, 15)}...`
+                        : clusterFilter}
                     </Badge>
                   )}
                 </div>
@@ -501,7 +589,7 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
         </div>
       </div>
 
-      {/* Results Counter */}
+      {/* Results Counter - Updated to include cluster filter count */}
       <div className="pt-1">
         <Separator className="mb-2" />
         <div className="flex items-center justify-between">
@@ -516,10 +604,12 @@ export const LockerFilter: React.FC<LockerFilterProps> = ({
           {showFilters && (
             <p className="text-muted-foreground text-xs">
               <span className="font-medium text-foreground">
+                {/* Updated active filters count to include cluster */}
                 {
                   Object.values([
                     statusFilter !== "all" ? 1 : 0,
                     locationFilter !== "all" ? 1 : 0,
+                    clusterFilter !== "all" ? 1 : 0,
                     searchTerm ? 1 : 0,
                   ]).filter(Boolean).length
                 }
