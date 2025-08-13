@@ -1,6 +1,6 @@
 {
   "name": "igpims",
-  "version": "1.182.18",
+  "version": "1.182.19",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",

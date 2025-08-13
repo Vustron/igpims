@@ -115,8 +115,7 @@ export async function findManyLockers(
         .offset(offset)
         .orderBy(
           asc(locker.clusterName),
-          sql`CAST(REGEXP_REPLACE(${locker.lockerName}, '[^0-9]', '') AS UNSIGNED) ASC`, // Added natural sorting for lockerName numeric part
-          asc(locker.lockerName), // Added fallback alphabetical sorting for lockerName
+          asc(locker.lockerName),
           asc(locker.createdAt),
         )
 
