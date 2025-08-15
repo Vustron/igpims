@@ -8,6 +8,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/separators/tabs"
 import { useMediaQuery } from "@/hooks/use-media-query"
+import { useSidebarToggle } from "@/hooks/use-sidebar-toggle"
 import { cn } from "@/utils/cn"
 import { ClipboardList, FileX } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -30,6 +31,7 @@ export const LockerIgpClient = () => {
   const [openMobileSheet, setOpenMobileSheet] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
   const isSmallScreen = useMediaQuery("(max-width: 640px)")
+  const { isOpen } = useSidebarToggle()
 
   const tabs: TabItem[] = [
     {
@@ -108,7 +110,7 @@ export const LockerIgpClient = () => {
         value="locker_rental_management"
         className="fade-in-50 mt-0 animate-in duration-300 focus-visible:outline-none focus-visible:ring-0"
       >
-        <LockersClient />
+        <LockersClient isSidebarOpen={isOpen} />
       </TabsContent>
 
       <TabsContent
