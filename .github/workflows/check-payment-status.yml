@@ -1,0 +1,37 @@
+name: Weekly Payment Status Check
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run at 00:00 on Sunday
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  check-payments:
+    runs-on: ubuntu-latest
+    environment: Production
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+      ACTION_KEY: ${{ secrets.ACTION_KEY }}
+
+    steps:
+      - name: Check Required Secrets
+        run: |
+          if [ -z "$ACTION_KEY" ]; then
+            echo "Error: ACTION_KEY secret is not set"
+            exit 1
+          fi
+          if [ -z "$API_KEY" ]; then
+            echo "Error: API_KEY secret is not set"
+            exit 1
+          fi
+
+      - name: Check Payment Status
+        run: |
+          curl --request POST \
+            --url 'https://ssc-igpims.vercel.app/api/v1/cron-jobs/check-payment-status' \
+            --header "Authorization: Bearer ${{ secrets.ACTION_KEY }}" \
+            --header "X-App-API-Key: ${{ secrets.API_KEY }}" \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 3
