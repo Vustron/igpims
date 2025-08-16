@@ -311,7 +311,9 @@ const renderIgpContent = (igp: any) => (
 
 const IgpFinancialDocument = ({
   financialData,
-}: { financialData: FinancialDataResponse }) => {
+}: {
+  financialData: FinancialDataResponse
+}) => {
   const reportData = financialData || {
     reportPeriod: "",
     dateGenerated: 0,

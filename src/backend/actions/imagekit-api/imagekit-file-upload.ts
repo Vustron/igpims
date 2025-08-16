@@ -8,11 +8,7 @@ import {
 import toast from "react-hot-toast"
 import { ImagekitUploadAuth, getImagekitUploadAuth } from "./upload-auth"
 
-export const imagekitFileUpload = async ({
-  fileInput,
-}: {
-  fileInput: any
-}) => {
+export const imagekitFileUpload = async ({ fileInput }: { fileInput: any }) => {
   const fileInputData = fileInput.current
   if (
     !fileInputData ||

@@ -19,7 +19,9 @@ import toast from "react-hot-toast"
 
 export const IgpTransactionAction = ({
   igp,
-}: { igp: IgpTransactionWithIgp }) => {
+}: {
+  igp: IgpTransactionWithIgp
+}) => {
   const deleteExpenseTransaction = useDeleteIgpTransaction(igp?.id!)
   const confirm = useConfirm()
   const { onOpen } = useDialog()

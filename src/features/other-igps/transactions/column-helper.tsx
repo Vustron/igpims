@@ -38,7 +38,10 @@ export const ColumnHeader = ({
 export const SelectCell = ({
   row,
   table = undefined,
-}: { row?: any; table?: any }) => {
+}: {
+  row?: any
+  table?: any
+}) => {
   if (table) {
     return (
       <div className="px-1">
@@ -151,7 +154,10 @@ export const BatchCell = ({ value }: { value: string }) => {
 export const QuantityCell = ({
   value,
   price,
-}: { value: number; price?: number }) => {
+}: {
+  value: number
+  price?: number
+}) => {
   const formatted = new Intl.NumberFormat("en-PH").format(value)
   const totalPrice = price ? value * price : undefined
 
@@ -222,7 +228,9 @@ export const DateCell = ({ value }: { value: number }) => {
 
 export const StatusCell = ({
   value,
-}: { value: "received" | "pending" | "cancelled" }) => {
+}: {
+  value: "received" | "pending" | "cancelled"
+}) => {
   const statusConfig = {
     received: {
       icon: <Check className="h-3 w-3" />,

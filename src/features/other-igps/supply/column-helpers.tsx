@@ -75,7 +75,10 @@ export const ExpensesCell = ({ value }: { value: number }) => {
 export const ItemsGivenCell = ({
   given,
   total,
-}: { given: number; total: number }) => {
+}: {
+  given: number
+  total: number
+}) => {
   const percentage = Math.round((given / total) * 100)
   const remaining = total - given
 
@@ -113,7 +116,10 @@ export const ItemsGivenCell = ({
 export const ItemsLeftCell = ({
   given,
   total,
-}: { given: number; total: number }) => {
+}: {
+  given: number
+  total: number
+}) => {
   const remaining = total - given
   const percentage = Math.round((remaining / total) * 100)
 

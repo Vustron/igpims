@@ -34,7 +34,10 @@ export const useUpdateNotification = () => {
     mutationFn: async ({
       id,
       payload,
-    }: { id: string; payload: UpdateNotificationPayload }) => {
+    }: {
+      id: string
+      payload: UpdateNotificationPayload
+    }) => {
       const statusArray = Array.isArray(payload.status)
         ? payload.status
         : typeof payload.status === "string"
