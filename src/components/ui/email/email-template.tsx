@@ -1,4 +1,3 @@
-import { env } from "@/config/env"
 import {
   Body,
   Button,
@@ -13,13 +12,15 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components"
+import { env } from "@/config/env"
+import { formatDateFromTimestamp, returnDateDue } from "@/utils/date-convert"
 
 interface EmailTemplateProps {
   token?: string
   email: string
   recipientName?: string
   lockerDetails?: { name: string; location: string }
-  dueDate?: string
+  dueDate?: string | Date | number
   amount?: number
   transactionId?: string
   paymentDate?: string
@@ -87,7 +88,15 @@ export function EmailTemplate({
     "rental-expiration": {
       preview: "Locker Rental Expiration Notice",
       title: "Locker Rental Expiring Soon",
-      subtitle: `Your locker rental will expire on ${dueDate || "the specified date"}.`,
+      subtitle: `Your locker rental will expire on ${
+        formatDateFromTimestamp(
+          typeof dueDate === "number"
+            ? dueDate
+            : dueDate instanceof Date
+              ? dueDate.getTime()
+              : new Date(dueDate!).getTime(),
+        ) || "the specified date"
+      }.`,
       buttonText: "Renew Now →",
       disclaimer:
         "Please ensure to clear your locker before the expiration date.",
@@ -108,8 +117,16 @@ export function EmailTemplate({
           style: "currency",
           currency: "PHP",
         }) || "the specified amount"
-      } is due on ${dueDate || "the due date"}.`,
-      buttonText: "Pay Now →",
+      } is due on ${
+        formatDateFromTimestamp(
+          typeof dueDate === "number"
+            ? dueDate
+            : dueDate instanceof Date
+              ? dueDate.getTime()
+              : new Date(dueDate!).getTime(),
+        ) || "the due date"
+      }.`,
+      buttonText: "",
       disclaimer:
         "Please settle your payment before the due date to avoid any service interruption.",
     },
@@ -145,7 +162,14 @@ export function EmailTemplate({
           {dueDate && (
             <>
               <br />
-              Due Date: {dueDate}
+              Due Date:{" "}
+              {formatDateFromTimestamp(
+                typeof dueDate === "number"
+                  ? dueDate
+                  : dueDate instanceof Date
+                    ? dueDate.getTime()
+                    : new Date(dueDate).getTime(),
+              )}
             </>
           )}
           {amount && (
@@ -178,7 +202,15 @@ export function EmailTemplate({
 
           <div>
             <Text className="font-medium text-gray-600">Payment Date</Text>
-            <Text>{paymentDate || new Date().toLocaleDateString()}</Text>
+            <Text>
+              {formatDateFromTimestamp(
+                typeof paymentDate === "number"
+                  ? paymentDate
+                  : typeof paymentDate === "string"
+                    ? new Date(paymentDate).getTime()
+                    : Date.now(),
+              )}
+            </Text>
           </div>
 
           {lockerDetails && (
@@ -204,12 +236,12 @@ export function EmailTemplate({
           <div>
             <Text className="font-medium text-red-600">Days Overdue</Text>
             <Text className="font-semibold">
-              {Math.max(
-                1,
-                Math.floor(
-                  (new Date().getTime() - new Date(dueDate || "").getTime()) /
-                    (1000 * 60 * 60 * 24),
-                ),
+              {returnDateDue(
+                dueDate instanceof Date
+                  ? dueDate.getTime()
+                  : typeof dueDate === "string"
+                    ? new Date(dueDate).getTime()
+                    : (Number(dueDate) ?? 0),
               )}{" "}
               days
             </Text>

@@ -496,7 +496,7 @@ export async function getKeyMetrics() {
 }
 
 export async function getIgpFinancialData() {
-  const reportPeriod = new Date().getTime()
+  const reportPeriod = Date.now()
 
   const igps = await db.query.igp.findMany({
     with: {
@@ -560,7 +560,7 @@ export async function getIgpFinancialData() {
 
   return {
     reportPeriod,
-    dateGenerated: new Date().getTime(),
+    dateGenerated: Date.now(),
     igps: formattedIgps,
   }
 }
@@ -646,7 +646,7 @@ export async function getDuePayments() {
 
   return {
     reportPeriod: currentDate.getTime(),
-    dateGenerated: new Date().getTime(),
+    dateGenerated: Date.now(),
     overdueStudents,
     dueStudents,
   }

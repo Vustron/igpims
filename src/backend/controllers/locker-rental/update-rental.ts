@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from "next/server"
 import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -7,7 +8,6 @@ import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { CreateRentalData, createRentalSchema } from "@/validation/rental"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function updateRental(
   request: NextRequest,

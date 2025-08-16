@@ -49,7 +49,7 @@ const VerifyClient = () => {
     const lastSentTime = localStorage.getItem("lastVerificationSent")
     if (lastSentTime) {
       const timeLeft =
-        COOLDOWN_TIME - (Date.now() - Number.parseInt(lastSentTime))
+        COOLDOWN_TIME - (Date.now() - Number.parseInt(lastSentTime, 10))
       if (timeLeft > 0) {
         setCooldownTime(Math.ceil(timeLeft / 1000))
         timer = startCooldown()

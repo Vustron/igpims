@@ -1,12 +1,14 @@
+import { checkPaymentStatusCronJob } from "../controllers/cron-jobs/check-payment-status"
+import { flushCacheCronJob } from "../controllers/cron-jobs/flush-cache"
 import { sendRentLockerConfirm } from "../controllers/email/send-rent-locker-confirm.ts"
 import { createExpenseTransaction } from "../controllers/expense-transaction/create-expense"
 import { createFundRequest } from "../controllers/fund-request/create-fund-request"
+import { createIgp } from "../controllers/igp/create-igp"
 import { createIgpSupply } from "../controllers/igp-supply/create-igp-supply"
 import { createIgpTransaction } from "../controllers/igp-transactions/create-igp-transaction"
-import { createIgp } from "../controllers/igp/create-igp"
 import { createInspection } from "../controllers/inspection/create-inspection"
-import { createRent } from "../controllers/locker-rental/create-rent"
 import { createLocker } from "../controllers/locker/create-locker"
+import { createRent } from "../controllers/locker-rental/create-rent"
 import { deleteManyUserById } from "../controllers/user/delete-many-by-id"
 import { resetUserPassword } from "../controllers/user/reset-password"
 import { sendResetLink } from "../controllers/user/send-reset-link"
@@ -67,6 +69,14 @@ export const postRoutes: Route[] = [
   {
     path: "/api/v1/igp-supplies/create-igp-supply",
     handler: createIgpSupply,
+  },
+  {
+    path: "/api/v1/cron-jobs/flush-cache",
+    handler: flushCacheCronJob,
+  },
+  {
+    path: "/api/v1/cron-jobs/check-payment-status",
+    handler: checkPaymentStatusCronJob,
   },
   // Add more POST routes here
 ]

@@ -1,5 +1,7 @@
 "use client"
 
+import { render } from "@react-email/components"
+import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/cards"
 import { EmailTemplate } from "@/components/ui/email/email-template"
 import { ScrollArea, ScrollBar } from "@/components/ui/scrollareas"
@@ -9,8 +11,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/separators"
-import { render } from "@react-email/components"
-import { useEffect, useState } from "react"
 
 export default function EmailPreviewPage() {
   const previewData = {

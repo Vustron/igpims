@@ -44,9 +44,9 @@ export const EditWaterFundForm = ({
       waterFundsExpenses: initialData.waterFundsExpenses,
       waterFundsRevenue: initialData.waterFundsRevenue,
       waterFundsProfit: initialData.waterFundsProfit,
-      // @ts-ignore
+      // @ts-expect-error
       dateFund: convertTimestampToDate(initialData.dateFund),
-      // @ts-ignore
+      // @ts-expect-error
       weekFund: convertTimestampToDate(initialData.weekFund),
     },
   })

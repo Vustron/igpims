@@ -93,7 +93,7 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
         </Button>
       ),
       cell: ({ row }) => {
-        const amount = Number.parseInt(row.getValue("suppliedGallons"))
+        const amount = Number.parseInt(row.getValue("suppliedGallons"), 10)
         return (
           <div className="flex items-center gap-2">
             <Droplet className="h-4 w-4 shrink-0 text-blue-500" />
@@ -118,7 +118,7 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
         </Button>
       ),
       cell: ({ row }) => {
-        const amount = Number.parseInt(row.getValue("expenses"))
+        const amount = Number.parseInt(row.getValue("expenses"), 10)
         const formatted = new Intl.NumberFormat("en-PH", {
           style: "currency",
           currency: "PHP",
@@ -150,8 +150,8 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
         </Button>
       ),
       cell: ({ row }) => {
-        const used = Number.parseInt(row.getValue("usedGallons"))
-        const supplied = Number.parseInt(row.getValue("suppliedGallons"))
+        const used = Number.parseInt(row.getValue("usedGallons"), 10)
+        const supplied = Number.parseInt(row.getValue("suppliedGallons"), 10)
         const percentage = Math.round((used / supplied) * 100) || 0
         const colorClass = cn("transition-colors", {
           "text-red-500": percentage > 75,
@@ -191,8 +191,8 @@ export const waterSupplyListColumn: ColumnDef<WaterSupplyWithVendoLocation>[] =
         </Button>
       ),
       cell: ({ row }) => {
-        const remaining = Number.parseInt(row.getValue("remainingGallons"))
-        const supplied = Number.parseInt(row.getValue("suppliedGallons"))
+        const remaining = Number.parseInt(row.getValue("remainingGallons"), 10)
+        const supplied = Number.parseInt(row.getValue("suppliedGallons"), 10)
         const percentage = Math.round((remaining / supplied) * 100) || 0
         const colorClass = cn("transition-colors", {
           "text-red-500": percentage < 25,

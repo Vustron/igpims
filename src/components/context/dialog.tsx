@@ -245,8 +245,7 @@ export const DialogProvider = () => {
   if (!isMounted) return null
 
   return (
-    <>
-      <Suspense fallback={null}>
+    <Suspense fallback={null}>
         <ConfirmDialog />
         <VerifyUserDialog />
         <SessionExpiredDialog />
@@ -295,6 +294,5 @@ export const DialogProvider = () => {
         <EditIgpSupplyDialog />
         <EditIgpDialog />
       </Suspense>
-    </>
   )
 }

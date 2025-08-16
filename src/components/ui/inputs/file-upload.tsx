@@ -160,10 +160,10 @@ export const FileUpload = ({
             ? [uploadedUrls[0]]
             : files
 
-        // @ts-ignore
+        // @ts-expect-error
         setFiles(updatedFiles)
         if (!isInitialMount.current) {
-          // @ts-ignore
+          // @ts-expect-error
           memoizedOnChange?.(updatedFiles)
         }
       } else {
@@ -175,10 +175,10 @@ export const FileUpload = ({
           : validFiles.length > 0
             ? [validFiles[0]]
             : files
-        // @ts-ignore
+        // @ts-expect-error
         setFiles(updatedFiles)
         if (!isInitialMount.current) {
-          // @ts-ignore
+          // @ts-expect-error
           memoizedOnChange?.(updatedFiles)
         }
       }

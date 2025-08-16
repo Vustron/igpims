@@ -1,11 +1,5 @@
 "use client"
 
-import { ExpenseTransactionWithRequestor } from "@/backend/actions/expense-transaction/find-many"
-import { Badge } from "@/components/ui/badges"
-import { Button } from "@/components/ui/buttons"
-import { DateCell } from "@/features/locker-igp/violations/column-helpers"
-import { useDialog } from "@/hooks/use-dialog"
-import { cn } from "@/utils/cn"
 import { ColumnDef } from "@tanstack/react-table"
 import {
   ArrowUpDown,
@@ -19,6 +13,13 @@ import {
   Wallet,
   XCircle,
 } from "lucide-react"
+import Image from "next/image"
+import { ExpenseTransactionWithRequestor } from "@/backend/actions/expense-transaction/find-many"
+import { Badge } from "@/components/ui/badges"
+import { Button } from "@/components/ui/buttons"
+import { DateCell } from "@/features/locker-igp/violations/column-helpers"
+import { useDialog } from "@/hooks/use-dialog"
+import { cn } from "@/utils/cn"
 import { Actions } from "./actions"
 
 export const expenseTransactionListColumn: ColumnDef<ExpenseTransactionWithRequestor>[] =
@@ -169,10 +170,12 @@ export const expenseTransactionListColumn: ColumnDef<ExpenseTransactionWithReque
               variant="ghost"
               className="rounded-2xl"
             >
-              <img
+              <Image
                 src={receiptUrl}
                 alt="Receipt"
-                className="p-1 rounded-md border border-gray-200 size-8 object-contain"
+                height={200}
+                width={200}
+                className="p-1 rounded-md border border-gray-200 w-8 h-8 object-contain"
               />
             </Button>
           </div>

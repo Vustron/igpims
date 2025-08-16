@@ -1,7 +1,7 @@
-import { SessionType, isEmptySession, sessionOptions } from "@/config/session"
-import { UserRole } from "@/types/user"
 import { unsealData } from "iron-session"
 import { NextRequest, NextResponse } from "next/server"
+import { isEmptySession, SessionType, sessionOptions } from "@/config/session"
+import { UserRole } from "@/types/user"
 
 const roleProtectedRoutes: Record<UserRole, string[]> = {
   admin: [

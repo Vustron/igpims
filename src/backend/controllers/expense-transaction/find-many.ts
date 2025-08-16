@@ -1,11 +1,11 @@
+import { and, eq, inArray, like, or, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 import { expenseTransaction, fundRequest, user } from "@/backend/db/schemas"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
 import { getTotalProfit } from "@/backend/queries/analytics"
 import { db } from "@/config/drizzle"
 import { catchError } from "@/utils/catch-error"
-import { and, eq, inArray, like, or, sql } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function findManyExpenseTransaction(
   request: NextRequest,
@@ -111,7 +111,9 @@ export async function findManyExpenseTransaction(
         : []
 
     const requestorMap = new Map<string, (typeof requestors)[0]>()
-    requestors.forEach((r) => requestorMap.set(r.id, r))
+    requestors.forEach((r) => {
+      requestorMap.set(r.id, r)
+    })
 
     const transactions = expenseTransactionsData.map((t) => ({
       ...t,

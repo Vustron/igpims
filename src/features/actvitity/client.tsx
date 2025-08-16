@@ -1,5 +1,6 @@
 "use client"
 
+import { useCallback, useEffect, useMemo, useState } from "react"
 import {
   ActivityFilters,
   useFindManyActivity,
@@ -7,7 +8,6 @@ import {
 import { TableErrorState } from "@/components/ui/fallbacks"
 import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
-import { useCallback, useEffect, useMemo, useState } from "react"
 import { activityLogColumn } from "./activity-log-column"
 import { ActivityLogSkeleton } from "./activity-log-skeleton"
 
@@ -16,18 +16,17 @@ interface ActivityLogClientProps {
 }
 
 export const ActivityLogClient = ({ userId }: ActivityLogClientProps) => {
+  const [searchValue, setSearchValue] = useState("")
+  const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState<ActivityFilters>({
     page: 1,
     limit: 10,
     ...(userId && { userId }),
   })
 
-  const [searchValue, setSearchValue] = useState("")
-  const [showFilters, setShowFilters] = useState(false)
-
   const debouncedSearch = useDebounce(searchValue, 500)
 
-  const finalFilters = useMemo(
+  const queryFilters = useMemo(
     () => ({
       ...filters,
       search: debouncedSearch || undefined,
@@ -42,74 +41,67 @@ export const ActivityLogClient = ({ userId }: ActivityLogClientProps) => {
     error,
     refetch,
     isFetching,
-  } = useFindManyActivity(finalFilters)
-
-  const isLoadingData = isLoading || isFetching
-
-  const transformedData = useMemo(() => {
-    if (!activityResponse?.data) return []
-    return activityResponse.data
-  }, [activityResponse?.data])
+  } = useFindManyActivity(queryFilters)
 
   useEffect(() => {
-    if (debouncedSearch !== searchValue) return
-    if (filters.page !== 1 && debouncedSearch !== filters.search) {
+    if (debouncedSearch !== undefined && debouncedSearch !== filters.search) {
       setFilters((prev) => ({ ...prev, page: 1 }))
     }
-  }, [debouncedSearch, filters.page, filters.search, searchValue])
+  }, [debouncedSearch, filters.search])
 
-  const updateFilters = useCallback((newFilters: Partial<ActivityFilters>) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...newFilters,
-      page:
-        newFilters.page ??
-        (Object.keys(newFilters).some((key) => key !== "page") ? 1 : prev.page),
-    }))
-  }, [])
-
-  const handleSearch = useCallback((value: string) => {
+  const handleSearchChange = useCallback((value: string) => {
     setSearchValue(value)
   }, [])
 
-  const goToPage = useCallback(
-    (page: number) => {
-      updateFilters({ page })
+  const handleUpdateFilters = useCallback(
+    (newFilters: Partial<ActivityFilters>) => {
+      setFilters((prev) => ({
+        ...prev,
+        ...newFilters,
+        page: newFilters.page ?? prev.page,
+      }))
     },
-    [updateFilters],
+    [],
   )
 
-  const goToFirstPage = useCallback(() => goToPage(1), [goToPage])
-  const goToLastPage = useCallback(() => {
-    if (activityResponse?.meta.totalPages) {
-      goToPage(activityResponse.meta.totalPages)
-    }
-  }, [goToPage, activityResponse?.meta.totalPages])
-
-  const goToPreviousPage = useCallback(() => {
-    if (activityResponse?.meta.hasPrevPage) {
-      goToPage((filters.page ?? 1) - 1)
-    }
-  }, [goToPage, filters.page, activityResponse?.meta.hasPrevPage])
-
-  const goToNextPage = useCallback(() => {
-    if (activityResponse?.meta.hasNextPage) {
-      goToPage((filters.page ?? 1) + 1)
-    }
-  }, [goToPage, filters.page, activityResponse?.meta.hasNextPage])
-
-  const handlePageSizeChange = useCallback(
-    (newLimit: number) => {
-      updateFilters({ limit: newLimit, page: 1 })
-    },
-    [updateFilters],
-  )
-
-  const resetFilters = useCallback(() => {
+  const handleResetFilters = useCallback(() => {
+    setSearchValue("")
     const baseFilters = { page: 1, limit: 10 }
     setFilters(userId ? { ...baseFilters, userId } : baseFilters)
-    setSearchValue("")
   }, [userId])
+
+  const handlePageSizeChange = useCallback((newLimit: number) => {
+    setFilters((prev) => ({ ...prev, limit: newLimit, page: 1 }))
+  }, [])
+
+  const handleGoToPage = useCallback((page: number) => {
+    setFilters((prev) => ({ ...prev, page }))
+  }, [])
+
+  const handleGoToFirstPage = useCallback(
+    () => handleGoToPage(1),
+    [handleGoToPage],
+  )
+
+  const handleGoToPreviousPage = useCallback(() => {
+    const currentPage = filters.page || 1
+    if (currentPage > 1) {
+      handleGoToPage(currentPage - 1)
+    }
+  }, [handleGoToPage, filters.page])
+
+  const handleGoToNextPage = useCallback(() => {
+    const currentPage = filters.page || 1
+    const totalPages = activityResponse?.meta.totalPages || 1
+    if (currentPage < totalPages) {
+      handleGoToPage(currentPage + 1)
+    }
+  }, [handleGoToPage, filters.page, activityResponse?.meta.totalPages])
+
+  const handleGoToLastPage = useCallback(() => {
+    const totalPages = activityResponse?.meta.totalPages || 1
+    handleGoToPage(totalPages)
+  }, [handleGoToPage, activityResponse?.meta.totalPages])
 
   const activeFiltersCount = useMemo(() => {
     let count = 0
@@ -119,7 +111,14 @@ export const ActivityLogClient = ({ userId }: ActivityLogClientProps) => {
     if (filters.action) count++
     if (debouncedSearch) count++
     return count
-  }, [filters, debouncedSearch, userId])
+  }, [
+    filters.startDate,
+    filters.endDate,
+    filters.userId,
+    filters.action,
+    debouncedSearch,
+    userId,
+  ])
 
   if (isLoading) {
     return <ActivityLogSkeleton />
@@ -129,45 +128,39 @@ export const ActivityLogClient = ({ userId }: ActivityLogClientProps) => {
     return <TableErrorState error={error} onRetry={() => refetch()} />
   }
 
-  const currentPage = activityResponse?.meta.page || 1
-  const totalPages = activityResponse?.meta.totalPages || 1
-  const totalItems = activityResponse?.meta.totalItems || 0
-  const hasNextPage = activityResponse?.meta.hasNextPage || false
-  const hasPrevPage = activityResponse?.meta.hasPrevPage || false
-
   return (
     <div className="mt-2 space-y-4">
       <DataTable
         columns={activityLogColumn}
-        data={transformedData}
+        data={activityResponse?.data || []}
         placeholder="Search activities..."
-        isLoading={isLoadingData}
-        onRefetch={refetch}
-        isFetching={isLoadingData}
+        isLoading={isLoading || isFetching}
         isDynamic={true}
+        onRefetch={() => refetch()}
+        isFetching={isFetching}
+        filterType="activities"
         searchValue={searchValue}
-        onSearchChange={handleSearch}
+        onSearchChange={handleSearchChange}
         showFilters={showFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
         activeFiltersCount={activeFiltersCount}
         filters={filters}
-        onUpdateFilters={updateFilters}
-        onResetFilters={resetFilters}
+        onUpdateFilters={handleUpdateFilters}
+        onResetFilters={handleResetFilters}
         onClose={() => setShowFilters(false)}
-        totalItems={totalItems}
-        currentDataLength={activityResponse?.data.length || 0}
-        currentPage={currentPage}
-        totalPages={totalPages}
+        totalItems={activityResponse?.meta.totalItems || 0}
+        currentDataLength={activityResponse?.data?.length || 0}
+        currentPage={filters.page || 1}
+        totalPages={activityResponse?.meta.totalPages || 1}
         limit={filters.limit || 10}
         onPageSizeChange={handlePageSizeChange}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
-        onGoToFirstPage={goToFirstPage}
-        onGoToPreviousPage={goToPreviousPage}
-        onGoToNextPage={goToNextPage}
-        onGoToLastPage={goToLastPage}
-        onGoToPage={goToPage}
-        filterType="activities"
+        hasNextPage={activityResponse?.meta.hasNextPage || false}
+        hasPrevPage={activityResponse?.meta.hasPrevPage || false}
+        onGoToFirstPage={handleGoToFirstPage}
+        onGoToPreviousPage={handleGoToPreviousPage}
+        onGoToNextPage={handleGoToNextPage}
+        onGoToLastPage={handleGoToLastPage}
+        onGoToPage={handleGoToPage}
         resultLabel="activities"
       />
     </div>

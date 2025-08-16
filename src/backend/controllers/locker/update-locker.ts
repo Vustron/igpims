@@ -1,3 +1,5 @@
+import { eq, sql } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 import { locker } from "@/backend/db/schemas"
 import { activityLogger } from "@/backend/helpers/activity-logger"
 import { sendLockerEmail } from "@/backend/helpers/send-email"
@@ -10,8 +12,6 @@ import { catchError } from "@/utils/catch-error"
 import { toTimestamp } from "@/utils/date-convert"
 import { requestJson } from "@/utils/request-json"
 import { LockerConfig, lockerConfigSchema } from "@/validation/locker"
-import { eq, sql } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function updateLocker(
   request: NextRequest,

@@ -1,5 +1,9 @@
 "use client"
 
+import { upload } from "@imagekit/next"
+import { FileText, Upload } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import toast from "react-hot-toast"
 import { useUpdateIgp } from "@/backend/actions/igp/update-igp"
 import { getImagekitUploadAuth } from "@/backend/actions/imagekit-api/upload-auth"
 import { Button } from "@/components/ui/buttons"
@@ -22,10 +26,6 @@ import {
 import { isIgpData, useDialog } from "@/hooks/use-dialog"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { catchError } from "@/utils/catch-error"
-import { upload } from "@imagekit/next"
-import { FileText, Upload } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import toast from "react-hot-toast"
 import { PDFViewer } from "../pdf/pdf-viewer"
 
 export const CreateResolutionDialog = () => {

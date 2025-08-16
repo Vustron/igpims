@@ -1,11 +1,8 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
 
   // imports section
-
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
 
   // formatter section
   "formatter": {
@@ -34,7 +31,8 @@
         "useExhaustiveDependencies": "off",
         "noPrecisionLoss": "error",
         "noUnusedVariables": "off",
-        "useArrayLiterals": "off"
+        "noNestedComponentDefinitions": "off",
+        "useUniqueElementIds": "off"
       },
       "style": {
         "noInferrableTypes": "off",
@@ -43,7 +41,8 @@
         "useBlockStatements": "off",
         "useConsistentArrayType": "warn",
         "noNonNullAssertion": "off",
-        "useImportType": "off"
+        "useImportType": "off",
+        "useArrayLiterals": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off",
@@ -51,11 +50,14 @@
         "noExtraNonNullAssertion": "error",
         "noMisleadingInstantiator": "error",
         "noUnsafeDeclarationMerging": "error",
-        "useAwait": "off"
+        "useAwait": "off",
+        "useIterableCallbackReturn": "off",
+        "noUnknownAtRules": "off"
       },
       "a11y": {
         "noSvgWithoutTitle": "off",
-        "useFocusableInteractive": "off"
+        "useFocusableInteractive": "off",
+        "useSemanticElements": "off"
       },
       "security": {
         "noDangerouslySetInnerHtml": "off"
@@ -97,7 +99,7 @@
   // overrides section
   "overrides": [
     {
-      "include": ["*.json"],
+      "includes": ["**/*.json"],
       "formatter": {
         "indentWidth": 2
       }

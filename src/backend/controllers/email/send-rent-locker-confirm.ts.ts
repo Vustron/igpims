@@ -1,3 +1,6 @@
+import { render } from "@react-email/components"
+import { format } from "date-fns"
+import { NextRequest, NextResponse } from "next/server"
 import { activityLogger } from "@/backend/helpers/activity-logger"
 import { checkAuth } from "@/backend/middlewares/check-auth"
 import { httpRequestLimit } from "@/backend/middlewares/http-request-limit"
@@ -7,9 +10,6 @@ import { transporter } from "@/config/nodemailer"
 import { catchError } from "@/utils/catch-error"
 import { requestJson } from "@/utils/request-json"
 import { lockerRentRecipientSchema } from "@/validation/email"
-import { render } from "@react-email/components"
-import { format } from "date-fns"
-import { NextRequest, NextResponse } from "next/server"
 
 export async function sendRentLockerConfirm(
   request: NextRequest,

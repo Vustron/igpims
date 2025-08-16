@@ -1,9 +1,9 @@
 "use client"
 
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { UserFilters, useFindManyUser } from "@/backend/actions/user/find-many"
 import { DataTable } from "@/components/ui/tables"
 import { useDebounce } from "@/hooks/use-debounce"
-import { useCallback, useEffect, useMemo, useState } from "react"
 import { usersColumns } from "./users-column"
 
 export const UsersClient = () => {
